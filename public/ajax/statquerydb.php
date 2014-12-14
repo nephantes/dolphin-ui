@@ -3,7 +3,8 @@
 error_reporting(E_ALL);
 ini_set('report_errors','on');
 
-require_once("dbfuncs.php");
+require_once("../../config/config.php");
+require_once("../../includes/dbfuncs.php");
 
 $query = new dbfuncs();
 

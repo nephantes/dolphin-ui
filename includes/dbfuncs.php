@@ -1,10 +1,5 @@
 <?php
 class dbfuncs {
-   private $dbhost       = "localhost";
-   private $db           = "biocore";
-   private $dbuser       = "biocore";
-   private $dbpass       = "biocore2013";
-
    function test()
    {
       return "[HERE]";
@@ -12,7 +7,7 @@ class dbfuncs {
    
    function runSQL($sql)
    {
-        $link = new mysqli($this->dbhost, $this->dbuser, $this->dbpass, $this->db);
+        $link = new mysqli(DB_HOST, DB_USER, DB_PASSWORD, DB_NAME);
         // check connection
         if (mysqli_connect_errno()) {
                 exit('Connect failed: '. mysqli_connect_error());
