@@ -1,16 +1,17 @@
 <?php
 class Ngsimport extends Model {
     private $series_id;
-    private $username;
+    public $username;
     private $worksheet;
     private $sheetData;
-    private $dir;
+    public $fastq_dir;
+    public $backup_dir;
+    public $amazon_bucket;
 
     function parseExcel($dir, $worksheet, $sheetData) {
         $this->worksheet=$worksheet;
         $this->sheetData=$sheetData;
-        $this->dir=$dir;
-        
+	
         $text='<li>'.$this->worksheet['worksheetName'].'<br />';
                                 
         $text.='Rows: '.$this->worksheet['totalRows'].' Columns: '.$this->worksheet['totalColumns'].'<br />';
@@ -41,19 +42,27 @@ class Ngsimport extends Model {
     function getMeta() {
         //var_dump($sheetData);
         $conts=[];
+	
         for ($i=1;$i<=$this->worksheet['totalRows'];$i++)
         {
            if($this->sheetData[$i]["A"]=="title"){$experiment_name=$this->sheetData[$i]["B"];}
            if($this->sheetData[$i]["A"]=="summary"){$summary=$this->sheetData[$i]["B"];}
            if($this->sheetData[$i]["A"]=="overall design"){$design=$this->sheetData[$i]["B"];}
            if($this->sheetData[$i]["A"]=="contributor"){array_push($conts, $this->sheetData[$i]["B"]);}
+	   if($this->sheetData[$i]["A"]=="fastq directory"){$this->fastq_dir=$this->sheetData[$i]["B"];}
+	   if($this->sheetData[$i]["A"]=="backup directory"){$this->backup_dir=$this->sheetData[$i]["B"];}
+	   if($this->sheetData[$i]["A"]=="amazon bucket"){$this->amazon_bucket=$this->sheetData[$i]["B"];}
         }
         $new_series = new series($this, $this->username, $experiment_name,$summary,$design);
         $this->series_id=$new_series->getId();
         $text="SERIES:".$new_series->getStat()."<BR>";
-        $new_conts = new contributors($this, $this->username, $this->series_id, $conts);       
+        $new_conts = new contributors($this, $this->username, $this->series_id, $conts);
+        $text.= "CONT:".$new_conts->getStat()."<BR>";
+	if (isset($this->fastq_dir)){
+	    $new_dirs = new dirs($this);
+	    $text.= "DIRS:".$new_dirs->getStat()."<BR>";
+	}
 
-        $text.= "CONT:".$new_conts->getStat()."<BR>"; 
 	return $text;
     }
     
@@ -192,6 +201,7 @@ class main{
     public $model;
     public $insert=0;
     public $update=0;
+    public $sql;
     
     function process($my) {        
         return ($my->getId()>0 ? $my->update(): $my->insert()); 
@@ -308,7 +318,6 @@ class lane{}
 class lanes extends main{
     private $lane_arr=[];
     private $series_id;
-    private $sql;
 
     function __construct($model, $username, $series_id, $lane_arr = [])
     {
@@ -434,7 +443,6 @@ class sample{}
 class samples extends main{
     private $sample_arr=[];
     private $series_id;
-    private $sql;
 
     function __construct($model, $username, $series_id, $sample_arr = [])
     {
@@ -558,12 +566,14 @@ class characteristics extends main{
         $sql="select id from biocore.ngs_samples where `name`='$name'";
         return $this->model->query($sql,1);
     }
+
     function getId($tag)
     {
         $sample_id = $this->getSampleId($tag->sample_name);
         $sql="select id from biocore.ngs_characteristics where `sample_id` = $sample_id and `tag`='$tag->tag'";
         return $this->model->query($sql,1);
     }
+
     function insert($tag)
     {
         $sample_id = $this->getSampleId($tag->sample_name);
@@ -585,8 +595,7 @@ class characteristics extends main{
 }
 
 
-
-/* characteristics class */
+/* files class */
 class file{}
 class files extends main{
     private $files_arr=[];
@@ -619,6 +628,12 @@ class files extends main{
         $sql="select id from biocore.ngs_samples where `name`='$name'";
         return $this->model->query($sql,1);
     }
+    function getDirId($model)
+    {
+        $sql="select id from biocore.ngs_dirs where `fastq_dir`='$model->fastq_dir'";
+        return $this->model->query($sql,1);
+    }
+
     function getId($file)
     {
         $sql="select id from biocore.ngs_fastq_files where `file_name`='$file->file_name'";
@@ -630,15 +645,15 @@ class files extends main{
         $sample_id = $this->getSampleId($file->name);
 	$lane_id=0;
         $lane_id = ($sample_id==0 ? $this->getLaneId($file->name) : $this->getLaneIdFromSample($file->name));
-	
+	$dir_id = $this->getDirId($this->model);
         
         $sql="INSERT INTO `biocore`.`ngs_fastq_files`
             (`file_name`, `checksum`,
-            `sample_id`, `lane_id`,
+            `sample_id`, `lane_id`, `dir_id`,
             `date_created`, `date_modified`,`last_modified_user`)
             VALUES
             ('$file->file_name', '$file->checksum', '$sample_id',
-            '$lane_id', now(), now(), '$this->username');";
+            '$lane_id', '$dir_id', now(), now(), '$this->username');";
         $this->insert++;
         //return $sql;
         return $this->model->query($sql);
@@ -660,6 +675,52 @@ class files extends main{
     }
 }
 
+/* diretories for the files class */
+class dirs extends main{
+    
+    function __construct($model)
+    {
+        $this->model=$model;
+	$this->process($this);
+    }
+
+    function getSQL()
+    {
+        return $this->sql;
+    }
+    
+    function getStat()
+    {
+        return "Update:$this->update, Insert:$this->insert";
+    }
+    
+    function getId()
+    {
+        $sql="select id from biocore.ngs_dirs where `fastq_dir`='".$this->model->fastq_dir."'";
+        return $this->model->query($sql,1);
+    }
+    
+    function insert()
+    {
+
+        $sql=" INSERT INTO `biocore`.`ngs_dirs`(`fastq_dir`,  `backup_dir`, `amazon_bucket`, `date_created`, `date_modified`, `last_modified_user`)
+                 VALUES('".$this->model->fastq_dir."', '".$this->model->backup_dir."', '".$this->model->amazon_bucket."', now(), now(), '".$this->model->username."');";
+        $this->insert++;
+	$this->sql=$sql;
+        return $this->model->query($sql);
+    }
+    
+    function update()
+    {
+        $sql="update `biocore`.`ngs_dirs` set
+	      `backup_dir`='".$this->model->backup_dir."', `amazon_bucket`='".$this->model->amazon_bucket."',
+	      `date_modified`=now(), `last_modified_user`= '".$this->model->username."'
+               where `id` = ".$this->getId();
+        $this->update++;
+
+        return $this->model->query($sql);
+    }
+}
 
 
 

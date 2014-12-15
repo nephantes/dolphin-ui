@@ -14,14 +14,15 @@
                 <section class="content">
                     <div class="row">
                         <div class="col-md-6">
-                             <?php echo $html->getBoxTable_ng("Experiment Series", "experiment_series", "<th>Name</th><th>Summary</th><th>Design</th><th>Username</th><th>Action</th>"); ?>
-                             <?php echo $html->getBoxTable_ng("Protocols", "protocols", "<th>Name</th><th>Growth</th><th>Treatment</th><th>Username</th><th>Action</th>"); ?>
+                             <?php echo $html->getBoxTable_ng("Experiment Series", "experiment_series", "<th>id</th><th>Name</th><th>Summary</th><th>Design</th><th>Username</th><th>Action</th>"); ?>
+                             <?php echo $html->getBoxTable_ng("Protocols", "protocols", "<th>id</th><th>Name</th><th>Growth</th><th>Treatment</th><th>Username</th><th>Action</th>"); ?>
                         </div><!-- /.col (LEFT) -->
                         <div class="col-md-6">
-                            <?php echo $html->getBoxTable_ng("Lanes", "lanes", "<th>Lane name</th><th>Facility</th><th>Total Reads</th><th>Username</th><th>Action</th>"); ?>
-                            <?php echo $html->getBoxTable_ng("Samples", "samples", "<th>Sample Name</th><th>title</th><th>organism</th><th>Username</th><th>Action</th>"); ?>
-
+                            <?php echo $html->getBoxTable_ng("Lanes", "lanes", "<th>id</th><th>Lane name</th><th>Facility</th><th>Total Reads</th><th>Total Samples</th><th>Action</th>"); ?>
+                            <?php echo $html->getBoxTable_ng("Samples", "samples", "<th>id</th><th>Title</th><th>Source</th><th>Organism</th><th>Read length</th><th>Action</th>"); ?>
                         </div><!-- /.col (RIGHT) -->
                     </div><!-- /.row -->
                 </section><!-- /.content -->
+                
+                
 

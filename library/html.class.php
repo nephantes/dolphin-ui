@@ -46,7 +46,15 @@ class HTML {
 
    function getBoxTable_ng($title, $table, $fields)
    {
-      $html='
+      $html='		       <style>
+				 
+				 .table {margin:0 auto; border-collapse:separate;}
+				 .table thead {display:block}
+				 
+				 .table tbody {height:300px;overflow-y:scroll;display:block}
+  
+				</style>
+			
                               <div class="box">
                                 <div class="box-header">
                                    <h3 class="box-title">'.$title.' Table</h3>
@@ -58,20 +66,18 @@ range"><i class="fa fa-calendar"></i></button>
                                    </div><!-- /. tools -->
                                </div><!-- /.box-header -->
                                <div class="box-body table-responsive">
-                                <table id="jsontable_'.$table.'" class="table table-bordered table-striped" cellspacing="0" width="100%">
+                                <table id="jsontable_'.$table.'" class="table table-bordered table-striped table-condensed table-scrollable" cellspacing="0" width="100%">
                                    <thead>
                                       <tr>
                                           '.$fields.'
                                       </tr>
                                   </thead>
-                                  <tfoot>
-                                     <tr>
-                                          '.$fields.'
-                                     </tr>
-                                 </tfoot>
+
                                  </table>
                             </div><!-- /.box-body -->
                             </div><!-- /.box -->
+			    
+			   
       ';
       return $html;
    }
