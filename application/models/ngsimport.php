@@ -45,13 +45,13 @@ class Ngsimport extends Model {
 	
         for ($i=1;$i<=$this->worksheet['totalRows'];$i++)
         {
-           if($this->sheetData[$i]["A"]=="title"){$experiment_name=$this->sheetData[$i]["B"];}
-           if($this->sheetData[$i]["A"]=="summary"){$summary=$this->sheetData[$i]["B"];}
-           if($this->sheetData[$i]["A"]=="overall design"){$design=$this->sheetData[$i]["B"];}
-           if($this->sheetData[$i]["A"]=="contributor"){array_push($conts, $this->sheetData[$i]["B"]);}
-	   if($this->sheetData[$i]["A"]=="fastq directory"){$this->fastq_dir=$this->sheetData[$i]["B"];}
-	   if($this->sheetData[$i]["A"]=="backup directory"){$this->backup_dir=$this->sheetData[$i]["B"];}
-	   if($this->sheetData[$i]["A"]=="amazon bucket"){$this->amazon_bucket=$this->sheetData[$i]["B"];}
+           if($this->sheetData[$i]["A"]=="title"){$experiment_name=$this->esc($this->sheetData[$i]["B"]);}
+           if($this->sheetData[$i]["A"]=="summary"){$summary=$this->esc($this->sheetData[$i]["B"]);}
+           if($this->sheetData[$i]["A"]=="overall design"){$design=$this->esc($this->sheetData[$i]["B"]);}
+           if($this->sheetData[$i]["A"]=="contributor"){array_push($conts, $this->esc($this->sheetData[$i]["B"]));}
+	   if($this->sheetData[$i]["A"]=="fastq directory"){$this->fastq_dir=$this->esc($this->sheetData[$i]["B"]);}
+	   if($this->sheetData[$i]["A"]=="backup directory"){$this->backup_dir=$this->esc($this->sheetData[$i]["B"]);}
+	   if($this->sheetData[$i]["A"]=="amazon bucket"){$this->amazon_bucket=$this->esc($this->sheetData[$i]["B"]);}
         }
         $new_series = new series($this, $this->username, $experiment_name,$summary,$design);
         $this->series_id=$new_series->getId();
@@ -73,17 +73,17 @@ class Ngsimport extends Model {
            $lane = new lane();
            for ($j='A';$j<=$this->worksheet['lastColumnLetter'];$j++)
            {              
-              if($this->sheetData[3][$j]=="Lane name"){$lane->name=$this->sheetData[$i][$j];}
-              if($this->sheetData[3][$j]=="Sequencing facility"){$lane->facility=$this->sheetData[$i][$j];}
-              if($this->sheetData[3][$j]=="Cost"){$lane->cost=$this->sheetData[$i][$j];}
-              if($this->sheetData[3][$j]=="Date submitted"){$lane->date_submitted=$this->sheetData[$i][$j];}
-              if($this->sheetData[3][$j]=="Date received"){$lane->date_received=$this->sheetData[$i][$j];}
-              if($this->sheetData[3][$j]=="Total reads"){$lane->total_reads=$this->sheetData[$i][$j];}
-              if($this->sheetData[3][$j]=="% PhiX requested"){$lane->phix_requested=$this->sheetData[$i][$j];}
-              if($this->sheetData[3][$j]=="% PhiX in lane"){$lane->phix_in_lane=$this->sheetData[$i][$j];} 
-              if($this->sheetData[3][$j]=="# of Samples"){$lane->total_samples=$this->sheetData[$i][$j];}
-              if($this->sheetData[3][$j]=="Resequenced?"){$lane->resequenced=$this->sheetData[$i][$j];}
-              if($this->sheetData[3][$j]=="Notes"){$lane->notes=$this->sheetData[$i][$j];}
+              if($this->sheetData[3][$j]=="Lane name"){$lane->name=$this->esc($this->sheetData[$i][$j]);}
+              if($this->sheetData[3][$j]=="Sequencing facility"){$lane->facility=$this->esc($this->sheetData[$i][$j]);}
+              if($this->sheetData[3][$j]=="Cost"){$lane->cost=$this->esc($this->sheetData[$i][$j]);}
+              if($this->sheetData[3][$j]=="Date submitted"){$lane->date_submitted=$this->esc($this->sheetData[$i][$j]);}
+              if($this->sheetData[3][$j]=="Date received"){$lane->date_received=$this->esc($this->sheetData[$i][$j]);}
+              if($this->sheetData[3][$j]=="Total reads"){$lane->total_reads=$this->esc($this->sheetData[$i][$j]);}
+              if($this->sheetData[3][$j]=="% PhiX requested"){$lane->phix_requested=$this->esc($this->sheetData[$i][$j]);}
+              if($this->sheetData[3][$j]=="% PhiX in lane"){$lane->phix_in_lane=$this->esc($this->sheetData[$i][$j]);} 
+              if($this->sheetData[3][$j]=="# of Samples"){$lane->total_samples=$this->esc($this->sheetData[$i][$j]);}
+              if($this->sheetData[3][$j]=="Resequenced?"){$lane->resequenced=$this->esc($this->sheetData[$i][$j]);}
+              if($this->sheetData[3][$j]=="Notes"){$lane->notes=$this->esc($this->sheetData[$i][$j]);}
 
               if($lane->name){$lane_arr[$lane->name]=$lane;}
 
@@ -104,12 +104,12 @@ class Ngsimport extends Model {
            $prot = new prot();
            for ($j='A';$j<=$this->worksheet['lastColumnLetter'];$j++)
            {
-              if($this->sheetData[3][$j]=="protocol name"){$prot->name=$this->sheetData[$i][$j];}
-              if($this->sheetData[3][$j]=="growth protocol"){$prot->growth=$this->sheetData[$i][$j];}
-              if($this->sheetData[3][$j]=="treatment protocol"){$prot->treatment=$this->sheetData[$i][$j];}
-              if($this->sheetData[3][$j]=="extract protocol"){$prot->extraction=$this->sheetData[$i][$j];}
-              if($this->sheetData[3][$j]=="library construction protocol"){$prot->library_construction=$this->sheetData[$i][$j];}
-              if($this->sheetData[3][$j]=="library strategy"){$prot->library_strategy=$this->sheetData[$i][$j];}
+              if($this->sheetData[3][$j]=="protocol name"){$prot->name= $this->esc($this->sheetData[$i][$j]);}
+              if($this->sheetData[3][$j]=="growth protocol"){$prot->growth= $this->esc($this->sheetData[$i][$j]);}
+              if($this->sheetData[3][$j]=="treatment protocol"){$prot->treatment= $this->esc($this->sheetData[$i][$j]);}
+              if($this->sheetData[3][$j]=="extract protocol"){$prot->extraction= $this->esc($this->sheetData[$i][$j]);}
+              if($this->sheetData[3][$j]=="library construction protocol"){$prot->library_construction= $this->esc($this->sheetData[$i][$j]);}
+              if($this->sheetData[3][$j]=="library strategy"){$prot->library_strategy= $this->esc($this->sheetData[$i][$j]);}
 
               if($prot->name){$prot_arr[$prot->name]=$prot;}
            }
@@ -130,24 +130,24 @@ class Ngsimport extends Model {
            $tag = new tag();
            for ($j='A';$j<=$this->worksheet['lastColumnLetter'];$j++)
            {
-              if($this->sheetData[3][$j]=="Sample name"){$samp->name=$this->sheetData[$i][$j];}
-              if($this->sheetData[3][$j]=="Lane name"){$samp->lane_name=$this->sheetData[$i][$j];}
-              if($this->sheetData[3][$j]=="Protocol name"){$samp->protocol_name=$this->sheetData[$i][$j];}
-              if($this->sheetData[3][$j]=="barcode"){$samp->barcode=$this->sheetData[$i][$j];}
-              if($this->sheetData[3][$j]=="title"){$samp->title=$this->sheetData[$i][$j];}
-              if($this->sheetData[3][$j]=="source name"){$samp->source=$this->sheetData[$i][$j];}
-              if($this->sheetData[3][$j]=="organism"){$samp->organism=$this->sheetData[$i][$j];}
-              if($this->sheetData[3][$j]=="molecule"){$samp->molecule=$this->sheetData[$i][$j];}
-              if($this->sheetData[3][$j]=="description"){$samp->description=$this->sheetData[$i][$j];}
-              if($this->sheetData[3][$j]=="instrument model"){$samp->instrument_model=$this->sheetData[$i][$j];} 
-              if($this->sheetData[3][$j]=="average insert size"){$samp->avg_insert_size=$this->sheetData[$i][$j];}
-              if($this->sheetData[3][$j]=="read length"){$samp->read_length=$this->sheetData[$i][$j];}
-              if($this->sheetData[3][$j]=="Genotype"){$samp->genotype=$this->sheetData[$i][$j];}
-              if($this->sheetData[3][$j]=="Condition"){$samp->condition=$this->sheetData[$i][$j];}
-              if($this->sheetData[3][$j]=="Library type"){$samp->library_type=$this->sheetData[$i][$j];}
-              if($this->sheetData[3][$j]=="3' Adapter sequence"){$samp->adapter=$this->sheetData[$i][$j];}
-              if($this->sheetData[3][$j]=="Notebook reference"){$samp->notebook_ref=$this->sheetData[$i][$j];}
-              if($this->sheetData[3][$j]=="Notes"){$samp->notes=$this->sheetData[$i][$j];}
+              if($this->sheetData[3][$j]=="Sample name"){$samp->name=$this->esc($this->sheetData[$i][$j]);}
+              if($this->sheetData[3][$j]=="Lane name"){$samp->lane_name=$this->esc($this->sheetData[$i][$j]);}
+              if($this->sheetData[3][$j]=="Protocol name"){$samp->protocol_name=$this->esc($this->sheetData[$i][$j]);}
+              if($this->sheetData[3][$j]=="barcode"){$samp->barcode=$this->esc($this->sheetData[$i][$j]);}
+              if($this->sheetData[3][$j]=="title"){$samp->title=$this->esc($this->sheetData[$i][$j]);}
+              if($this->sheetData[3][$j]=="source name"){$samp->source=$this->esc($this->sheetData[$i][$j]);}
+              if($this->sheetData[3][$j]=="organism"){$samp->organism=$this->esc($this->sheetData[$i][$j]);}
+              if($this->sheetData[3][$j]=="molecule"){$samp->molecule=$this->esc($this->sheetData[$i][$j]);}
+              if($this->sheetData[3][$j]=="description"){$samp->description=$this->esc($this->sheetData[$i][$j]);}
+              if($this->sheetData[3][$j]=="instrument model"){$samp->instrument_model=$this->esc($this->sheetData[$i][$j]);} 
+              if($this->sheetData[3][$j]=="average insert size"){$samp->avg_insert_size=$this->esc($this->sheetData[$i][$j]);}
+              if($this->sheetData[3][$j]=="read length"){$samp->read_length=$this->esc($this->sheetData[$i][$j]);}
+              if($this->sheetData[3][$j]=="Genotype"){$samp->genotype=$this->esc($this->sheetData[$i][$j]);}
+              if($this->sheetData[3][$j]=="Condition"){$samp->condition=$this->esc($this->sheetData[$i][$j]);}
+              if($this->sheetData[3][$j]=="Library type"){$samp->library_type=$this->esc($this->sheetData[$i][$j]);}
+              if($this->sheetData[3][$j]=="3' Adapter sequence"){$samp->adapter=$this->esc($this->sheetData[$i][$j]);}
+              if($this->sheetData[3][$j]=="Notebook reference"){$samp->notebook_ref=$this->esc($this->sheetData[$i][$j]);}
+              if($this->sheetData[3][$j]=="Notes"){$samp->notes=$this->esc($this->sheetData[$i][$j]);}
 
               $valid = "/^characteristics:\s+?(.*)/";
               
@@ -179,10 +179,9 @@ class Ngsimport extends Model {
            $file = new file();
            for ($j='A';$j<=$this->worksheet['lastColumnLetter'];$j++)
            {
-              if($this->sheetData[3][$j]=="Sample or Lane Name (Enter same name for multiple files)"){$file->name=$this->sheetData[$i][$j];}
-              if($this->sheetData[3][$j]=="file name(comma separated for paired ends)"){$file->file_name=$this->sheetData[$i][$j
-];}
-              if($this->sheetData[3][$j]=="file checksum"){$file->checksum=$this->sheetData[$i][$j];}
+              if($this->sheetData[3][$j]=="Sample or Lane Name (Enter same name for multiple files)"){$file->name=$this->esc($this->sheetData[$i][$j]);}
+              if($this->sheetData[3][$j]=="file name(comma separated for paired ends)"){$file->file_name=$this->esc($this->sheetData[$i][$j]);}
+              if($this->sheetData[3][$j]=="file checksum"){$file->checksum=$this->esc($this->sheetData[$i][$j]);}
             
            }
            if($file->file_name){$file_arr[$file->file_name]=$file;}

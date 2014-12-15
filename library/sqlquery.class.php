@@ -23,6 +23,11 @@ class SQLQuery {
             return 0;
         }
     }
+
+    function esc($str)
+    {
+      return $this->_dbHandle->real_escape_string($str);
+    }
     
     function selectAll() {
         $query = 'select * from `'.$this->_table.'`';
