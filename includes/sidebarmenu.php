@@ -14,6 +14,13 @@
                             <ul class="treeview-menu">
                                 <li><a href="<?php echo BASE_PATH?>/ngsimport"><i class="fa fa-angle-double-right"></i>Excel Import</a></li>
                                 <li><a href="<?php echo BASE_PATH?>/ngstrack"><i class="fa fa-angle-double-right"></i>NGS Tracking</a></li>
+                                <li><a href="<?php echo BASE_PATH?>/experimentseries"><i class="fa fa-angle-double-right"></i>Series</a></li>
+                                <li><a href="<?php echo BASE_PATH?>/protocols"><i class="fa fa-angle-double-right"></i>Protocols</a></li>
+                                <li><a href="<?php echo BASE_PATH?>/contributors"><i class="fa fa-angle-double-right"></i>Contributors</a></li>
+                                <li><a href="<?php echo BASE_PATH?>/lanes"><i class="fa fa-angle-double-right"></i>Lanes</a></li>
+                                <li><a href="<?php echo BASE_PATH?>/samples"><i class="fa fa-angle-double-right"></i>Samples</a></li>
+                                <li><a href="<?php echo BASE_PATH?>/dirs"><i class="fa fa-angle-double-right"></i>Dirs</a></li>
+                                <li><a href="<?php echo BASE_PATH?>/fastqfiles"><i class="fa fa-angle-double-right"></i>Fastq Files</a></li>
                             </ul>
                         </li>
                         <li class="treeview">
