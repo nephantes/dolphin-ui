@@ -44,12 +44,14 @@ $(document).ready(function() {
                                 "label": "Date Submitted:",
                                 "name": "ngs_lanes.date_submitted",
 				"type": "date",
+				"dateImage" : "/dolphin/public/img/calender.png",
                 		"def": function () { return new Date(); },
                 		dateFormat: $.datepicker.ISO_8601
                         }, {
                                 "label": "Date received:",
                                 "name": "ngs_lanes.date_received",
 				"type": "date",
+				"dateImage" : "/dolphin/public/img/calender.png",
                 		"def": function () { return new Date(); },
                 		dateFormat: $.datepicker.ISO_8601
                         }, {
