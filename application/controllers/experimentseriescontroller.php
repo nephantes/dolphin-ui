@@ -8,13 +8,17 @@ class ExperimentseriesController extends VanillaController {
  
     function index() {
         
-        $this->title="Experiment Series";
-        $this->parenttitle="NGSTrack";
-        $this->parentlink="ngstrack";
-       
-        $this->set('title',$this->title);
-        $this->set('parenttitle',$this->parenttitle);
-        $this->set('parentlink',$this->parentlink);
+        $tablename="ngs_experiment_series";
+        
+        $table = $this->Experimentseries->query("select * from datatables where mainmysql_table='$tablename'");
+        $table = json_decode($table, true);
+        $this->set('table',$table);
+        
+        $res = $this->Experimentseries->query("select * from datatables dt, datafields df where dt.mainmysql_table='$tablename' and df.datatable_id=dt.id");
+        $res = json_decode($res, true);
+        $this->set('fields', $res);
+        
+        
     }
 
     function afterAction() {

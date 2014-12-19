@@ -59,6 +59,112 @@ class HTML {
                 </section>';
 	return $html;
    }
+   
+   function getDataTableFooterContent($fields, $table)
+   {
+     $html='</aside><!-- /.right-side -->
+        </div><!-- ./wrapper -->
+
+
+        <script type="text/javascript" language="javascript" src="//code.jquery.com/jquery-1.11.1.min.js"></script> 
+        <script src="//maxcdn.bootstrapcdn.com/bootstrap/3.2.0/js/bootstrap.min.js" type="text/javascript"></script>
+        <script src="//cdn.datatables.net/1.10.4/js/jquery.dataTables.min.js"></script>
+        <script src="//cdn.datatables.net/plug-ins/725b2a2115b/integration/bootstrap/3/dataTables.bootstrap.js"></script>
+        <script src="//cdn.datatables.net/tabletools/2.2.3/js/dataTables.tableTools.min.js"></script>
+        
+        <!-- AdminLTE App -->
+        <script src="'.BASE_PATH.'/js/AdminLTE/app.js" type="text/javascript"></script>
+
+        <script type="text/javascript" language="javascript" src="'.BASE_PATH.'/js/dataTables/dataTables.editor.js"></script>
+        <script type="text/javascript" language="javascript" src="'.BASE_PATH.'/js/dataTables/resources/syntax/shCore.js"></script>
+        <script type="text/javascript" language="javascript" class="init">
+
+	var editor; // use a global for the submit and return data rendering in the examples
+	
+	function toggleTable() {
+	    var lTable = document.getElementById("descTable");
+	    lTable.style.display = (lTable.style.display == "table") ? "none" : "table";
+	}
+	
+	$(document).ready(function() {
+		editor = new $.fn.dataTable.Editor( {
+			"ajax": "'.$table[0]['ajax'].'",
+			"table": "#'.$table[0]['datatable_name'].'",
+			"fields": [';
+			foreach ($fields as $field):
+			$html.='{
+				"label": "'.$field['title'].':",
+				"name": "'.$field['fieldname'].'"
+			},';
+			endforeach;
+	$html.=']
+		} );
+	
+		$("#'.$table[0]['datatable_name'].'").DataTable( {
+			dom: "Tfrtip",
+			ajax: "'.$table[0]['ajax'].'",
+			columns: [';
+			foreach ($fields as $field):
+			$html.='	{ data: "'.$field['fieldname'].'" },
+			';
+			endforeach;
+	$html.='],
+			tableTools: {
+				sRowSelect: "os",
+				aButtons: [
+					{ sExtends: "editor_create", editor: editor },
+					{ sExtends: "editor_edit",   editor: editor },
+					{ sExtends: "editor_remove", editor: editor }
+				]
+			}
+		} );
+	} );
+	
+		</script>
+	   </body>
+	</html>
+	';
+	return $html;
+   }
+   
+   
+   function getDataTableContent($fields, $datatable_name)
+   {
+	$html='	<div class="container">
+                <!-- Main content -->
+                <section class="content">
+                    <div class="row">
+                        <div class="info">
+                                <a id="descLink" onclick="toggleTable();" href="#">Click </a> to see the description of each field in the table.<br>
+                                <table id="descTable" class="display" style="display:none" cellspacing="0" width="100%">
+                                <thead>
+                                   <tr>
+                                     <th></th>
+                                     <th>Summary</th>
+                                </thead>
+                                <tbody>';
+	foreach ($fields as $field):
+             $html.="<tr><th>".$field['title']."</th><td>".$field['summary']."</td></tr>";
+	endforeach;
+	$html.='			</table>
+				</p>
+                        </div>
+
+                        <table id="'.$datatable_name.'" class="display" cellspacing="0" width="100%">
+                                <thead>
+                                        <tr>';
+	foreach ($fields as $field):
+                $html.="<th>".$field['title']."</th>";
+	endforeach;
+         $html.='                               </tr>
+                                </thead>
+                        </table>
+			
+                    </div><!-- /.row -->
+                </section><!-- /.content -->
+		</div>';
+	return $html;
+   }
 
 
    function getBoxTable_ng($title, $table, $fields)
