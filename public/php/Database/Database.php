@@ -48,7 +48,7 @@ class Database {
 	 *      )
 	 *    </code>
 	 */
-	function __construct( $opts )
+	function __construct( $opts)
 	{
 		$this->query_driver = "DataTables\\Database\\Driver".$opts['type'].'Query';
 		$this->_db = call_user_func($this->query_driver.'::connect', $opts );
@@ -62,8 +62,6 @@ class Database {
 
 	/** @var resource */
 	private $_db = null;
-
-
 
 	/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
 	 * Public methods

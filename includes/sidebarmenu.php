@@ -46,6 +46,17 @@
                                 <i class="fa fa-angle-left pull-right"></i>
                             </a>
                         </li>
+                        <li class="treeview">
+                            <a href="#">
+                                <i class="fa fa-bar-chart-o"></i>
+                                <span>Administration</span>
+                                <i class="fa fa-angle-left pull-right"></i>
+                            </a>
+                            <ul class="treeview-menu">
+                                <li><a href="<?php echo BASE_PATH?>/datatables"><i class="fa fa-angle-double-right"></i>Data Tables</a></li>
+                                <li><a href="<?php echo BASE_PATH?>/datafields"><i class="fa fa-angle-double-right"></i>Data Fields</a></li>
+                            </ul>
+                        </li>
                     </ul>
                 </section>
                 <!-- /.sidebar -->

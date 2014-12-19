@@ -23,7 +23,7 @@ function toggleTable() {
 
 $(document).ready(function() {
         editor = new $.fn.dataTable.Editor( {
-                "ajax": "/dolphin/public/php/contributors.php",
+                "ajax": "/dolphin/public/php/ajax/contributors.php",
                 "table": "#contributors",
                 "fields": [ {
                                 "label": "Series Name:",
@@ -38,7 +38,7 @@ $(document).ready(function() {
 
         $('#contributors').DataTable( {
                 dom: "Tfrtip",
-                ajax: "/dolphin/public/php/contributors.php",
+                ajax: "/dolphin/public/php/ajax/contributors.php",
                 columns: [
                         { data: "ngs_experiment_series.experiment_name" },
                         { data: "ngs_contributors.contributor" },

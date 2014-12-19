@@ -5,7 +5,7 @@
  */
 
 // DataTables PHP library
-include(  dirname(__FILE__)."/DataTables.php" );
+include(  dirname(__FILE__)."/../DataTables.php" );
 
 // Alias Editor classes so they are easy to use
 use
@@ -16,14 +16,15 @@ use
 	DataTables\Editor\Validate;
 
 // Build our Editor instance and process the data coming from _POST
-Editor::inst( $db, 'ngs_protocols' )
+Editor::inst( $db, 'datatables' )
 	->fields(
 		Field::inst( 'name' ),
-		Field::inst( 'growth' ),
-		Field::inst( 'treatment' ),
-		Field::inst( 'extraction' ),
-		Field::inst( 'library_construction' ),
-		Field::inst( 'library_strategy' )
+		Field::inst( 'parent_name' ),
+		Field::inst( 'parent_link' ),
+		Field::inst( 'ajax' ),
+		Field::inst( 'datatable_name' ),
+		Field::inst( 'mainmysql_table' ),
+		Field::inst( 'joined' )
 	)
 	->process( $_POST )
 	->json();

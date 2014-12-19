@@ -25,7 +25,7 @@ function toggleTable() {
 
 $(document).ready(function() {
         editor = new $.fn.dataTable.Editor( {
-                "ajax": "/dolphin/public/php/lanes.php",
+                "ajax": "/dolphin/public/php/ajax/lanes.php",
                 "table": "#lanes",
                 "fields": [ {
                                 "label": "Series Name:",
@@ -90,7 +90,7 @@ $(document).ready(function() {
 
         $('#lanes').DataTable( {
                 dom: "Tfrtip",
-                ajax: "/dolphin/public/php/lanes.php",
+                ajax: "/dolphin/public/php/ajax/lanes.php",
                 columns: [
                         { data: "ngs_experiment_series.experiment_name" },
                         { data: "ngs_lanes.name" },

@@ -1,15 +1,8 @@
-		<!-- Content Header (Page header) -->
-                <section class="content-header">
-                    <h1>
-                        Experiment Series
-                        <small>NGS Tracking</small>
-                    </h1>
-                    <ol class="breadcrumb">
-                        <li><a href="<?php echo BASE_PATH?>"><i class="fa fa-dashboard"></i> Home</a></li>
-                        <li><a href="<?php echo BASE_PATH."/ngstrack"?>"></a>NGS Tracking</li>
-                        <li class="active">Experiment Series</li>
-                    </ol>
-                </section>
+		<?php
+		    
+		    echo $html->getContentHeader($title, $parenttitle, $parentlink);
+		?>
+
 	        <div class="container">
                 <!-- Main content -->
                 <section class="content">
@@ -30,7 +23,7 @@
 				</p>
                         </div>
 
-                        <table id="example" class="display" cellspacing="0" width="100%">
+                        <table id="experimentseries" class="display" cellspacing="0" width="100%">
                                 <thead>
                                         <tr>
                                                 <th>Title</th>
@@ -42,6 +35,5 @@
 			
                     </div><!-- /.row -->
                 </section><!-- /.content -->
-                
-       </div>        
+		</div>        
 

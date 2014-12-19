@@ -4,6 +4,7 @@
 
         <script type="text/javascript" language="javascript" src="//code.jquery.com/jquery-1.11.1.min.js"></script> 
         <script src="//maxcdn.bootstrapcdn.com/bootstrap/3.2.0/js/bootstrap.min.js" type="text/javascript"></script>
+        <script src="//code.jquery.com/ui/1.10.3/jquery-ui.js"></script>
         <script src="//cdn.datatables.net/1.10.4/js/jquery.dataTables.min.js"></script>
         <script src="//cdn.datatables.net/plug-ins/725b2a2115b/integration/bootstrap/3/dataTables.bootstrap.js"></script>
         <script src="//cdn.datatables.net/tabletools/2.2.3/js/dataTables.tableTools.min.js"></script>
@@ -24,40 +25,54 @@ function toggleTable() {
 
 $(document).ready(function() {
         editor = new $.fn.dataTable.Editor( {
-                "ajax": "/dolphin/public/php/ajax/protocols.php",
-                "table": "#protocols",
+                "ajax": "/dolphin/public/php/ajax/datafields.php",
+                "table": "#datafields",
                 "fields": [ {
-                                "label": "Protocol Name:",
-                                "name": "name"
+                                "label": "Datatable:",
+                                "name": "datafields.datatable_id",
+                                "type": "select",
                         }, {
-                                "label": "Growth Protocol:",
-                                "name": "growth"
+                                "label": "Table Name:",
+                                "name": "datafields.tablename",
                         }, {
-                                "label": "Treatment Protocol:",
-                                "name": "treatment"
+                                "label": "Field Name:",
+                                "name": "datafields.fieldname",
                         }, {
-                                "label": "Extract Protocol:",
-                                "name": "extraction"
+                                "label": "title:",
+                                "name": "datafields.summary",
                         }, {
-                                "label": "Library Construction Protocol:",
-                                "name": "library_construction"
+                                "label": "Type:",
+                                "name": "datafields.type",
                         }, {
-                                "label": "Library Strategy:",
-                                "name": "library_strategy"
-                        }
+                                "label": "Len:",
+                                "name": "datafields.len",
+                        }, {
+                                "label": "Joined Table Name:",
+                                "name": "datafields.joinedtablename",
+                        }, {
+                                "label": "Joined Field ID Name:",
+                                "name": "datafields.joinedfieldidname",
+                        }, {
+                                "label": "Joined Target Field:",
+                                "name": "datafields.joinedtargetfield",
+			}
                 ]
         } );
 
-        $('#protocols').DataTable( {
+        $('#datafields').DataTable( {
                 dom: "Tfrtip",
-                ajax: "/dolphin/public/php/ajax/protocols.php",
+                ajax: "/dolphin/public/php/ajax/datafields.php",
                 columns: [
-                        { data: "name" },
-                        { data: "growth" },
-                        { data: "treatment" },
-                        { data: "extraction" },
-                        { data: "library_construction" },
-                        { data: "library_strategy" },
+                        { data: "datatables.mainmysql_table" },
+                        { data: "datafields.tablename" },
+                        { data: "datafields.fieldname" },
+                        { data: "datafields.title" },
+                        { data: "datafields.summary" },
+                        { data: "datafields.type" },
+                        { data: "datafields.len" },
+                        { data: "datafields.joinedtablename" },
+                        { data: "datafields.joinedfieldidname" },
+                        { data: "datafields.joinedtargetfield" },
                 ],
                 tableTools: {
                         sRowSelect: "os",

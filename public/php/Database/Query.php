@@ -775,13 +775,21 @@ class Query {
 	 */
 	protected function _insert()
 	{
+		if (!isset($_SESSION) || !is_array($_SESSION)) session_start();
+
+		$user = $_SESSION['user'];
+		//$prefield= ",date_created, date_modified, last_modified_user ";
+		$prefield= ",date_created, date_modified, last_modified_user ";
+		//$preval= ", now(), now(), '".$user."' ";
+		$preval= ", now(), now(), '".$user."' ";
+
 		$this->_prepare( 
 			'INSERT INTO '
 				.$this->_build_table().' ('
-					.$this->_build_field()
+					.$this->_build_field().$prefield
 				.') '
 			.'VALUES ('
-				.$this->_build_value()
+				.$this->_build_value().$preval
 			.')'
 		);
 
@@ -887,11 +895,15 @@ class Query {
 	 *  @internal
 	 */
 	protected function _update()
-	{
+	{	
+		if (!isset($_SESSION) || !is_array($_SESSION)) session_start();
+
+		$user = $_SESSION['user'];
+		$preset= ", date_modified=now(), last_modified_user='".$user."' ";
 		$this->_prepare( 
 			'UPDATE '
 			.$this->_build_table()
-			.'SET '.$this->_build_set()
+			.'SET '.$this->_build_set().$preset
 			.$this->_build_where()
 		);
 

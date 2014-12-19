@@ -7,8 +7,14 @@ class ExperimentseriesController extends VanillaController {
     }
  
     function index() {
-
-        $this->set('title','Experiment Series');
+        
+        $this->title="Experiment Series";
+        $this->parenttitle="NGSTrack";
+        $this->parentlink="ngstrack";
+       
+        $this->set('title',$this->title);
+        $this->set('parenttitle',$this->parenttitle);
+        $this->set('parentlink',$this->parentlink);
     }
 
     function afterAction() {

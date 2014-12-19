@@ -26,7 +26,7 @@ function toggleTable() {
 
 $(document).ready(function() {
         editor = new $.fn.dataTable.Editor( {
-                "ajax": "/dolphin/public/php/fastqfiles.php",
+                "ajax": "/dolphin/public/php/ajax/fastqfiles.php",
                 "table": "#fastqfiles",
                 "fields": [ {
                                 "label": "Lane Name:",
@@ -49,7 +49,7 @@ $(document).ready(function() {
 
         $('#fastqfiles').DataTable( {
                 dom: "Tfrtip",
-                ajax: "/dolphin/public/php/fastqfiles.php",
+                ajax: "/dolphin/public/php/ajax/fastqfiles.php",
                 columns: [
                         { data: "ngs_lanes.name" },
                         { data: "ngs_samples.name" },

@@ -43,6 +43,23 @@ class HTML {
 		return $data;
 	}
 
+   function getContentHeader($name, $parent_name, $parent_link)
+   {
+	$html='	<!-- Content Header (Page header) -->
+                <section class="content-header">
+                    <h1>
+                        '.$name.'
+                        <small>'.$parent_name.'</small>
+                    </h1>
+                    <ol class="breadcrumb">
+                        <li><a href="'.BASE_PATH.'"><i class="fa fa-dashboard"></i> Home</a></li>
+                        <li><a href="'.BASE_PATH.'/'.$parent_link.'">'.$parent_name.'</a></li>
+                        <li class="active">'.$name.'</li>
+                    </ol>
+                </section>';
+	return $html;
+   }
+
 
    function getBoxTable_ng($title, $table, $fields)
    {
