@@ -7,8 +7,12 @@ class LanesController extends VanillaController {
     }
  
     function index() {
-
-        $this->set('title','Lanes');
+        
+        $tablename="ngs_lanes";
+        
+        $this->set('table',$this->Lane->getDataTable($tablename));
+        $this->set('fields', $this->Lane->getDataFields($tablename));
+          
     }
 
     function afterAction() {

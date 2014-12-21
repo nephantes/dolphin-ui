@@ -7,8 +7,12 @@ class DirsController extends VanillaController {
     }
  
     function index() {
-
-        $this->set('title','Directories');
+        
+        $tablename="ngs_dirs";
+        
+        $this->set('table',$this->Dir->getDataTable($tablename));
+        $this->set('fields', $this->Dir->getDataFields($tablename));
+          
     }
 
     function afterAction() {

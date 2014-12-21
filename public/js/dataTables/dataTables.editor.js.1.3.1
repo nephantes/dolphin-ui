@@ -985,13 +985,12 @@ Editor.display.lightbox = $.extend( true, {}, Editor.models.displayController, {
 
 		self._dte = dte;
 
-
 		var content = self._dom.content;
 		content.children().detach();
 		content
 			.append( append )
 			.append( self._dom.close );
-	
+
 		self._shown = true;
 		self._show( callback );
 	},
@@ -1036,7 +1035,7 @@ Editor.display.lightbox = $.extend( true, {}, Editor.models.displayController, {
 		if ( window.orientation !== undefined ) {
 			$('body').addClass( 'DTED_Lightbox_Mobile' );
 		}
-		
+
 		// Adjust size for the content
 		dom.content.css( 'height', 'auto' );
 		dom.wrapper.css( {
@@ -1092,7 +1091,6 @@ Editor.display.lightbox = $.extend( true, {}, Editor.models.displayController, {
 	"_heightCalc": function () {
 		// Set the max-height for the form content
 		var dom = self._dom;
-		
 		var maxHeight = $(window).height() - (self.conf.windowPadding*2) -
 			$('div.DTE_Header', dom.wrapper).outerHeight() -
 			$('div.DTE_Footer', dom.wrapper).outerHeight();

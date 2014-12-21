@@ -68,9 +68,10 @@ class HTML {
 
         <script type="text/javascript" language="javascript" src="//code.jquery.com/jquery-1.11.1.min.js"></script> 
         <script src="//maxcdn.bootstrapcdn.com/bootstrap/3.2.0/js/bootstrap.min.js" type="text/javascript"></script>
-        <script src="//cdn.datatables.net/1.10.4/js/jquery.dataTables.min.js"></script>
-        <script src="//cdn.datatables.net/plug-ins/725b2a2115b/integration/bootstrap/3/dataTables.bootstrap.js"></script>
-        <script src="//cdn.datatables.net/tabletools/2.2.3/js/dataTables.tableTools.min.js"></script>
+	<script src="//code.jquery.com/ui/1.10.3/jquery-ui.js"></script>
+        <script src="'.BASE_PATH.'/js/dataTables/jquery.dataTables.min.js"></script>
+        <script src="'.BASE_PATH.'/js/dataTables/dataTables.bootstrap.js"></script>
+        <script src="'.BASE_PATH.'/js/dataTables/dataTables.tableTools.min.js"></script>
         
         <!-- AdminLTE App -->
         <script src="'.BASE_PATH.'/js/AdminLTE/app.js" type="text/javascript"></script>
@@ -88,24 +89,32 @@ class HTML {
 	
 	$(document).ready(function() {
 		editor = new $.fn.dataTable.Editor( {
-			"ajax": "'.$table[0]['ajax'].'",
-			"table": "#'.$table[0]['datatable_name'].'",
+			"ajax": "/dolphin/public/php/ajax/lanes.php?t='.$table[0]['tablename'].'",
+			"display": "envelope",
+			"table": "#'.$table[0]['tablename'].'",
 			"fields": [';
+	$usetablename = ($table[0]['joined']) ? $table[0]['tablename'].'.' : '';
 			foreach ($fields as $field):
 			$html.='{
 				"label": "'.$field['title'].':",
-				"name": "'.$field['fieldname'].'"
-			},';
+				"name": "'.$usetablename.$field['fieldname'].'",
+				';
+			$html.=($field['options']!='' ) ? $field['options']:'';
+			$html.=($field['joinedtablename']!="")? '"type": "select"':"";
+			$html.='},';
 			endforeach;
 	$html.=']
 		} );
 	
-		$("#'.$table[0]['datatable_name'].'").DataTable( {
+		$("#'.$table[0]['tablename'].'").DataTable( {
 			dom: "Tfrtip",
-			ajax: "'.$table[0]['ajax'].'",
+			ajax: "/dolphin/public/php/ajax/lanes.php?t='.$table[0]['tablename'].'",
 			columns: [';
 			foreach ($fields as $field):
-			$html.='	{ data: "'.$field['fieldname'].'" },
+			$datafield=($field['joinedtablename']!="")? $field['joinedtablename'].'.'.$field['joinedtargetfield']:$usetablename.$field['fieldname'];
+			
+			$render = ( $field['render']!='' ) ? ",".$field['render']:'';
+			$html.='	{ data: "'.$datafield.'"'.$render.' },
 			';
 			endforeach;
 	$html.='],
@@ -116,9 +125,23 @@ class HTML {
 					{ sExtends: "editor_edit",   editor: editor },
 					{ sExtends: "editor_remove", editor: editor }
 				]
+			},
+			';
+			if ($table[0]['joined']=='1'){
+			$html.='initComplete: function ( settings, json ) {
+			';
+				foreach ($fields as $field):
+				    if ($field['joinedtablename']!="") {
+					$html.='editor.field( "'.$table[0]['tablename'].'.'.$field['fieldname'].'" ).update( json.'.$field['joinedtablename'].' );
+					';
+				    }
+				endforeach;
+			
+			$html.='}';
 			}
-		} );
-	} );
+	$html.='	} );';
+			
+	$html.='} );
 	
 		</script>
 	   </body>
@@ -128,7 +151,7 @@ class HTML {
    }
    
    
-   function getDataTableContent($fields, $datatable_name)
+   function getDataTableContent($fields, $tablename)
    {
 	$html='	<div class="container">
                 <!-- Main content -->
@@ -144,16 +167,17 @@ class HTML {
                                 </thead>
                                 <tbody>';
 	foreach ($fields as $field):
-             $html.="<tr><th>".$field['title']."</th><td>".$field['summary']."</td></tr>";
+		$html.="<tr><th>".$field['title']."</th><td>".$field['summary']."</td></tr>";
 	endforeach;
 	$html.='			</table>
 				</p>
                         </div>
 
-                        <table id="'.$datatable_name.'" class="display" cellspacing="0" width="100%">
+                        <table id="'.$tablename.'" class="display" cellspacing="0" width="100%">
                                 <thead>
                                         <tr>';
 	foreach ($fields as $field):
+
                 $html.="<th>".$field['title']."</th>";
 	endforeach;
          $html.='                               </tr>

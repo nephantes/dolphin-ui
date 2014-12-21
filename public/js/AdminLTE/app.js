@@ -105,7 +105,7 @@ $(function() {
      **/
     function _fix() {
         //Get window height and the wrapper height
-        var height = $(window).height() - $("body > .header").height() - ($("body > .footer").outerHeight() || 0);
+        var height = $(window).height() - $("body > .myheader").height() - ($("body > .footer").outerHeight() || 0);
         $(".wrapper").css("min-height", height + "px");
         var content = $(".wrapper").height();
         //If the wrapper height is greater than the window
@@ -147,7 +147,7 @@ function fix_sidebar() {
 
     //Add slimscroll
     $(".sidebar").slimscroll({
-        height: ($(window).height() - $(".header").height()) + "px",
+        height: ($(window).height() - $(".myheader").height()) + "px",
         color: "rgba(0,0,0,0.2)"
     });
 }

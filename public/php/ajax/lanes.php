@@ -16,38 +16,97 @@ use
 	DataTables\Editor\Validate;
 
 // Build our Editor instance and process the data coming from _POST
-Editor::inst( $db, 'ngs_lanes' )
-	->fields(
-		Field::inst( 'ngs_lanes.name' ),
-		Field::inst( 'ngs_lanes.series_id' )
-		   ->options('ngs_experiment_series', 'id', 'experiment_name'),
-		Field::inst( 'ngs_experiment_series.experiment_name' ),
-		Field::inst( 'ngs_lanes.facility' ),
-		Field::inst( 'ngs_lanes.cost' ),
-		Field::inst( 'ngs_lanes.date_submitted' )
-            		->validator( 'Validate::dateFormat', array(
-                    		"empty" => false,
-                    		"format" => Format::DATE_ISO_8601,
-                    		"message" => "Please enter a date in the format yyyy-mm-dd"
-            		) )
-            		->getFormatter( 'Format::date_sql_to_format', Format::DATE_ISO_8601 )
-            		->setFormatter( 'Format::date_format_to_sql', Format::DATE_ISO_8601 ),
-		Field::inst( 'ngs_lanes.date_received' )
-            		->validator( 'Validate::dateFormat', array(
-                    		"empty" => false,
-                    		"format" => Format::DATE_ISO_8601,
-                    		"message" => "Please enter a date in the format yyyy-mm-dd"
-            		) )
-            		->getFormatter( 'Format::date_sql_to_format', Format::DATE_ISO_8601 )
-            		->setFormatter( 'Format::date_format_to_sql', Format::DATE_ISO_8601 ),
 
-		Field::inst( 'ngs_lanes.total_reads' ),
-		Field::inst( 'ngs_lanes.phix_requested' ),
-		Field::inst( 'ngs_lanes.phix_in_lane' ),
-		Field::inst( 'ngs_lanes.total_samples' ),
-		Field::inst( 'ngs_lanes.resequenced' ),
-		Field::inst( 'ngs_lanes.notes' )
+$tablename=$_GET['t'];
+
+
+        $tables= $db->query( 'select', 'datatables' )
+                ->distinct('true')
+                ->get( 'id' )
+                ->get( 'joined' )
+                ->where( 'datatables.tablename',$tablename,'=' )
+                ->exec()
+                ->fetch();
+        $id=$tables{'id'};
+        $joined=$tables{'joined'};
+        
+        $fields= $db->query( 'select', 'datafields' )
+                ->distinct('true')
+                ->get( '*' )
+                ->where( 'datafields.table_id',$id,'=' )
+                ->exec()
+                ->fetchAll();
+        
+        $field_arr = array();
+
+
+        foreach ($fields as $field):
+            if ($field{'joinedtablename'}=="")
+            {
+               $tablestr=($joined=="1") ?  $tablestr=$tablename.".": "";
+                
+                
+               if ($field{'type'}=='date')
+               {
+                 array_push($field_arr, Field::inst($tablestr.$field{'fieldname'})->validator( 'Validate::dateFormat', array(
+                    		"empty" => false,
+                    		"format" => Format::DATE_ISO_8601,
+                    		"message" => "Please enter a date in the format yyyy-mm-dd"
+            		) )
+            		->getFormatter( 'Format::date_sql_to_format', Format::DATE_ISO_8601 )
+            		->setFormatter( 'Format::date_format_to_sql', Format::DATE_ISO_8601 ));
+               }
+               else
+               {
+                  array_push($field_arr, Field::inst($tablestr.$field{'fieldname'}));
+               }
+            }
+            else
+            {
+                array_push($field_arr, Field::inst($tablename.".".$field{'fieldname'})->options($field{'joinedtablename'}, $field{'joinedfieldidname'} ,$field{'joinedtargetfield'}));
+                array_push($field_arr, Field::inst($field{'joinedtablename'}.".".$field{'joinedtargetfield'}));
+            }
+
+        endforeach;
+        
+        //print_r($field_arr);
+        
+        if ($joined!="1")
+        {
+        Editor::inst( $db, $tablename )
+            ->fields(
+		$field_arr
 	)
-	->leftJoin( 'ngs_experiment_series', 'ngs_experiment_series.id', '=', 'ngs_lanes.series_id' )
 	->process( $_POST )
 	->json();
+        }
+        else
+        {
+        $out = Editor::inst( $db, $tablename );
+        $out=$out->fields($field_arr);
+        foreach ($fields as $field):
+           if ($field{'joinedtablename'}!="")
+           {
+              $out=$out->leftJoin( $field{'joinedtablename'}, $field{'joinedtablename'}.".".$field{'joinedfieldidname'}, '=', $tablename.".".$field{'fieldname'} );
+           }
+        endforeach;
+        $out=$out->process( $_POST )
+        ->data();
+        
+        foreach ($fields as $field):
+           if ($field{'joinedtablename'}!="")
+           {
+            // Get a list of sites for the `select` list
+            $out[$field{'joinedtablename'}] = $db
+              ->selectDistinct( $field{'joinedtablename'}, $field{'joinedfieldidname'}.' as value, '.$field{'joinedtargetfield'}.' as label' )
+              ->fetchAll();
+            }
+        endforeach;
+
+        
+        
+        echo json_encode( $out );
+        }
+    
+        
+        

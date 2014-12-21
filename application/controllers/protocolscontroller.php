@@ -7,8 +7,12 @@ class ProtocolsController extends VanillaController {
     }
  
     function index() {
-
-        $this->set('title','Protocols');
+        
+        $tablename="ngs_protocols";
+        
+        $this->set('table',$this->Protocol->getDataTable($tablename));
+        $this->set('fields', $this->Protocol->getDataFields($tablename));
+          
     }
 
     function afterAction() {

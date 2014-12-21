@@ -8,7 +8,11 @@ class ContributorsController extends VanillaController {
  
     function index() {
 
-        $this->set('title','Contributors');
+        $tablename="ngs_contributors";
+        
+        $this->set('table',$this->Contributor->getDataTable($tablename));
+        $this->set('fields', $this->Contributor->getDataFields($tablename));
+        
     }
 
     function afterAction() {

@@ -76,7 +76,17 @@ class SQLQuery {
          }
        }
     }
-
+    /** Get data table **/
+    function getDataTable($tablename) {
+        $table = $this->query("select * from datatables where tablename='$tablename'");
+        return json_decode($table, true);
+    }
+    /** Get data fields **/
+    function getDataFields($tablename) {
+        $fields = $this->query("select * from datatables dt, datafields df where dt.tablename='$tablename' and df.table_id=dt.id");
+        return json_decode($fields, true);
+    }
+	
     /** Get number of rows **/
     function getNumRows() {
         return $this->_result->num_rows;

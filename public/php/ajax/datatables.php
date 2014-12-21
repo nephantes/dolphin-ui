@@ -22,8 +22,7 @@ Editor::inst( $db, 'datatables' )
 		Field::inst( 'parent_name' ),
 		Field::inst( 'parent_link' ),
 		Field::inst( 'ajax' ),
-		Field::inst( 'datatable_name' ),
-		Field::inst( 'mainmysql_table' ),
+		Field::inst( 'tablename' ),
 		Field::inst( 'joined' )
 	)
 	->process( $_POST )
