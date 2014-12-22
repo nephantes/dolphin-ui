@@ -12,7 +12,7 @@
                                         <li><!-- start message -->
                                             <a href="#">
                                                 <div class="pull-left">
-                                                    <img src="img/avatar3.png" class="img-circle" alt="User Image"/>
+                                                    <img src="<?php echo BASE_PATH?>/img/avatar3.png" class="img-circle" alt="User Image"/>
                                                 </div>
                                                 <h4>
                                                     Support Team
@@ -24,7 +24,7 @@
                                         <li>
                                             <a href="#">
                                                 <div class="pull-left">
-                                                    <img src="img/avatar5.png" class="img-circle" alt="user image"/>
+                                                    <img src="<?php echo BASE_PATH?>/img/avatar5.png" class="img-circle" alt="user image"/>
                                                 </div>
                                                 <h4>
                                                     Biocore Design Team
@@ -36,7 +36,7 @@
                                         <li>
                                             <a href="#">
                                                 <div class="pull-left">
-                                                    <img src="img/avatar.png" class="img-circle" alt="user image"/>
+                                                    <img src="<?php echo BASE_PATH?>/img/avatar.png" class="img-circle" alt="user image"/>
                                                 </div>
                                                 <h4>
                                                     Developers
@@ -48,7 +48,7 @@
                                         <li>
                                             <a href="#">
                                                 <div class="pull-left">
-                                                    <img src="img/avatar5.png" class="img-circle" alt="user image"/>
+                                                    <img src="<?php echo BASE_PATH?>/img/avatar5.png" class="img-circle" alt="user image"/>
                                                 </div>
                                                 <h4>
                                                     Bioinformatics Support
@@ -60,7 +60,7 @@
                                         <li>
                                             <a href="#">
                                                 <div class="pull-left">
-                                                    <img src="img/avatar.png" class="img-circle" alt="user image"/>
+                                                    <img src="<?php echo BASE_PATH?>/img/avatar.png" class="img-circle" alt="user image"/>
                                                 </div>
                                                 <h4>
                                                     Reviewers
