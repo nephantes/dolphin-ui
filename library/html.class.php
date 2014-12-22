@@ -89,7 +89,7 @@ class HTML {
 	
 	$(document).ready(function() {
 		editor = new $.fn.dataTable.Editor( {
-			"ajax": "/dolphin/public/php/ajax/lanes.php?t='.$table[0]['tablename'].'",
+			"ajax": "/dolphin/public/php/ajax/ajax.php?t='.$table[0]['tablename'].'",
 			"display": "envelope",
 			"table": "#'.$table[0]['tablename'].'",
 			"fields": [';
@@ -101,6 +101,7 @@ class HTML {
 				';
 			$html.=($field['options']!='' ) ? $field['options']:'';
 			$html.=($field['joinedtablename']!="")? '"type": "select"':"";
+			$html.=($field['len']>128)? '"type": "textarea"':"";
 			$html.='},';
 			endforeach;
 	$html.=']
@@ -108,7 +109,7 @@ class HTML {
 	
 		$("#'.$table[0]['tablename'].'").DataTable( {
 			dom: "Tfrtip",
-			ajax: "/dolphin/public/php/ajax/lanes.php?t='.$table[0]['tablename'].'",
+			ajax: "/dolphin/public/php/ajax/ajax.php?t='.$table[0]['tablename'].'",
 			columns: [';
 			foreach ($fields as $field):
 			$datafield=($field['joinedtablename']!="")? $field['joinedtablename'].'.'.$field['joinedtargetfield']:$usetablename.$field['fieldname'];
@@ -150,6 +151,14 @@ class HTML {
 	return $html;
    }
    
+   function getSideMenuItem($obj )
+   {
+	$html="";
+	foreach ($obj as $item):
+	    $html.='<li><a href="'.BASE_PATH.'/'.$item->{'link'}.'"><i class="fa fa-angle-double-right"></i>'.$item->{'name'}.'</a></li>';
+	endforeach;
+	return $html;
+   }
    
    function getDataTableContent($fields, $tablename)
    {

@@ -1,4 +1,8 @@
 <?php
+error_reporting(E_ERROR);
+//error_reporting(E_ALL);
+ini_set('report_errors','on');
+
 
 function checkLDAP($username, $password)
 {
@@ -6,6 +10,7 @@ function checkLDAP($username, $password)
   $dn_string  = 'ou=Accounts,dc=ad,dc=umassmed,dc=edu';
   $binduser   = 'SVCLinuxLDAPAuth';
   $bindpass   = 'Umass2008';
+  try{
  
   $connection = ldap_connect($ldapserver);
   ldap_set_option($connection, LDAP_OPT_PROTOCOL_VERSION, 3);
@@ -28,9 +33,16 @@ function checkLDAP($username, $password)
              else
                 return 0;
       }
+     else
+     {
+	return 0;
+     }
+  }
+  }catch (Exception $e) {
+        echo 'Caught exception: ',  $e->getMessage(), "\n";
+	return 0;
   }
 }
-
 
 if(!empty($_POST) && isset($_POST['password'])){ 
         $login_ok = false; 
@@ -55,6 +67,9 @@ if(!empty($_POST) && isset($_POST['password'])){
             }
         } 
         else{ 
+  	    session_destroy();
+            require_once("../includes/loginform.php");
+            exit;
             $e="Login Failed."; 
         } 
 } 

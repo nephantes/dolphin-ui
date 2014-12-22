@@ -27,13 +27,13 @@
                                 <!-- Menu Body -->
                                 <li class="user-body">
                                     <div class="col-xs-4 text-center">
-                                        <a href="#">Projects</a>
+                                        <a href="<?php echo BASE_PATH?>/tables/index/ngs_experiment_series?>">Experiments</a>
                                     </div>
                                     <div class="col-xs-4 text-center">
-                                        <a href="#">Runs</a>
+                                        <a href="<?php echo BASE_PATH?>/tables/index/ngs_lanes?>">Lanes</a>
                                     </div>
                                     <div class="col-xs-4 text-center">
-                                        <a href="#">Samples</a>
+                                        <a href="<?php echo BASE_PATH?>/tables/index/ngs_samples?>">Samples</a>
                                     </div>
                                 </li>
                                 <!-- Menu Footer-->
