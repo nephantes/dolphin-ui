@@ -90,7 +90,7 @@ class HTML {
 	$(document).ready(function() {
 		editor = new $.fn.dataTable.Editor( {
 			"ajax": "/dolphin/public/php/ajax/ajax.php?t='.$table[0]['tablename'].'",
-			"display": "envelope",
+			"display": "lightbox",
 			"table": "#'.$table[0]['tablename'].'",
 			"fields": [';
 	$usetablename = ($table[0]['joined']) ? $table[0]['tablename'].'.' : '';

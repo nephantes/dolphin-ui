@@ -78,6 +78,13 @@ class dbfuncs {
      $sql="SELECT name FROM biocore.users  where username='$username';";
      return $this->queryAVal($sql);
    }
+   function getUserId($username)
+   {
+     
+     $sql="SELECT id FROM biocore.users where username='$username';";
+     return $this->queryAVal($sql);
+   }
+   
    function getRole($username)
    {
      
@@ -85,18 +92,36 @@ class dbfuncs {
      return $this->queryAVal($sql);
    }
    function getParentSideBar()
-   { 
-     $sql="SELECT name, link, iconname, treeview from biocore.sidebar where parent_name=''";
+   {
+     $sql= "SELECT DISTINCT name, link, iconname, treeview FROM
+           (SELECT t.* FROM biocore.sidebar t where ((t.perms>32) OR t.owner_id=".$_SESSION['uid'].")
+           UNION 
+           SELECT t.* FROM biocore.sidebar t, biocore.user_group ug
+           where t.group_id in (select group_id from user_group where u_id=".$_SESSION['uid'].") 
+           and ug.group_id=t.group_id and t.perms>=15) s where s.parent_name=''";
      return $this->queryTableArr($sql); 
    }
    function getSubMenuFromSideBar($parent)
    {
-      $sql="SELECT name, link from biocore.sidebar where parent_name='$parent'";
+      $sql="SELECT DISTINCT name, link from
+           (SELECT t.* FROM biocore.sidebar t where ((t.perms>32) OR t.owner_id=".$_SESSION['uid'].")
+           UNION 
+           SELECT t.* FROM biocore.sidebar t, biocore.user_group ug
+           where t.group_id in (select group_id from user_group where u_id=".$_SESSION['uid'].") 
+           and ug.group_id=t.group_id and t.perms>=15) s
+      where s.parent_name='$parent'";
       return $this->queryTableArr($sql); 
    }
    function getSubMenuFromDataTables($parent)
    {
-      $sql="SELECT name, CONCAT('tables/index/', tablename) as link from biocore.datatables where parent_name='$parent'";
+      $sql="SELECT DISTINCT name, CONCAT('tables/index/', tablename) as link from
+            (SELECT t.* FROM biocore.datatables t where ((t.perms>32) OR t.owner_id=".$_SESSION['uid'].")
+           UNION 
+           SELECT t.* FROM biocore.datatables t, biocore.user_group ug
+           where t.group_id in (select group_id from user_group where u_id=".$_SESSION['uid'].") 
+           and ug.group_id=t.group_id and t.perms>=15) s
+      where s.parent_name='$parent'";
+      
       return $this->queryTableArr($sql); 
    }
    

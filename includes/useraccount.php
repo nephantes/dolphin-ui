@@ -42,7 +42,7 @@
                                         <a href="#" class="btn btn-default btn-flat">Profile</a>
                                     </div>
                                     <div class="pull-right">
-                                        <a href="index.php?p=logout" class="btn btn-default btn-flat">Sign out</a>
+                                        <a href="<?php echo BASE_PATH?>/index.php?p=logout" class="btn btn-default btn-flat">Sign out</a>
                                     </div>
                                 </li>
                             </ul>

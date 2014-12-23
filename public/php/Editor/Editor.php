@@ -241,6 +241,7 @@ class Editor extends Ext {
 	}
 
 
+	
 	/**
 	 * Get / set field instances.
 	 * 
@@ -425,7 +426,6 @@ class Editor extends Ext {
 
 		return $this;
 	}
-
 
 	/**
 	 * Get / set the table name.

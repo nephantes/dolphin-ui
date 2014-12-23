@@ -1,3 +1,5 @@
 <?php
-    echo $html->getDataTableFooterContent($fields, $table);
+    if(isset($table) && isset($fields)){
+        echo $html->getDataTableFooterContent($fields, $table);
+    }
 ?>

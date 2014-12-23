@@ -29,8 +29,6 @@ $(function() {
                         s[i].experiment_name,
                         s[i].summary,
                         s[i].design,
-			s[i].username,
-			s[i].id
                         ]);
                         } // End For
 			for (var i=0; i<6; i++)
@@ -74,8 +72,6 @@ $(function() {
                         s[i].experiment_name,
                         s[i].summary,
                         s[i].design,
-			s[i].username,
-			s[i].id
                         ]);
                         } // End For
                      }
@@ -102,8 +98,6 @@ $(function() {
                         s[i].name,
                         s[i].growth,
 			s[i].treatment,
-			s[i].last_modified_user,
-			s[i].id
                         ]);
                         } // End For
                      }
@@ -137,8 +131,6 @@ $(function() {
                         s[i].name,
                         s[i].growth,
 			s[i].treatment,
-			s[i].last_modified_user,
-			s[i].id
                         ]);
                         } // End For
                      }
@@ -165,7 +157,6 @@ $(function() {
 			s[i].facility,
 			s[i].total_reads,
 			s[i].total_samples,
-			s[i].id
                         ]);
                         } // End For
                     }
@@ -200,7 +191,6 @@ $(function() {
 			s[i].facility,
 			s[i].total_reads,
 			s[i].total_samples,
-			s[i].id
                         ]);
                         } // End For
                      }
@@ -228,7 +218,6 @@ $(function() {
 			s[i].source,
 			s[i].organism,
 			s[i].molecule,
-			s[i].id
                         ]);
                         } // End For
                      }
@@ -263,7 +252,6 @@ $(function() {
 			s[i].source,
 			s[i].organism,
 			s[i].molecule,
-			s[i].id
                         ]);
                         } // End For
                      }

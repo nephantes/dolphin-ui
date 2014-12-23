@@ -17,7 +17,7 @@ if($p == "getExperimentSeries")
     $time="";
     if (isset($start)){$time="WHERE `date_created`>='$start' and `date_created`<='$end'";}
     $data=$query->queryTable("
-    SELECT id, experiment_name, summary, design, username
+    SELECT id, experiment_name, summary, design
     FROM biocore.ngs_experiment_series $time
     ");
 }
@@ -26,7 +26,7 @@ else if($p == "getProtocols")
     $time="";
     if (isset($start)){$time="WHERE `date_created`>='$start' and `date_created`<='$end'";}
     $data=$query->queryTable("
-    SELECT id, name, growth, treatment, last_modified_user
+    SELECT id, name, growth, treatment
     FROM biocore.ngs_protocols $time
     ");
 }

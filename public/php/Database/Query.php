@@ -777,11 +777,10 @@ class Query {
 	{
 		if (!isset($_SESSION) || !is_array($_SESSION)) session_start();
 
-		$user = $_SESSION['user'];
+		$uid = $_SESSION['uid'];
 		//$prefield= ",date_created, date_modified, last_modified_user ";
 		$prefield= ",date_created, date_modified, last_modified_user ";
-		//$preval= ", now(), now(), '".$user."' ";
-		$preval= ", now(), now(), '".$user."' ";
+		$preval= ", now(), now(), '".$uid."' ";
 
 		$this->_prepare( 
 			'INSERT INTO '
@@ -898,8 +897,8 @@ class Query {
 	{	
 		if (!isset($_SESSION) || !is_array($_SESSION)) session_start();
 
-		$user = $_SESSION['user'];
-		$preset= ", date_modified=now(), last_modified_user='".$user."' ";
+		$uid = $_SESSION['uid'];
+		$preset= ", date_modified=now(), last_modified_user='".$uid."' ";
 		$this->_prepare( 
 			'UPDATE '
 			.$this->_build_table()

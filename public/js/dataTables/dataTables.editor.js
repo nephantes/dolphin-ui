@@ -1083,9 +1083,9 @@ Editor.display.lightbox = $.extend( true, {}, Editor.models.displayController, {
 		// For smaller screens we need to hide the other elements in the
 		// document since iOS and Android both mess up display:fixed when
 		// the virtual keyboard is shown
-		var kids = $('body').children().not( dom.background ).not( dom.wrapper );
+		//var kids = $('body').children().not( dom.background ).not( dom.wrapper );
 		$('body').append( '<div class="DTED_Lightbox_Shown"/>' );
-		$('div.DTED_Lightbox_Shown').append( kids );
+		//$('div.DTED_Lightbox_Shown').append( kids );
 	},
 
 
@@ -1093,7 +1093,7 @@ Editor.display.lightbox = $.extend( true, {}, Editor.models.displayController, {
 		// Set the max-height for the form content
 		var dom = self._dom;
 		
-		var maxHeight = $(window).height() - (self.conf.windowPadding*2) -
+		var maxHeight = $(window).height() - 100 - (self.conf.windowPadding*2) -
 			$('div.DTE_Header', dom.wrapper).outerHeight() -
 			$('div.DTE_Footer', dom.wrapper).outerHeight();
 

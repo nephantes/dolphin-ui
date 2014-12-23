@@ -9,9 +9,10 @@ class TablesController extends VanillaController {
 
     function index($tablename) {
         $this->tablename=$tablename;
-        
-        $this->set('table',$this->Table->getDataTable($this->tablename));
-        $this->set('fields', $this->Table->getDataFields($this->tablename));
+        if($this->Table->checkPerms(UID, $this->tablename)){
+            $this->set('table',$this->Table->getDataTable($this->tablename));
+            $this->set('fields', $this->Table->getDataFields($this->tablename));
+        }
           
     }
     function afterAction() {

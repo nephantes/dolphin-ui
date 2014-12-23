@@ -60,7 +60,11 @@ if(!empty($_POST) && isset($_POST['password'])){
  
         if($login_ok){ 
             $s="Succefull";
-            $_SESSION['user'] = $_POST['username'];  
+            $_SESSION['user'] = $_POST['username'];
+            require_once("dbfuncs.php");
+            $query=new dbfuncs();
+            $_SESSION['uid'] = $query->getUserID($_SESSION['user']);
+
             if ($_POST['username'] == "kucukura" || $_POST['username']=="garberm")
             {
               $_SESSION['admin'] = "admin";
