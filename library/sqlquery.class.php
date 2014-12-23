@@ -91,9 +91,10 @@ class SQLQuery {
             (SELECT t.tablename FROM biocore.datatables t where ((t.perms>32) OR t.owner_id=".$uid.")
             UNION 
             SELECT t.tablename FROM biocore.datatables t, biocore.user_group ug
-            where t.group_id in (select group_id from user_group where u_id=".$uid.") 
+            where t.group_id in (select g_id from user_group where u_id=".$uid.") 
             and ug.group_id=t.group_id and t.perms>=15) s
 	    where s.tablename='".$tablename."'", 1);
+
 	if ($table=='[]'){
 	    return 0;
 	}

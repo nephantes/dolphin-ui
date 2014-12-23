@@ -97,7 +97,7 @@ class dbfuncs {
            (SELECT t.* FROM biocore.sidebar t where ((t.perms>32) OR t.owner_id=".$_SESSION['uid'].")
            UNION 
            SELECT t.* FROM biocore.sidebar t, biocore.user_group ug
-           where t.group_id in (select group_id from user_group where u_id=".$_SESSION['uid'].") 
+           where t.group_id in (select g_id from user_group where u_id=".$_SESSION['uid'].") 
            and ug.group_id=t.group_id and t.perms>=15) s where s.parent_name=''";
      return $this->queryTableArr($sql); 
    }
@@ -107,7 +107,7 @@ class dbfuncs {
            (SELECT t.* FROM biocore.sidebar t where ((t.perms>32) OR t.owner_id=".$_SESSION['uid'].")
            UNION 
            SELECT t.* FROM biocore.sidebar t, biocore.user_group ug
-           where t.group_id in (select group_id from user_group where u_id=".$_SESSION['uid'].") 
+           where t.group_id in (select g_id from user_group where u_id=".$_SESSION['uid'].") 
            and ug.group_id=t.group_id and t.perms>=15) s
       where s.parent_name='$parent'";
       return $this->queryTableArr($sql); 
@@ -118,7 +118,7 @@ class dbfuncs {
             (SELECT t.* FROM biocore.datatables t where ((t.perms>32) OR t.owner_id=".$_SESSION['uid'].")
            UNION 
            SELECT t.* FROM biocore.datatables t, biocore.user_group ug
-           where t.group_id in (select group_id from user_group where u_id=".$_SESSION['uid'].") 
+           where t.group_id in (select g_id from user_group where u_id=".$_SESSION['uid'].") 
            and ug.group_id=t.group_id and t.perms>=15) s
       where s.parent_name='$parent'";
       
