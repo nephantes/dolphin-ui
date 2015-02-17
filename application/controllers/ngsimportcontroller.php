@@ -1,14 +1,15 @@
 <?php
  
 class NgsimportController extends VanillaController {
-
+    private $username;
     function beforeAction() {
 
     }
  
     function index() {
-     
+        $this->username=$_SESSION['user'];
         $this->set('title','NGS Excel Import');
+        $this->set('groups',$this->Ngsimport->getGroups($this->username));
     }
     function process() {
             $filename=$_FILES["excelFile"]["tmp_name"];
@@ -43,7 +44,7 @@ class NgsimportController extends VanillaController {
                foreach ($worksheetData as $worksheet) {
                     $objPHPExcel->setActiveSheetIndexByName($worksheet['worksheetName']);
                     $sheetData = $objPHPExcel->getActiveSheet()->toArray(null,true,true,true);
-                    $text.=$ngs->parseExcel($_POST["inputDir"], $worksheet, $sheetData);
+                    $text.=$ngs->parseExcel($_POST["group_id"], $_POST["security_id"], $worksheet, $sheetData);
                 }
                 $text.='</ol>';
 

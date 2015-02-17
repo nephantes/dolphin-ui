@@ -270,5 +270,24 @@ e range"><i class="fa fa-calendar"></i></button>
       ';
       return $html;
    }
-
+   
+   function getMultipleSelectBox($options, $id, $field, $idfield)
+   {
+	$html='<select class="form-control" id="'.$id.'" name="'.$id.'">';
+	foreach ($options as $option):
+                $html.="<option value='".$option[$idfield]."'>".$option[$field]."</option>";
+	endforeach;
+	$html.='</select>';
+	return $html;
+   }
+   function getRadioBox($options, $id, $field)
+   {
+	$html='';
+	foreach ($options as $option):
+	        $html.='<div class="radio"><label>';
+                $html.='<input type="radio" name="'.$id.'" id="'.$option['name'].'" value="'.$option['value'].'" '.$option['selected'].'>&nbsp;'.$option['name'];
+		$html.='</label></div>';
+	endforeach;
+	return $html;
+   }
 }

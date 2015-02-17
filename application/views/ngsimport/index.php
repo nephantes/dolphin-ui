@@ -13,19 +13,33 @@
                                 <form role="form" enctype="multipart/form-data" action="ngsimport/process" method="post">
                                     <div class="box-body">
                                         <div class="form-group">
-                                            <label for="inputDir">Input Directory in the Cluster</label>
-                                            <input name="inputDir" type="input" class="form-control" id="inputDir" placeholder="Enter Director
-y">
-                                            <p class="help-block">Please enter full path of the fastq files in your project space in the clust
-er.</p>
-                                        </div>
-                                        <div class="form-group">
                                             <label for="excelInputFile">Excel file input</label>
                                             <input type="file" name="excelFile" id="excelFile">
                                             <p class="help-block">Please choose excel file from your device.</p>
                                         </div>
                                     </div><!-- /.box-body -->
-
+                                    <div class="box-body">
+                                        <div class="form-group">
+                                            <label for="Group">Project Group</label>
+                                            <?php
+					    echo $html->getMultipleSelectBox($groups, 'group_id', 'name', 'id');
+					    ?>
+                                            <p class="help-block">Please select a group/s you belong for this project</p>
+                                        </div>
+                                    </div><!-- /.box-body -->
+				    <div class="box-body">
+                                        <div class="form-group">
+                                            <label for="Group">Who can see?</label>
+                                            <?php
+					    $radiofields=array(
+							    array('name' => 'only me', 'value' => '3', 'selected' => ''),
+							    array('name' => 'only my group', 'value' => '15', 'selected' => 'checked'),
+							    array('name' => 'everyone', 'value' => '32', 'selected' => ''));
+					    echo $html->getRadioBox($radiofields, 'security_id', 'name');
+					    ?>
+                                            <p class="help-block">Please select the security credentials for this import</p>
+                                        </div>
+                                    </div><!-- /.box-body -->
                                     <div class="box-footer">
                                         <button type="submit" class="btn btn-primary">Submit</button>
                                     </div>

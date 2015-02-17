@@ -100,6 +100,12 @@ class SQLQuery {
 	}
         return 1;
     }
+    
+    /** Get groups for the user **/
+    function getGroups($username) {
+        $groups = $this->query("select g.id, g.name from user_group ug, users u, groups g where ug.u_id=u.id and ug.g_id=g.id and username='$username'");
+        return json_decode($groups, true);
+    }
 	
     /** Get number of rows **/
     function getNumRows() {

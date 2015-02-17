@@ -1,6 +1,9 @@
 <?php
-class Ngsimport extends Model {
-    private $series_id;
+class Ngsimport extends VanillaModel {
+    public $series_id;
+    public $sid;
+    public $gid;
+    public $uid;
     public $username;
     private $worksheet;
     private $sheetData;
@@ -8,9 +11,11 @@ class Ngsimport extends Model {
     public $backup_dir;
     public $amazon_bucket;
 
-    function parseExcel($dir, $worksheet, $sheetData) {
+    function parseExcel($gid, $sid, $worksheet, $sheetData) {
         $this->worksheet=$worksheet;
         $this->sheetData=$sheetData;
+	$this->sid=$sid;
+	$this->gid=$gid;
 	
         $text='<li>'.$this->worksheet['worksheetName'].'<br />';
                                 
@@ -19,7 +24,9 @@ class Ngsimport extends Model {
         $text.='</li>';
         
         $this->username=$_SESSION['user'];
-        
+        $sql="select id from biocore.users where `username`='$this->username'";
+        $this->uid=$this->query($sql, 1);
+	
         if ( $this->worksheet['worksheetName']=="METADATA"){
             $text.=$this->getMeta();
         }
@@ -53,10 +60,10 @@ class Ngsimport extends Model {
 	   if($this->sheetData[$i]["A"]=="backup directory"){$this->backup_dir=$this->esc($this->sheetData[$i]["B"]);}
 	   if($this->sheetData[$i]["A"]=="amazon bucket"){$this->amazon_bucket=$this->esc($this->sheetData[$i]["B"]);}
         }
-        $new_series = new series($this, $this->username, $experiment_name,$summary,$design);
+        $new_series = new series($this, $experiment_name,$summary,$design);    
         $this->series_id=$new_series->getId();
         $text="SERIES:".$new_series->getStat()."<BR>";
-        $new_conts = new contributors($this, $this->username, $this->series_id, $conts);
+        $new_conts = new contributors($this, $conts);
         $text.= "CONT:".$new_conts->getStat()."<BR>";
 	if (isset($this->fastq_dir)){
 	    $new_dirs = new dirs($this);
@@ -91,7 +98,7 @@ class Ngsimport extends Model {
         }
         //echo json_encode($lane_arr);
         
-        $new_lanes = new lanes($this, $this->username, $this->series_id, $lane_arr);
+        $new_lanes = new lanes($this, $lane_arr);
         $text="LANE:".$new_lanes->getStat()."</br>";   
         #$text.="LANE:".$new_lanes->getSQL();   
 	return $text;
@@ -116,7 +123,7 @@ class Ngsimport extends Model {
         }
         //echo json_encode($prot_arr);
         
-        $new_protocol = new protocols($this, $this->username, $prot_arr);
+        $new_protocol = new protocols($this, $prot_arr);
         return "PROT:".$new_protocol->getStat();   
         //var_dump($sheetData);
     }
@@ -166,9 +173,9 @@ class Ngsimport extends Model {
         }
         //echo json_encode($sample_arr);
         
-        $new_samples = new samples($this, $this->username, $this->series_id, $sample_arr);
+        $new_samples = new samples($this, $sample_arr);
         $text="SAMPLE:".$new_samples->getStat()."<BR>";
-        $new_chars = new characteristics($this, $this->username, $char_arr);
+        $new_chars = new characteristics($this, $char_arr);
         $text.="CHAR:".$new_chars->getStat();
         return $text;
     }
@@ -180,15 +187,15 @@ class Ngsimport extends Model {
            for ($j='A';$j<=$this->worksheet['lastColumnLetter'];$j++)
            {
               if($this->sheetData[3][$j]=="Sample or Lane Name (Enter same name for multiple files)"){$file->name=$this->esc($this->sheetData[$i][$j]);}
-              if($this->sheetData[3][$j]=="file name(comma separated for paired ends)"){$file->file_name=$this->esc($this->sheetData[$i][$j]);}
+              if($this->sheetData[3][$j]=="file name(comma separated for paired ends)"){$file->file_name=$this->esc($this->sheetData[$i][$j]);$file->file_name=preg_replace('/\s/', '', $file->file_name);}
               if($this->sheetData[3][$j]=="file checksum"){$file->checksum=$this->esc($this->sheetData[$i][$j]);}
-            
-           }
+              
+           } 
            if($file->file_name){$file_arr[$file->file_name]=$file;}
         }
         //echo json_encode($file_arr);
         
-        $new_files = new files($this, $this->username, $file_arr);
+        $new_files = new files($this, $file_arr);
         return "FILES:".$new_files->getStat();   
         //var_dump($sheetData);
     }
@@ -196,7 +203,6 @@ class Ngsimport extends Model {
 
 /* main class */
 class main{
-    public $username;
     public $model;
     public $insert=0;
     public $update=0;
@@ -230,10 +236,10 @@ class series extends main{
     private $experiment_name;
     private $summary;
     private $design;
+    
 
-    function __construct($model, $username, $experiment_name, $summary, $design) 
+    function __construct($model, $experiment_name, $summary, $design) 
     {
-        $this->username=$username;
         $this->experiment_name=$experiment_name;
         $this->summary=$summary;
         $this->design=$design;
@@ -252,15 +258,22 @@ class series extends main{
     }
     function insert()
     {
-        $sql="insert into biocore.ngs_experiment_series(`experiment_name`, `summary`, `design`, `username`, `date_created`, `date_modified`, `last_modified_user`)
-              values('$this->experiment_name', '$this->summary', '$this->design', '$this->username', now(), now(), '$this->username');";
+
+        $sql="insert into biocore.ngs_experiment_series(`experiment_name`, `summary`, `design`,
+	      `owner_id`, `group_id`, `perms`, `date_created`, `date_modified`, `last_modified_user`)
+              values('$this->experiment_name', '$this->summary', '$this->design',
+	      '".$this->model->uid."', '".$this->model->gid."', '".$this->model->sid."',
+	      now(), now(), '".$this->model->uid."');";
+	      
         $this->insert++;
         return $this->model->query($sql);
     }
-    
+
     function update()
     {
-        $sql="update biocore.ngs_experiment_series set `summary`='$this->summary', `design`='$this->design', `date_modified`=now(), `last_modified_user`='$this->username' where `id` = ".$this->getId();
+        $sql="update biocore.ngs_experiment_series set `summary`='$this->summary', `design`='$this->design',
+	`group_id`='".$this->model->gid."', `perms`='".$this->model->sid."',
+	`date_modified`=now(), `last_modified_user`='".$this->model->uid."' where `id` = ".$this->getId();
         $this->update++;
         //return $sql;
         return $this->model->query($sql);
@@ -269,13 +282,10 @@ class series extends main{
 
 /* Contributors class */
 class contributors extends main{
-    private $series_id;
     private $conts=[];
     
-    function __construct($model, $username, $series_id, $conts = []) 
+    function __construct($model, $conts = []) 
     {
-        $this->username=$username;
-        $this->series_id=$series_id;
         $this->conts = $conts;
 	$this->model=$model;
         
@@ -295,15 +305,17 @@ class contributors extends main{
     }
     function insert($val)
     {
-        $sql="insert into biocore.ngs_contributors(`series_id`, `contributor`, `date_created`, `date_modified`, `last_modified_user`)
-              values('$this->series_id', '$val', now(), now(), '$this->username');";
+        $sql="insert into biocore.ngs_contributors(`series_id`, `contributor`, `owner_id`, `group_id`, `perms`, `date_created`, `date_modified`, `last_modified_user`)
+              values('".$this->model->series_id."', '$val', '".$this->model->uid."', '".$this->model->gid."', '".$this->model->sid."', now(), now(), '".$this->model->uid."');";
         $this->insert++;
         return $this->model->query($sql);
     }
     
     function update($val)
     {
-        $sql="update biocore.ngs_contributors set `contributor`='$val',`date_modified`=now(), `last_modified_user`='$this->username'  where `id` =".$this->getId($val);
+        $sql="update biocore.ngs_contributors set `contributor`='$val',
+	`group_id`='".$this->model->gid."', `perms`='".$this->model->sid."',
+	`date_modified`=now(), `last_modified_user`='".$this->model->uid."'  where `id` =".$this->getId($val);
         $this->update++;
 
         return $this->model->query($sql);
@@ -316,13 +328,10 @@ class contributors extends main{
 class lane{}
 class lanes extends main{
     private $lane_arr=[];
-    private $series_id;
 
-    function __construct($model, $username, $series_id, $lane_arr = [])
+    function __construct($model, $lane_arr = [])
     {
-        $this->username = $username;
         $this->lane_arr = $lane_arr;
-        $this->series_id = $series_id;
         $this->model=$model;
 
         $this->processArr($lane_arr);
@@ -348,14 +357,16 @@ class lanes extends main{
     {
         $sql="insert into `biocore`.`ngs_lanes`(`series_id`, `name`, `facility`, `cost`,
                    `date_submitted`, `date_received`, `total_reads`, `phix_requested`,
-                   `phix_in_lane`, `total_samples`, `resequenced`, `notes`, `date_created`,
+                   `phix_in_lane`, `total_samples`, `resequenced`, `notes`,
+		   `owner_id`, `group_id`, `perms`, `date_created`,
                    `date_modified`, `last_modified_user`)
-              values('$this->series_id',  '$lane->name',  '$lane->facility',  '$lane->cost',
+              values('".$this->model->series_id."',  '$lane->name',  '$lane->facility',  '$lane->cost',
                     ".$this->correct_date($lane->date_submitted).",  ".$this->correct_date($lane->date_received).",  
 		    '$lane->total_reads',  '$lane->phix_requested',
                     '$lane->phix_in_lane',  '$lane->total_samples',  
-		    ".$this->correct_bool($lane->resequenced).",  '$lane->notes',  
-                    now(), now(), '$this->username');";
+		    ".$this->correct_bool($lane->resequenced).",  '$lane->notes',
+		    '".$this->model->uid."', '".$this->model->gid."', '".$this->model->sid."',
+                    now(), now(), '".$this->model->uid."');";
                     
         $this->insert++;
 	$this->sql=$sql;
@@ -366,7 +377,7 @@ class lanes extends main{
     {
         $sql="  UPDATE `biocore`.`ngs_lanes`
                 SET
-                `series_id` = '$this->series_id',
+                `series_id` = '".$this->model->series_id."',
                 `facility` = '$lane->facility',
                 `cost` = '$lane->cost',
                 `date_submitted` = ".$this->correct_date($lane->date_submitted).",
@@ -377,8 +388,10 @@ class lanes extends main{
                 `total_samples` = '$lane->total_samples',
                 `resequenced` = ".$this->correct_bool($lane->resequenced).",
                 `notes` = '$lane->notes',
-                `date_modified` = now(),
-                `last_modified_user` = '$this->username'
+		`group_id`='".$this->model->gid."',
+		`perms`='".$this->model->sid."',
+		`date_modified`=now(),
+		`last_modified_user`='".$this->model->uid."' 
                 where `id` = ".$this->getId($lane);
         $this->update++;
 
@@ -393,9 +406,8 @@ class prot{}
 class protocols extends main{
     private $prot_arr=[];
 
-    function __construct($model, $username, $prot_arr = [])
+    function __construct($model, $prot_arr = [])
     {
-        $this->username = $username;
         $this->prot_arr = $prot_arr;
         $this->model=$model;
         
@@ -416,10 +428,12 @@ class protocols extends main{
     {
         $sql="insert into biocore.ngs_protocols(`name`, `growth`, `treatment`,
                 `extraction`, `library_construction`, `library_strategy`,
+		`owner_id`, `group_id`, `perms`,
                 `date_created`, `date_modified`, `last_modified_user`)
               values('$prot->name', '$prot->growth', '$prot->treatment',
                 '$prot->extraction', '$prot->library_construction', '$prot->library_strategy',
-                now(), now(), '$this->username');";
+		'".$this->model->uid."', '".$this->model->gid."', '".$this->model->sid."',
+                now(), now(), '".$this->model->uid."');";
         $this->insert++;
         return $this->model->query($sql);
     }
@@ -428,7 +442,10 @@ class protocols extends main{
     {
         $sql="update biocore.ngs_protocols set `growth`='$prot->growth',`treatment`='$prot->treatment',
             `extraction`='$prot->extraction', `library_construction`='$prot->library_construction',
-            `library_strategy`='$prot->library_strategy', `date_modified`=now(), `last_modified_user`='$this->username'
+            `library_strategy`='$prot->library_strategy',
+	    `owner_id`='".$this->model->uid."', `group_id`='".$this->model->gid."', `perms`='".$this->model->sid."',
+	    `group_id`='".$this->model->gid."', `perms`='".$this->model->sid."',
+	    `date_modified`=now(), `last_modified_user`='".$this->model->uid."' 
             where `id` = ".$this->getId($prot);
         $this->update++;
 
@@ -441,12 +458,9 @@ class protocols extends main{
 class sample{}
 class samples extends main{
     private $sample_arr=[];
-    private $series_id;
 
-    function __construct($model, $username, $series_id, $sample_arr = [])
+    function __construct($model, $sample_arr = [])
     {
-        $this->username=$username;
-        $this->series_id=$series_id;
         $this->sample_arr=$sample_arr;
         $this->model=$model;
         
@@ -490,16 +504,19 @@ class samples extends main{
             `molecule`, `description`, `instrument_model`,
             `avg_insert_size`, `read_length`, `genotype`,
             `condition`, `library_type`, `adapter`,
-            `notebook_ref`, `notes`, `date_created`,
+            `notebook_ref`, `notes`,
+	    `owner_id`, `group_id`, `perms`, `date_created`,
             `date_modified`, `last_modified_user`)
             VALUES
             (
-            '$this->series_id', '$protocol_id', '$lane_id',
+            '".$this->model->series_id."', '$protocol_id', '$lane_id',
             '$sample->name', '$sample->barcode', '$sample->title', '$sample->source', '$sample->organism',
             '$sample->molecule', '$sample->description', '$sample->instrument_model',
             '$sample->avg_insert_size', '$sample->read_length', '$sample->genotype',
             '$sample->condition', '$sample->library_type', '$sample->adapter',
-            '$sample->notebook_ref', '$sample->notes', now(), now(), '$this->username');";
+            '$sample->notebook_ref', '$sample->notes',
+	    '".$this->model->uid."', '".$this->model->gid."', '".$this->model->sid."',
+	     now(), now(), '".$this->model->uid."');";
         $this->insert++;
 
         return $this->model->query($sql);
@@ -511,7 +528,7 @@ class samples extends main{
         $protocol_id=$this->getProtocolId($sample->protocol_name);
         $sql="UPDATE `biocore`.`ngs_samples`
             SET
-            `series_id` = '$this->series_id',
+            `series_id` = '".$this->model->series_id."',
             `protocol_id` = '$protocol_id',
             `lane_id` = '$lane_id',
             `name` = '$sample->name',
@@ -530,9 +547,11 @@ class samples extends main{
             `adapter` = '$sample->adapter',
             `notebook_ref` = '$sample->notebook_ref',
             `notes` = '$sample->notes',
-            `date_modified` = now(),
-            `last_modified_user` = '$this->username'
-              where `id` = ".$this->getId($sample);
+	    `group_id`='".$this->model->gid."',
+	    `perms`='".$this->model->sid."',
+	    `date_modified`=now(),
+	    `last_modified_user`='".$this->model->uid."' 
+            where `id` = ".$this->getId($sample);
         $this->update++;
 
         return $this->model->query($sql);
@@ -546,9 +565,8 @@ class tag{}
 class characteristics extends main{
     private $char_arr=[];
 
-    function __construct($model, $username, $char_arr = [])
+    function __construct($model, $char_arr = [])
     {
-        $this->username = $username;
         $this->char_arr=$char_arr;
         $this->model=$model;
         
@@ -576,8 +594,11 @@ class characteristics extends main{
     function insert($tag)
     {
         $sample_id = $this->getSampleId($tag->sample_name);
-        $sql=" INSERT INTO `biocore`.`ngs_characteristics`(`sample_id`, `tag`,  `value`, `date_created`, `date_modified`, `last_modified_user`)
-                 VALUES('$sample_id','$tag->tag', '$tag->value', now(), now(), '$this->username');";
+        $sql=" INSERT INTO `biocore`.`ngs_characteristics`(`sample_id`, `tag`,  `value`,
+		`owner_id`, `group_id`, `perms`, `date_created`, `date_modified`, `last_modified_user`)
+                 VALUES('$sample_id','$tag->tag', '$tag->value',
+		 '".$this->model->uid."', '".$this->model->gid."', '".$this->model->sid."',
+		 now(), now(), '".$this->model->uid."');";
         $this->insert++;
         //return $sql;
         return $this->model->query($sql);
@@ -585,8 +606,10 @@ class characteristics extends main{
     
     function update($tag)
     {
-        $sql="update `biocore`.`ngs_characteristics` set `value`='$tag->value', `date_modified`=now(), `last_modified_user`= '$this->username'
-               where `id` = ".$this->getId($tag);
+        $sql="update `biocore`.`ngs_characteristics` set `value`='$tag->value',
+	    `group_id`='".$this->model->gid."', `perms`='".$this->model->sid."',
+	    `date_modified`=now(), `last_modified_user`='".$this->model->uid."' 
+            where `id` = ".$this->getId($tag);
         $this->update++;
 
         return $this->model->query($sql);
@@ -599,9 +622,8 @@ class file{}
 class files extends main{
     private $files_arr=[];
 
-    function __construct($model, $username, $files_arr = [])
+    function __construct($model, $files_arr = [])
     {
-        $this->username = $username;
         $this->files_arr=$files_arr;
         $this->model=$model;
 
@@ -649,10 +671,12 @@ class files extends main{
         $sql="INSERT INTO `biocore`.`ngs_fastq_files`
             (`file_name`, `checksum`,
             `sample_id`, `lane_id`, `dir_id`,
+	    `owner_id`, `group_id`, `perms`,
             `date_created`, `date_modified`,`last_modified_user`)
             VALUES
             ('$file->file_name', '$file->checksum', '$sample_id',
-            '$lane_id', '$dir_id', now(), now(), '$this->username');";
+            '$lane_id', '$dir_id', '".$this->model->uid."', '".$this->model->gid."', '".$this->model->sid."',
+	    now(), now(), '".$this->model->uid."');";
         $this->insert++;
         //return $sql;
         return $this->model->query($sql);
@@ -660,13 +684,15 @@ class files extends main{
     
     function update($file)
     {
+	$file->file_name=preg_replace('/\s/', '', $file->file_name);
         $sample_id = $this->getSampleId($file->name);
 	$lane_id=0;
         $lane_id = ($sample_id==0 ? $this->getLaneId($file->name) : $this->getLaneIdFromSample($file->name));
         
         $sql="update `biocore`.`ngs_fastq_files` set `checksum`='$file->checksum',
             `sample_id`='$sample_id', `lane_id`='$lane_id',
-            `date_modified`=now(), `last_modified_user`= '$this->username'
+            `group_id`='".$this->model->gid."', `perms`='".$this->model->sid."',
+	    `date_modified`=now(), `last_modified_user`='".$this->model->uid."' 
             where `id` = ".$this->getId($file);
         $this->update++;
 
@@ -702,8 +728,12 @@ class dirs extends main{
     function insert()
     {
 
-        $sql=" INSERT INTO `biocore`.`ngs_dirs`(`fastq_dir`,  `backup_dir`, `amazon_bucket`, `date_created`, `date_modified`, `last_modified_user`)
-                 VALUES('".$this->model->fastq_dir."', '".$this->model->backup_dir."', '".$this->model->amazon_bucket."', now(), now(), '".$this->model->username."');";
+        $sql=" INSERT INTO `biocore`.`ngs_dirs`(`fastq_dir`,  `backup_dir`, `amazon_bucket`,
+		`owner_id`, `group_id`, `perms`,
+		`date_created`, `date_modified`, `last_modified_user`)
+                 VALUES('".$this->model->fastq_dir."', '".$this->model->backup_dir."', '".$this->model->amazon_bucket."',
+		 '".$this->model->uid."', '".$this->model->gid."', '".$this->model->sid."',
+		 now(), now(), '".$this->model->uid."');";
         $this->insert++;
 	$this->sql=$sql;
         return $this->model->query($sql);
@@ -713,7 +743,8 @@ class dirs extends main{
     {
         $sql="update `biocore`.`ngs_dirs` set
 	      `backup_dir`='".$this->model->backup_dir."', `amazon_bucket`='".$this->model->amazon_bucket."',
-	      `date_modified`=now(), `last_modified_user`= '".$this->model->username."'
+	      `group_id`='".$this->model->gid."', `perms`='".$this->model->sid."',
+	      `date_modified`=now(), `last_modified_user`='".$this->model->uid."' 
                where `id` = ".$this->getId();
         $this->update++;
 
