@@ -205,9 +205,9 @@ class HTML {
       $html='		       <style>
 				 
 				 .table {margin:0 auto; border-collapse:separate;}
-				 .table thead {display:block}
+				 .table thead {}
 				 
-				 .table tbody {height:300px;overflow-y:scroll;display:block}
+				 .table tbody {height:300px;overflow-y:scroll;}
   
 				</style>
 			
