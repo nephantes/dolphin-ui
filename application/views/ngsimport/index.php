@@ -24,7 +24,7 @@
                                             <?php
 					    echo $html->getMultipleSelectBox($groups, 'group_id', 'name', 'id');
 					    ?>
-                                            <p class="help-block">Please select a group/s you belong for this project</p>
+                                            <p class="help-block">Please select a group you belong for this project</p>
                                         </div>
                                     </div><!-- /.box-body -->
 				    <div class="box-body">

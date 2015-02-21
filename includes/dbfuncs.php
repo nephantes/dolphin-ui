@@ -46,18 +46,34 @@ class dbfuncs {
      return "0";
    }
    
-   function getTotalGalaxyRuns()
+   function getTotalGalaxyRuns($username)
    {
+     $userstr="";
+     if ($username!="")
+     {
+       #For individual user
+       #$userstr=" where username='$username'"; 
+       #For the groups the user belong to
+       $userstr=" where username in (select u.username from user_group ug, users u where u.id=ug.u_id and ug.g_id in ( SELECT ug.g_id from user_group ug, users u where u.id=ug.u_id and u.username='$username'))";
+     }
      
-     $sql="SELECT count(id) totalGalaxyRuns FROM biocore.galaxy_run;";
+     
+     $sql="SELECT count(id) totalGalaxyRuns FROM biocore.galaxy_run $userstr;";
     
      return $this->queryAVal($sql);
    }
    
-   function getTotalDolphinRuns()
+   function getTotalDolphinRuns($username)
    {
-     
-     $sql="SELECT count(id) totalGalaxyRuns FROM biocore.galaxy_run where dolphin=true;";
+     $userstr="";
+     if ($username!="")
+     {
+       #For individual user
+       #$userstr=" and username='$username'"; 
+       #For the groups the user belong to
+       $userstr=" and username in (select u.username from user_group ug, users u where u.id=ug.u_id and ug.g_id in ( SELECT ug.g_id from user_group ug, users u where u.id=ug.u_id and u.username='$username'))";
+     }
+     $sql="SELECT count(id) totalGalaxyRuns FROM biocore.galaxy_run where dolphin=true $userstr;";
      return $this->queryAVal($sql);
    }
    function getTotalUsers()
@@ -66,10 +82,23 @@ class dbfuncs {
      $sql="SELECT count(id) totalUsers FROM biocore.users;";
      return $this->queryAVal($sql);
    }
-   function getTotalJobs()
+   function getTotalJobs($username)
    {
-     
-     $sql="SELECT count(job_id) totaljobs FROM biocore.jobs;";
+     $userstr="";
+     if ($username!="")
+     {
+       $userstr=" , biocore.users u where j.username=u.clusteruser and u.username='$username'"; 
+     }
+     $sql="SELECT count(j.job_id) totaljobs FROM biocore.jobs j $userstr;";
+     return $this->queryAVal($sql);
+   }
+   function getTotalSamples($username)
+   {
+     #For individual user
+     #$userstr=" and username='$username'"; 
+     #For the groups the user belong to
+     $userstr=" and username in (select u.username from user_group ug, users u where u.id=ug.u_id and ug.g_id in ( SELECT ug.g_id from user_group ug, users u where u.id=ug.u_id and u.username='$username'))";
+     $sql="SELECT count(ng.id)  FROM biocore.ngs_samples ng, biocore.users u where u.id=ng.owner_id $userstr;";
      return $this->queryAVal($sql);
    }
    function getName($username)

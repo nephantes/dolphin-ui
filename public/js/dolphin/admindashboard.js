@@ -1,8 +1,8 @@
 /*
- * Author: Alper Kucukural
+ * Author: Abdullah A Almsaeed
  * Date: 4 Jan 2014
  * Description:
- *      This is a js file for the user dashboard
+ *      This is a demo file used only for the main dashboard (index.html)
  **/
 
 $(function() {
@@ -126,7 +126,7 @@ $(function() {
     /* Morris.js Charts */
      var responseJobs = '';
             $.ajax({ type: "GET",   
-                     url: "/dolphin/public/ajax/dashboardquerydb.php",
+                     url: "/dolphin/public/ajax/admindashboardquerydb.php",
                      data: { p: "getMonthlyJobs" },
                      async: false,
                      success : function(text)
@@ -146,7 +146,7 @@ $(function() {
     });
      var response = '';
             $.ajax({ type: "GET",   
-                     url: "/dolphin/public/ajax/dashboardquerydb.php",
+                     url: "/dolphin/public/ajax/admindashboardquerydb.php",
                      data: { p: "getMonthlyRuns" },
                      async: false,
                      success : function(text)

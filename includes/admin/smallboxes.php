@@ -1,13 +1,12 @@
 <?php
-  $username=$_SESSION['user'];
-  $totalruns=$query->getTotalGalaxyRuns($username);
+  $totalruns=$query->getTotalGalaxyRuns("");
   $totalruntext="Total Galaxy runs";
-  $totaldolphinruns=$query->getTotalDolphinRuns($username);
-  $totaldolphinruntext="Total Dolphin runs";
-  $totalsamples=$query->getTotalSamples($username);
-  $totalsamplestext="Total Samples";
-  $totalclusterjobs=$query->getTotalJobs($username);
-  $totalclusterjobstext="Total Jobs";
+  $totaldolphinruns=$query->getTotalDolphinRuns("");
+  $totaldolphinruntext="Total dolphin runs";
+  $totalusers=$query->getTotalUsers("");
+  $totaluserstext="Total users";
+  $totalclusterjobs=$query->getTotalJobs("");
+  $totalclusterjobstext="Total cluster submissions";
 ?>
 		    <!-- Small boxes (Stat box) -->
                     <div class="row">
@@ -25,7 +24,7 @@
                                 <div class="icon">
                                     <i class="ion ion-stats-bars"></i>
                                 </div>
-                                <a href="galaxystats" class="small-box-footer">
+                                <a href="admingalaxystats" class="small-box-footer">
                                     More info <i class="fa fa-arrow-circle-right"></i>
                                 </a>
                             </div>
@@ -44,7 +43,7 @@
                                 <div class="icon">
                                     <i class="ion ion-stats-bars"></i>
                                 </div>
-                                <a href="dolphinstats" class="small-box-footer">
+                                <a href="admindolphinstats" class="small-box-footer">
                                     More info <i class="fa fa-arrow-circle-right"></i>
                                 </a>
                             </div>
@@ -54,17 +53,17 @@
                             <div class="small-box bg-yellow">
                                 <div class="inner">
                                     <h3>
-                                        <?php print $totalsamples;?>
+                                        <?php print $totalusers;?>
                                         
                                     </h3>
                                     <p>
-                                        <?php print $totalsamplestext;?>
+                                        <?php print $totaluserstext;?>
                                     </p>
                                 </div>
                                 <div class="icon">
-                                    <i class="ion ion-pie-graph"></i>
+                                    <i class="ion ion-person-add"></i>
                                 </div>
-                                <a href="tables/index/ngs_samples" class="small-box-footer">
+                                <a href="tables/index/users" class="small-box-footer">
                                     More info <i class="fa fa-arrow-circle-right"></i>
                                 </a>
                             </div>

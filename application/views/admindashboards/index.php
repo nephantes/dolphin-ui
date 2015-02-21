@@ -1,7 +1,7 @@
                 <!-- Content Header (Page header) -->
                 <section class="content-header">
                     <h1>
-                        Dashboard
+                        Admin Dashboard
                         <small>Control panel</small>
                     </h1>
                     <ol class="breadcrumb">
@@ -11,19 +11,20 @@
                 </section>
                 <!-- Main content -->
                 <section class="content">
-                    <?php require_once("../includes/smallboxes.php");?>
+                    <?php require_once("../includes/admin/smallboxes.php");?>
 
                     <!-- Main row -->
                     <div class="row">
                         <!-- Left col -->
                         <section class="col-lg-7 connectedSortable">
-                            <?php require_once("../includes/bar_chart.php");?>
-                            <?php require_once("../includes/charts.php");?>
-                            <?php require_once("../includes/quickemail.php");?>
+                            <?php require_once("../includes/admin/bar_chart.php");?>
+                            <?php require_once("../includes/admin/charts.php");?>
+                            <?php require_once("../includes/admin/quickemail.php");?>
                         <!-- /.Left col -->
                         <!-- right col (We are only adding the ID to make the widgets sortable)-->
                         <section class="col-lg-5 connectedSortable"> 
-                            <?php require_once("../includes/totalruns.php");?>
+                            <?php require_once("../includes/admin/totalruns.php");?>
+                            <?php require_once("../includes/admin/mapbox.php");?>
 
                             <!-- Calendar -->
                             <div class="box box-solid bg-green-gradient">
