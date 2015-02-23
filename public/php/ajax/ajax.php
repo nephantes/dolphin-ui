@@ -97,7 +97,12 @@ $tablename=$_GET['t'];
        endforeach;
    }
    //Filter according to security credentials
-   if ($uid>2)
+   $action="";
+   if ($_POST)
+   {
+     $action=$_POST['action'];
+   }
+   if ($uid>2 && $action=="")
    {
       
        $out=$out->where(function ($q) use( $uid, $user_groups,$tablenamestr )  {
