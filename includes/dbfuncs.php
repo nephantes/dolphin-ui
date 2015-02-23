@@ -87,7 +87,8 @@ class dbfuncs {
      $userstr="";
      if ($username!="")
      {
-       $userstr=" , biocore.users u where j.username=u.clusteruser and u.username='$username'"; 
+       #$userstr=" , biocore.users u where j.username=u.clusteruser and u.username='$username'"; 
+       $userstr=" , biocore.users u where j.username=u.clusteruser and j.username in (select u.clusteruser from user_group ug, users u where u.id=ug.u_id and ug.g_id in ( SELECT ug.g_id from user_group ug, users u where u.id=ug.u_id and u.username='$username'))";
      }
      $sql="SELECT count(j.job_id) totaljobs FROM biocore.jobs j $userstr;";
      return $this->queryAVal($sql);

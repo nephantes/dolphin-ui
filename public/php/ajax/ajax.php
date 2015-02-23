@@ -38,7 +38,7 @@ $tablename=$_GET['t'];
 	   ->fetch();
    $id=$tables{'id'};
    $joined=$tables{'joined'};
-   
+
    //Get fields
    $fields= $db->query( 'select', 'datafields' )
 	   ->distinct('true')

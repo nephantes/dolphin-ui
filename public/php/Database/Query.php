@@ -778,9 +778,8 @@ class Query {
 		if (!isset($_SESSION) || !is_array($_SESSION)) session_start();
 
 		$uid = $_SESSION['uid'];
-		//$prefield= ",date_created, date_modified, last_modified_user ";
-		$prefield= ",date_created, date_modified, last_modified_user ";
-		$preval= ", now(), now(), '".$uid."' ";
+		$prefield= "owner_id, date_created, date_modified, last_modified_user ";
+		$preval= ",'".$uid."',now(), now(), '".$uid."' ";
 
 		$this->_prepare( 
 			'INSERT INTO '

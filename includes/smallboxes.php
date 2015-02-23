@@ -7,7 +7,7 @@
   $totalsamples=$query->getTotalSamples($username);
   $totalsamplestext="Total Samples";
   $totalclusterjobs=$query->getTotalJobs($username);
-  $totalclusterjobstext="Total Jobs";
+  $totalclusterjobstext="Total cluster submissions";
 ?>
 		    <!-- Small boxes (Stat box) -->
                     <div class="row">

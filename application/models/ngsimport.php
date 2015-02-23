@@ -344,7 +344,7 @@ class lanes extends main{
     
     function getId($lane)
     {
-        $sql="select id from biocore.ngs_lanes where `name`='$lane->name'";
+        $sql="select id from biocore.ngs_lanes where `name`='$lane->name' and `series_id`='".$this->model->series_id."'";
         return $this->model->query($sql,1);
     }
 
@@ -367,7 +367,6 @@ class lanes extends main{
 		    ".$this->correct_bool($lane->resequenced).",  '$lane->notes',
 		    '".$this->model->uid."', '".$this->model->gid."', '".$this->model->sid."',
                     now(), now(), '".$this->model->uid."');";
-                    
         $this->insert++;
 	$this->sql=$sql;
         return $this->model->query($sql);
@@ -479,12 +478,12 @@ class samples extends main{
     
     function getId($sample)
     {
-        $sql="select id from biocore.ngs_samples where `name`='$sample->name'";
+        $sql="select id from biocore.ngs_samples where `name`='$sample->name' and `series_id`='".$this->model->series_id."'";
         return $this->model->query($sql,1);
     }
     function getLaneId($name)
     {
-        $sql="select id from biocore.ngs_lanes where `name`='$name'";
+        $sql="select id from biocore.ngs_lanes where `name`='$name' and `series_id`='".$this->model->series_id."'";
         return $this->model->query($sql,1);
     }
     function getProtocolId($name)
@@ -580,7 +579,7 @@ class characteristics extends main{
     
     function getSampleId($name)
     {
-        $sql="select id from biocore.ngs_samples where `name`='$name'";
+        $sql="select id from biocore.ngs_samples where `name`='$name' and `series_id`='$this->model->series_id'";
         return $this->model->query($sql,1);
     }
 
@@ -621,6 +620,12 @@ class characteristics extends main{
 class file{}
 class files extends main{
     private $files_arr=[];
+    public $sample_id;
+    private $lane_id;
+    private $tablename;
+    private $fieldname;
+    private $value;
+    private $dir_id;
 
     function __construct($model, $files_arr = [])
     {
@@ -637,16 +642,16 @@ class files extends main{
     
     function getLaneId($name)
     {
-        $sql="select id from biocore.ngs_lanes where `name`='$name'";
+        $sql="select id from biocore.ngs_lanes where `name`='$name' and `series_id`='".$this->model->series_id."'";
         return $this->model->query($sql,1);
     }
     function getLaneIdFromSample($name){
-        $sql="SELECT lane_id FROM biocore.ngs_samples where name='$name'";
+        $sql="SELECT lane_id FROM biocore.ngs_samples where name='$name' and `series_id`='".$this->model->series_id."'";
         return $this->model->query($sql,1);
     }
     function getSampleId($name)
     {
-        $sql="select id from biocore.ngs_samples where `name`='$name'";
+        $sql="select id from biocore.ngs_samples where `name`='$name' and `series_id`='".$this->model->series_id."'";
         return $this->model->query($sql,1);
     }
     function getDirId($model)
@@ -657,25 +662,36 @@ class files extends main{
 
     function getId($file)
     {
-        $sql="select id from biocore.ngs_fastq_files where `file_name`='$file->file_name'";
+        $this->sample_id = $this->getSampleId($file->name);
+        $this->lane_id = ($this->sample_id==0 ? $this->getLaneId($file->name) : $this->getLaneIdFromSample($file->name));
+	$this->dir_id = $this->getDirId($this->model);
+        if ($this->sample_id>0)
+        {
+           $this->tablename="ngs_temp_sample_files";
+           $this->fieldname="sample_id";
+	   $this->value=$this->sample_id;
+        }
+	else
+	{
+           $this->tablename="ngs_temp_lane_files";
+           $this->fieldname="lane_id";
+	   $this->value=$this->lane_id;
+	}
+        $sql="select id from `biocore`.`$this->tablename` where `file_name`='$file->file_name'";
         return $this->model->query($sql,1);
     }
 
     function insert($file)
     {
-        $sample_id = $this->getSampleId($file->name);
-	$lane_id=0;
-        $lane_id = ($sample_id==0 ? $this->getLaneId($file->name) : $this->getLaneIdFromSample($file->name));
-	$dir_id = $this->getDirId($this->model);
-        
-        $sql="INSERT INTO `biocore`.`ngs_fastq_files`
-            (`file_name`, `checksum`,
-            `sample_id`, `lane_id`, `dir_id`,
+
+        $sql="INSERT INTO `biocore`.`$this->tablename`
+            (`file_name`,
+            `$this->fieldname`, `dir_id`,
 	    `owner_id`, `group_id`, `perms`,
             `date_created`, `date_modified`,`last_modified_user`)
             VALUES
-            ('$file->file_name', '$file->checksum', '$sample_id',
-            '$lane_id', '$dir_id', '".$this->model->uid."', '".$this->model->gid."', '".$this->model->sid."',
+            ('$file->file_name', '$this->value',
+            '$this->dir_id', '".$this->model->uid."', '".$this->model->gid."', '".$this->model->sid."',
 	    now(), now(), '".$this->model->uid."');";
         $this->insert++;
         //return $sql;
@@ -684,13 +700,9 @@ class files extends main{
     
     function update($file)
     {
-	$file->file_name=preg_replace('/\s/', '', $file->file_name);
-        $sample_id = $this->getSampleId($file->name);
-	$lane_id=0;
-        $lane_id = ($sample_id==0 ? $this->getLaneId($file->name) : $this->getLaneIdFromSample($file->name));
         
-        $sql="update `biocore`.`ngs_fastq_files` set `checksum`='$file->checksum',
-            `sample_id`='$sample_id', `lane_id`='$lane_id',
+        $sql="update `biocore`.`$this->tablename` set
+            `fieldname`='$this->value', `dir_id`='$this->dir_id',
             `group_id`='".$this->model->gid."', `perms`='".$this->model->sid."',
 	    `date_modified`=now(), `last_modified_user`='".$this->model->uid."' 
             where `id` = ".$this->getId($file);

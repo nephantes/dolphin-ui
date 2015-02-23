@@ -35,7 +35,7 @@ class SQLQuery {
     }
     
     function select($id) {
-        $query = 'select * from `'.$this->_table.'` where `id` = \''.$id.'\'';
+        $query = 'select * from `'.$this->_table.'` where `id` = \''.$id.'\' '.$userstr.'';
         return $this->query($query, 1);    
     }
 
