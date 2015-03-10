@@ -478,7 +478,9 @@ class samples extends main{
     
     function getId($sample)
     {
-        $sql="select id from biocore.ngs_samples where `name`='$sample->name' and `series_id`='".$this->model->series_id."'";
+        $lane_id=$this->getLaneId($sample->lane_name);
+
+        $sql="select id from biocore.ngs_samples where `name`='$sample->name' and `lane_id`='$lane_id' and `series_id`='".$this->model->series_id."'";
         return $this->model->query($sql,1);
     }
     function getLaneId($name)
