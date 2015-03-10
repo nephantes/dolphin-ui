@@ -2,10 +2,7 @@
 stepCheck = 'stepCheck%(sep)s@RUNCHECK -i @INPUT -b @BARCODES -a @ADAPTER -t @TRIM -o @OUTDIR -r %(resume)s -s stepCheck -j @JGEN%(sep)s1'
 stepSeqMapping = 'stepSeqMapping%(indexname)s%(sep)s@RUNRECMAPPING -i @INPUT -a @AWKDIR -d @SPAIRED -m @SAMTOOLS -o @OUTDIR -b @PARAM%(indexname)s -c @BOWTIE2CMD -s stepSeqMapping%(indexname)s -r @ADVPARAMS -j @JMAPPING%(sep)s1'
 stepBarcode = 'stepBarcode%(sep)s@RUNBARCODE -i @INPUT -d @SPAIRED -b @BARCODES -o @OUTDIR -c @SINGLEBSPLITTERCMD:@PAIREDBSPLITTERCMD -s stepBarcode -j @JGEN%(sep)s1'
-<<<<<<< HEAD
 stepBackupS3 = 'stepBackupS3%(sep)s@RUNBACKUPS3 -b @BARCODES -g @GROUPID -p @SPAIRED -o @OUTDIR -u @USERNAME -j @JGEN%(sep)s10'
-=======
->>>>>>> b4e46361835fc188e0abe2ee1c87f74373462b59
 stepFastQC = 'stepFastQC%(sep)s@PERL @RUNFASTQC -b @BARCODES -o @OUTDIR -p @FASTQCPROG -s stepFastQC -j @JGEN%(sep)s1'
 stepMergeFastQC = 'stepMergeFastQC%(sep)s@PERL @RUNFASTQCMERGE -o @OUTDIR%(sep)s0'
 stepAdapter = 'stepAdapters%(sep)s@RUNADAPTER -d @SPAIRED -p @PREVIOUSADAPTER -o @OUTDIR -a @ADAPTER -c @MATICCMD -s stepAdapter -j @JGEN%(sep)s1'
