@@ -19,7 +19,7 @@
                         </div><!-- /.col (LEFT) -->
                         <div class="col-md-6">
                             <?php echo $html->getBoxTable_ng("Lanes", "lanes", "<th>id</th><th>Lane name</th><th>Facility</th><th>Total Reads</th><th>Total Samples</th>"); ?>
-                            <?php echo $html->getBoxTable_ng("Samples", "samples", "<th>id</th><th>Title</th><th>Source</th><th>Organism</th><th>Read length</th>"); ?>
+                            <?php echo $html->getBoxTable_ng("Samples", "samples", "<th>id</th><th>Title</th><th>Source</th><th>Organism</th><th>Molecule</th>"); ?>
                         </div><!-- /.col (RIGHT) -->
                     </div><!-- /.row -->
                 </section><!-- /.content -->

@@ -1,0 +1,14 @@
+@GENOME=mousetest
+@VERSION=mm10
+@INPUT=control_rep1,/share/data/umw_biocore/genome_data/mousetest/mm10/control_rep1.1,/share/data/umw_biocore/genome_data/mousetest/mm10/control_rep1.2:control_rep2,/share/data/umw_biocore/genome_data/mousetest/mm10/control_rep2.1,/share/data/umw_biocore/genome_data/mousetest/mm10/control_rep2.2:control_rep3,/share/data/umw_biocore/genome_data/mousetest/mm10/control_rep3.1,/share/data/umw_biocore/genome_data/mousetest/mm10/control_rep3.1:exper_rep1,/share/data/umw_biocore/genome_data/mousetest/mm10/exper_rep1.1,/share/data/umw_biocore/genome_data/mousetest/mm10/exper_rep1.2:exper_rep2,/share/data/umw_biocore/genome_data/mousetest/mm10/exper_rep2.1,/share/data/umw_biocore/genome_data/mousetest/mm10/exper_rep2.2:exper_rep3,/share/data/umw_biocore/genome_data/mousetest/mm10/exper_rep3.1,/share/data/umw_biocore/genome_data/mousetest/mm10/exper_rep3.2
+@DATADIR=/share/data/umw_biocore/genome_data/mousetest/mm10
+@OUTFILE=../tmp/files/input.txt
+@GENOMEBUILD=mousetest,mm10
+@SPAIRED=paired
+@BARCODES=NONE
+@ADAPTER=NONE
+@QUALITY=NONE
+@TRIM=NONE
+@PREVIOUSSPLIT=NONE
+@MAPNAMES=
+@PREVIOUSPIPE=NONE

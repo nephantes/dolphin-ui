@@ -313,16 +313,6 @@ img {
   -moz-border-radius: 0 !important;
   border-radius: 0 !important;
 }
-/* Change the color of the striped tables */
-.table-striped > tbody > tr:nth-child(odd) > td,
-.table-striped > tbody > tr:nth-child(odd) > th {
-  background-color: #f3f4f5;
-}
-.table.no-border,
-.table.no-border td,
-.table.no-border th {
-  border: 0;
-}
 /* .text-center in tables */
 table.text-center,
 table.text-center td,

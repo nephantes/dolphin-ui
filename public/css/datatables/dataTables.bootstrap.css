@@ -118,7 +118,7 @@ div.dataTables_scrollFoot table {
 
 .table-striped tbody tr.active:nth-child(odd) td,
 .table-striped tbody tr.active:nth-child(odd) th {
-	background-color: #017ebc;
+	background-color: #FFFebc;
 }
 
 table.DTTT_selectable tbody tr {

@@ -13,7 +13,6 @@ class TablesController extends VanillaController {
             $this->set('table',$this->Table->getDataTable($this->tablename));
             $this->set('fields', $this->Table->getDataFields($this->tablename));
         }
-          
     }
     function afterAction() {
 

@@ -199,7 +199,29 @@ class HTML {
 	return $html;
    }
 
+ function getRespBoxTable_ng($title, $table, $fields)
+   {
+      $html='		       <div class="box">
+                <div class="box-header">
+                   <h3 class="box-title">'.$title.'</h3>
+                </div><!-- /.box-header -->
+                <div class="box-body table-responsive">
+                  <table id="jsontable_'.$table.'" class="table table-hover table-striped table-condensed table-scrollable">
+		  <thead>
+                    <tr>
+			'.$fields.'
+                    </tr>
+                   </thead>
+                  </table>
+                </div><!-- /.box-body -->
+              </div><!-- /.box -->
+			    
+			   
+      ';
+      return $html;
+   }
 
+   
    function getBoxTable_ng($title, $table, $fields)
    {
       $html='		       <style>
@@ -269,6 +291,99 @@ e range"><i class="fa fa-calendar"></i></button>
                             </div><!-- /.box -->
       ';
       return $html;
+   }
+   function getAccordion($name, $object)
+   {
+	 $html='      <div class="panel box box-primary">
+                      <div class="box-header with-border">
+                        <h4 class="box-title">
+                          <a data-toggle="collapse" data-parent="#accordion" href="#collapse'.$name.'">
+                            '.$name.'
+                          </a>
+                        </h4>
+                      </div>
+                      <div id="collapse'.$name.'" class="panel-collapse collapse in">
+                        <div class="box-body">
+			    <ul>
+			    ';
+			    foreach ($object as $obj):
+				$html.='<li><a href="/dolphin/search/browse/'.$name."/".$obj['name'].'">'.$obj['name'].' ('.$obj['count'].')</a></li>';
+			    endforeach;
+	$html.='
+			    </ul>
+			</div>
+                      </div>
+		      </div>
+	  ';
+	  return $html;
+   }
+   
+   function getExperimentSeriesPanel($objects)
+   {
+	foreach ($objects as $obj):
+	$html='<div class="panel panel-default">
+		<div class="panel-heading">
+		<h4 class="panel-title">Experiment Series</h3>
+		</div>
+		<div class="panel-body">
+		<h4>
+		    '.$obj['experiment_name'].'
+		</h4>
+		</div>
+		<div class="box-body">
+		<dl class="dl-horizontal">
+		<dt>Summary</dt>
+		<dd>'.$obj['summary'].'</dd>
+		<dt>Design</dt>
+		<dd>'.$obj['design'].'</dd>
+		</dl>
+		</div> 
+		</div>';
+	endforeach;
+	return $html;
+   }
+   function getBrowserPanel($objects, $fields, $header ,$name)
+   {
+	foreach ($objects as $obj):
+	$html='<div class="panel panel-default">
+		<div class="panel-heading">
+		<h4 class="panel-title">'.$header.'</h3>
+		</div>
+		<div class="panel-body">
+		<h4>
+		    '.$obj[$name].'
+		</h4>
+		</div>
+		<div class="box-body">
+		<dl class="dl-horizontal">
+		';
+		foreach ($fields as $field):
+		  if ($field['fieldname']!=$name && $obj[$field['fieldname']]!=""){
+      	             $html.='   <dt>'.$field['title'].'</dt>';
+		     $html.='  <dd>'.$obj[$field['fieldname']].'</dd>';
+		  }
+		endforeach;
+	
+	$html.=	'</dl>
+		</div> 
+		</div>';
+	endforeach;
+	return $html;
+   }
+   
+   function getQCPanel()
+   {
+	$html='
+	<div class="panel panel-default">
+		<div class="panel-heading">
+		  <h4>Analysis Results <small>Comprehensive Analysis</small></h4>
+		</div>
+		<div class="panel-body">
+	 <iframe src="http://localhost/dolphin/bs.html" seamless frameborder=0 onload="this.width=855;this.height=600;"></iframe>
+	</div>
+	</div>
+    ';
+    return $html;
    }
    
    function getMultipleSelectBox($options, $id, $field, $idfield)
