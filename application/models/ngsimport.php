@@ -10,6 +10,7 @@ class Ngsimport extends VanillaModel {
     public $fastq_dir;
     public $backup_dir;
     public $amazon_bucket;
+    public $samples=[];
 
     function parseExcel($gid, $sid, $worksheet, $sheetData) {
         $this->worksheet=$worksheet;
@@ -172,7 +173,7 @@ class Ngsimport extends VanillaModel {
            }
         }
         //echo json_encode($sample_arr);
-        
+        $this->samples=$sample_arr;
         $new_samples = new samples($this, $sample_arr);
         $text="SAMPLE:".$new_samples->getStat()."<BR>";
         $new_chars = new characteristics($this, $char_arr);
@@ -195,7 +196,7 @@ class Ngsimport extends VanillaModel {
         }
         //echo json_encode($file_arr);
         
-        $new_files = new files($this, $file_arr);
+        $new_files = new files($this, $file_arr, $this->samples);
         return "FILES:".$new_files->getStat();   
         //var_dump($sheetData);
     }
@@ -622,6 +623,7 @@ class characteristics extends main{
 class file{}
 class files extends main{
     private $files_arr=[];
+    private $sample_arr=[];
     public $sample_id;
     private $lane_id;
     private $tablename;
@@ -629,9 +631,10 @@ class files extends main{
     private $value;
     private $dir_id;
 
-    function __construct($model, $files_arr = [])
+    function __construct($model, $files_arr = [], $sample_arr=[])
     {
         $this->files_arr=$files_arr;
+        $this->sample_arr=$sample_arr;
         $this->model=$model;
 
         $this->processArr($files_arr);
@@ -648,12 +651,16 @@ class files extends main{
         return $this->model->query($sql,1);
     }
     function getLaneIdFromSample($name){
-        $sql="SELECT lane_id FROM biocore.ngs_samples where name='$name' and `series_id`='".$this->model->series_id."'";
+        $lane_name=$this->sample_arr[$name]->lane_name;
+        $sql="SELECT id FROM biocore.ngs_lanes where name='$lane_name' and `series_id`='".$this->model->series_id."'";
+
         return $this->model->query($sql,1);
     }
     function getSampleId($name)
     {
-        $sql="select id from biocore.ngs_samples where `name`='$name' and `series_id`='".$this->model->series_id."'";
+        $lane_id=$this->getLaneIdFromSample($name);
+        $sql="select id from biocore.ngs_samples where `name`='$name' and `lane_id`='$lane_id' and `series_id`='".$this->model->series_id."'";
+
         return $this->model->query($sql,1);
     }
     function getDirId($model)
@@ -679,7 +686,7 @@ class files extends main{
            $this->fieldname="lane_id";
 	   $this->value=$this->lane_id;
 	}
-        $sql="select id from `biocore`.`$this->tablename` where `file_name`='$file->file_name'";
+        $sql="select id from `biocore`.`$this->tablename` where `file_name`='$file->file_name' and `sample_id`='$this->sample_id'";
         return $this->model->query($sql,1);
     }
 
