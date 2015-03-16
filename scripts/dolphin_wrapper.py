@@ -159,6 +159,7 @@ def main():
       
            output      = "../tmp/files/input.txt"
            
+           gettotalreads = "Yes"
            fastqc      = None
            adapter     = None
            quality     = None
@@ -196,7 +197,7 @@ def main():
               commonind = re.sub('test', '', commonind)
            write_input( input_fn, inputdir, content, genomebuild, spaired, barcodes, adapter, quality, trim, trimpaired, split, commonind, advparams, customind, pipeline )
            workflow = join( bin_dir, 'seqmapping_workflow.txt' )
-           write_workflow(resume, backupS3, customind, commonind, pipeline, barcodes, fastqc, adapter, quality, trim, split, workflow, clean) 
+           write_workflow(resume, gettotalreads, backupS3, rungroup, customind, commonind, pipeline, barcodes, fastqc, adapter, quality, trim, split, workflow, clean) 
            os.system("chmod 777 "+str(output))
            galaxyhost=commands.getstatusoutput('cat /etc/galaxyhost')[1]
 
@@ -358,7 +359,7 @@ def write_input( input_fn, data_dir, content,genomebuild,spaired,barcodes,adapte
 
         fp.close()
 
-def write_workflow( resume, backupS3, customind, commonind, pipeline, barcodes, fastqc, adapter, quality, trim, split, file, clean ):
+def write_workflow( resume, gettotalreads, backupS3, rungroup, customind, commonind, pipeline, barcodes, fastqc, adapter, quality, trim, split, file, clean ):
         fp = open ( file, 'w') 
         sep='\t'
 
@@ -368,6 +369,9 @@ def write_workflow( resume, backupS3, customind, commonind, pipeline, barcodes, 
         if (barcodes):
            stepline=stepBarcode % locals()
            print >>fp, '%s'%stepline
+        if (gettotalreads):
+            stepline=stepGetTotalReads % locals()
+            print >> fp, '%s'%stepline
 
         if (backupS3):
             stepline=stepBackupS3 % locals()
