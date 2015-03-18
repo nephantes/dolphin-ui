@@ -82,6 +82,7 @@ class Ngsimport extends VanillaModel {
            for ($j='A';$j<=$this->worksheet['lastColumnLetter'];$j++)
            {              
               if($this->sheetData[3][$j]=="Lane name"){$lane->name=$this->esc($this->sheetData[$i][$j]);}
+              if($this->sheetData[3][$j]=="Lane id"){$lane->lane_id=$this->esc($this->sheetData[$i][$j]);}
               if($this->sheetData[3][$j]=="Sequencing facility"){$lane->facility=$this->esc($this->sheetData[$i][$j]);}
               if($this->sheetData[3][$j]=="Cost"){$lane->cost=$this->esc($this->sheetData[$i][$j]);}
               if($this->sheetData[3][$j]=="Date submitted"){$lane->date_submitted=$this->esc($this->sheetData[$i][$j]);}
@@ -356,12 +357,12 @@ class lanes extends main{
     
     function insert($lane)
     {
-        $sql="insert into `biocore`.`ngs_lanes`(`series_id`, `name`, `facility`, `cost`,
+        $sql="insert into `biocore`.`ngs_lanes`(`series_id`, `name`, `lane_id`, `facility`, `cost`,
                    `date_submitted`, `date_received`, `total_reads`, `phix_requested`,
                    `phix_in_lane`, `total_samples`, `resequenced`, `notes`,
 		   `owner_id`, `group_id`, `perms`, `date_created`,
                    `date_modified`, `last_modified_user`)
-              values('".$this->model->series_id."',  '$lane->name',  '$lane->facility',  '$lane->cost',
+              values('".$this->model->series_id."',  '$lane->name',  '$lane->lane_id', '$lane->facility',  '$lane->cost',
                     ".$this->correct_date($lane->date_submitted).",  ".$this->correct_date($lane->date_received).",  
 		    '$lane->total_reads',  '$lane->phix_requested',
                     '$lane->phix_in_lane',  '$lane->total_samples',  
@@ -379,6 +380,7 @@ class lanes extends main{
                 SET
                 `series_id` = '".$this->model->series_id."',
                 `facility` = '$lane->facility',
+                `lane_id` = '$lane->lane_id',
                 `cost` = '$lane->cost',
                 `date_submitted` = ".$this->correct_date($lane->date_submitted).",
                 `date_received` = ".$this->correct_date($lane->date_received).",
