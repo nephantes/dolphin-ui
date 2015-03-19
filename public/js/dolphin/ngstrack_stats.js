@@ -17,24 +17,8 @@ $(function() {
     
 
     /*##### PAGE DETERMINER #####*/
-    
-    var URLPartition = document.URL.split("/");
-    
-    var segmentName = URLPartition[URLPartition.length - 3];
-    var table = URLPartition[URLPartition.length - 2];
-    var value = URLPartition[URLPartition.length - 1];
-    
-    
-    /*##### JSON DATA TESTING #####*/
-    
-    /*$.getJSON('http://localhost/dolphin/search/details', function(data) {
-	alert(data);
-	segmentName = data[0];
-	table = data[1];
-	value = data[2];
-    });
-    */
-    
+
+    var segment = phpGrab.theSegment;
     var qvar = ""
     var rvar = "";
     
@@ -42,20 +26,20 @@ $(function() {
     
     //Details values
     
-    if (segmentName == "details") {
-	if (table == "experiment_series") {
-	    qvar = value;
+    if (segment == "details") {
+	if (phpGrab.theField == "experiment_series") {
+	    qvar = phpGrab.theValue;
 	}
-	else if (table == "experiments") {
-	    rvar = value;
+	else if (phpGrab.theField == "experiments") {
+	    rvar = phpGrab.theValue;
 	}
     }
     
     //Browse values
     
-    else if (segmentName == "browse") {
-	qvar = table;  //field
-	rvar = unescape(value);  //value
+    else if (segment == "browse") {
+	qvar = phpGrab.theField;  //field
+	rvar = unescape(phpGrab.theValue);  //value
     }
     
     /*##### PROTOCOLS TABLE #####*/
@@ -64,7 +48,7 @@ $(function() {
      
      $.ajax({ type: "GET",   
                      url: "/dolphin/public/ajax/ngsquerydb.php",
-                     data: { p: "getProtocols", type:"Dolphin", q: qvar, r: rvar, seg: segmentName },
+                     data: { p: "getProtocols", type:"Dolphin", q: qvar, r: rvar, seg: segment },
                      async: false,
                      success : function(s)
                      {
@@ -97,7 +81,7 @@ $(function() {
     function(start, end) {
             $.ajax({ type: "GET",   
                      url: "/dolphin/public/ajax/ngsquerydb.php",
-                     data: { p: "getProtocols", q: qvar, r: rvar, seg: segmentName, start:start.format('YYYY-MM-DD'), end:end.format('YYYY-MM-DD') },
+                     data: { p: "getProtocols", q: qvar, r: rvar, seg: segment, start:start.format('YYYY-MM-DD'), end:end.format('YYYY-MM-DD') },
                      async: false,
                      success : function(s)
                      {
@@ -125,7 +109,7 @@ $(function() {
     
     $.ajax({ type: "GET",   
                      url: "/dolphin/public/ajax/ngsquerydb.php",
-                     data: { p: "getSamples", q: qvar, r: rvar, seg: segmentName },
+                     data: { p: "getSamples", q: qvar, r: rvar, seg: segment },
                      async: false,
                      success : function(s)
                      {
@@ -159,7 +143,7 @@ $(function() {
     function(start, end) {
             $.ajax({ type: "GET",   
                      url: "/dolphin/public/ajax/ngsquerydb.php",
-                     data: { p: "getSamples", q: qvar, r: rvar, seg: segmentName, start:start.format('YYYY-MM-DD'), end:end.format('YYYY-MM-DD') },
+                     data: { p: "getSamples", q: qvar, r: rvar, seg: segment, start:start.format('YYYY-MM-DD'), end:end.format('YYYY-MM-DD') },
                      async: false,
                      success : function(s)
                      {
@@ -187,7 +171,7 @@ $(function() {
     
     $.ajax({ type: "GET",   
                      url: "/dolphin/public/ajax/ngsquerydb.php",
-                     data: { p: "getLanes", q: qvar, r: rvar, seg: segmentName },
+                     data: { p: "getLanes", q: qvar, r: rvar, seg: segment },
                      async: false,
                      success : function(s)
                      {
@@ -221,7 +205,7 @@ $(function() {
     function(start, end) {
             $.ajax({ type: "GET",   
                      url: "/dolphin/public/ajax/ngsquerydb.php",
-                     data: { p: "getLanes", q: qvar, r: rvar, seg: segmentName, start:start.format('YYYY-MM-DD'), end:end.format('YYYY-MM-DD') },
+                     data: { p: "getLanes", q: qvar, r: rvar, seg: segment, start:start.format('YYYY-MM-DD'), end:end.format('YYYY-MM-DD') },
                      async: false,
                      success : function(s)
                      {
@@ -248,7 +232,7 @@ $(function() {
      var experiment_seriesTable = $('#jsontable_experiment_series').dataTable(); 
      $.ajax({ type: "GET",   
                      url: "/dolphin/public/ajax/ngsquerydb.php",
-                     data: { p: "getExperimentSeries", q: qvar, r: rvar, seg: segmentName },
+                     data: { p: "getExperimentSeries", q: qvar, r: rvar, seg: segment },
                      async: false,
                      success : function(s)
                      {
@@ -281,7 +265,7 @@ $(function() {
     function(start, end) {
             $.ajax({ type: "GET",   
                      url: "/dolphin/public/ajax/ngsquerydb.php",
-                     data: { p: "getExperimentSeries", q: qvar, r: rvar, seg: segmentName, start:start.format('YYYY-MM-DD'), end:end.format('YYYY-MM-DD') },
+                     data: { p: "getExperimentSeries", q: qvar, r: rvar, seg: segment, start:start.format('YYYY-MM-DD'), end:end.format('YYYY-MM-DD') },
                      async: false,
                      success : function(s)
                      {
