@@ -22,8 +22,6 @@ $(function() {
     var qvar = ""
     var rvar = "";
     
-    //Determine which values should be passed
-    
     //Details values
     
     if (segment == "details") {

@@ -20,7 +20,10 @@ class Search extends VanillaModel {
         $result = $this->query("select df.fieldname, df.title from datatables dt, datafields df where df.table_id=dt.id and dt.tablename='$table'");
         return json_decode($result, true);
     }
-    
-    
-    
+    function sendJScriptData($segment, $field, $value){
+        $jsData['theSegment'] = $segment;
+        $jsData['theField'] = $field;
+        $jsData['theValue'] = $value;
+        return json_encode($jsData);
+    }
 }

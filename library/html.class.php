@@ -198,7 +198,7 @@ class HTML {
 		</div>';
 	return $html;
    }
-
+   
  function getRespBoxTable_ng($title, $table, $fields)
    {
       $html='		       <div class="box">
@@ -403,6 +403,16 @@ e range"><i class="fa fa-calendar"></i></button>
                 $html.='<input type="radio" name="'.$id.'" id="'.$option['name'].'" value="'.$option['value'].'" '.$option['selected'].'>&nbsp;'.$option['name'];
 		$html.='</label></div>';
 	endforeach;
+	return $html;
+   }
+   
+   function sendJScript($jsData){
+	$html="";
+	if (!empty($jsData)) {
+		$html.="<script type='text/javascript'>\n";
+		$html.="var phpGrab = " . $jsData . "\n";
+		$html.="</script>\n";
+	}
 	return $html;
    }
 }

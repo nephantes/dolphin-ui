@@ -34,6 +34,7 @@
           <!-- END ACCORDION & CAROUSEL-->
 			</div><!-- /.col (LEFT) -->
                         <div class="col-md-9">
+			    <?php echo $html->sendJScript($jsData); ?>
 			    <?php echo $html->getRespBoxTable_ng("Experiment Series", "experiment_series", "<th>id</th><th>Name</th><th>Summary</th><th>Design</th>"); ?>
                             
 			    <?php echo $html->getRespBoxTable_ng("Experiments", "lanes", "<th>id</th><th>Experiment name</th><th>Facility</th><th>Total Reads</th><th>Total Samples</th>"); ?>
