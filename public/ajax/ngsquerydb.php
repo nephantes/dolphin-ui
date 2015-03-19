@@ -9,10 +9,50 @@ require_once("../../includes/dbfuncs.php");
 $query = new dbfuncs();
 
 if (isset($_GET['p'])){$p = $_GET['p'];}
+if (isset($_GET['q'])){$q = $_GET['q'];}
+if (isset($_GET['r'])){$r = $_GET['r'];}
+if (isset($_GET['seg'])){$seg = $_GET['seg'];}
 if (isset($_GET['start'])){$start = $_GET['start'];}
 if (isset($_GET['end'])){$end = $_GET['end'];}
 
-if($p == "getExperimentSeries")
+//browse
+
+//details
+
+if($p == "getLanes" && $q != "")
+{
+    $time="";
+    if (isset($start)){$time="WHERE `date_created`>='$start' and `date_created`<='$end'";}
+    $data=$query->queryTable("
+    SELECT id,  name, facility, total_reads, total_samples
+    FROM biocore.ngs_lanes
+    WHERE biocore.ngs_lanes.series_id = $q $time
+    ");
+}
+else if($p == "getSamples" && $r != "")
+{
+    $time="";
+    if (isset($start)){$time="and `date_created`>='$start' and `date_created`<='$end'";}
+    $data=$query->queryTable("
+    SELECT id, title, source, organism, molecule
+    FROM biocore.ngs_samples
+    WHERE biocore.ngs_samples.lane_id = $r $time
+    ");
+}
+else if($p == "getSamples" && $q != "")
+{
+    $time="";
+    if (isset($start)){$time="and `date_created`>='$start' and `date_created`<='$end'";}
+    $data=$query->queryTable("
+    SELECT id, title, source, organism, molecule
+    FROM biocore.ngs_samples
+    WHERE biocore.ngs_samples.series_id = $q $time
+    ");
+}
+
+//index
+
+else if($p == "getExperimentSeries")
 {
     $time="";
     if (isset($start)){$time="WHERE `date_created`>='$start' and `date_created`<='$end'";}
@@ -30,6 +70,7 @@ else if($p == "getProtocols")
     FROM biocore.ngs_protocols $time
     ");
 }
+
 else if($p == "getLanes")
 {
     $time="";
@@ -44,10 +85,12 @@ else if($p == "getSamples")
     $time="";
     if (isset($start)){$time="and `date_created`>='$start' and `date_created`<='$end'";}
     $data=$query->queryTable("
-     SELECT id, title, source, organism, molecule
-     FROM biocore.ngs_samples $time
+    SELECT id, title, source, organism, molecule
+    FROM biocore.ngs_samples $time
     ");
 }
+
+
 
 header('Cache-Control: no-cache, must-revalidate');
 header('Expires: Mon, 26 Jul 1997 05:00:00 GMT');
