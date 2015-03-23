@@ -71,7 +71,7 @@ class SQLQuery {
               else {
                  while(($row=$this->_result->fetch_assoc())){$result[]=$row;}
               }
-           }	
+           }
            return json_encode($result);
          }
        }

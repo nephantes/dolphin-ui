@@ -8,22 +8,17 @@
 $(function() {
     "use strict";
     
-
-
-
     //The Calender
     $("#calendar").datepicker();
-
-    
 
     /*##### PAGE DETERMINER #####*/
 
     var segment = phpGrab.theSegment;
     var qvar = ""
     var rvar = "";
+    var theSearch = phpGrab.theSearch;
     
     //Details values
-    
     if (segment == "details") {
 	if (phpGrab.theField == "experiment_series") {
 	    qvar = phpGrab.theValue;
@@ -34,7 +29,6 @@ $(function() {
     }
     
     //Browse values
-    
     else if (segment == "browse") {
 	qvar = phpGrab.theField;  //field
 	rvar = unescape(phpGrab.theValue);  //value
@@ -46,7 +40,7 @@ $(function() {
      
      $.ajax({ type: "GET",   
                      url: "/dolphin/public/ajax/ngsquerydb.php",
-                     data: { p: "getProtocols", type:"Dolphin", q: qvar, r: rvar, seg: segment },
+                     data: { p: "getProtocols", type:"Dolphin", q: qvar, r: rvar, seg: segment, search: theSearch},
                      async: false,
                      success : function(s)
                      {
@@ -54,7 +48,7 @@ $(function() {
                         for(var i = 0; i < s.length; i++) {
                         protocolsTable.fnAddData([
 			s[i].id,
-			"<a href=\"/dolphin/search/details/protocols/"+s[i].id+"\">"+s[i].name+"</a>", 
+			"<a href=\"/dolphin/search/details/protocols/"+s[i].id+'/'+theSearch+"\">"+s[i].name+"</a>", 
                         s[i].growth,
 			s[i].treatment,
                         ]);
@@ -79,7 +73,7 @@ $(function() {
     function(start, end) {
             $.ajax({ type: "GET",   
                      url: "/dolphin/public/ajax/ngsquerydb.php",
-                     data: { p: "getProtocols", q: qvar, r: rvar, seg: segment, start:start.format('YYYY-MM-DD'), end:end.format('YYYY-MM-DD') },
+                     data: { p: "getProtocols", q: qvar, r: rvar, seg: segment, search: theSearch, start:start.format('YYYY-MM-DD'), end:end.format('YYYY-MM-DD') },
                      async: false,
                      success : function(s)
                      {
@@ -87,7 +81,7 @@ $(function() {
                         for(var i = 0; i < s.length; i++) {
                         protocolsTable.fnAddData([
 			s[i].id,
-			"<a href=\"/dolphin/search/details/protocols/"+s[i].id+"\">"+s[i].name+"</a>", 
+			"<a href=\"/dolphin/search/details/protocols/"+s[i].id+'/'+theSearch+"\">"+s[i].name+"</a>", 
                         s[i].growth,
 			s[i].treatment,
                         ]);
@@ -107,7 +101,7 @@ $(function() {
     
     $.ajax({ type: "GET",   
                      url: "/dolphin/public/ajax/ngsquerydb.php",
-                     data: { p: "getSamples", q: qvar, r: rvar, seg: segment },
+                     data: { p: "getSamples", q: qvar, r: rvar, seg: segment, search: theSearch },
                      async: false,
                      success : function(s)
                      {
@@ -115,7 +109,7 @@ $(function() {
                         for(var i = 0; i < s.length; i++) {
                         samplesTable.fnAddData([
                         s[i].id,
-			"<a href=\"/dolphin/search/details/samples/"+s[i].id+"\">"+s[i].title+"</a>", 
+			"<a href=\"/dolphin/search/details/samples/"+s[i].id+'/'+theSearch+"\">"+s[i].title+"</a>", 
 			s[i].source,
 			s[i].organism,
 			s[i].molecule,
@@ -141,7 +135,7 @@ $(function() {
     function(start, end) {
             $.ajax({ type: "GET",   
                      url: "/dolphin/public/ajax/ngsquerydb.php",
-                     data: { p: "getSamples", q: qvar, r: rvar, seg: segment, start:start.format('YYYY-MM-DD'), end:end.format('YYYY-MM-DD') },
+                     data: { p: "getSamples", q: qvar, r: rvar, seg: segment, search: theSearch, start:start.format('YYYY-MM-DD'), end:end.format('YYYY-MM-DD') },
                      async: false,
                      success : function(s)
                      {
@@ -149,7 +143,7 @@ $(function() {
                         for(var i = 0; i < s.length; i++) {
                         samplesTable.fnAddData([
                         s[i].id,
-			"<a href=\"/dolphin/search/details/samples/"+s[i].id+"\">"+s[i].title+"</a>", 
+			"<a href=\"/dolphin/search/details/samples/"+s[i].id+'/'+theSearch+"\">"+s[i].title+"</a>", 
 			s[i].source,
 			s[i].organism,
 			s[i].molecule,
@@ -169,7 +163,7 @@ $(function() {
     
     $.ajax({ type: "GET",   
                      url: "/dolphin/public/ajax/ngsquerydb.php",
-                     data: { p: "getLanes", q: qvar, r: rvar, seg: segment },
+                     data: { p: "getLanes", q: qvar, r: rvar, seg: segment, search: theSearch },
                      async: false,
                      success : function(s)
                      {
@@ -177,7 +171,7 @@ $(function() {
                         for(var i = 0; i < s.length; i++) {
                         lanesTable.fnAddData([
                         s[i].id,
-			"<a href=\"/dolphin/search/details/experiments/"+s[i].id+"\">"+s[i].name+"</a>", 
+			"<a href=\"/dolphin/search/details/experiments/"+s[i].id+'/'+theSearch+"\">"+s[i].name+"</a>", 
 			s[i].facility,
 			s[i].total_reads,
 			s[i].total_samples,
@@ -203,7 +197,7 @@ $(function() {
     function(start, end) {
             $.ajax({ type: "GET",   
                      url: "/dolphin/public/ajax/ngsquerydb.php",
-                     data: { p: "getLanes", q: qvar, r: rvar, seg: segment, start:start.format('YYYY-MM-DD'), end:end.format('YYYY-MM-DD') },
+                     data: { p: "getLanes", q: qvar, r: rvar, seg: segment, search: theSearch, start:start.format('YYYY-MM-DD'), end:end.format('YYYY-MM-DD') },
                      async: false,
                      success : function(s)
                      {
@@ -211,7 +205,7 @@ $(function() {
                         for(var i = 0; i < s.length; i++) {
                         lanesTable.fnAddData([
                         s[i].id,
-			"<a href=\"/dolphin/search/details/experiments/"+s[i].id+"\">"+s[i].name+"</a>", 
+			"<a href=\"/dolphin/search/details/experiments/"+s[i].id+'/'+theSearch+"\">"+s[i].name+"</a>", 
 			s[i].facility,
 			s[i].total_reads,
 			s[i].total_samples,
@@ -230,7 +224,7 @@ $(function() {
      var experiment_seriesTable = $('#jsontable_experiment_series').dataTable(); 
      $.ajax({ type: "GET",   
                      url: "/dolphin/public/ajax/ngsquerydb.php",
-                     data: { p: "getExperimentSeries", q: qvar, r: rvar, seg: segment },
+                     data: { p: "getExperimentSeries", q: qvar, r: rvar, seg: segment, search: theSearch },
                      async: false,
                      success : function(s)
                      {
@@ -238,7 +232,7 @@ $(function() {
                         for(var i = 0; i < s.length; i++) {
                         experiment_seriesTable.fnAddData([
 			s[i].id,
-			"<a href=\"/dolphin/search/details/experiment_series/"+s[i].id+"\">"+s[i].experiment_name+"</a>", 
+			"<a href=\"/dolphin/search/details/experiment_series/"+s[i].id+'/'+theSearch+"\">"+s[i].experiment_name+"</a>", 
                         s[i].summary,
                         s[i].design,
                         ]);
@@ -263,7 +257,7 @@ $(function() {
     function(start, end) {
             $.ajax({ type: "GET",   
                      url: "/dolphin/public/ajax/ngsquerydb.php",
-                     data: { p: "getExperimentSeries", q: qvar, r: rvar, seg: segment, start:start.format('YYYY-MM-DD'), end:end.format('YYYY-MM-DD') },
+                     data: { p: "getExperimentSeries", q: qvar, r: rvar, seg: segment, search: theSearch, start:start.format('YYYY-MM-DD'), end:end.format('YYYY-MM-DD') },
                      async: false,
                      success : function(s)
                      {
@@ -271,7 +265,7 @@ $(function() {
                         for(var i = 0; i < s.length; i++) {
                         experiment_seriesTable.fnAddData([
 			s[i].id,
-			"<a href=\"/dolphin/search/details/experiment_series/"+s[i].id+"\">"+s[i].experiment_name+"</a>", 
+			"<a href=\"/dolphin/search/details/experiment_series/"+s[i].id+'/'+theSearch+"\">"+s[i].experiment_name+"</a>", 
                         s[i].summary,
                         s[i].design,
                         ]);

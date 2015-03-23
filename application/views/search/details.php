@@ -22,11 +22,11 @@
                 <div class="box-body">
                   <div class="box-group" id="accordion">
                     <!-- we are adding the .panel class so bootstrap.js collapse plugin detects it -->
-                    <?php echo $html->getAccordion("Assay", $assay, "in")?>
-		    <?php echo $html->getAccordion("Organism", $organism, "")?>
-		    <?php echo $html->getAccordion("Molecule", $molecule, "")?>
-		    <?php echo $html->getAccordion("Source", $source, "")?>
-		    <?php echo $html->getAccordion("Genotype", $genotype, "")?>
+                    <?php echo $html->getAccordion("Assay", $assay, $search)?>
+		    <?php echo $html->getAccordion("Organism", $organism, $search)?>
+		    <?php echo $html->getAccordion("Molecule", $molecule, $search)?>
+		    <?php echo $html->getAccordion("Source", $source, $search)?>
+		    <?php echo $html->getAccordion("Genotype", $genotype, $search)?>
 
                   </div>
                 </div><!-- /.box-body -->
@@ -35,7 +35,7 @@
 			</div><!-- /.col (LEFT) -->
                         <div class="col-md-9">
 			    <?php
-			    echo $html->sendJScript($jsData);
+			    echo $html->sendJScript($segment, $table, $value, $search);
 			    if ($table!=""){
 				echo $html->getBrowserPanel($experiment_series, $experiment_series_fields, "Experiment Series", 'experiment_name');
 			    }
