@@ -198,7 +198,7 @@ class HTML {
 		</div>';
 	return $html;
    }
-
+   
  function getRespBoxTable_ng($title, $table, $fields)
    {
       $html='		       <div class="box">
@@ -292,7 +292,7 @@ e range"><i class="fa fa-calendar"></i></button>
       ';
       return $html;
    }
-   function getAccordion($name, $object)
+   function getAccordion($name, $object, $search)
    {
 	 $html='      <div class="panel box box-primary">
                       <div class="box-header with-border">
@@ -306,9 +306,47 @@ e range"><i class="fa fa-calendar"></i></button>
                         <div class="box-body">
 			    <ul>
 			    ';
-			    foreach ($object as $obj):
-				$html.='<li><a href="/dolphin/search/browse/'.$name."/".$obj['name'].'">'.$obj['name'].' ('.$obj['count'].')</a></li>';
-			    endforeach;
+			    if($name == "Assay"){ $adjName = "library_type"; }
+			    else{ $adjName = $name; }
+			    if($search == ""){
+				foreach ($object as $obj):
+				    $html.='<li><a href="/dolphin/search/browse/'
+					.$name."/".$obj['name']."/".strtolower($adjName)."=".$obj['name']."".
+					'">'.$obj['name'].' ('.$obj['count'].')</a></li>';
+				endforeach;
+			    }
+			    else
+			    {
+				$selectChk = explode('$', $search);
+				
+				foreach ($object as $obj):
+					$modSearch = strtolower($adjName)."=".$obj['name'];
+					if(in_array($modSearch, $selectChk))
+					{
+						$tmpSelectCheck = $selectChk;
+						$key = array_search($modSearch, $tmpSelectCheck);
+						unset($tmpSelectCheck[$key]);
+						if(empty($tmpSelectCheck)){
+							$modSearch = implode('$',$tmpSelectCheck);
+							$html.='<li><a href="/dolphin/search/'
+								."index".'">'.$obj['name'].' ('.$obj['count'].') +</a></li>';
+						}
+						else
+						{
+							$modSearch = implode('$',$tmpSelectCheck);
+							$html.='<li><a href="/dolphin/search/browse/'
+								.$name."/".$obj['name']."/".$modSearch.
+								'">'.$obj['name'].' ('.$obj['count'].') +</a></li>';	
+						}
+						
+					}
+					else{
+						$html.='<li><a href="/dolphin/search/browse/'
+							.$name."/".$obj['name']."/".$search. "$" .$modSearch.
+							'">'.$obj['name'].' ('.$obj['count'].')</a></li>';
+					}
+				endforeach;
+			    }
 	$html.='
 			    </ul>
 			</div>
@@ -317,7 +355,6 @@ e range"><i class="fa fa-calendar"></i></button>
 	  ';
 	  return $html;
    }
-   
    function getExperimentSeriesPanel($objects)
    {
 	foreach ($objects as $obj):
@@ -403,6 +440,21 @@ e range"><i class="fa fa-calendar"></i></button>
                 $html.='<input type="radio" name="'.$id.'" id="'.$option['name'].'" value="'.$option['value'].'" '.$option['selected'].'>&nbsp;'.$option['name'];
 		$html.='</label></div>';
 	endforeach;
+	return $html;
+   }
+   
+   function sendJScript($segment, $field, $value, $search){
+	$html="";
+	$jsData['theSegment'] = $segment;
+        $jsData['theField'] = $field;
+        $jsData['theValue'] = $value;
+	$jsData['theSearch'] = $search;
+	$jsData = json_encode($jsData);
+	if (!empty($jsData)) {
+		$html.="<script type='text/javascript'>\n";
+		$html.="var phpGrab = " . $jsData . "\n";
+		$html.="</script>\n";
+	}
 	return $html;
    }
 }

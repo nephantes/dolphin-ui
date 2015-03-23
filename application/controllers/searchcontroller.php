@@ -8,6 +8,7 @@ class SearchController extends VanillaController {
  
     function index() {
         $this->set('field', "Search");
+        $this->set('segment', "index");
         $this->set('assay', $this->Search->getAccItems("library_type", "ngs_samples"));
         $this->set('organism', $this->Search->getAccItems("organism", "ngs_samples"));
         $this->set('molecule', $this->Search->getAccItems("molecule", "ngs_samples"));
@@ -15,14 +16,30 @@ class SearchController extends VanillaController {
         $this->set('genotype', $this->Search->getAccItems("genotype", "ngs_samples"));
     }
     
-    function browse($field, $value) {
-        $this->index();
-        $this->set('field', $field);
+    function browse($field, $value, $search) {
+        $this->set('field', "Search");
+        $this->set('segment', "browse");
+        $this->set('table', $field);
         $this->set('value', $value);
+        $this->set('search', $search);
+        $this->set('assay', $this->Search->getAccItemsCont("library_type", "ngs_samples", $search), $search);
+        $this->set('organism', $this->Search->getAccItemsCont("organism", "ngs_samples", $search), $search);
+        $this->set('molecule', $this->Search->getAccItemsCont("molecule", "ngs_samples", $search), $search);
+        $this->set('source', $this->Search->getAccItemsCont("source", "ngs_samples", $search), $search);
+        $this->set('genotype', $this->Search->getAccItemsCont("genotype", "ngs_samples", $search), $search);
     }
-    function details($table, $value) {
-        $this->index();
-        $this->set('table', $table); 
+    function details($table, $value, $search) {
+        $this->set('field', "Search");
+        $this->set('segment', "details");
+        $this->set('value', $value);
+        $this->set('table', $table);
+        $this->set('search', $search);
+        $this->set('assay', $this->Search->getAccItemsCont("library_type", "ngs_samples", $search), $search);
+        $this->set('organism', $this->Search->getAccItemsCont("organism", "ngs_samples", $search), $search);
+        $this->set('molecule', $this->Search->getAccItemsCont("molecule", "ngs_samples", $search), $search);
+        $this->set('source', $this->Search->getAccItemsCont("source", "ngs_samples", $search), $search);
+        $this->set('genotype', $this->Search->getAccItemsCont("genotype", "ngs_samples", $search), $search);
+        
         if ($table=='experiment_series')
         {
            $this->set('experiment_series', $this->Search->getValues($value, 'ngs_experiment_series'));

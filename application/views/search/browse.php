@@ -22,11 +22,11 @@
                 <div class="box-body">
                   <div class="box-group" id="accordion">
                     <!-- we are adding the .panel class so bootstrap.js collapse plugin detects it -->
-                    <?php echo $html->getAccordion("Assay", $assay, "in")?>
-		    <?php echo $html->getAccordion("Organism", $organism, "")?>
-		    <?php echo $html->getAccordion("Molecule", $molecule, "")?>
-		    <?php echo $html->getAccordion("Source", $source, "")?>
-		    <?php echo $html->getAccordion("Genotype", $genotype, "")?>
+                    <?php echo $html->getAccordion("Assay", $assay, $search)?>
+		    <?php echo $html->getAccordion("Organism", $organism, $search)?>
+		    <?php echo $html->getAccordion("Molecule", $molecule, $search)?>
+		    <?php echo $html->getAccordion("Source", $source, $search)?>
+		    <?php echo $html->getAccordion("Genotype", $genotype, $search)?>
 
                   </div>
                 </div><!-- /.box-body -->
@@ -34,6 +34,7 @@
           <!-- END ACCORDION & CAROUSEL-->
 			</div><!-- /.col (LEFT) -->
                         <div class="col-md-9">
+			    <?php echo $html->sendJScript($segment, $table, $value, $search); ?>
 			    <?php echo $html->getRespBoxTable_ng("Experiment Series", "experiment_series", "<th>id</th><th>Name</th><th>Summary</th><th>Design</th>"); ?>
                             
 			    <?php echo $html->getRespBoxTable_ng("Experiments", "lanes", "<th>id</th><th>Experiment name</th><th>Facility</th><th>Total Reads</th><th>Total Samples</th>"); ?>
