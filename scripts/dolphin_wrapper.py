@@ -61,7 +61,7 @@ def runSQL(sql):
     return results
 
 def getRunGroups():
-    sql = "SELECT DISTINCT nrl.run_group_id, u.username, nrp.barcode from biocore.ngs_runlist nrl, biocore.ngs_runparams nrp, biocore.users u where nrp.run_group_id=nrl.run_group_id and u.id=nrl.owner_id;"
+    sql = "SELECT DISTINCT nrl.run_group_id, u.username, nrp.barcode from biocore.ngs_runlist nrl, biocore.ngs_runparams nrp, biocore.users u where nrp.run_group_id=nrl.run_group_id and u.id=nrl.owner_id and nrp.run_status=0;"
     return runSQL(sql)
 
 def getAmazonCredentials(username):
@@ -75,16 +75,10 @@ def getDirs(run_group_id, isbarcode):
     sql = "SELECT DISTINCT d.fastq_dir, d.backup_dir, d.amazon_bucket, rp.outdir, s.organism, s.library_type FROM biocore.ngs_runlist nr, biocore.ngs_samples s, biocore.ngs_temp_sample_files ts, biocore.ngs_dirs d, biocore.ngs_runparams rp where nr.sample_id=s.id and rp.run_status=0 and s.id=ts.sample_id and d.id=ts.dir_id and  rp.run_group_id=nr.run_group_id and nr.run_group_id='"+str(run_group_id)+"';"
     if (isbarcode):
        sql = "SELECT DISTINCT d.fastq_dir, d.backup_dir, d.amazon_bucket, rp.outdir, s.organism, s.library_type FROM biocore.ngs_runlist nr, biocore.ngs_samples s, biocore.ngs_temp_lane_files tl, biocore.ngs_dirs d, biocore.ngs_runparams rp where nr.sample_id=s.id and rp.run_status=0 and s.lane_id=tl.lane_id and d.id=tl.dir_id and  rp.run_group_id=nr.run_group_id and nr.run_group_id='"+str(run_group_id)+"';"
-
     results=runSQL(sql)
     for row in results:
-        inputdir=row[0]
-        backup_dir=row[1]
-        amazon_bucket=row[2]
-        outdir=row[3]
-        organism=row[4]
-        library_type=row[5]
-    return (inputdir, backup_dir, amazon_bucket, outdir,organism,library_type)
+	print row
+    	return row
 
 def getSampleList(run_group_id):
     sql = "SELECT s.name, s.adapter, s.genotype, s.name, ts.file_name FROM biocore.ngs_runparams nrp, biocore.ngs_runlist nr, biocore.ngs_samples s, biocore.ngs_temp_sample_files ts, biocore.ngs_dirs d where nr.run_group_id=nrp.run_group_id and nr.sample_id=s.id and nrp.run_status=0 and s.id=ts.sample_id and d.id=ts.dir_id and nr.run_group_id='"+str(run_group_id)+"';"
@@ -140,14 +134,15 @@ def main():
            rungroup=rungroup_arr[0]
            username=rungroup_arr[1]
            isbarcode=rungroup_arr[2]
+	   print rungroup_arr 
 
            amazon = getAmazonCredentials(username)
            backupS3=None           
            if (amazon != ()):
               backupS3    = "Yes"
     
-           inputdir, backup_dir, amazon_bucket, outdir, organism, library_type = getDirs(rungroup, isbarcode)
-           #print "%s %s %s %s %s %s"%(inputdir, backup_dir, amazon_bucket, outdir, organism, library_type )
+           (inputdir, backup_dir, amazon_bucket, outdir, organism, library_type) = getDirs(rungroup, isbarcode)
+           print "%s %s %s %s %s %s"%(inputdir, backup_dir, amazon_bucket, outdir, organism, library_type )
            
            genomebuild=organism+","+gbuild[organism]
            if (isbarcode):
@@ -183,10 +178,6 @@ def main():
            if pipeline:
               pipeline    = [i for i in pipeline]
 
-           if not inputdir :
-           	print >>stderr, 'Error: Input dir is NULL.'
-           	exit( 128 )
-
            if not outdir :
            	print >>stderr, 'Error: Output dir is NULL.'
            	exit( 128 )
@@ -215,7 +206,7 @@ def main():
            os.system("chmod 755 "+str(output))
 
     except Exception, ex:
-        stop_err('Error running seqmapping.py\n' + str(ex))
+        stop_err('Error running dolphin_wrapper.py\n' + str(ex))
 
     sys.exit(0)
 
