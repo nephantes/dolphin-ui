@@ -16,11 +16,13 @@ if (isset($_GET['search'])){$search = $_GET['search'];}
 if (isset($_GET['start'])){$start = $_GET['start'];}
 if (isset($_GET['end'])){$end = $_GET['end'];}
 
+if (isset($_POST['p'])){$p = $_POST['p'];}
+
 //make the q val proper for queries
 if($q == "Assay"){ $q = "library_type"; }
 else { $q = strtolower($q); }
 
-if($search != ""){
+if($search != "" && $p != 'getSelectedSamples' && $p != 'submitPipeline'){
     //Prepare search query
     $searchQuery = "";
     $splt = explode("$", $search);
@@ -119,7 +121,7 @@ if($search != ""){
         }
     }
 }
-else
+else if ($p != "getSelectedSamples")
 {
     //browse (no search)
     if($seg == "browse")
@@ -239,6 +241,69 @@ else
             ");
         }
     }
+}
+else if ($p == "getSelectedSamples")
+{
+    
+    //Prepare selected search query
+    $searchQuery = "";
+    $splitIndex = ['id','lane_id'];
+    $typeCount = 0;
+    if (substr($search, 0, 1) == "$"){
+        //only lanes selected
+        $search = substr($search, 1, strlen($search));
+        $splt = explode(",", $search);
+        foreach ($splt as $x){
+            $searchQuery .= "biocore.ngs_samples.$splitIndex[1] = $x";
+            if($x != end($splt)){
+                $searchQuery .= " OR ";
+            }
+        }
+    }
+    else if(substr($search, strlen($search) - 1, strlen($search)) == "$"){
+        //only samples selected
+        $search = substr($search, 0, strlen($search) - 1);
+        $splt = explode(",", $search);
+        foreach ($splt as $x){
+            $searchQuery .= "biocore.ngs_samples.$splitIndex[0] = $x";
+            if($x != end($splt)){
+                $searchQuery .= " OR ";
+            }
+        }
+    }
+    else{
+        $splt = explode("$", $search);
+        foreach ($splt as $s){
+            $secondSplt = explode(",", $s);
+            foreach ($secondSplt as $x){
+                $searchQuery .= "biocore.ngs_samples.$splitIndex[$typeCount] = $x";
+                if($x != end($secondSplt)){
+                    $searchQuery .= " OR ";
+                }
+            }
+            if($s != end($splt)){
+                    $searchQuery .= " OR ";
+            }
+            $typeCount = $typeCount + 1;
+        }
+    }
+    $time="";
+    if (isset($start)){$time="and `date_created`>='$start' and `date_created`<='$end'";}
+    $data=$query->queryTable("
+    SELECT id, title, source, organism, molecule
+    FROM biocore.ngs_samples
+    WHERE $searchQuery $time
+    ");
+}
+else if ($p == "submitPipeline")
+{
+    $time="";
+    if (isset($start)){$time="and `date_created`>='$start' and `date_created`<='$end'";}
+    $data=$query->queryTable("
+    INSERT INTO ngs_runparams (outdir, run_status, barcode)
+    VALUES (\"/this/is/but/a/test\", 0, 0)
+    $time
+    ");
 }
 
 header('Cache-Control: no-cache, must-revalidate');

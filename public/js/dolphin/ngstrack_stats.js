@@ -5,6 +5,44 @@
  * Ascription:
  **/
 
+var currentChecked = "";
+var checklist_samples = [];
+var checklist_lanes = [];
+
+/*##### CHECKBOX FUNCTIONS #####*/
+function pass_data(name, id){
+	currentChecked = name;
+	if (id == "sample_checkbox") {
+	//sample checkbox
+	    if ( checklist_samples.indexOf( name ) > -1 ){
+		//remove
+		checklist_samples.pop(name);
+	    }
+	    else
+	    {
+		//add
+		checklist_samples.push(name);
+	    }
+	}
+	else
+	{
+	//lane checkbox
+	if ( checklist_lanes.indexOf( name ) > -1 ){
+		//remove
+		checklist_lanes.pop(name);
+	    }
+	    else
+	    {
+		//add
+		checklist_lanes.push(name);
+	    }
+	}
+}
+
+function submitSelected(){
+    window.location.href = "/dolphin/pipeline/selectedv2/" + checklist_samples + "$" + checklist_lanes;
+}
+
 $(function() {
     "use strict";
     
@@ -12,11 +50,16 @@ $(function() {
     $("#calendar").datepicker();
 
     /*##### PAGE DETERMINER #####*/
-
-    var segment = phpGrab.theSegment;
-    var qvar = ""
+    
+    var qvar = "";
     var rvar = "";
-    var theSearch = phpGrab.theSearch;
+    var segment = "";
+    var theSearch = "";
+    
+    if (phpGrab) {
+	var segment = phpGrab.theSegment;
+	var theSearch = phpGrab.theSearch;
+    }
     
     //Details values
     if (segment == "details") {
@@ -32,6 +75,11 @@ $(function() {
     else if (segment == "browse") {
 	qvar = phpGrab.theField;  //field
 	rvar = unescape(phpGrab.theValue);  //value
+    }
+    
+    //Selected Values
+    else if (segment == "selected") {
+	theSearch = phpGrab.theSearch;
     }
     
     /*##### PROTOCOLS TABLE #####*/
@@ -93,15 +141,21 @@ $(function() {
     protocolsTable.fnSort( [ [0,'asc'] ] );
     //protocolsTable.fnAdjustColumnSizing(true);
     
-    
-    
     /*##### SAMPLES TABLE #####*/
     
     var samplesTable = $('#jsontable_samples').dataTable();
     
+    var samplesType = "";
+    if (segment == 'selected') {
+	samplesType = "getSelectedSamples";
+    }
+    else{
+	samplesType = "getSamples";
+    }
+    
     $.ajax({ type: "GET",   
                      url: "/dolphin/public/ajax/ngsquerydb.php",
-                     data: { p: "getSamples", q: qvar, r: rvar, seg: segment, search: theSearch },
+                     data: { p: samplesType, q: qvar, r: rvar, seg: segment, search: theSearch },
                      async: false,
                      success : function(s)
                      {
@@ -113,6 +167,7 @@ $(function() {
 			s[i].source,
 			s[i].organism,
 			s[i].molecule,
+			"<input type=\"checkbox\" class=\"ngs_checkbox\" name=\""+s[i].id+"\" id=\"sample_checkbox\" onClick=\"pass_data(this.name, this.id);\">",
                         ]);
                         } // End For
                      }
@@ -147,6 +202,7 @@ $(function() {
 			s[i].source,
 			s[i].organism,
 			s[i].molecule,
+			"<input type=\"checkbox\" class=\"ngs_checkbox\" name=\""+s[i].id+"\" id=\"sample_checkbox\" onClick=\"pass_data(this.name, this.id);\">",
                         ]);
                         } // End For
                      }
@@ -175,6 +231,7 @@ $(function() {
 			s[i].facility,
 			s[i].total_reads,
 			s[i].total_samples,
+			"<input type=\"checkbox\" class=\"ngs_checkbox\" name=\""+s[i].id+"\" id=\"lane_checkbox\" onClick=\"pass_data(this.name, this.id);\">",
                         ]);
                         } // End For
                     }
@@ -209,6 +266,7 @@ $(function() {
 			s[i].facility,
 			s[i].total_reads,
 			s[i].total_samples,
+			"<input type=\"checkbox\" class=\"ngs_checkbox\" name=\""+s[i].id+"\" id=\"lane_checkbox\" onClick=\"pass_data(this.name, this.id);\">",
                         ]);
                         } // End For
                      }
@@ -277,6 +335,19 @@ $(function() {
      
     experiment_seriesTable.fnSort( [ [0,'asc'] ] );
     experiment_seriesTable.fnAdjustColumnSizing(true);
+    
+    $(document).on('click', '#submitPipeline', function(){
+	alert("this works");
+       	$.ajax({
+          	type: 	'POST',
+           	url: 	'/dolphin/public/ajax/ngsquerydb.php',
+          	data:  	{ p: "submitPipeline", q: qvar, r: rvar, seg: segment, search: theSearch, },
+       		success: function(r)
+           	{
+		    alert("You're run has been submitted");
+           	}
+	    });
+  	});
     
 });
 

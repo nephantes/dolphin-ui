@@ -442,7 +442,96 @@ e range"><i class="fa fa-calendar"></i></button>
 	endforeach;
 	return $html;
    }
-   
+   function getSubmitBrowserButton()
+   {
+	$html = '';
+	$html.= '<div id="btn-group"><label>';
+	$html.= '<input type="button" class="btn btn-primary" name="pipeline_button" value="Send to Pipeline" onClick="submitSelected();"/>';
+	$html.= '<a href=/dolphin/pipeline/index><input type="button" class="btn btn-primary" name="status_button" value="Status/Report"/></a>';
+	$html.= '<a href=/dolphin/pipeline/index><input type="button" class="btn btn-primary" name="interactive_button" value="Interactive"/></a>';
+	$html.= '</label></div>';
+	return $html;
+   }
+   function getSelectionBox($title, $selection){
+	$html = '<div class="input-group margin col-md-11">
+				<form role="form">';
+	if($selection[0] == "TEXTBOX"){
+		$html.= 	'<label>' .$title. '</label>
+				<div class="form-group">
+				<textarea class="form-control" rows="5" placeholder="..."></textarea>
+				</div>';
+	}
+	else if($selection[0] == "TEXT")
+	{
+		$html.= 	'<label>' .$title. '</label>
+				<input type="text" class="form-control" value="'.$selection[1].'" rows="5">';
+	}
+	else
+	{
+		$html.= 	'<form role="form">
+				<label>' .$title. '</label>
+				<div class="form-group">
+				<select class="form-control">';
+				
+		foreach($selection as $sel){
+			$html.=		'<option>'.$sel.'</option>';
+		}
+		$html.=		'</select>
+				</div>';
+	}
+	$html.=		'</form>
+		</div>';
+	return $html;
+   }
+   function getStaticSelectionBox($title, $selection, $width){
+	$html = "";
+	$html = '<div class="col-md-'.$width.'">
+			<div class="box box-default">
+				<div class="box-header with-border">
+				  <h3 class="box-title">'.$title.'</h3>
+				</div><!-- /.box-header -->
+				<div class="box-body">
+					<div class="input-group margin col-md-11">
+					      <form role="form">
+						      <div class="form-group">';
+	if ($selection == "TEXT"){
+	$html.= 					      '<input type="text" class="form-control" id="'.$title.'">';
+	}
+	else
+	{
+	$html.=						      '<select class="form-control">
+								      '.$selection.'
+							      </select>';
+	}	
+	$html.= 					      '</div>
+					      </form>
+				      </div>
+				</div><!-- /.box-body -->
+			</div><!-- /.box -->
+		</div><!-- /.col -->';
+	return $html;
+   }
+   function getExpandingSelectionBox($title, $numFields, $width, $fieldTitles, $selection){
+	$html = "";
+	$html = '<div class="col-md-'.$width.'">
+			<div class="box box-default collapsed-box">
+				<div class="box-header with-border">
+					<h3 class="box-title">'.$title.'</h3>
+					<div class="box-tools pull-right">
+					<button class="btn btn-box-tool btn-primary" data-widget="collapse"><i class="fa fa-plus"></i></button>
+					</div><!-- /.box-tools -->
+				</div><!-- /.box-header -->
+				<div class="box-body" style="display: none;">
+					<input type="radio" name="'.$title.'" value="yes"> Yes</input>
+					<input type="radio" name="'.$title.'" value="no" checked> No</input>';
+	for($y = 0; $y < $numFields; $y++){
+		$html.= $this->getSelectionBox($fieldTitles[$y], $selection[$y]);
+	}
+	$html.= '			</div><!-- /.box-body -->
+		      </div><!-- /.box -->
+		</div><!-- /.col -->';
+	return $html;
+   }
    function sendJScript($segment, $field, $value, $search){
 	$html="";
 	$jsData['theSegment'] = $segment;

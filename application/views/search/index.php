@@ -27,7 +27,6 @@
 		    <?php echo $html->getAccordion("Molecule", $molecule, "")?>
 		    <?php echo $html->getAccordion("Source", $source, "")?>
 		    <?php echo $html->getAccordion("Genotype", $genotype, "")?>
-
                   </div>
                 </div><!-- /.box-body -->
               </div><!-- /.box -->
@@ -37,8 +36,9 @@
 			    <?php echo $html->sendJScript("index", "", "", ""); ?>
 			    <?php echo $html->getRespBoxTable_ng("Experiment Series", "experiment_series", "<th>id</th><th>Name</th><th>Summary</th><th>Design</th>"); ?>
                             
-			    <?php echo $html->getRespBoxTable_ng("Experiments", "lanes", "<th>id</th><th>Experiment Name</th><th>Facility</th><th>Total Reads</th><th>Total Samples</th>"); ?>
-                            <?php echo $html->getRespBoxTable_ng("Samples", "samples", "<th>id</th><th>Title</th><th>Source</th><th>Organism</th><th>Molecule</th>"); ?>
+			    <?php echo $html->getRespBoxTable_ng("Experiments", "lanes", "<th>id</th><th>Experiment Name</th><th>Facility</th><th>Total Reads</th><th>Total Samples</th><th>Selected</th>"); ?>
+                            <?php echo $html->getRespBoxTable_ng("Samples", "samples", "<th>id</th><th>Title</th><th>Source</th><th>Organism</th><th>Molecule</th><th>Selected</th>"); ?>
+			    <?php echo $html->getSubmitBrowserButton()?>
                         </div><!-- /.col (RIGHT) -->
                     </div><!-- /.row -->
                 </section><!-- /.content -->
