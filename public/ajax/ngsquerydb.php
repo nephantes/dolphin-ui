@@ -8,23 +8,21 @@ require_once("../../includes/dbfuncs.php");
 
 $query = new dbfuncs();
 
-$pDictionary = ['getSelectedSamples', 'submitPipeline', 'submitUpdate', 'getStatus', 'getRerunSamples', 'getRerunJson'];
+$pDictionary = ['getSelectedSamples', 'submitPipeline', 'getStatus', 'getRunSamples', 'grabReload', 'getReportNames', 'lanesToSamples', 'getAllSampleIds', 'getLaneIdFromSample', 'getSingleSample', 'getSeriesIdFromLane', 'getAllLaneIds'];
+
+$q = "";
+$r = "";
+$seg = "";
+$search = "";
 
 if (isset($_GET['p'])){$p = $_GET['p'];}
 if (isset($_GET['q'])){$q = $_GET['q'];}
 if (isset($_GET['r'])){$r = $_GET['r'];}
 if (isset($_GET['seg'])){$seg = $_GET['seg'];}
 if (isset($_GET['search'])){$search = $_GET['search'];}
+
 if (isset($_GET['start'])){$start = $_GET['start'];}
 if (isset($_GET['end'])){$end = $_GET['end'];}
-
-if (isset($_POST['p'])){$p = $_POST['p'];}
-if (isset($_POST['q'])){$q = $_POST['q'];}
-if (isset($_POST['r'])){$r = $_POST['r'];}
-if (isset($_POST['seg'])){$seg = $_POST['seg'];}
-if (isset($_POST['search'])){$search = $_POST['search'];}
-if (isset($_POST['start'])){$start = $_POST['start'];}
-if (isset($_POST['end'])){$end = $_POST['end'];}
 
 //make the q val proper for queries
 if($q == "Assay"){ $q = "library_type"; }
@@ -253,7 +251,7 @@ else if (!in_array($p, $pDictionary))
 else if ($p == "getSelectedSamples")
 {
     
-    //Prepare selected search query
+    //Prepare selected sample search query
     $searchQuery = "";
     $splitIndex = ['id','lane_id'];
     $typeCount = 0;
@@ -303,38 +301,6 @@ else if ($p == "getSelectedSamples")
     WHERE $searchQuery $time
     ");
 }
-else if ($p == "submitPipeline" && $r != 'insertRunlist')
-{
-    //run_group_id set to -1 as a placeholder.  Cannot grab primary key as it's being made, so a placeholder is needed.
-    $data=$query->runSQL("
-    INSERT INTO biocore.ngs_runparams (run_group_id, outdir, run_status, barcode, json_parameters, run_name, run_description)
-    VALUES (-1, '$r', 0, 0, '$q', '$seg', '$search')");
-    //need to grab the id for runlist insertion
-    $idKey=$query->queryAVal("SELECT id FROM biocore.ngs_runparams WHERE run_group_id = -1");
-    //update required to make run_group_id equal to it's primary key "id".  Replace the arbitrary -1 with the id
-    if (isset($_POST['runid'])){$runid = $_POST['runid'];}
-    if( $runid == 'new'){
-        $data=$query->runSQL("UPDATE biocore.ngs_runparams SET run_group_id = id WHERE run_group_id = -1");
-    }else{
-        $data=$query->runSQL("UPDATE biocore.ngs_runparams SET run_group_id = $runid WHERE run_group_id = -1");
-        $idKey= $idKey - $runid;
-    }
-    $data=$idKey;
-}
-else if ($p == 'submitPipeline' && $r == 'insertRunlist')
-{
-    if (isset($_POST['runid'])){$runid = $_POST['runid'];}
-    $searchQuery = "INSERT INTO ngs_runlist
-        (run_id, run_group_id, sample_id, owner_id, group_id, perms, date_created, date_modified, last_modified_user)
-        VALUES ";
-    foreach ($seg as $s){
-                $searchQuery .= "($search, $runid, $s, 1, 1, 15, NOW(), NOW(), 1)";
-                if($s != end($seg)){
-                    $searchQuery .= ",";
-                }
-            }
-    $data=$query->runSQL($searchQuery);
-}
 else if ($p ==  'getStatus')
 {
     $time="";
@@ -345,20 +311,102 @@ else if ($p ==  'getStatus')
     $time
     ");
 }
-else if($p == 'getRerunSamples')
+else if($p == 'getRunSamples')
 {
+    //Grab Variables
+    if (isset($_GET['runID'])){$runID = $_GET['runID'];}
+    if (isset($_GET['groupID'])){$groupID = $_GET['groupID'];}
+    
     $data=$query->queryTable("
     SELECT sample_id
     FROM biocore.ngs_runlist
-    WHERE biocore.ngs_runlist.run_group_id = $q AND biocore.ngs_runlist.run_id = $search
+    WHERE biocore.ngs_runlist.run_group_id = $groupID AND biocore.ngs_runlist.run_id = $runID
     ");
 }
-else if ($p == 'getRerunJson')
+else if ($p == 'grabReload')
 {
+    //Grab variables
+    if (isset($_GET['groupID'])){$groupID = $_GET['groupID'];}
+    
     $data=$query->queryTable("
     SELECT outdir, json_parameters, run_name, run_description
     FROM biocore.ngs_runparams
-    WHERE biocore.ngs_runparams.run_group_id = $search
+    WHERE biocore.ngs_runparams.id = $groupID
+    ");
+}
+else if ($p == 'getReportNames')
+{
+    if (isset($_GET['samp'])){$samp = $_GET['samp'];}
+    if (isset($_GET['runid'])){$runid = $_GET['runid'];}
+
+    $sampleQuery = '';
+    foreach($samp as $s){
+        $sampleQuery.= 'ngs_runlist.sample_id = '+ $s;
+        if($s != end($samp)){
+            $sampleQuery.= ' OR ';
+        }
+    }
+    
+    $data=$query->queryTable("
+        SELECT distinct(ngs_fastq_files.file_name), ngs_runparams.outdir
+        FROM ngs_fastq_files, ngs_runparams, ngs_runlist
+        WHERE ngs_runlist.sample_id = ngs_fastq_files.sample_id
+	    AND ngs_runparams.id = ngs_fastq_files.lane_id
+                AND ngs_fastq_files.lane_id = $runid
+		    AND ( $sampleQuery );
+    "); 
+}
+else if ($p == 'lanesToSamples')
+{
+    if (isset($_GET['lane'])){$lane = $_GET['lane'];}
+    $data=$query->queryTable("
+        SELECT id
+        FROM ngs_samples
+        WHERE ngs_samples.lane_id = $lane
+    "); 
+}
+else if ($p == 'getAllSampleIds')
+{
+    $data=$query->queryTable("
+        SELECT id
+        FROM ngs_samples
+    "); 
+}
+else if ($p == 'getAllLaneIds')
+{
+    $data=$query->queryTable("
+        SELECT id
+        FROM ngs_lanes
+    ");
+}
+else if ($p == 'getLaneIdFromSample')
+{
+    if (isset($_GET['sample'])){$sample = $_GET['sample'];}
+    $data=$query->queryTable("
+        SELECT id
+        FROM ngs_lanes
+        where id =
+                (select lane_id
+                from ngs_samples
+                where ngs_samples.id = $sample);
+    ");
+}
+else if($p == 'getSingleSample')
+{
+    if (isset($_GET['sample'])){$sample = $_GET['sample'];}
+    $data=$query->queryTable("
+        SELECT id, title
+        FROM ngs_samples
+        where id = $sample
+    ");
+}
+else if($p == 'getSeriesIdFromLane')
+{
+    if (isset($_GET['lane'])){$lane = $_GET['lane'];}
+    $data=$query->queryTable("
+        SELECT series_id
+        FROM ngs_lanes
+        where id = $lane
     ");
 }
 

@@ -9,16 +9,8 @@ class PipelineController extends VanillaController {
     function index() {
         $this->set('field', "Pipeline");
     }
-
-    function fastlane() {
-        $this->set('field', "Fastlane");
-    }
     
-    function selected() {
-        $this->set('field', "Selected");
-    }
-    
-    function selectedv2($selection) {
+    function selected($selection) {
         $this->set('field', "Selected");
         $this->set('selection', $selection);
     }
@@ -27,15 +19,27 @@ class PipelineController extends VanillaController {
         $this->set('field', 'Status');
     }
     
-    function rerun($run_group, $selection){
+    function rerun($run_group, $run_id, $selection){
         $this->set('selection', $selection);
         $this->set('run_group', $run_group);
+        $this->set('run_id', $run_id);
         $this->set('field', 'Status');
     }
     
-    function report($selection){
+    function report($run_id, $selection){
+        $this->set('run_id', $run_id);
         $this->set('selection', $selection);
         $this->set('field', 'Status');
+    }
+    
+    function fastlane($selection){
+        $this->set('field', 'Fastlane');
+        $this->set('selection', $selection);
+    }
+    
+    function plots($selection){
+        $this->set('field', 'Plots');
+        $this->set('selection', $selection);
     }
     
     function afterAction() {

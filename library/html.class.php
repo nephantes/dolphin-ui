@@ -384,7 +384,12 @@ e range"><i class="fa fa-calendar"></i></button>
 	foreach ($objects as $obj):
 	$html='<div class="panel panel-default">
 		<div class="panel-heading">
-		<h4 class="panel-title">'.$header.'</h3>
+			<h3 class="panel-title">'.$header.'</h3>
+			<div class="panel-tools pull-right">
+				<button class="btn btn-panel-tool" onclick="backFromDetails(\''.$header.'\')">
+					<i class="fa fa-arrow-left"></i>
+				</button>
+			</div>
 		</div>
 		<div class="panel-body">
 		<h4>
@@ -405,6 +410,28 @@ e range"><i class="fa fa-calendar"></i></button>
 		</div> 
 		</div>';
 	endforeach;
+	return $html;
+   }
+   
+   function getDolphinBasket(){
+	$html = '';
+	$html.= '<div class="box">
+			<div class="box-header">
+				<h4 class="box-title">Selected Samples</h3>
+			</div>
+			<div class="box-body table-responsive non-padding">
+				<table id="dolphin_basket" class="table table-hover">
+				<tbody id="dolphin_basket_body">
+					<tr>
+						<th>ID</th>
+						<th>Sample Name</th>
+						<th><button id="clear_basket" class="btn btn-primary btn-xs pull-right" disabled="true" onclick="clearBasket()">Clear Basket</button></th>
+					</tr>
+				</tbody>
+				</table>
+			</div>
+		</div>
+		<input type="button" id="selected_report_btn" class="btn btn-primary" value="View Selected Reports" disabled="true" onclick=""></input>';
 	return $html;
    }
    
@@ -446,41 +473,47 @@ e range"><i class="fa fa-calendar"></i></button>
    {
 	$html = '';
 	$html.= '<div id="btn-group"><label>';
-	$html.= '<input type="button" class="btn btn-primary" name="pipeline_button" value="Send to Pipeline" onClick="submitSelected();"/>';
-	$html.= '<a href=/dolphin/pipeline/index><input type="button" class="btn btn-primary" name="status_button" value="Status/Report"/></a>';
-	$html.= '<a href=/dolphin/pipeline/index><input type="button" class="btn btn-primary" name="interactive_button" value="Interactive"/></a>';
+	$html.= '<input type="button" class="btn btn-primary" name="pipeline_button" value="Send to Pipeline" onClick="submitSelected();"/>
+		<input type="button" class="btn btn-primary" name="fastlane_button" value="Send to Fastlane" onClick="sendToFastlane()"/>
+		<input type="button" class="btn btn-primary" name="send_to_status_button" value="Pipeline Status" onClick="sendToStatus()"/>';
 	$html.= '</label></div>';
 	return $html;
    }
    function getSelectionBox($title, $selection){
-	$html = '<div class="input-group margin col-md-11">
-				<form role="form">';
+	$html = '';
 	if($selection[0] == "TEXTBOX"){
-		$html.= 	'<label>' .$title. '</label>
-				<div class="form-group">
+		$html.= 	'<div class="form-group">
+				<label>' .$title. '</label>
 				<textarea id="'.$title.'_val" type="text" class="form-control" rows="5" placeholder="..."></textarea>
 				</div>';
 	}
 	else if($selection[0] == "TEXT")
 	{
-		$html.= 	'<label>' .$title. '</label>
-				<input id="'.$title.'_val" type="text" class="form-control" value="'.$selection[1].'" rows="5">';
+		$html.= 	'<div class="col-md-6">
+				<label>' .$title. '</label>
+				<input id="'.$title.'_val" type="text" class="form-control" value="'.$selection[1].'" rows="5">
+				</div>';
 	}
 	else
 	{
-		$html.= 	'<form role="form">
-				<label>' .$title. '</label>
-				<div class="form-group">
-				<select id="'.$title.'_val" class="form-control">';
-				
-		foreach($selection as $sel){
-			$html.=		'<option>'.$sel.'</option>';
+		
+		$html.= '<div class="col-md-12">';
+		
+		$html.=		'<label>' .$title. '</label>
+					<select id="'.$title.'_val" class="form-control"';
+		if($selection[0] == "ONCHANGE"){
+		$html.= 								' onchange="selectTrimming(this.id, 0, 0)">';
+		}else{
+		$html .=								'>';
 		}
-		$html.=		'</select>
+		foreach($selection as $sel){
+			if ($sel != "ONCHANGE"){
+		$html.=			'<option>'.$sel.'</option>';
+			}
+		}
+		$html.=			'</select>
 				</div>';
 	}
-	$html.=		'</form>
-		</div>';
 	return $html;
    }
    function getStaticSelectionBox($title, $id, $selection, $width){
@@ -511,6 +544,16 @@ e range"><i class="fa fa-calendar"></i></button>
 		</div><!-- /.col -->';
 	return $html;
    }
+   function startExpandingSelectionBox($width){
+	$html = '';
+	$html.= '<div class="col-md-'.$width.'">';
+	return $html;
+   }
+   function endExpandingSelectionBox(){
+	$html = '';
+	$html.= '</div><!-- /.col -->';
+	return $html;
+   }
    function getExpandingSelectionBox($title, $id, $numFields, $width, $fieldTitles, $selection){
 	$html = "";
 	$html = '<div class="col-md-'.$width.'">
@@ -521,36 +564,149 @@ e range"><i class="fa fa-calendar"></i></button>
 					<button class="btn btn-box-tool btn-primary" data-widget="collapse"><i id="'.$id.'_exp_btn" class="fa fa-plus"></i></button>
 					</div><!-- /.box-tools -->
 				</div><!-- /.box-header -->';
-	if ($selection[0][0] == "BUTTON")
+	if ($fieldTitles[0] == "Add a Pipeline")
 	{
-		$html.= $this->getPipelinesButton($fieldTitles[0]);
+		$html.= $this->getPipelinesButton();
+	}
+	else if ($fieldTitles[0] == "Add new Custom Sequence Set")
+	{
+		$html.= $this->getCustomButton();	
 	}
 	else
 	{
 		$html.= 	'<div id="'.$id.'_exp_body" class="box-body" style="display: none;" onchange="">
+				<form role="form">
 					<input id="'.$id.'_yes" type="radio" name="'.$id.'" value="yes"> yes</input>
 					<input id="'.$id.'_no" type="radio" name="'.$id.'" value="no" checked> no</input>';
+		$html.= 		'<div class="input-group margin col-md-11">
+					';
 		for($y = 0; $y < $numFields; $y++){
 			$html.= $this->getSelectionBox($fieldTitles[$y], $selection[$y]);
 		}
+		$html.= 		'</div>';
 	}
+	$html.= 		'</form>
+				</div><!-- /.box-body -->
+			</div><!-- /.box -->
+		</div><!-- /.col -->';
+	return $html;
+   }
+   function getExpandingCommonRNABox($title, $id, $numFields, $width, $fieldTitles, $selection){
+	$html = "";
+	$html = '<div class="col-md-'.$width.'">
+			<div id="'.$id.'_exp" class="box box-default collapsed-box">
+				<div class="box-header with-border">
+					<h3 class="box-title">'.$title.'</h3>
+					<div class="box-tools pull-right">
+					<button class="btn btn-box-tool btn-primary" data-widget="collapse"><i id="'.$id.'_exp_btn" class="fa fa-plus"></i></button>
+					</div><!-- /.box-tools -->
+				</div><!-- /.box-header -->
+				<div id="'.$id.'_exp_body" class="box-body compact" style="display: none;" onchange="">
+					<input id="'.$id.'_yes" type="radio" name="'.$id.'" value="yes"> yes</input>
+					<input id="'.$id.'_no" type="radio" name="'.$id.'" value="no" checked> no</input>';
+	
+	$html.= 			'<div class="input-group col-md-12">
+						<form role="form">';
+	for($y = 0; $y < $numFields; $y++){
+	$html.=					'<div class ="text-center btn-group-vertical margin">
+							<label value="'.$fieldTitles[$y].'">'.$fieldTitles[$y].'</label>
+							<div class="text-center">
+								yes
+								<input id="'.$fieldTitles[$y].'_yes" name="'.$fieldTitles[$y].'_val" type="radio" value="yes"/>
+								<input id="'.$fieldTitles[$y].'_no" name="'.$fieldTitles[$y].'_val" type="radio" value="no" checked/>
+								no
+							</div>
+						</div>';
+	}
+	$html.=					'<div class="input-group margin">
+							<div class="input-group margin">
+								<div id="change_params_outer"></div>
+								<input id="change_params_btn" class="btn btn-primary" type="button" value="Change Parameters" onclick="changeRNAParamsBtn()"/> 
+							</div>
+						</div>
+						</form>
+					</div>
+				</div><!-- /.box-body -->
+		      </div><!-- /.box -->
+		</div><!-- /.col -->';
+	return $html;
+   }
+   function getExpandingAnalysisBox($title, $id, $box_open){
+	$html = "";
+	if($box_open){
+		$exp = 'box box-default';
+		$exp_btn = 'fa fa-minus';
+		$exp_body = 'display: block';
+	}else{
+		$exp = 'box box-default collapsed-box';
+		$exp_btn = 'fa fa-plus';
+		$exp_body = 'display: none';
+	}
+	
+	$html = '<div class="col-md-12">
+			<div id="'.$id.'_exp" class="'.$exp.' box">
+				<div class="box-header with-border">
+					<h3 class="box-title">'.$title.'</h3>
+					<div class="box-tools pull-right">
+						<button class="btn btn-box-tool btn-primary" data-widget="collapse"><i id="'.$id.'_exp_btn" class="'.$exp_btn.'"></i></button>
+					</div><!-- /.box-tools -->
+				</div><!-- /.box-header -->
+				<div id="'.$id.'_exp_body" class="box-solid box-body" style="'.$exp_body.'">';
+				
+				if($id == "initial_mapping"){
+					$html.= $this->getInitialMappingTable();
+				}else{
+					
+				}
+				
 	$html.= 		'</div><!-- /.box-body -->
 		      </div><!-- /.box -->
 		</div><!-- /.col -->';
 	return $html;
    }
-   function getPipelinesButton($title){
+   function getInitialMappingTable(){
+	$html = '';
+	$html.= '<table id="jsontable_initial_mapping" class="table table-hover compact">
+			<thead>
+			<tr>
+				<th>Libname</th>
+				<th>Total Reads</th>
+				<th>rRNA</th>
+				<th>miRNA</th>
+				<th>tRNA</th>
+				<th>snRNA</th>
+				<th>rmsk</th>
+				<th>Usable Reads</th>
+				<th>Selected</th>
+			</tr>
+			</thead>
+		</table>';
+		
+	return $html;
+   }
+   function getPipelinesButton(){
 	$html = '';
 	$num = 0;
 	$html.=	'<div id= "pipeline_exp_body" class="box-body" style="display: none;">
 			<div class="input-group margin col-md-11">
 				<form role="form">
-				<div id="masterPipeline">';
-	$html.=			'</div>
-				<input id="addPipe_'.$num.'" type="button" class="btn btn-primary" value="Add Pipeline" onClick="additionalPipes()"/>
+					<div id="masterPipeline">
+					</div>
+					<input id="addPipe_'.$num.'" type="button" class="btn btn-primary" value="Add Pipeline" onClick="additionalPipes()"/>
 				</form>
-			</div>
-		';
+			</div>';
+	return $html;
+   }
+   function getCustomButton(){
+	$html = '';
+	$html.= '<div id= "custom_exp_body" class="box-body" style="display: none;">
+			<div class="input-group margin col-md-11">
+				<form role="form">
+					<div id="custom_seq_outer">
+					</div>
+					<input id="sequence_sets_btn" class="btn btn-primary" type="button" value="Add a Custom Sequence Set" onclick="sequenceSetsBtn()"/>
+				</form>
+			</div>';
 	return $html;
    }
    function sendJScript($segment, $field, $value, $search){
