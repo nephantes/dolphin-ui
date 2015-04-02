@@ -17,12 +17,18 @@ if (isset($_GET['start'])){$start = $_GET['start'];}
 if (isset($_GET['end'])){$end = $_GET['end'];}
 
 if (isset($_POST['p'])){$p = $_POST['p'];}
+if (isset($_POST['q'])){$q = $_POST['q'];}
+if (isset($_POST['r'])){$r = $_POST['r'];}
+if (isset($_POST['seg'])){$seg = $_POST['seg'];}
+if (isset($_POST['search'])){$search = $_POST['search'];}
+if (isset($_POST['start'])){$start = $_POST['start'];}
+if (isset($_POST['end'])){$end = $_POST['end'];}
 
 //make the q val proper for queries
 if($q == "Assay"){ $q = "library_type"; }
 else { $q = strtolower($q); }
 
-if($search != "" && $p != 'getSelectedSamples' && $p != 'submitPipeline'){
+if($search != "" && $p != 'getSelectedSamples' && $p != 'submitPipeline' && $p != "submitUpdate"){
     //Prepare search query
     $searchQuery = "";
     $splt = explode("$", $search);
@@ -121,7 +127,7 @@ if($search != "" && $p != 'getSelectedSamples' && $p != 'submitPipeline'){
         }
     }
 }
-else if ($p != "getSelectedSamples")
+else if ($p != "getSelectedSamples" && $p != "submitPipeline" && $p != "submitUpdate")
 {
     //browse (no search)
     if($seg == "browse")
@@ -295,15 +301,30 @@ else if ($p == "getSelectedSamples")
     WHERE $searchQuery $time
     ");
 }
-else if ($p == "submitPipeline")
+else if ($p == "submitPipeline" && $r != 'insertRunlist')
 {
-    $time="";
-    if (isset($start)){$time="and `date_created`>='$start' and `date_created`<='$end'";}
-    $data=$query->queryTable("
-    INSERT INTO ngs_runparams (outdir, run_status, barcode)
-    VALUES (\"/this/is/but/a/test\", 0, 0)
-    $time
-    ");
+    //run_group_id set to -1 as a placeholder.  Cannot grab primary key as it's being made, so a placeholder is needed.
+    $data=$query->runSQL("
+    INSERT INTO biocore.ngs_runparams (run_group_id, outdir, run_status, barcode, json_parameters)
+    VALUES (-1, '$r', 0, 0, '$q')");
+    //need to grab the id for runlist insertion
+    $idKey=$query->queryAVal("SELECT id FROM biocore.ngs_runparams WHERE run_group_id = -1");
+    //update required to make run_group_id equal to it's primary key "id".  Replace the arbitrary -1 with the id
+    $data=$query->runSQL("UPDATE biocore.ngs_runparams SET run_group_id = id WHERE run_group_id = -1");
+    $data=$idKey;
+}
+else if ($p == 'submitPipeline' && $r == 'insertRunlist')
+{
+    $searchQuery = "INSERT INTO ngs_runlist
+        (run_group_id, sample_id, owner_id, group_id, perms, date_created, date_modified, last_modified_user)
+        VALUES ";
+    foreach ($seg as $s){
+                $searchQuery .= "($search, $s, 1, 1, 15, NOW(), NOW(), 1)";
+                if($s != end($seg)){
+                    $searchQuery .= ",";
+                }
+            }
+    $data=$query->runSQL($searchQuery);
 }
 
 header('Cache-Control: no-cache, must-revalidate');
