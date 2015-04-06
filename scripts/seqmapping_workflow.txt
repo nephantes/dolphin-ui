@@ -1,3 +1,20 @@
-stepCheck	@RUNCHECK -i @INPUT -b @BARCODES -a @ADAPTER -t @TRIM -o @OUTDIR -r None -s stepCheck -j @JGEN	1
-stepGetTotalReads	@RUNGETTOTALREADS -b @BARCODES -g 27 -p @SPAIRED -o @OUTDIR -u @USERNAME -j @JGEN	10
-stepBackupS3	@RUNBACKUPS3 -b @BARCODES -g 27 -p @SPAIRED -o @OUTDIR -u @USERNAME -j @JGEN	10
+stepCheck	@RUNCHECK -i @INPUT -b @BARCODES -a @ADAPTER -t @TRIM -o @OUTDIR -r resume -s stepCheck -j @JGEN	1
+stepFastQC	@PERL @RUNFASTQC -b @BARCODES -o @OUTDIR -p @FASTQCPROG -s stepFastQC -j @JGEN	1
+stepMergeFastQC	@PERL @RUNFASTQCMERGE -o @OUTDIR	0
+stepAdapters	@RUNADAPTER -d @SPAIRED -p @PREVIOUSADAPTER -o @OUTDIR -a @ADAPTER -c @MATICCMD -s stepAdapter -j @JGEN	1
+stepQuality	@RUNQUALITY -d @SPAIRED -p @PREVIOUSQUALITY -o @OUTDIR -q @QUALITY -c @MATICCMD -s stepQuality -j @JGEN	1
+stepTrim	@RUNTRIM -t @TRIM -d @TRIMPAIRED -p @PREVIOUSTRIM -o @OUTDIR -c @TRIMMERCMD -s stepTrim -j @JGEN	1
+stepSeqMappingrRNA	@RUNRECMAPPING -i @INPUT -a @AWKDIR -d @SPAIRED -m @SAMTOOLS -o @OUTDIR -b @PARAMrRNA -c @BOWTIE2CMD -s stepSeqMappingrRNA -r @ADVPARAMS -j @JMAPPING	1
+stepSeqMappingmiRNA	@RUNRECMAPPING -i @INPUT -a @AWKDIR -d @SPAIRED -m @SAMTOOLS -o @OUTDIR -b @PARAMmiRNA -c @BOWTIE2CMD -s stepSeqMappingmiRNA -r @ADVPARAMS -j @JMAPPING	1
+stepSeqMappingtRNA	@RUNRECMAPPING -i @INPUT -a @AWKDIR -d @SPAIRED -m @SAMTOOLS -o @OUTDIR -b @PARAMtRNA -c @BOWTIE2CMD -s stepSeqMappingtRNA -r @ADVPARAMS -j @JMAPPING	1
+stepSeqMappingsnRNA	@RUNRECMAPPING -i @INPUT -a @AWKDIR -d @SPAIRED -m @SAMTOOLS -o @OUTDIR -b @PARAMsnRNA -c @BOWTIE2CMD -s stepSeqMappingsnRNA -r @ADVPARAMS -j @JMAPPING	1
+stepSeqMappingrmsk	@RUNRECMAPPING -i @INPUT -a @AWKDIR -d @SPAIRED -m @SAMTOOLS -o @OUTDIR -b @PARAMrmsk -c @BOWTIE2CMD -s stepSeqMappingrmsk -r @ADVPARAMS -j @JMAPPING	1
+stepRSEM	@RUNRSEM -c @RSEMCMD -r @RSEMREF -d @SPAIRED -pa @PARAMSRSEM -pr @PREVIOUSPIPE -o @OUTDIR -b @BOWTIEPATH -s stepRSEM -j @JRSEM	10
+stepRSEMCountgenestpm	@RUNRSEMCOUNT -o @OUTDIR -t tpm -g genes -s stepRSEMCountgenestpm -j @JGEN	0
+stepRSEMCountgenesexpected_count	@RUNRSEMCOUNT -o @OUTDIR -t expected_count -g genes -s stepRSEMCountgenesexpected_count -j @JGEN	0
+stepRSEMCountisoformstpm	@RUNRSEMCOUNT -o @OUTDIR -t tpm -g isoforms -s stepRSEMCountisoformstpm -j @JGEN	0
+stepRSEMCountisoformsexpected_count	@RUNRSEMCOUNT -o @OUTDIR -t expected_count -g isoforms -s stepRSEMCountisoformsexpected_count -j @JGEN	0
+stepIGVTDFRSEM	@RUNIGVTDF -o @OUTDIR -g @GENOMEFASTA -l @TSIZE -sa @SAMTOOLS -t RSEM -i @IGVTOOLS -se stepIGVTDFRSEM -j @JGEN	0
+stepBam2BWRSEM	@RUNBAM2BW -o @OUTDIR -g @GENOMESIZE -c @RUNCOVERAGE -t RSEM -w @WIGTOBIGWIG -s stepBam2BWRSEM -j @JGEN	0
+stepCounts	@RUNCOUNTS -m @MAPNAMES -o @OUTDIR -g @GCOMMONDB -b @MAKEBED -c @BEDTOOLSCMD -s stepCounts -j @JGEN	1
+stepMakeReport	@RUNMAKEREPORT -f @OUTFILE -o @OUTDIR -m @MAPNAMES -s stepMakeReport -j @JMAPPING	1
