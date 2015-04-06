@@ -93,10 +93,9 @@ class Ngsimport extends VanillaModel {
               if($this->sheetData[3][$j]=="# of Samples"){$lane->total_samples=$this->esc($this->sheetData[$i][$j]);}
               if($this->sheetData[3][$j]=="Resequenced?"){$lane->resequenced=$this->esc($this->sheetData[$i][$j]);}
               if($this->sheetData[3][$j]=="Notes"){$lane->notes=$this->esc($this->sheetData[$i][$j]);}
-
-              if($lane->name){$lane_arr[$lane->name]=$lane;}
-
            }
+           if (!isset($lane->lane_id)){$lane->lane_id=0;}
+           if($lane->name){$lane_arr[$lane->name]=$lane;}
         }
         //echo json_encode($lane_arr);
         
@@ -522,6 +521,7 @@ class samples extends main{
 	    '".$this->model->uid."', '".$this->model->gid."', '".$this->model->sid."',
 	     now(), now(), '".$this->model->uid."');";
         $this->insert++;
+        $this->insert=$sql;
 
         return $this->model->query($sql);
     }
