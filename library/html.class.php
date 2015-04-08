@@ -458,20 +458,20 @@ e range"><i class="fa fa-calendar"></i></button>
 	if($selection[0] == "TEXTBOX"){
 		$html.= 	'<label>' .$title. '</label>
 				<div class="form-group">
-				<textarea id="'.$title.'" class="form-control" rows="5" placeholder="..."></textarea>
+				<textarea id="'.$title.'_val" type="text" class="form-control" rows="5" placeholder="..."></textarea>
 				</div>';
 	}
 	else if($selection[0] == "TEXT")
 	{
 		$html.= 	'<label>' .$title. '</label>
-				<input id="'.$title.'" type="text" class="form-control" value="'.$selection[1].'" rows="5">';
+				<input id="'.$title.'_val" type="text" class="form-control" value="'.$selection[1].'" rows="5">';
 	}
 	else
 	{
 		$html.= 	'<form role="form">
 				<label>' .$title. '</label>
 				<div class="form-group">
-				<select id="'.$title.'" class="form-control">';
+				<select id="'.$title.'_val" class="form-control">';
 				
 		foreach($selection as $sel){
 			$html.=		'<option>'.$sel.'</option>';
@@ -483,7 +483,7 @@ e range"><i class="fa fa-calendar"></i></button>
 		</div>';
 	return $html;
    }
-   function getStaticSelectionBox($title, $selection, $width){
+   function getStaticSelectionBox($title, $id, $selection, $width){
 	$html = "";
 	$html = '<div class="col-md-'.$width.'">
 			<div class="box box-default">
@@ -495,11 +495,11 @@ e range"><i class="fa fa-calendar"></i></button>
 					      <form role="form">
 						      <div class="form-group">';
 	if ($selection == "TEXT"){
-	$html.= 					      '<input type="text" class="form-control" id="'.$title.'">';
+	$html.= 					      '<input type="text" class="form-control" id="'.$id.'">';
 	}
 	else
 	{
-	$html.=						      '<select class="form-control" id="'.$title.'">
+	$html.=						      '<select class="form-control" id="'.$id.'">
 								      '.$selection.'
 							      </select>';
 	}	
@@ -511,14 +511,14 @@ e range"><i class="fa fa-calendar"></i></button>
 		</div><!-- /.col -->';
 	return $html;
    }
-   function getExpandingSelectionBox($title, $numFields, $width, $fieldTitles, $selection){
+   function getExpandingSelectionBox($title, $id, $numFields, $width, $fieldTitles, $selection){
 	$html = "";
 	$html = '<div class="col-md-'.$width.'">
-			<div class="box box-default collapsed-box">
+			<div id="'.$id.'_exp" class="box box-default collapsed-box">
 				<div class="box-header with-border">
 					<h3 class="box-title">'.$title.'</h3>
 					<div class="box-tools pull-right">
-					<button class="btn btn-box-tool btn-primary" data-widget="collapse"><i class="fa fa-plus"></i></button>
+					<button class="btn btn-box-tool btn-primary" data-widget="collapse"><i id="'.$id.'_exp_btn" class="fa fa-plus"></i></button>
 					</div><!-- /.box-tools -->
 				</div><!-- /.box-header -->';
 	if ($selection[0][0] == "BUTTON")
@@ -527,9 +527,9 @@ e range"><i class="fa fa-calendar"></i></button>
 	}
 	else
 	{
-		$html.= 	'<div class="box-body" style="display: none;">
-					<input id="'.$title.'_yes" type="radio" name="'.$title.'" value="Yes"> Yes</input>
-					<input id="'.$title.'_no" type="radio" name="'.$title.'" value="No" checked> No</input>';
+		$html.= 	'<div id="'.$id.'_exp_body" class="box-body" style="display: none;" onchange="">
+					<input id="'.$id.'_yes" type="radio" name="'.$id.'" value="yes"> yes</input>
+					<input id="'.$id.'_no" type="radio" name="'.$id.'" value="no" checked> no</input>';
 		for($y = 0; $y < $numFields; $y++){
 			$html.= $this->getSelectionBox($fieldTitles[$y], $selection[$y]);
 		}
@@ -542,7 +542,7 @@ e range"><i class="fa fa-calendar"></i></button>
    function getPipelinesButton($title){
 	$html = '';
 	$num = 0;
-	$html.=	'<div class="box-body" style="display: none;">
+	$html.=	'<div id= "pipeline_exp_body" class="box-body" style="display: none;">
 			<div class="input-group margin col-md-11">
 				<form role="form">
 				<div id="masterPipeline">';

@@ -52,7 +52,7 @@
                         <?php echo $html->getExpandingSelectionBox("Split FastQ", "split", 1, 6, ["number of reads per file"], [["TEXT","5000000"]])?>
                         <?php echo $html->getExpandingSelectionBox("Additional Pipelines", "pipeline", 1, 6, ["Add a Pipeline"], [["BUTTON"]])?>
 			<div class="col-md-4">
-                        <input type="button" id="submitPipeline" class="btn btn-primary" name="pipeline_send_button" value="Submit Pipeline" onClick="submitPipeline('selected');"/>
+                        <input type="button" id="submitPipeline" class="btn btn-primary" name="pipeline_send_button" value="Submit Pipeline" onClick="submitPipeline('rerun');"/>
                         </div>
                     </div><!-- /.row -->
                 </section><!-- /.content -->

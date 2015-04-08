@@ -8,6 +8,8 @@ require_once("../../includes/dbfuncs.php");
 
 $query = new dbfuncs();
 
+$pDictionary = ['getSelectedSamples', 'submitPipeline', 'submitUpdate', 'getStatus', 'getRerunSamples', 'getRerunJson'];
+
 if (isset($_GET['p'])){$p = $_GET['p'];}
 if (isset($_GET['q'])){$q = $_GET['q'];}
 if (isset($_GET['r'])){$r = $_GET['r'];}
@@ -28,7 +30,7 @@ if (isset($_POST['end'])){$end = $_POST['end'];}
 if($q == "Assay"){ $q = "library_type"; }
 else { $q = strtolower($q); }
 
-if($search != "" && $p != 'getSelectedSamples' && $p != 'submitPipeline' && $p != "submitUpdate"){
+if($search != "" && !in_array($p, $pDictionary)){
     //Prepare search query
     $searchQuery = "";
     $splt = explode("$", $search);
@@ -127,7 +129,7 @@ if($search != "" && $p != 'getSelectedSamples' && $p != 'submitPipeline' && $p !
         }
     }
 }
-else if ($p != "getSelectedSamples" && $p != "submitPipeline" && $p != "submitUpdate")
+else if (!in_array($p, $pDictionary))
 {
     //browse (no search)
     if($seg == "browse")
@@ -305,12 +307,18 @@ else if ($p == "submitPipeline" && $r != 'insertRunlist')
 {
     //run_group_id set to -1 as a placeholder.  Cannot grab primary key as it's being made, so a placeholder is needed.
     $data=$query->runSQL("
-    INSERT INTO biocore.ngs_runparams (run_group_id, outdir, run_status, barcode, json_parameters)
-    VALUES (-1, '$r', 0, 0, '$q')");
+    INSERT INTO biocore.ngs_runparams (run_group_id, outdir, run_status, barcode, json_parameters, run_name, run_description)
+    VALUES (-1, '$r', 0, 0, '$q', '$seg', '$search')");
     //need to grab the id for runlist insertion
     $idKey=$query->queryAVal("SELECT id FROM biocore.ngs_runparams WHERE run_group_id = -1");
     //update required to make run_group_id equal to it's primary key "id".  Replace the arbitrary -1 with the id
-    $data=$query->runSQL("UPDATE biocore.ngs_runparams SET run_group_id = id WHERE run_group_id = -1");
+    if (isset($_POST['runid'])){$runid = $_POST['runid'];}
+    if( $runid == 'new'){
+        $data=$query->runSQL("UPDATE biocore.ngs_runparams SET run_group_id = id WHERE run_group_id = -1");
+    }else{
+        $data=$query->runSQL("UPDATE biocore.ngs_runparams SET run_group_id = $runid WHERE run_group_id = -1");
+        $idKey=$runid;
+    }
     $data=$idKey;
 }
 else if ($p == 'submitPipeline' && $r == 'insertRunlist')
@@ -325,6 +333,32 @@ else if ($p == 'submitPipeline' && $r == 'insertRunlist')
                 }
             }
     $data=$query->runSQL($searchQuery);
+}
+else if ($p ==  'getStatus')
+{
+    $time="";
+    if (isset($start)){$time="and `date_created`>='$start' and `date_created`<='$end'";}
+    $data=$query->queryTable("
+    SELECT id, run_group_id, run_name, outdir, run_status, run_description
+    FROM biocore.ngs_runparams
+    $time
+    ");
+}
+else if($p == 'getRerunSamples')
+{
+    $data=$query->queryTable("
+    SELECT sample_id
+    FROM biocore.ngs_runlist
+    WHERE biocore.ngs_runlist.run_group_id = $search
+    ");
+}
+else if ($p == 'getRerunJson')
+{
+    $data=$query->queryTable("
+    SELECT outdir, json_parameters, run_name, run_description
+    FROM biocore.ngs_runparams
+    WHERE biocore.ngs_runparams.run_group_id = $search
+    ");
 }
 
 header('Cache-Control: no-cache, must-revalidate');
