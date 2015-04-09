@@ -33,6 +33,11 @@ class PipelineController extends VanillaController {
         $this->set('field', 'Status');
     }
     
+    function report($selection){
+        $this->set('selection', $selection);
+        $this->set('field', 'Status');
+    }
+    
     function afterAction() {
 
     }

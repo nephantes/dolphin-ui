@@ -317,17 +317,18 @@ else if ($p == "submitPipeline" && $r != 'insertRunlist')
         $data=$query->runSQL("UPDATE biocore.ngs_runparams SET run_group_id = id WHERE run_group_id = -1");
     }else{
         $data=$query->runSQL("UPDATE biocore.ngs_runparams SET run_group_id = $runid WHERE run_group_id = -1");
-        $idKey=$runid;
+        $idKey= $idKey - $runid;
     }
     $data=$idKey;
 }
 else if ($p == 'submitPipeline' && $r == 'insertRunlist')
 {
+    if (isset($_POST['runid'])){$runid = $_POST['runid'];}
     $searchQuery = "INSERT INTO ngs_runlist
-        (run_group_id, sample_id, owner_id, group_id, perms, date_created, date_modified, last_modified_user)
+        (run_id, run_group_id, sample_id, owner_id, group_id, perms, date_created, date_modified, last_modified_user)
         VALUES ";
     foreach ($seg as $s){
-                $searchQuery .= "($search, $s, 1, 1, 15, NOW(), NOW(), 1)";
+                $searchQuery .= "($search, $runid, $s, 1, 1, 15, NOW(), NOW(), 1)";
                 if($s != end($seg)){
                     $searchQuery .= ",";
                 }
@@ -339,7 +340,7 @@ else if ($p ==  'getStatus')
     $time="";
     if (isset($start)){$time="and `date_created`>='$start' and `date_created`<='$end'";}
     $data=$query->queryTable("
-    SELECT id, run_group_id, run_name, outdir, run_status, run_description
+    SELECT id, run_group_id, run_name, outdir, run_description, run_status
     FROM biocore.ngs_runparams
     $time
     ");
@@ -349,7 +350,7 @@ else if($p == 'getRerunSamples')
     $data=$query->queryTable("
     SELECT sample_id
     FROM biocore.ngs_runlist
-    WHERE biocore.ngs_runlist.run_group_id = $search
+    WHERE biocore.ngs_runlist.run_group_id = $q AND biocore.ngs_runlist.run_id = $search
     ");
 }
 else if ($p == 'getRerunJson')

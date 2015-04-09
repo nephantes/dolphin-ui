@@ -19,32 +19,48 @@ var rsemSwitch = false;
 
 /*##### CHECKBOX FUNCTIONS #####*/
 function pass_data(name, id){
-	currentChecked = name;
-	if (id == "sample_checkbox") {
-	//sample checkbox
-	    if ( checklist_samples.indexOf( name ) > -1 ){
-		//remove
-		checklist_samples.pop(name);
-	    }
-	    else
-	    {
-		//add
-		checklist_samples.push(name);
-	    }
+    currentChecked = name;
+    if (id == "sample_checkbox") {
+    //sample checkbox
+	if ( checklist_samples.indexOf( name ) > -1 ){
+	    //remove
+	    checklist_samples.pop(name);
 	}
 	else
 	{
-	//lane checkbox
-	if ( checklist_lanes.indexOf( name ) > -1 ){
-		//remove
-		checklist_lanes.pop(name);
-	    }
-	    else
-	    {
-		//add
-		checklist_lanes.push(name);
-	    }
+	    //add
+	    checklist_samples.push(name);
 	}
+    }
+    else
+    {
+    //lane checkbox
+    if ( checklist_lanes.indexOf( name ) > -1 ){
+	    //remove
+	    checklist_lanes.pop(name);
+	}
+	else
+	{
+	    //add
+	    checklist_lanes.push(name);
+	}
+    }
+}
+
+function passIDData(run_group_id, id){
+    currentChecked = name;
+    //lane checkbox
+    if ( checklist_lanes.indexOf( id ) > -1 ){
+	    //remove
+	    checklist_lanes.pop(id);
+	    checklist_samples.pop(run_group_id);
+    }
+    else
+    {
+	//add
+	checklist_lanes.push(id);
+	checklist_samples.push(run_group_id);
+    }
 }
 
 /*##### SEND TO PIPELINE WITH SELECTION #####*/
@@ -52,11 +68,11 @@ function submitSelected(){
     window.location.href = "/dolphin/pipeline/selectedv2/" + checklist_samples + "$" + checklist_lanes;
 }
 
-function rerunSelected(){
+function rerunSelected(id, groupID){
     var ids = [];
     $.ajax({ type: "GET",   
 		 url: "/dolphin/public/ajax/ngsquerydb.php",
-		 data: { p: "getRerunSamples", search: checklist_lanes[0], q: "", r: "", seg: "", },
+		 data: { p: "getRerunSamples", search: id, q: groupID, r: "", seg: "", },
 		 async: false,
 		 success : function(s)
 		 {
@@ -65,7 +81,23 @@ function rerunSelected(){
 		    }
 		 }
     });
-    window.location.href = "/dolphin/pipeline/rerun/" + checklist_lanes[0] + "/" + ids + "$";
+    window.location.href = "/dolphin/pipeline/rerun/" + groupID + "/" + ids + "$";
+}
+
+function reportSelected(id, groupID){
+    var ids = [];
+    $.ajax({ type: "GET",   
+		 url: "/dolphin/public/ajax/ngsquerydb.php",
+		 data: { p: "getRerunSamples", search: id, q: "", r: "", seg: "", },
+		 async: false,
+		 success : function(s)
+		 {
+		    for(var i = 0; i < s.length; i++) {
+			ids.push(s[i].sample_id);
+		    }
+		 }
+    });
+    window.location.href = "/dolphin/pipeline/report/" + ids + "$";
 }
 
 function rerunLoad() {
@@ -510,15 +542,22 @@ function submitPipeline(type) {
 	    async:	false,
 	    success: function(r)
 	    {
-		s2 = r;
-		r1 = 'insertRunlist';
+		if (rerunID == 'new') {
+		    rerunID = r;
+		    s2 = r;
+		    r1 = 'insertRunlist';
+		}else{
+		    var intstr = parseInt(rerunID) + r;
+		    s2 = intstr;
+		    r1 = 'insertRunlist';
+		}
 	    }
 	});
     if (r1 == 'insertRunlist') {
 	$.ajax({
 	    type: 	'POST',
 	    url: 	'/dolphin/public/ajax/ngsquerydb.php',
-	    data:  	{ p: "submitPipeline", q: json, r: r1, seg: ids, search: s2 },
+	    data:  	{ p: "submitPipeline", q: json, r: r1, seg: ids, search: s2, runid: rerunID },
 	    async:	false,
 	    success: function(r)
 	    {
@@ -569,11 +608,6 @@ $(function() {
 	rvar = unescape(phpGrab.theValue);  //value
     }
     
-    //Selected Values
-    else if (segment == "selected") {
-	theSearch = phpGrab.theSearch;
-    }
-    
     /*##### STATUS TABLE #####*/
     if (segment == 'status') {
 	var runparams = $('#jsontable_runparams').dataTable();
@@ -586,14 +620,26 @@ $(function() {
 			 {
 			    runparams.fnClearTable();
 			    for(var i = 0; i < s.length; i++) {
+			    var runstat = "";
+			    if (s[i].run_status == 0) {
+				runstat = '<button type="button" class="btn btn-xs disabled"><i class="fa fa-refresh">\tRunning...</i></button>';
+			    }else if (s[i].run_status == 1) {
+				runstat = '<button type="button" class="btn btn-success btn-xs disabled"><i class="fa fa-check">\tComplete!</i></button>';
+			    }else{
+				runstat = '<button type="button" class="btn btn-danger btn-xs disabled"><i class="fa fa-warning">\tError</i></button>';
+			    }
 			    runparams.fnAddData([
 			    s[i].id,
 			    s[i].run_group_id,
 			    s[i].run_name,
 			    s[i].outdir,
-			    s[i].run_status,
 			    s[i].run_description,
-			    "<input type=\"checkbox\" class=\"ngs_checkbox\" name=\""+s[i].run_group_id+"\" id=\"run_checkbox\" onClick=\"pass_data(this.name, this.id);\">",
+			    runstat,
+			    '<div class="btn-group">' +
+			    '<input type="button" id="'+s[i].id+'" name="'+s[i].run_group_id+'" class="btn btn-xs btn-primary" value="Report Details" onClick="reportSelected(this.id, this.name)"/>' + 
+			    '<input type="button" id="'+s[i].id+'" name="'+s[i].run_group_id+'" class="btn btn-xs btn-primary disabled" value="Pause" onClick=""/>' +
+			    '<input type="button" id="'+s[i].id+'" name="'+s[i].run_group_id+'" class="btn btn-xs btn-primary" value="Re-run" onClick="rerunSelected(this.id, this.name)"/>' +
+			    '</div>',
 			    ]);
 			    } // End For
 			}
@@ -622,14 +668,26 @@ $(function() {
 			 {
 			    runparams.fnClearTable();
 			    for(var i = 0; i < s.length; i++) {
+			    var runstat = "";
+			    if (s[i].run_status == 0) {
+				runstat = '<button type="button" class="btn btn-xs disabled"><i class="fa fa-refresh">\tRunning...</i></button>';
+			    }else if (s[i].run_status == 1) {
+				runstat = '<button type="button" class="btn btn-success btn-xs disabled"><i class="fa fa-check">\tComplete!</i></button>';
+			    }else{
+				runstat = '<button type="button" class="btn btn-danger btn-xs disabled"><i class="fa fa-warning">\tError</i></button>';
+			    }
 			    runparams.fnAddData([
 			    s[i].id,
 			    s[i].run_group_id,
-			    s[i].name,
+			    s[i].run_name,
 			    s[i].outdir,
-			    s[i].run_status,
-			    s[i].description,
-			    "<input type=\"checkbox\" class=\"ngs_checkbox\" name=\""+s[i].run_group_id+"\" id=\"run_checkbox\" onClick=\"pass_data(this.name, this.id);\">",
+			    s[i].run_description,
+			    runstat,
+			    '<div class="btn-group">' +
+			    '<input type="button" id="'+s[i].id+'" name="'+s[i].run_group_id+'" class="btn btn-xs btn-primary" value="Report Details" onClick="reportSelected(this.id, this.name)"/>' + 
+			    '<input type="button" id="'+s[i].id+'" name="'+s[i].run_group_id+'" class="btn btn-xs btn-primary disabled" value="Pause" onClick=""/>' +
+			    '<input type="button" id="'+s[i].id+'" name="'+s[i].run_group_id+'" class="btn btn-xs btn-primary" value="Re-run" onClick="rerunSelected(this.id, this.name)"/>' +
+			    '</div>',
 			    ]);
 			    } // End For
 			 }
@@ -712,7 +770,6 @@ $(function() {
     else{
 	samplesType = "getSamples";
     }
-    
     $.ajax({ type: "GET",   
                      url: "/dolphin/public/ajax/ngsquerydb.php",
                      data: { p: samplesType, q: qvar, r: rvar, seg: segment, search: theSearch },
