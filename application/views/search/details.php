@@ -27,7 +27,7 @@
 		    <?php echo $html->getAccordion("Molecule", $molecule, $search)?>
 		    <?php echo $html->getAccordion("Source", $source, $search)?>
 		    <?php echo $html->getAccordion("Genotype", $genotype, $search)?>
-
+		    
                   </div>
                 </div><!-- /.box-body -->
               </div><!-- /.box -->
@@ -46,7 +46,7 @@
                                 echo $html->getBrowserPanel($experiments, $experiment_fields, "Experiment", 'name');
 			    }
 			    else{
-			       echo $html->getRespBoxTable_ng("Experiments", "lanes", "<th>id</th><th>Experiment name</th><th>Facility</th><th>Total Reads</th><th>Total Samples</th>");
+			       echo $html->getRespBoxTable_ng("Experiments", "lanes", "<th>id</th><th>Experiment name</th><th>Facility</th><th>Total Reads</th><th>Total Samples</th><th>Selected</th>");
 			    }
 			    if ($table=="samples"){
 				echo $html->getBrowserPanel($samples, $sample_fields, "Sample",'name');
@@ -57,7 +57,8 @@
 				
 			    }
 			    else{
-                              echo $html->getRespBoxTable_ng("Samples", "samples", "<th>id</th><th>Title</th><th>Source</th><th>Organism</th><th>Molecule</th>");
+                              echo $html->getRespBoxTable_ng("Samples", "samples", "<th>id</th><th>Title</th><th>Source</th><th>Organism</th><th>Molecule</th><th>Selected</th>");
+			      echo $html->getSubmitBrowserButton();
 			    }
 			    ?>
                         </div><!-- /.col (RIGHT) -->

@@ -442,7 +442,117 @@ e range"><i class="fa fa-calendar"></i></button>
 	endforeach;
 	return $html;
    }
-   
+   function getSubmitBrowserButton()
+   {
+	$html = '';
+	$html.= '<div id="btn-group"><label>';
+	$html.= '<input type="button" class="btn btn-primary" name="pipeline_button" value="Send to Pipeline" onClick="submitSelected();"/>';
+	$html.= '<a href=/dolphin/pipeline/index><input type="button" class="btn btn-primary" name="status_button" value="Status/Report"/></a>';
+	$html.= '<a href=/dolphin/pipeline/index><input type="button" class="btn btn-primary" name="interactive_button" value="Interactive"/></a>';
+	$html.= '</label></div>';
+	return $html;
+   }
+   function getSelectionBox($title, $selection){
+	$html = '<div class="input-group margin col-md-11">
+				<form role="form">';
+	if($selection[0] == "TEXTBOX"){
+		$html.= 	'<label>' .$title. '</label>
+				<div class="form-group">
+				<textarea id="'.$title.'_val" type="text" class="form-control" rows="5" placeholder="..."></textarea>
+				</div>';
+	}
+	else if($selection[0] == "TEXT")
+	{
+		$html.= 	'<label>' .$title. '</label>
+				<input id="'.$title.'_val" type="text" class="form-control" value="'.$selection[1].'" rows="5">';
+	}
+	else
+	{
+		$html.= 	'<form role="form">
+				<label>' .$title. '</label>
+				<div class="form-group">
+				<select id="'.$title.'_val" class="form-control">';
+				
+		foreach($selection as $sel){
+			$html.=		'<option>'.$sel.'</option>';
+		}
+		$html.=		'</select>
+				</div>';
+	}
+	$html.=		'</form>
+		</div>';
+	return $html;
+   }
+   function getStaticSelectionBox($title, $id, $selection, $width){
+	$html = "";
+	$html = '<div class="col-md-'.$width.'">
+			<div class="box box-default">
+				<div class="box-header with-border">
+				  <h3 class="box-title">'.$title.'</h3>
+				</div><!-- /.box-header -->
+				<div class="box-body">
+					<div class="input-group margin col-md-11">
+					      <form role="form">
+						      <div class="form-group">';
+	if ($selection == "TEXT"){
+	$html.= 					      '<input type="text" class="form-control" id="'.$id.'">';
+	}
+	else
+	{
+	$html.=						      '<select class="form-control" id="'.$id.'">
+								      '.$selection.'
+							      </select>';
+	}	
+	$html.= 					      '</div>
+					      </form>
+				      </div>
+				</div><!-- /.box-body -->
+			</div><!-- /.box -->
+		</div><!-- /.col -->';
+	return $html;
+   }
+   function getExpandingSelectionBox($title, $id, $numFields, $width, $fieldTitles, $selection){
+	$html = "";
+	$html = '<div class="col-md-'.$width.'">
+			<div id="'.$id.'_exp" class="box box-default collapsed-box">
+				<div class="box-header with-border">
+					<h3 class="box-title">'.$title.'</h3>
+					<div class="box-tools pull-right">
+					<button class="btn btn-box-tool btn-primary" data-widget="collapse"><i id="'.$id.'_exp_btn" class="fa fa-plus"></i></button>
+					</div><!-- /.box-tools -->
+				</div><!-- /.box-header -->';
+	if ($selection[0][0] == "BUTTON")
+	{
+		$html.= $this->getPipelinesButton($fieldTitles[0]);
+	}
+	else
+	{
+		$html.= 	'<div id="'.$id.'_exp_body" class="box-body" style="display: none;" onchange="">
+					<input id="'.$id.'_yes" type="radio" name="'.$id.'" value="yes"> yes</input>
+					<input id="'.$id.'_no" type="radio" name="'.$id.'" value="no" checked> no</input>';
+		for($y = 0; $y < $numFields; $y++){
+			$html.= $this->getSelectionBox($fieldTitles[$y], $selection[$y]);
+		}
+	}
+	$html.= 		'</div><!-- /.box-body -->
+		      </div><!-- /.box -->
+		</div><!-- /.col -->';
+	return $html;
+   }
+   function getPipelinesButton($title){
+	$html = '';
+	$num = 0;
+	$html.=	'<div id= "pipeline_exp_body" class="box-body" style="display: none;">
+			<div class="input-group margin col-md-11">
+				<form role="form">
+				<div id="masterPipeline">';
+	$html.=			'</div>
+				<input id="addPipe_'.$num.'" type="button" class="btn btn-primary" value="Add Pipeline" onClick="additionalPipes()"/>
+				</form>
+			</div>
+		';
+	return $html;
+   }
    function sendJScript($segment, $field, $value, $search){
 	$html="";
 	$jsData['theSegment'] = $segment;
