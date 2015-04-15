@@ -12,13 +12,23 @@
                 </section>
                 <!-- Main content -->
                 <section class="content">
+		    <?php echo $html->sendJScript("report", "", "", $selection); ?>
                     <div class="row">
                         <div class="col-md-12">
-                        <?PHP echo $html->getQCPanel();?>
+                        <div class="panel panel-default">
+				<div class="panel-heading">
+				  <h4>Analysis Results <small>Comprehensive Analysis</small></h4>
+				</div>
+				<div class="panel-body">
+				    <?php echo $html->getExpandingAnalysisBox('Initial Mapping Results', "initial_mapping", true); ?>
+				    <?php echo $html->getExpandingAnalysisBox('Summary', "summary", false); ?>
+				    <?php echo $html->getExpandingAnalysisBox('Detailed Results', "detailed_results", false); ?>
+				    <?php echo $html->getExpandingAnalysisBox('Plots', "plots", false); ?>
+				</div>
+			</div>
                         </div><!-- /.col (RIGHT) -->
                     </div><!-- /.row -->
                     <div class="row">
 
                     </div><!-- /.row -->
                 </section><!-- /.content -->
-                
