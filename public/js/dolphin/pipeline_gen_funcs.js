@@ -349,32 +349,109 @@ function submitPipeline(type) {
     }
 }
 
+function sendToFastlane(){
+    window.location.href = "/dolphin/pipeline/fastlane/" + checklist_samples + "$";
+}
+
+function sendToReports(){
+    window.location.href = "/dolphin/pipeline/report/-1/$";
+}
+
 /*##### CHECKBOX FUNCTIONS #####*/
-function pass_data(name, id){
-    currentChecked = name;
-    if (id == "sample_checkbox") {
+function pass_data(name, id, type){
+    if (type == 'sample_checkbox') {
     //sample checkbox
 	if ( checklist_samples.indexOf( name ) > -1 ){
 	    //remove
-	    checklist_samples.pop(name);
+	    checklist_samples.splice(checklist_samples.indexOf(name), 1);
+	    
+	    var lane_check = getLaneIdFromSample(name);
+	    if (checklist_lanes.indexOf(lane_check) > -1) {
+		document.getElementById('lane_checkbox_' + lane_check).checked = false;
+		checklist_lanes.splice(checklist_lanes.indexOf(lane_check), 1);
+	    }
 	}else{
 	    //add
 	    checklist_samples.push(name);
+	    
+	    var lane_check = getLaneIdFromSample(name);
+	    var lane_samples = getLanesToSamples(lane_check);
+	    var lanes_bool = true;
+	    
+	    if (checklist_lanes.indexOf(lane_check) == -1) {
+		for(var x = 0; x < lane_samples.length; x++){
+		    if (checklist_samples.indexOf(lane_samples[x]) == -1 && lanes_bool) {
+			lanes_bool = false;
+		    }
+		}
+		if (lanes_bool) {
+		    document.getElementById('lane_checkbox_' + lane_check).checked = true;
+		    checklist_lanes.push(lane_check);
+		}
+	    }
 	}
     }
     else
     {
     //lane checkbox
-    if ( checklist_lanes.indexOf( name ) > -1 ){
+	if ( checklist_lanes.indexOf( name ) > -1 ){
 	    //remove
-	    checklist_lanes.pop(name);
+	    checklist_lanes.splice(checklist_lanes.indexOf(name), 1);
+	    var lane_samples = getLanesToSamples(name);
+	    for (var x = 0; x < lane_samples.length; x++) {
+		if ( document.getElementById('sample_checkbox_' + lane_samples[x]) != null ) {
+		    document.getElementById('sample_checkbox_' + lane_samples[x]).checked = false;
+		}
+		if ( checklist_samples.indexOf( lane_samples[x] ) > -1 ){
+		    checklist_samples.splice(checklist_samples.indexOf(lane_samples[x]), 1);
+		}
+	    }
 	}
 	else
 	{
 	    //add
 	    checklist_lanes.push(name);
+	    var lane_samples = getLanesToSamples(name);
+	    for (var x = 0; x < lane_samples.length; x++) {
+		if ( checklist_samples.indexOf( lane_samples[x] ) == -1 ){
+		    checklist_samples.push(lane_samples[x]);
+		}
+	    }
+	    for(var y = 0; y < checklist_samples.length; y++){
+		if ( document.getElementById('sample_checkbox_' + checklist_samples[y]) != null) {
+		    document.getElementById('sample_checkbox_' + checklist_samples[y]).checked = true;
+		}
+	    }
 	}
     }
+}
+
+function checkOffAll(){
+    var hrefSplit = window.location.href.split("/");
+    var searchLoc = $.inArray('search', hrefSplit);
+    
+    if (searchLoc != -1) {
+	var pagination = document.getElementById('jsontable_samples_paginate');
+	var pagination_ul = pagination.childNodes;
+	var pagination_li = pagination_ul[0].childNodes;
+	for(var y = 0; y < pagination_li.length; y++){
+	    pagination_li[y].setAttribute('onclick', 'checkCheckedList()');
+	}
+    }
+}
+
+function checkCheckedList(){
+    var allSamples = getAllSampleIds();
+    for (var x = 0; x < allSamples.length; x++){
+	if ( document.getElementById('sample_checkbox_' + allSamples[x]) != null) {
+	    if (checklist_samples.indexOf(allSamples[x]) > -1) {
+		document.getElementById('sample_checkbox_' + allSamples[x]).checked = true;
+	    }else{
+		document.getElementById('sample_checkbox_' + allSamples[x]).checked = false;
+	    }
+	}
+    }
+    checkOffAll();
 }
 
 function passIDData(run_group_id, id){
@@ -393,7 +470,7 @@ function passIDData(run_group_id, id){
 
 /*##### SEND TO PIPELINE WITH SELECTION #####*/
 function submitSelected(){
-    window.location.href = "/dolphin/pipeline/selected/" + checklist_samples + "$" + checklist_lanes;
+    window.location.href = "/dolphin/pipeline/selected/" + checklist_samples + "$";
 }
 
 /*##### CHECK RADIO SELECTED FUNCTION #####*/

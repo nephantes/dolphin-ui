@@ -33,7 +33,7 @@ function reportSelected(runID, groupID){
 		    }
 		 }
     });
-    window.location.href = "/dolphin/pipeline/report/" + ids + "$";
+    window.location.href = "/dolphin/pipeline/report/" + runID + '/' + ids + "$";
 }
 
 function getSampleIDs(search){
@@ -68,4 +68,68 @@ function grabReload(groupID){
 		 }
     });
     return jsonArray
+}
+
+function getSummaryInfo(runid, sampleids){
+    var nameArray = [];
+    var dirArray = [];
+    $.ajax({ type: "GET",   
+        url: "/dolphin/public/ajax/ngsquerydb.php",
+        data: { p: "getReportNames", runid: runid, samp: sampleids },
+        async: false,
+        success : function(s)
+        {
+            for(var x = 0; x < s.length; x++){
+                nameArray.push(s[x].file_name);
+                dirArray.push(s[x].outdir);
+            }
+        }
+    });
+    return [nameArray, dirArray];
+}
+
+function getLanesToSamples(lane_id){
+    samples_returned = [];
+    $.ajax({ type: "GET",   
+        url: "/dolphin/public/ajax/ngsquerydb.php",
+        data: { p: "lanesToSamples", lane: lane_id},
+        async: false,
+        success : function(s)
+        {
+            for(var x = 0; x < s.length; x++){
+                samples_returned.push(s[x].id);
+            }
+        }
+    });
+    return samples_returned;
+}
+
+function getAllSampleIds(){
+    samples_returned = [];
+    $.ajax({ type: "GET",   
+        url: "/dolphin/public/ajax/ngsquerydb.php",
+        data: { p: "getAllSampleIds" },
+        async: false,
+        success : function(s)
+        {
+            for(var x = 0; x < s.length; x++){
+                samples_returned.push(s[x].id);
+            }
+        }
+    });
+    return samples_returned;
+}
+
+function getLaneIdFromSample(sample){
+    lane_id_returned = -1;
+    $.ajax({ type: "GET",   
+        url: "/dolphin/public/ajax/ngsquerydb.php",
+        data: { p: "getLaneIdFromSample", sample: sample },
+        async: false,
+        success : function(s)
+        {
+            lane_id_returned = s[0].id;
+        }
+    });
+    return lane_id_returned;
 }

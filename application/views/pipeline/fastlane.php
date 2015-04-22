@@ -10,3 +10,15 @@
 			<li class="active"><?php echo $field?></li
                     </ol>
                 </section>
+                <!-- Main content -->
+                <section class="content">
+                    <div class="row">
+                        <div class="col-md-12">
+                        
+                        </div><!-- /.col (RIGHT) -->
+                    </div><!-- /.row -->
+                    <div class="row">
+			
+                    </div><!-- /.row -->
+                </section><!-- /.content -->
+                

@@ -21,8 +21,8 @@
 				</div>
 				<div class="panel-body">
 				    <?php echo $html->getExpandingAnalysisBox('Initial Mapping Results', "initial_mapping", true); ?>
-				    <?php echo $html->getExpandingAnalysisBox('Summary', "summary", false); ?>
-				    <?php echo $html->getExpandingAnalysisBox('Detailed Results', "detailed_results", false); ?>
+				    <?php echo $html->getExpandingAnalysisBox('Summary', "summary", true); ?>
+				    <?php echo $html->getExpandingAnalysisBox('Detailed Results', "details", false); ?>
 				    <?php echo $html->getExpandingAnalysisBox('Plots', "plots", false); ?>
 				</div>
 			</div>
