@@ -27,8 +27,6 @@
         <script src='<?php echo BASE_PATH?>/js/dolphin/ngsget_funcs.js'></script>
         <script src='<?php echo BASE_PATH?>/js/dolphin/pipeline_gen_funcs.js'></script>
         <script src="<?php echo BASE_PATH?>/js/dolphin/ngstrack_stats.js" type="text/javascript"></script>
-
-
+        <script src="<?php echo BASE_PATH?>/js/dolphin/sessionget_funcs.js" type="text/javascript"></script>
    </body>
-
 </html>

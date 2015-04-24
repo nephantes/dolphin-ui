@@ -74,6 +74,7 @@ function rerunLoad() {
 				}else if (jsonTypeList[x] == 'trim'){
 				    if (z == 0 && jsonObj.hasOwnProperty('trimpaired')) {
 					document.getElementById( trimmingDict[z]+'_val').value = 'paired-end';
+					selectTrimming('single or paired-end_val', 0, 0);
 				    }else if(z == 0 && !jsonObj.hasOwnProperty('trimpaired')){
 					document.getElementById( trimmingDict[z]+'_val').value = 'single-end';
 				    }
@@ -155,7 +156,7 @@ function rerunLoad() {
 function pipelineSelect(num){
     //Grab some useful variables
     var pipeType = document.getElementById('select_'+num).value;
-    var divAdj = createElement('div', ['id', 'class'], ['select_child_'+num, 'input-group margin col-md-11']);
+    var divAdj = createElement('div', ['id', 'class', 'style'], ['select_child_'+num, 'input-group margin col-md-11', 'float:left']);
     //Check for only one RSEM
     if (pipeType == pipelineDict[0] && rsemSwitch)
     {
@@ -353,31 +354,78 @@ function sendToFastlane(){
     window.location.href = "/dolphin/pipeline/fastlane/" + checklist_samples + "$";
 }
 
-function sendToReports(){
-    window.location.href = "/dolphin/pipeline/report/-1/$";
+function sendToStatus(){
+    window.location.href = "/dolphin/pipeline/status/";
+}
+
+function backFromDetails(back_type){
+    var changeHTML = '';
+    var hrefSplit = window.location.href.split("/");
+    var search = hrefSplit[hrefSplit.length - 1];
+    var id = hrefSplit[hrefSplit.length - 2];
+    var type = hrefSplit[hrefSplit.length - 3];
+    
+    if (back_type == 'Sample') {
+	hrefSplit[hrefSplit.length - 2] = getLaneIdFromSample(hrefSplit[hrefSplit.length - 2]);
+	hrefSplit[hrefSplit.length - 3] = 'experiments'
+    }else if (back_type == 'Experiment') {
+	hrefSplit[hrefSplit.length - 2] = getSeriesIdFromLane(hrefSplit[hrefSplit.length - 2]);
+	hrefSplit[hrefSplit.length - 3] = 'experiment_series'
+    }else{
+       searchSplit = hrefSplit[hrefSplit.length - 1].split('$');
+       lastSearch = searchSplit[searchSplit.length - 1].split('=');
+       
+       if (lastSearch[1] != undefined) {
+	    hrefSplit[hrefSplit.length - 2] = lastSearch[1];
+	    hrefSplit[hrefSplit.length - 3] = lastSearch[0];
+	    hrefSplit[hrefSplit.length - 4] = 'browse';
+       }else{
+	    hrefSplit.pop();
+	    hrefSplit.pop();
+	    hrefSplit.pop();
+	    hrefSplit[hrefSplit.length -1] = 'index';
+       }
+    }
+    
+    for (var x = 0; x < hrefSplit.length; x++) {
+	if (x == (hrefSplit.length - 1)) {
+	    changeHTML += hrefSplit[x];
+	}else{
+	    changeHTML += hrefSplit[x] + '/';
+	}
+    }
+    window.location.href = changeHTML;
 }
 
 /*##### CHECKBOX FUNCTIONS #####*/
-function pass_data(name, id, type){
+function manageChecklists(name, type){
     if (type == 'sample_checkbox') {
     //sample checkbox
 	if ( checklist_samples.indexOf( name ) > -1 ){
 	    //remove
 	    checklist_samples.splice(checklist_samples.indexOf(name), 1);
+	    removeFromDolphinBasket(name);
 	    
 	    var lane_check = getLaneIdFromSample(name);
 	    if (checklist_lanes.indexOf(lane_check) > -1) {
 		document.getElementById('lane_checkbox_' + lane_check).checked = false;
 		checklist_lanes.splice(checklist_lanes.indexOf(lane_check), 1);
 	    }
+	    if (document.getElementById('sample_checkbox_' + name).checked != false) {
+		document.getElementById('sample_checkbox_' + name).checked = false;
+	    }
 	}else{
 	    //add
 	    checklist_samples.push(name);
+	    addToDolphinBasket(name);
 	    
 	    var lane_check = getLaneIdFromSample(name);
 	    var lane_samples = getLanesToSamples(lane_check);
 	    var lanes_bool = true;
 	    
+	    if (document.getElementById('sample_checkbox_' + name).checked != true) {
+		document.getElementById('sample_checkbox_' + name).checked = true;
+	    }
 	    if (checklist_lanes.indexOf(lane_check) == -1) {
 		for(var x = 0; x < lane_samples.length; x++){
 		    if (checklist_samples.indexOf(lane_samples[x]) == -1 && lanes_bool) {
@@ -403,6 +451,7 @@ function pass_data(name, id, type){
 		    document.getElementById('sample_checkbox_' + lane_samples[x]).checked = false;
 		}
 		if ( checklist_samples.indexOf( lane_samples[x] ) > -1 ){
+		    removeFromDolphinBasket(lane_samples[x]);
 		    checklist_samples.splice(checklist_samples.indexOf(lane_samples[x]), 1);
 		}
 	    }
@@ -415,6 +464,7 @@ function pass_data(name, id, type){
 	    for (var x = 0; x < lane_samples.length; x++) {
 		if ( checklist_samples.indexOf( lane_samples[x] ) == -1 ){
 		    checklist_samples.push(lane_samples[x]);
+		    addToDolphinBasket(lane_samples[x]);
 		}
 	    }
 	    for(var y = 0; y < checklist_samples.length; y++){
@@ -424,6 +474,32 @@ function pass_data(name, id, type){
 	    }
 	}
     }
+}
+
+function addToDolphinBasket(sampleID){
+    var tblBody = document.getElementById("dolphin_basket_body");
+    var sample_info = getSingleSample(sampleID);
+    
+    var tblrow = document.createElement("tr");
+	tblrow.id = sampleID;
+    var tblcol1 = document.createElement("td");
+	tblcol1.appendChild(document.createTextNode(sample_info[0]));
+	tblrow.appendChild(tblcol1);
+    var tblcol2 = document.createElement("td");
+	tblcol2.appendChild(document.createTextNode(sample_info[1]));
+	tblrow.appendChild(tblcol2);
+    var tblcol3 = document.createElement("td");
+    var remove_button = createElement('button', ['id', 'class', 'onclick'], ['remove_basket_'+sampleID, 'btn btn-danger btn-xs pull-right', 'manageChecklists("'+sampleID+'", "sample_checkbox")']);
+	remove_button.appendChild(createElement('i', ['class'], ['fa fa-times']));
+	tblcol3.appendChild(remove_button);
+	tblrow.appendChild(tblcol3);
+	
+    tblBody.appendChild(tblrow);
+}
+
+function removeFromDolphinBasket(sampleID){
+    var tblrow = document.getElementById(sampleID);
+    tblrow.parentNode.removeChild(tblrow);
 }
 
 function checkOffAll(){
@@ -466,6 +542,10 @@ function passIDData(run_group_id, id){
 	checklist_lanes.push(id);
 	checklist_samples.push(run_group_id);
     }
+}
+
+function returnToIndex(){
+    window.location.href = "/dolphin/search/index/";
 }
 
 /*##### SEND TO PIPELINE WITH SELECTION #####*/
@@ -671,5 +751,28 @@ function changeRNAParamsBtn(){
 	innerDiv.appendChild(label);
 	innerDiv.appendChild(textBox);
 	outerDiv.appendChild(innerDiv);
+    }
+}
+
+function selectTrimming(select_id, five_num, three_num) {
+    var trim_select = document.getElementById(select_id);
+    var trim_parent_parent = trim_select.parentNode.parentNode
+    var single_option = trim_select.childNodes[0];
+    var paired_option = trim_select.childNodes[1];
+    
+    if (trim_select.value == paired_option.value) {
+	var five_len = createElement('div', ['class'], ['col-md-6']);
+	var three_len = createElement('div', ['class'], ['col-md-6']);
+	
+	five_len.appendChild(createElement('label', ['class','TEXTNODE'], ['box-title', '5 length 2']));
+	five_len.appendChild(createElement('input', ['id', 'class', 'type', 'value'], ['5 length 2_val', 'form-control', 'text', five_num]));
+	trim_parent_parent.appendChild(five_len);
+	
+	three_len.appendChild(createElement('label', ['class','TEXTNODE'], ['box-title', '3 length 2']));
+	three_len.appendChild(createElement('input', ['id', 'class', 'type', 'value'], ['3 length 2_val', 'form-control', 'text', three_num]));
+	trim_parent_parent.appendChild(three_len);
+    }else{
+	trim_parent_parent.removeChild(trim_parent_parent.childNodes[5]);
+	trim_parent_parent.removeChild(trim_parent_parent.childNodes[4]);
     }
 }

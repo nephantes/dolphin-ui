@@ -120,6 +120,20 @@ function getAllSampleIds(){
     return samples_returned;
 }
 
+function getSeriesIdFromLane(lane){
+    series_id_returned = -1;
+    $.ajax({ type: "GET",   
+        url: "/dolphin/public/ajax/ngsquerydb.php",
+        data: { p: "getSeriesIdFromLane", lane: lane },
+        async: false,
+        success : function(s)
+        {
+            series_id_returned = s[0].series_id;
+        }
+    });
+    return series_id_returned;
+}
+
 function getLaneIdFromSample(sample){
     lane_id_returned = -1;
     $.ajax({ type: "GET",   
@@ -132,4 +146,19 @@ function getLaneIdFromSample(sample){
         }
     });
     return lane_id_returned;
+}
+
+function getSingleSample(sampleID){
+    var sample_info = [];
+    $.ajax({ type: "GET",   
+        url: "/dolphin/public/ajax/ngsquerydb.php",
+        data: { p: "getSingleSample", sample: sampleID },
+        async: false,
+        success : function(s)
+        {
+            sample_info.push(s[0].id);
+            sample_info.push(s[0].title);
+        }
+    });
+    return sample_info;
 }
