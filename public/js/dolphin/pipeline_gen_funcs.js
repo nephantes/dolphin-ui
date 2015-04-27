@@ -405,26 +405,40 @@ function manageChecklists(name, type){
 	    //remove
 	    checklist_samples.splice(checklist_samples.indexOf(name), 1);
 	    removeFromDolphinBasket(name);
+	    removeBasketInfo();
 	    
 	    var lane_check = getLaneIdFromSample(name);
 	    if (checklist_lanes.indexOf(lane_check) > -1) {
-		document.getElementById('lane_checkbox_' + lane_check).checked = false;
+		if (document.getElementById('lane_checkbox_' + lane_check) != undefined) {
+		    document.getElementById('lane_checkbox_' + lane_check).checked = false;
+		}
 		checklist_lanes.splice(checklist_lanes.indexOf(lane_check), 1);
 	    }
-	    if (document.getElementById('sample_checkbox_' + name).checked != false) {
-		document.getElementById('sample_checkbox_' + name).checked = false;
+	    if (document.getElementById('sample_checkbox_' + name) != undefined) {
+		if (document.getElementById('sample_checkbox_' + name).checked != false) {
+		    document.getElementById('sample_checkbox_' + name).checked = false;
+		}
+	    }
+	    if (checklist_samples.length == 0) {
+		document.getElementById('clear_basket').disabled = 'true';
 	    }
 	}else{
 	    //add
 	    checklist_samples.push(name);
 	    addToDolphinBasket(name);
+	    sendBasketInfo(name);
 	    
 	    var lane_check = getLaneIdFromSample(name);
 	    var lane_samples = getLanesToSamples(lane_check);
 	    var lanes_bool = true;
 	    
-	    if (document.getElementById('sample_checkbox_' + name).checked != true) {
-		document.getElementById('sample_checkbox_' + name).checked = true;
+	    if (document.getElementById('clear_basket').disabled) {
+		document.getElementById('clear_basket').disabled = false;
+	    }
+	    if (document.getElementById('sample_checkbox_' + name) != undefined) {
+		if (document.getElementById('sample_checkbox_' + name).checked != true) {
+		    document.getElementById('sample_checkbox_' + name).checked = true;
+		}
 	    }
 	    if (checklist_lanes.indexOf(lane_check) == -1) {
 		for(var x = 0; x < lane_samples.length; x++){
@@ -433,7 +447,9 @@ function manageChecklists(name, type){
 		    }
 		}
 		if (lanes_bool) {
-		    document.getElementById('lane_checkbox_' + lane_check).checked = true;
+		    if (document.getElementById('lane_checkbox_' + lane_check) != undefined) {
+			document.getElementById('lane_checkbox_' + lane_check).checked = true;
+		    }
 		    checklist_lanes.push(lane_check);
 		}
 	    }
@@ -453,7 +469,11 @@ function manageChecklists(name, type){
 		if ( checklist_samples.indexOf( lane_samples[x] ) > -1 ){
 		    removeFromDolphinBasket(lane_samples[x]);
 		    checklist_samples.splice(checklist_samples.indexOf(lane_samples[x]), 1);
+		    removeBasketInfo();
 		}
+	    }
+	    if (checklist_samples.length == 0) {
+		document.getElementById('clear_basket').disabled = 'true';
 	    }
 	}
 	else
@@ -465,12 +485,28 @@ function manageChecklists(name, type){
 		if ( checklist_samples.indexOf( lane_samples[x] ) == -1 ){
 		    checklist_samples.push(lane_samples[x]);
 		    addToDolphinBasket(lane_samples[x]);
+		    sendBasketInfo(lane_samples[x]);
 		}
+	    }
+	    if (document.getElementById('clear_basket').disabled) {
+		document.getElementById('clear_basket').disabled = false;
 	    }
 	    for(var y = 0; y < checklist_samples.length; y++){
 		if ( document.getElementById('sample_checkbox_' + checklist_samples[y]) != null) {
 		    document.getElementById('sample_checkbox_' + checklist_samples[y]).checked = true;
 		}
+	    }
+	}
+    }
+}
+
+function reloadBasket(){
+    var lastBasket = getBasketInfo();
+    if (lastBasket != undefined) {
+	var basketArray = lastBasket.split(",");
+	for (var x = 0; x < basketArray.length; x++) {
+	    if (basketArray != '0') {
+		manageChecklists(basketArray[x], 'sample_checkbox');
 	    }
 	}
     }
@@ -502,7 +538,14 @@ function removeFromDolphinBasket(sampleID){
     tblrow.parentNode.removeChild(tblrow);
 }
 
-function checkOffAll(){
+function clearBasket(){
+    for(var x = (checklist_samples.length - 1); x >= 0; x = x - 1){
+	manageChecklists(checklist_samples[x], 'sample_checkbox');
+    }
+    flushBasketInfo();
+}
+
+function checkOffAllSamples(){
     var hrefSplit = window.location.href.split("/");
     var searchLoc = $.inArray('search', hrefSplit);
     
@@ -512,6 +555,20 @@ function checkOffAll(){
 	var pagination_li = pagination_ul[0].childNodes;
 	for(var y = 0; y < pagination_li.length; y++){
 	    pagination_li[y].setAttribute('onclick', 'checkCheckedList()');
+	}
+    }
+}
+
+function checkOffAllLanes(){
+    var hrefSplit = window.location.href.split("/");
+    var searchLoc = $.inArray('search', hrefSplit);
+    
+    if (searchLoc != -1) {
+	var pagination = document.getElementById('jsontable_lanes_paginate');
+	var pagination_ul = pagination.childNodes;
+	var pagination_li = pagination_ul[0].childNodes;
+	for(var y = 0; y < pagination_li.length; y++){
+	    pagination_li[y].setAttribute('onclick', 'checkCheckedLanes()');
 	}
     }
 }
@@ -527,7 +584,21 @@ function checkCheckedList(){
 	    }
 	}
     }
-    checkOffAll();
+    checkOffAllSamples();
+}
+
+function checkCheckedLanes(){
+    var allLanes = getAllLaneIds();
+    for (var x = 0; x < allLanes.length; x++){
+	if ( document.getElementById('lane_checkbox_' + allLanes[x]) != null) {
+	    if (checklist_lanes.indexOf(allLanes[x]) > -1) {
+		document.getElementById('lane_checkbox_' + allLanes[x]).checked = true;
+	    }else{
+		document.getElementById('lane_checkbox_' + allLanes[x]).checked = false;
+	    }
+	}
+    }
+    checkOffAllLanes();
 }
 
 function passIDData(run_group_id, id){

@@ -120,6 +120,22 @@ function getAllSampleIds(){
     return samples_returned;
 }
 
+function getAllLaneIds(){
+    lanes_returned = [];
+    $.ajax({ type: "GET",   
+        url: "/dolphin/public/ajax/ngsquerydb.php",
+        data: { p: "getAllLaneIds" },
+        async: false,
+        success : function(s)
+        {
+            for(var x = 0; x < s.length; x++){
+                lanes_returned.push(s[x].id);
+            }
+        }
+    });
+    return lanes_returned;
+}
+
 function getSeriesIdFromLane(lane){
     series_id_returned = -1;
     $.ajax({ type: "GET",   
@@ -142,7 +158,9 @@ function getLaneIdFromSample(sample){
         async: false,
         success : function(s)
         {
-            lane_id_returned = s[0].id;
+            if (s[0] != undefined) {
+                lane_id_returned = s[0].id;
+            }
         }
     });
     return lane_id_returned;
@@ -156,8 +174,10 @@ function getSingleSample(sampleID){
         async: false,
         success : function(s)
         {
-            sample_info.push(s[0].id);
-            sample_info.push(s[0].title);
+            if (s[0] != undefined) {
+                sample_info.push(s[0].id);
+                sample_info.push(s[0].title);
+            }
         }
     });
     return sample_info;
