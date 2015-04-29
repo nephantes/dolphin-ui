@@ -26,7 +26,7 @@
                                                                                 <option>rat,rn5</option>
                                                                                 <option>zebrafish,danrer7</option>
                                                                                 <option>mouse,mm10</option>
-                                                                                <option>mouse,mm10test</option>
+                                                                                <option>mousetest,mm10</option>
                                                                                 <option>s_cerevisiae,saccer3</option>
                                                                                 <option>c_elegans,ce10</option>
                                                                                 <option>cow,bostau7</option>
