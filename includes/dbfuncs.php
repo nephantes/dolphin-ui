@@ -104,7 +104,6 @@ class dbfuncs {
    }
    function getName($username)
    {
-     
      $sql="SELECT name FROM biocore.users  where username='$username';";
      return $this->queryAVal($sql);
    }
