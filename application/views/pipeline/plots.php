@@ -12,17 +12,15 @@
                 </section>
                 <!-- Main content -->
                 <section class="content">
-		    <?php echo $html->sendJScript("report", "", "", $selection); ?>
+		    <?php echo $html->sendJScript("plots", "", "", $selection); ?>
                     <div class="row">
                         <div class="col-md-12">
                         <div class="panel panel-default">
 				<div class="panel-heading">
-				  <h4>Analysis Results <small>Comprehensive Analysis</small></h4>
+				  <h4>Plot Analysis<small>Interactive Analysis</small></h4>
 				</div>
 				<div class="panel-body">
-				    <?php echo $html->getExpandingAnalysisBox('Initial Mapping Results', "initial_mapping", true); ?>
-				    <?php echo $html->getExpandingAnalysisBox('Summary', "summary", false); ?>
-				    <?php echo $html->getExpandingAnalysisBox('Detailed Results', "details", false); ?>
+				    <?php echo $html->getExpandingAnalysisBox('Plots', "plots", false); ?>
 				</div>
 			</div>
                         </div><!-- /.col (RIGHT) -->
