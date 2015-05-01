@@ -21,16 +21,16 @@
 			<?php echo $html->sendJScript("selected", "", "", $selection); ?>
                         <?php echo $html->getStaticSelectionBox("Name the Run", "run_name", "TEXT", 4)?>
 			<?php echo $html->getStaticSelectionBox("Description", "description", "TEXT", 8)?>
-			<?php echo $html->getStaticSelectionBox("Genome Build", "genomebuild", "<option>hg19</option>
-                                                                                <option>cho-k1</option>
-                                                                                <option>rn5</option>
-                                                                                <option>danrer7</option>
-                                                                                <option>mm10</option>
-                                                                                <option>mm10test</option>
-                                                                                <option>saccer3</option>
-                                                                                <option>ce10</option>
-                                                                                <option>bostau7</option>
-                                                                                <option>dm3</option>", 4)?>
+			<?php echo $html->getStaticSelectionBox("Genome Build", "genomebuild", "<option>human,hg19</option>
+                                                                                <option>hamster,cho-k1</option>
+                                                                                <option>rat,rn5</option>
+                                                                                <option>zebrafish,danrer7</option>
+                                                                                <option>mouse,mm10</option>
+                                                                                <option>mousetest,mm10</option>
+                                                                                <option>s_cerevisiae,saccer3</option>
+                                                                                <option>c_elegans,ce10</option>
+                                                                                <option>cow,bostau7</option>
+                                                                                <option>d_melanogaster,dm3</option>", 4)?>
                         <?php echo $html->getStaticSelectionBox("Mate-paired", "spaired", "<option>yes</option>
                                                                                 <option>no</option>", 4)?>
                         <?php echo $html->getStaticSelectionBox("Fresh Run", "resume", "<option>yes</option>
@@ -38,21 +38,30 @@
                         <?php echo $html->getStaticSelectionBox("Output Directory", "outdir", "TEXT", 8)?>
                         <?php echo $html->getStaticSelectionBox("FastQC", "fastqc", "<option>yes</option>
                                                                             <option>no</option>", 4)?>
-                        <?php echo $html->getExpandingSelectionBox("Barcode Separation", "barcodes", 2, 6, ["distance","format"], [[1,2,3,4,5],[
+			
+			<?php echo $html->startExpandingSelectionBox(6)?>
+                        <?php echo $html->getExpandingSelectionBox("Barcode Separation", "barcodes", 2, 12, ["distance","format"], [[1,2,3,4,5],[
                                                                     "5 end read 1","3 end read 2 (or 3 end on single end)","barcode is in header (illumina casava)",
                                                                     "no barcode on read 1 of a pair (read 2 must have on 5 end)",
                                                                     "paired end both reads 5 end"]])?>
-                        <?php echo $html->getExpandingSelectionBox("Adapter Removal", "adapter", 1, 6, ["adapter"], [["TEXTBOX"]])?>
-                        <?php echo $html->getExpandingSelectionBox("Quality Filtering", "quality", 5, 6, ["window size","required quality","leading","trailing","minlen"],
+                        <?php echo $html->getExpandingSelectionBox("Adapter Removal", "adapter", 1, 12, ["adapter"], [["TEXTBOX"]])?>
+                        
+			<?php echo $html->getExpandingSelectionbOX("Custom Sequence Set", "custom", 1, 12, ["Add new Custom Sequence Set"], [["BUTTON"]])?>
+			<?php echo $html->getExpandingSelectionBox("Additional Pipelines", "pipeline", 1, 12, ["Add a Pipeline"], [["BUTTON"]])?>
+			<?php echo $html->endExpandingSelectionBox()?>
+			
+			<?php echo $html->startExpandingSelectionBox(6)?>
+                        <?php echo $html->getExpandingCommonRNABox("Common RNAs", "commonind", 7, 12, ["ercc","rrna","mirna","trna","snrna","rmsk","genome"],
+                                                                   [["no","yes"],["no","yes"],["no","yes"],["no","yes"],["no","yes"],["no","yes"],["no","yes"]])?>
+                        <?php echo $html->getExpandingSelectionBox("Split FastQ", "split", 1, 12, ["number of reads per file"], [["TEXT","5000000"]])?>
+                        <?php echo $html->getExpandingSelectionBox("Quality Filtering", "quality", 5, 12, ["window size","required quality","leading","trailing","minlen"],
                                                                    [["TEXT","10"],["TEXT","15"],["TEXT","5"],["TEXT","5"],["TEXT","36"]])?>
-                        <?php echo $html->getExpandingSelectionBox("Trimming", "trim", 5, 6, ["single or paired-end", "5 length 1", "3 length 1", "5 length 2", "3 length 2"],
-                                                                   [["single-end", "paired-end"],["TEXT","0"],["TEXT","0"],["TEXT","0"],["TEXT","0"]])?>
-                        <?php echo $html->getExpandingSelectionBox("Common RNAs", "commonind", 8, 6, ["ercc","rrna","mirna","trna","snrna","rmsk","genome","change parameters"],
-                                                                   [["no","yes"],["no","yes"],["no","yes"],["no","yes"],["no","yes"],["no","yes"],["no","yes"],["no","yes"]])?>
-                        <?php echo $html->getExpandingSelectionBox("Split FastQ", "split", 1, 6, ["number of reads per file"], [["TEXT","5000000"]])?>
-                        <?php echo $html->getExpandingSelectionBox("Additional Pipelines", "pipeline", 1, 6, ["Add a Pipeline"], [["BUTTON"]])?>
-			<div class="col-md-4">
-                        <input type="button" id="submitPipeline" class="btn btn-primary" name="pipeline_send_button" value="Submit Pipeline" onClick="submitPipeline('rerun');"/>
+                        <?php echo $html->getExpandingSelectionBox("Trimming", "trim", 3, 12, ["single or paired-end", "5 length 1", "3 length 1"],
+                                                                   [["ONCHANGE", "single-end", "paired-end"],["TEXT","0"],["TEXT","0"]])?>
+			<?php echo $html->endExpandingSelectionBox()?>
+			
+			<div class="col-md-12">
+			    <input type="button" id="submitPipeline" class="btn btn-primary" name="pipeline_send_button" value="Submit Pipeline" onClick="submitPipeline('selected');"/>
                         </div>
                     </div><!-- /.row -->
                 </section><!-- /.content -->
