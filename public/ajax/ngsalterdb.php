@@ -22,7 +22,7 @@ if ($p == "submitPipeline" )
     if (isset($_POST['name'])){$name = $_POST['name'];}
     if (isset($_POST['desc'])){$desc = $_POST['desc'];}
     if (isset($_POST['runGroupID'])){$runGroupID = $_POST['runGroupID'];}
-    
+
     //run_group_id set to -1 as a placeholder.  Cannot grab primary key as it's being made, so a placeholder is needed.
     $data=$query->runSQL("
     INSERT INTO biocore.ngs_runparams (run_group_id, outdir, run_status, barcode, json_parameters, run_name, run_description)
@@ -45,7 +45,7 @@ else if ($p == 'insertRunlist')
     if (isset($_POST['sampID'])){$sampID = $_POST['sampID'];}
     if (isset($_POST['runID'])){$runID = $_POST['runID'];}
     if (isset($_POST['runGroupID'])){$runGroupID = $_POST['runGroupID'];}
-    
+
     $searchQuery = "INSERT INTO ngs_runlist
         (run_id, run_group_id, sample_id, owner_id, group_id, perms, date_created, date_modified, last_modified_user)
         VALUES ";

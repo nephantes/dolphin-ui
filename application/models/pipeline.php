@@ -1,5 +1,5 @@
 <?php
- 
+
 class Pipeline extends VanillaModel {
 
     function getId($value, $idfield, $table) {

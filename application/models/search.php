@@ -1,7 +1,7 @@
 <?php
- 
+
 class Search extends VanillaModel {
- 
+
   /** Get menuitems for this user **/
     function getAccItems($fieldname, $tablename) {
         $result = $this->query("select $fieldname name, count($fieldname) count from $tablename where $fieldname!='' group by $fieldname");

@@ -6,7 +6,7 @@
 
 function sessionTest(){
     var uid = '';
-    $.ajax({ type: "GET",   
+    $.ajax({ type: "GET",
         url: "/dolphin/public/ajax/sessionrequests.php",
         data: { p:"sessionTest" },
         async: false,
@@ -19,7 +19,7 @@ function sessionTest(){
 }
 
 function sendBasketInfo(id){
-    $.ajax({ type: "POST",   
+    $.ajax({ type: "POST",
         url: "/dolphin/public/ajax/sessionrequests.php",
         data: { p:"sendBasketInfo", id:id },
         async: false,
@@ -31,7 +31,7 @@ function sendBasketInfo(id){
 
 function getBasketInfo() {
     basket = "";
-    $.ajax({ type: "GET",   
+    $.ajax({ type: "GET",
         url: "/dolphin/public/ajax/sessionrequests.php",
         data: { p:"getBasketInfo" },
         async: false,
@@ -48,18 +48,18 @@ function getBasketInfo() {
 }
 
 function removeBasketInfo(id){
-    $.ajax({ type: "POST",   
+    $.ajax({ type: "POST",
         url: "/dolphin/public/ajax/sessionrequests.php",
         data: { p:"removeBasketInfo", id:id },
         async: false,
         success : function(s)
-        { 
+        {
         }
     });
 }
 
 function flushBasketInfo() {
-    $.ajax({ type: "POST",   
+    $.ajax({ type: "POST",
         url: "/dolphin/public/ajax/sessionrequests.php",
         data: { p:"flushBasketInfo"},
         async: false,

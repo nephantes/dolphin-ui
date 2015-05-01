@@ -3,10 +3,10 @@
  *  Date: 09 Apr 2015
  *  Ascription:
  */
- 
+
 function rerunSelected(runID, groupID){
     var sample_ids = [];
-    $.ajax({ type: "GET",   
+    $.ajax({ type: "GET",
 		 url: "/dolphin/public/ajax/ngsquerydb.php",
 		 data: { p: "getRunSamples", runID: runID, groupID: groupID },
 		 async: false,
@@ -22,7 +22,7 @@ function rerunSelected(runID, groupID){
 
 function reportSelected(runID, groupID){
     var ids = [];
-    $.ajax({ type: "GET",   
+    $.ajax({ type: "GET",
 		 url: "/dolphin/public/ajax/ngsquerydb.php",
 		 data: { p: "getRunSamples", runID: runID, groupID: groupID },
 		 async: false,
@@ -37,8 +37,8 @@ function reportSelected(runID, groupID){
 }
 
 function getSampleIDs(search){
-    var ids= [];  
-    $.ajax({ type: "GET",   
+    var ids= [];
+    $.ajax({ type: "GET",
 		 url: "/dolphin/public/ajax/ngsquerydb.php",
 		 data: { p: "getSelectedSamples", search: search },
 		 async: false,
@@ -54,7 +54,7 @@ function getSampleIDs(search){
 
 function grabReload(groupID){
     jsonArray = [];
-    $.ajax({ type: "GET",   
+    $.ajax({ type: "GET",
 		 url: "/dolphin/public/ajax/ngsquerydb.php",
 		 data: { p: "grabReload", groupID: groupID },
 		 async: false,
@@ -73,7 +73,7 @@ function grabReload(groupID){
 function getSummaryInfo(runid, sampleids){
     var nameArray = [];
     var dirArray = [];
-    $.ajax({ type: "GET",   
+    $.ajax({ type: "GET",
         url: "/dolphin/public/ajax/ngsquerydb.php",
         data: { p: "getReportNames", runid: runid, samp: sampleids },
         async: false,
@@ -90,7 +90,7 @@ function getSummaryInfo(runid, sampleids){
 
 function getLanesToSamples(lane_id){
     samples_returned = [];
-    $.ajax({ type: "GET",   
+    $.ajax({ type: "GET",
         url: "/dolphin/public/ajax/ngsquerydb.php",
         data: { p: "lanesToSamples", lane: lane_id},
         async: false,
@@ -106,7 +106,7 @@ function getLanesToSamples(lane_id){
 
 function getAllSampleIds(){
     samples_returned = [];
-    $.ajax({ type: "GET",   
+    $.ajax({ type: "GET",
         url: "/dolphin/public/ajax/ngsquerydb.php",
         data: { p: "getAllSampleIds" },
         async: false,
@@ -122,7 +122,7 @@ function getAllSampleIds(){
 
 function getAllLaneIds(){
     lanes_returned = [];
-    $.ajax({ type: "GET",   
+    $.ajax({ type: "GET",
         url: "/dolphin/public/ajax/ngsquerydb.php",
         data: { p: "getAllLaneIds" },
         async: false,
@@ -138,7 +138,7 @@ function getAllLaneIds(){
 
 function getSeriesIdFromLane(lane){
     series_id_returned = -1;
-    $.ajax({ type: "GET",   
+    $.ajax({ type: "GET",
         url: "/dolphin/public/ajax/ngsquerydb.php",
         data: { p: "getSeriesIdFromLane", lane: lane },
         async: false,
@@ -152,7 +152,7 @@ function getSeriesIdFromLane(lane){
 
 function getLaneIdFromSample(sample){
     lane_id_returned = -1;
-    $.ajax({ type: "GET",   
+    $.ajax({ type: "GET",
         url: "/dolphin/public/ajax/ngsquerydb.php",
         data: { p: "getLaneIdFromSample", sample: sample },
         async: false,
@@ -168,7 +168,7 @@ function getLaneIdFromSample(sample){
 
 function getSingleSample(sampleID){
     var sample_info = [];
-    $.ajax({ type: "GET",   
+    $.ajax({ type: "GET",
         url: "/dolphin/public/ajax/ngsquerydb.php",
         data: { p: "getSingleSample", sample: sampleID },
         async: false,

@@ -1,7 +1,7 @@
 		<!-- Content Header (Page header) -->
                 <section class="content-header">
                     <h1>
-                        NGS Browser 
+                        NGS Browser
                         <small>Project and experiment search</small>
                     </h1>
                     <ol class="breadcrumb">
@@ -61,7 +61,7 @@
 				//echo $html->getRSEMPanel();
 				//echo $html->getDESeqPanel();
 				//echo $html->getTophatPanel();
-				
+
 			    }
 			    else{
                               echo $html->getRespBoxTable_ng("Samples", "samples", "<th>id</th><th>Title</th><th>Source</th><th>Organism</th><th>Molecule</th><th>Selected</th>");
@@ -71,6 +71,6 @@
                         </div><!-- /.col (RIGHT) -->
                     </div><!-- /.row -->
                 </section><!-- /.content -->
-                
-                
+
+
 

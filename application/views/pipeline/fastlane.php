@@ -1,7 +1,7 @@
 <!-- Content Header (Page header) -->
                 <section class="content-header">
                     <h1>
-                        NGS Pipeline 
+                        NGS Pipeline
                         <small>Workflow creation</small>
                     </h1>
                     <ol class="breadcrumb">
@@ -14,11 +14,11 @@
                 <section class="content">
                     <div class="row">
                         <div class="col-md-12">
-                        
+
                         </div><!-- /.col (RIGHT) -->
                     </div><!-- /.row -->
                     <div class="row">
-			
+
                     </div><!-- /.row -->
                 </section><!-- /.content -->
-                
+

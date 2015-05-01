@@ -13,8 +13,8 @@ function parseTSV(report, jsonName, nameAndDirArray){
     var URL = nameAndDirArray[1][0] + 'counts/' + report + '.summary.tsv&fields=' + jsonName;
     var parsed = [];
     var parsePushed = [];
-    
-    $.ajax({ type: "GET",   
+
+    $.ajax({ type: "GET",
 			 url: basePath + URL,
 			 async: false,
 			 success : function(s)
@@ -35,8 +35,8 @@ function parseMoreTSV(report, jsonNameArray, nameAndDirArray){
     var URL = nameAndDirArray[1][0] + 'counts/' + report + '.summary.tsv&fields=' + jsonNameArray;
     var parsed = [];
     var parsePushed = [];
-    
-    $.ajax({ type: "GET",   
+
+    $.ajax({ type: "GET",
 			 url: basePath + URL,
 			 async: false,
 			 success : function(s)
@@ -59,15 +59,15 @@ function parseMoreTSV(report, jsonNameArray, nameAndDirArray){
 function getDownloadText(dataType, downloadType) {
     var basePath = 'http://galaxyweb.umassmed.edu/csv-to-api/?source=/project/umw_biocore/pub/ngstrack_pub';
     var URL = checkFrontAndEndDir('mousetest') + '/counts/' + dataType + '.counts.tsv&fields=id,' + lib_checklist.toString() + '&format=' + downloadType;
-    
+
     var stringData = '';
-    
-    $.ajax({ type: "GET",   
+
+    $.ajax({ type: "GET",
 			 url: basePath + URL,
 			 async: false,
 			 success : function(s)
 			 {
-			    stringData = s;   
+			    stringData = s;
                          }
     });
     return stringData;
@@ -77,9 +77,9 @@ function createSummary(nameAndDirArray) {
     var basePath = 'http://galaxyweb.umassmed.edu/pub/ngstrack_pub' + nameAndDirArray[1][0] + 'fastqc/UNITED';
     var linkRef = [ '/per_base_quality.html', '/per_base_sequence_content.html', '/per_sequence_quality.html'];
     var linkRefName = ['Per Base Quality Summary', 'Per Base Sequence Content Summary', 'Per Sequence Quality Summary'];
-    
+
     var masterDiv = document.getElementById('summary_exp_body');
-    
+
     for(var x = 0; x < linkRefName.length; x++){
 	var link = createElement('a', ['href'], [basePath + linkRef[x]]);
 	link.appendChild(document.createTextNode(linkRefName[x]));
@@ -90,9 +90,9 @@ function createSummary(nameAndDirArray) {
 
 function createDetails(nameAndDirArray) {
     var basePath = 'http://galaxyweb.umassmed.edu/pub/ngstrack_pub' + nameAndDirArray[1][x];
-    
+
     var masterDiv = document.getElementById('details_exp_body');
-    
+
     for(var x = 0; x < nameAndDirArray[0].length; x++){
 	var splt1 = nameAndDirArray[0][x].split(',');
 	for(var y = 0; y < splt1.length; y++){
@@ -109,11 +109,11 @@ function createPlot(){
     var url="http://galaxyweb.umassmed.edu/csv-to-api/?source=http://galaxyweb.umassmed.edu/pub/ngstrack_pub/mousetest/rsem/genes_expression_expected_count.tsv";
     var masterDiv = document.getElementById('plots_exp_body');
     var headDiv = document.getElementById('plots_exp');
-    
+
     var overlay = createElement('div', ['id', 'class'],['overlay', 'overlay']);
     overlay.appendChild(createElement('i', ['class'], ['fa fa-refresh fa-spin']));
     headDiv.appendChild(overlay);
-    
+
     d3.json(url, draw);
 }
 
@@ -152,7 +152,7 @@ function createDropdown(nameList){
     var masterDiv = document.getElementById('initial_mapping_exp_body');
     var childDiv = createElement('div', ['id', 'class'], ['select_div', 'input-group margin col-md-4']);
     var selectDiv = createElement('div', ['id', 'class'], ['inner_select_div', 'input-group-btn margin']);
-	
+
     selectDiv.appendChild( createElement('select',
 				    ['id', 'class', 'onchange', 'OPTION_DIS_SEL', 'OPTION', 'OPTION', 'OPTION', 'OPTION', 'OPTION'],
 				    ['select_report', 'form-control', 'showSelectTable()', '--- Select a Result ---',
@@ -168,7 +168,7 @@ function showSelectTable(){
     }else{
 	currentResultSelection = document.getElementById('select_report').value;
 	var masterDiv = document.getElementById('initial_mapping_exp_body');
-	
+
 	if (document.getElementById('jsontable_selected_results') == null) {
 	    var table = generateSelectionTable();
 	    masterDiv.appendChild(table);
@@ -177,7 +177,7 @@ function showSelectTable(){
 	    var newTable = generateSelectionTable();
 	    $('#jsontable_selected_results_wrapper').replaceWith(newTable);
 	}
-	
+
 	var newTableData = $('#jsontable_selected_results').dataTable();
 	newTableData.fnClearTable();
 	var objList = getCountsTableData(currentResultSelection).map(JSON.stringify);
@@ -218,10 +218,10 @@ function generateSelectionTable(){
 function getCountsTableData(currentResultSelection){
     var basePath = 'http://galaxyweb.umassmed.edu/csv-to-api/?source=/project/umw_biocore/pub/ngstrack_pub';
     var URL = nameAndDirArray[1][0] + 'counts/' + currentResultSelection + '.counts.tsv&fields=id,' + lib_checklist;
-    
+
     var objList = [];
-    
-    $.ajax({ type: "GET",   
+
+    $.ajax({ type: "GET",
 			url: basePath + URL,
 			async: false,
 			success : function(s)
@@ -233,13 +233,13 @@ function getCountsTableData(currentResultSelection){
 }
 
 function downloadReports(button, dataType, downloadType){
-    
+
     var stringData = getDownloadText(dataType, downloadType);
     var data = "text/json;charset=utf-8," + encodeURIComponent(stringData);
     // what to return in order to show download window?
 
     button.setAttribute("href", "data:"+data);
-    button.setAttribute("download", dataType + "." + downloadType);  
+    button.setAttribute("download", dataType + "." + downloadType);
 }
 
 $(function() {
@@ -247,28 +247,28 @@ $(function() {
     if (phpGrab.theSegment == 'report') {
 	var reports_table = $('#jsontable_initial_mapping').dataTable();
 	var basePath = 'http://galaxyweb.umassmed.edu/csv-to-api/?source=/project/umw_biocore/pub/ngstrack_pub';
-	
+
 	var hrefSplit = window.location.href.split("/");
 	var runId = hrefSplit[hrefSplit.length - 2];
 	var samples = hrefSplit[hrefSplit.length - 1].substring(0, hrefSplit[hrefSplit.length - 1].length - 1).split(",");
 	nameAndDirArray = getSummaryInfo(runId, samples);
-       
+
 	nameAndDirArray = [['','',''],['mousetest','','']];
-	
+
 	for(var x = 0; x < nameAndDirArray[1].length; x++){
 	    nameAndDirArray[1][x] = checkFrontAndEndDir(nameAndDirArray[1][x]);
 	}
 
 	createSummary(nameAndDirArray);
 	createDetails(nameAndDirArray);
-       
+
 	var jsonGrab = parseMoreTSV('rRNA', ['File','Total Reads','Reads 1'], nameAndDirArray);
 	var miRNA = parseTSV('miRNA', 'Reads 1', nameAndDirArray);
 	var tRNA= parseTSV('tRNA', 'Reads 1', nameAndDirArray);
 	var snRNA = parseTSV('snRNA', 'Reads 1', nameAndDirArray);
 	var rmsk = parseMoreTSV('rmsk', ['Reads 1','Unmapped Reads'], nameAndDirArray);
 	var libnames = ['rRNA', 'miRNA', 'tRNA', 'snRNA', 'rmsk'];
-	
+
 	//Initial Mapping Results
 	reports_table.fnClearTable();
 	for (var x = 0; x < miRNA.length; x++) {
@@ -282,12 +282,12 @@ $(function() {
 		cleanReports(rmsk[x * 2].split(" ")[0], jsonGrab[(x * 3) + 1]),
 		cleanReports(rmsk[(x * 2) + 1].split(" ")[0], jsonGrab[(x * 3) + 1]),
 		"<input type=\"checkbox\" class=\"ngs_checkbox\" name=\"" + jsonGrab[x * 3] + "\" id=\"lib_checkbox_"+x+"\" onClick=\"storeLib(this.name)\">",
-		]);   
+		]);
 	}
-	
+
 	createDropdown(libnames);
-	
+
 	reports_table.fnSort( [ [0,'asc'] ] );
-	reports_table.fnAdjustColumnSizing(true); 
+	reports_table.fnAdjustColumnSizing(true);
     }
 });

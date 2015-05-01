@@ -13,19 +13,19 @@ $(function() {
 
     //The Calender
     $("#calendar").datepicker();
-    
+
     /*##### PAGE DETERMINER #####*/
-    
+
     var qvar = "";
     var rvar = "";
     var segment = "";
     var theSearch = "";
-    
+
     if (phpGrab) {
 	var segment = phpGrab.theSegment;
 	var theSearch = phpGrab.theSearch;
     }
-    
+
     //Details values
     if (segment == "details") {
 	if (phpGrab.theField == "experiment_series") {
@@ -35,22 +35,22 @@ $(function() {
 	    rvar = phpGrab.theValue;
 	}
     }
-    
+
     //Browse values
     else if (segment == "browse") {
 	qvar = phpGrab.theField;  //field
 	rvar = unescape(phpGrab.theValue);  //value
     }
-    
+
     if (phpGrab.theField == "samples") {
 	reloadBasket();
     }
-    
+
     /*##### STATUS TABLE #####*/
     if (segment == 'status') {
 	var runparams = $('#jsontable_runparams').dataTable();
-    
-	$.ajax({ type: "GET",   
+
+	$.ajax({ type: "GET",
 			 url: "/dolphin/public/ajax/ngsquerydb.php",
 			 data: { p: "getStatus", q: qvar, r: rvar, seg: segment, search: theSearch },
 			 async: false,
@@ -74,7 +74,7 @@ $(function() {
 			    s[i].run_description,
 			    runstat,
 			    '<div class="btn-group">' +
-			    '<input type="button" id="'+s[i].id+'" name="'+s[i].run_group_id+'" class="btn btn-xs btn-primary" value="Report Details" onClick="reportSelected(this.id, this.name)"/>' + 
+			    '<input type="button" id="'+s[i].id+'" name="'+s[i].run_group_id+'" class="btn btn-xs btn-primary" value="Report Details" onClick="reportSelected(this.id, this.name)"/>' +
 			    '<input type="button" id="'+s[i].id+'" name="'+s[i].run_group_id+'" class="btn btn-xs btn-primary disabled" value="Pause" onClick=""/>' +
 			    '<input type="button" id="'+s[i].id+'" name="'+s[i].run_group_id+'" class="btn btn-xs btn-primary" value="Re-run" onClick="rerunSelected(this.id, this.name)"/>' +
 			    '</div>',
@@ -82,7 +82,7 @@ $(function() {
 			    } // End For
 			}
 		});
-	
+
 	$('.daterange_status').daterangepicker(
 		{
 		    ranges: {
@@ -98,7 +98,7 @@ $(function() {
 		    endDate: moment()
 		},
 	function(start, end) {
-		$.ajax({ type: "GET",   
+		$.ajax({ type: "GET",
 			 url: "/dolphin/public/ajax/ngsquerydb.php",
 			 data: { p: "getStatus", q: qvar, r: rvar, seg: segment, search: theSearch, start:start.format('YYYY-MM-DD'), end:end.format('YYYY-MM-DD') },
 			 async: false,
@@ -122,7 +122,7 @@ $(function() {
 			    s[i].run_description,
 			    runstat,
 			    '<div class="btn-group">' +
-			    '<input type="button" id="'+s[i].id+'" name="'+s[i].run_group_id+'" class="btn btn-xs btn-primary" value="Report Details" onClick="reportSelected(this.id, this.name)"/>' + 
+			    '<input type="button" id="'+s[i].id+'" name="'+s[i].run_group_id+'" class="btn btn-xs btn-primary" value="Report Details" onClick="reportSelected(this.id, this.name)"/>' +
 			    '<input type="button" id="'+s[i].id+'" name="'+s[i].run_group_id+'" class="btn btn-xs btn-primary disabled" value="Pause" onClick=""/>' +
 			    '<input type="button" id="'+s[i].id+'" name="'+s[i].run_group_id+'" class="btn btn-xs btn-primary" value="Re-run" onClick="rerunSelected(this.id, this.name)"/>' +
 			    '</div>',
@@ -130,19 +130,19 @@ $(function() {
 			    } // End For
 			 }
 		});
-    
+
 	});
-	
+
 	runparams.fnSort( [ [0,'des'] ] );
 	runparams.fnAdjustColumnSizing(true);
     }
-    
-    
+
+
     /*##### PROTOCOLS TABLE #####*/
-     
+
     var protocolsTable = $('#jsontable_protocols').dataTable();
-     
-     $.ajax({ type: "GET",   
+
+     $.ajax({ type: "GET",
                      url: "/dolphin/public/ajax/ngsquerydb.php",
                      data: { p: "getProtocols", type:"Dolphin", q: qvar, r: rvar, seg: segment, search: theSearch},
                      async: false,
@@ -152,14 +152,14 @@ $(function() {
                         for(var i = 0; i < s.length; i++) {
                         protocolsTable.fnAddData([
 			s[i].id,
-			"<a href=\"/dolphin/search/details/protocols/"+s[i].id+'/'+theSearch+"\">"+s[i].name+"</a>", 
+			"<a href=\"/dolphin/search/details/protocols/"+s[i].id+'/'+theSearch+"\">"+s[i].name+"</a>",
                         s[i].growth,
 			s[i].treatment,
                         ]);
                         } // End For
                      }
             });
-     
+
     $('.daterange_protocols').daterangepicker(
             {
                 ranges: {
@@ -175,7 +175,7 @@ $(function() {
                 endDate: moment()
             },
     function(start, end) {
-            $.ajax({ type: "GET",   
+            $.ajax({ type: "GET",
                      url: "/dolphin/public/ajax/ngsquerydb.php",
                      data: { p: "getProtocols", q: qvar, r: rvar, seg: segment, search: theSearch, start:start.format('YYYY-MM-DD'), end:end.format('YYYY-MM-DD') },
                      async: false,
@@ -185,7 +185,7 @@ $(function() {
                         for(var i = 0; i < s.length; i++) {
                         protocolsTable.fnAddData([
 			s[i].id,
-			"<a href=\"/dolphin/search/details/protocols/"+s[i].id+'/'+theSearch+"\">"+s[i].name+"</a>", 
+			"<a href=\"/dolphin/search/details/protocols/"+s[i].id+'/'+theSearch+"\">"+s[i].name+"</a>",
                         s[i].growth,
 			s[i].treatment,
                         ]);
@@ -196,11 +196,11 @@ $(function() {
     });
     protocolsTable.fnSort( [ [0,'asc'] ] );
     //protocolsTable.fnAdjustColumnSizing(true);
-    
+
     /*##### SAMPLES TABLE #####*/
-    
+
     var samplesTable = $('#jsontable_samples').dataTable();
-    
+
     var samplesType = "";
     if (segment == 'selected') {
 	samplesType = "getSelectedSamples";
@@ -208,7 +208,7 @@ $(function() {
     else{
 	samplesType = "getSamples";
     }
-    $.ajax({ type: "GET",   
+    $.ajax({ type: "GET",
                      url: "/dolphin/public/ajax/ngsquerydb.php",
                      data: { p: samplesType, q: qvar, r: rvar, seg: segment, search: theSearch },
                      async: false,
@@ -218,7 +218,7 @@ $(function() {
                         for(var i = 0; i < s.length; i++) {
                         samplesTable.fnAddData([
                         s[i].id,
-			"<a href=\"/dolphin/search/details/samples/"+s[i].id+'/'+theSearch+"\">"+s[i].title+"</a>", 
+			"<a href=\"/dolphin/search/details/samples/"+s[i].id+'/'+theSearch+"\">"+s[i].title+"</a>",
 			s[i].source,
 			s[i].organism,
 			s[i].molecule,
@@ -227,7 +227,7 @@ $(function() {
                         } // End For
                      }
             });
-    
+
     $('.daterange_samples').daterangepicker(
             {
                 ranges: {
@@ -243,7 +243,7 @@ $(function() {
                 endDate: moment()
             },
     function(start, end) {
-            $.ajax({ type: "GET",   
+            $.ajax({ type: "GET",
                      url: "/dolphin/public/ajax/ngsquerydb.php",
                      data: { p: samplesType, q: qvar, r: rvar, seg: segment, search: theSearch, start:start.format('YYYY-MM-DD'), end:end.format('YYYY-MM-DD') },
                      async: false,
@@ -253,7 +253,7 @@ $(function() {
                         for(var i = 0; i < s.length; i++) {
                         samplesTable.fnAddData([
                         s[i].id,
-			"<a href=\"/dolphin/search/details/samples/"+s[i].id+'/'+theSearch+"\">"+s[i].title+"</a>", 
+			"<a href=\"/dolphin/search/details/samples/"+s[i].id+'/'+theSearch+"\">"+s[i].title+"</a>",
 			s[i].source,
 			s[i].organism,
 			s[i].molecule,
@@ -264,20 +264,20 @@ $(function() {
             });
 
     });
-    
+
     samplesTable.fnSort( [ [0,'asc'] ] );
     samplesTable.fnAdjustColumnSizing(true);
-    
+
     if (phpGrab.theField == "experiments") {
 	checkOffAllSamples();
 	reloadBasket();
     }
-    
+
     /*##### LANES TABLE #####*/
-	
+
     var lanesTable = $('#jsontable_lanes').dataTable();
-    
-    $.ajax({ type: "GET",   
+
+    $.ajax({ type: "GET",
                      url: "/dolphin/public/ajax/ngsquerydb.php",
                      data: { p: "getLanes", q: qvar, r: rvar, seg: segment, search: theSearch },
                      async: false,
@@ -287,7 +287,7 @@ $(function() {
                         for(var i = 0; i < s.length; i++) {
                         lanesTable.fnAddData([
                         s[i].id,
-			"<a href=\"/dolphin/search/details/experiments/"+s[i].id+'/'+theSearch+"\">"+s[i].name+"</a>", 
+			"<a href=\"/dolphin/search/details/experiments/"+s[i].id+'/'+theSearch+"\">"+s[i].name+"</a>",
 			s[i].facility,
 			s[i].total_reads,
 			s[i].total_samples,
@@ -296,7 +296,7 @@ $(function() {
                         } // End For
                     }
             });
-    
+
     $('.daterange_lanes').daterangepicker(
             {
                 ranges: {
@@ -312,7 +312,7 @@ $(function() {
                 endDate: moment()
             },
     function(start, end) {
-            $.ajax({ type: "GET",   
+            $.ajax({ type: "GET",
                      url: "/dolphin/public/ajax/ngsquerydb.php",
                      data: { p: "getLanes", q: qvar, r: rvar, seg: segment, search: theSearch, start:start.format('YYYY-MM-DD'), end:end.format('YYYY-MM-DD') },
                      async: false,
@@ -322,7 +322,7 @@ $(function() {
                         for(var i = 0; i < s.length; i++) {
                         lanesTable.fnAddData([
                         s[i].id,
-			"<a href=\"/dolphin/search/details/experiments/"+s[i].id+'/'+theSearch+"\">"+s[i].name+"</a>", 
+			"<a href=\"/dolphin/search/details/experiments/"+s[i].id+'/'+theSearch+"\">"+s[i].name+"</a>",
 			s[i].facility,
 			s[i].total_reads,
 			s[i].total_samples,
@@ -333,7 +333,7 @@ $(function() {
             });
 
     });
-    
+
     lanesTable.fnSort( [ [0,'asc'] ] );
     lanesTable.fnAdjustColumnSizing(true);
 
@@ -342,11 +342,11 @@ $(function() {
 	checkOffAllLanes();
 	reloadBasket();
     }
-    
+
     /*##### SERIES TABLE #####*/
-	
-     var experiment_seriesTable = $('#jsontable_experiment_series').dataTable(); 
-     $.ajax({ type: "GET",   
+
+     var experiment_seriesTable = $('#jsontable_experiment_series').dataTable();
+     $.ajax({ type: "GET",
                      url: "/dolphin/public/ajax/ngsquerydb.php",
                      data: { p: "getExperimentSeries", q: qvar, r: rvar, seg: segment, search: theSearch },
                      async: false,
@@ -356,7 +356,7 @@ $(function() {
                         for(var i = 0; i < s.length; i++) {
                         experiment_seriesTable.fnAddData([
 			s[i].id,
-			"<a href=\"/dolphin/search/details/experiment_series/"+s[i].id+'/'+theSearch+"\">"+s[i].experiment_name+"</a>", 
+			"<a href=\"/dolphin/search/details/experiment_series/"+s[i].id+'/'+theSearch+"\">"+s[i].experiment_name+"</a>",
                         s[i].summary,
                         s[i].design,
                         ]);
@@ -379,7 +379,7 @@ $(function() {
                 endDate: moment()
             },
     function(start, end) {
-            $.ajax({ type: "GET",   
+            $.ajax({ type: "GET",
                      url: "/dolphin/public/ajax/ngsquerydb.php",
                      data: { p: "getExperimentSeries", q: qvar, r: rvar, seg: segment, search: theSearch, start:start.format('YYYY-MM-DD'), end:end.format('YYYY-MM-DD') },
                      async: false,
@@ -389,7 +389,7 @@ $(function() {
                         for(var i = 0; i < s.length; i++) {
                         experiment_seriesTable.fnAddData([
 			s[i].id,
-			"<a href=\"/dolphin/search/details/experiment_series/"+s[i].id+'/'+theSearch+"\">"+s[i].experiment_name+"</a>", 
+			"<a href=\"/dolphin/search/details/experiment_series/"+s[i].id+'/'+theSearch+"\">"+s[i].experiment_name+"</a>",
                         s[i].summary,
                         s[i].design,
                         ]);
@@ -398,10 +398,10 @@ $(function() {
             });
 
     });
-     
+
     experiment_seriesTable.fnSort( [ [0,'asc'] ] );
     experiment_seriesTable.fnAdjustColumnSizing(true);
-    
+
     checkOffAllSamples();
     checkOffAllLanes();
     reloadBasket();

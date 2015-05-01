@@ -16,10 +16,10 @@ if($p == "sessionTest")
 else if ($p == "sendBasketInfo")
 {
     if (isset($_POST['id'])){$id = $_POST['id'];}
-    
+
     $current_basket = $_SESSION['basket'];
     $basket_array = explode(",", $current_basket);
-    
+
     if (isset($_SESSION['basket']) && !(array_search($id, $basket_array) > -1)){
         $_SESSION['basket'] .= ',' . $id;
     }else if(!(array_search($id, $basket_array) > -1)){

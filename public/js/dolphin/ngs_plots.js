@@ -1,4 +1,4 @@
-function draw(data){ 
+function draw(data){
   "use strict";
 
   var w=800, h=400;
@@ -35,7 +35,7 @@ function draw(data){
                             .attr("fill", function(d) { return ['blue', 'green', 'red'][1]; })
                             .on("mouseover", function() { d3.select(this).attr("r", 10) })
                             .on("mouseout", function() { d3.select(this).attr("r", 5) });
-                            
+
     //Make sure to disable loading screen
     document.getElementById('overlay').parentNode.removeChild( document.getElementById('overlay'));
 }

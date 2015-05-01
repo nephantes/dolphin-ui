@@ -27,7 +27,7 @@ function rerunLoad() {
     var rerunLoc = $.inArray('rerun', hrefSplit)
     var infoArray = [];
     var jsonObj;
-    
+
     //make sure this is a rerun
     if (rerunLoc != -1) {
 	infoArray = grabReload(hrefSplit[rerunLoc + 2]);
@@ -51,14 +51,14 @@ function rerunLoad() {
 		}else{
 		    //try radio
 		    if (radioTypeCheckList.indexOf(jsonTypeList[x]) == -1) {
-			//expand the altered fields		    
+			//expand the altered fields
 			$( '#'+jsonTypeList[x]+'_yes' ).iCheck('check');
 			document.getElementById(jsonTypeList[x]+'_exp').setAttribute('class', 'box box-default');
 			document.getElementById(jsonTypeList[x]+'_exp_btn').setAttribute('class', 'fa fa-minus');
 			document.getElementById(jsonTypeList[x]+'_exp_body').setAttribute('style', 'display: block');
-			
+
 			//fill the fields that have been expanded
-    
+
 			var splt1 = jsonObj[jsonTypeList[x]].split(":");
 			if (splt1.length == 1) {
 			    if (jsonTypeList[x] == 'split') {
@@ -86,7 +86,7 @@ function rerunLoad() {
 				}else{
 				    document.getElementById( splt2[0]+'_val' ).value = splt2[1];
 				}
-				
+
 			    }
 			}
 		    }else if (jsonTypeList[x] == 'advparams') {
@@ -97,14 +97,14 @@ function rerunLoad() {
 			document.getElementById(jsonTypeList[x]+'_exp_btn').setAttribute('class', 'fa fa-minus');
 			for(var y = 0; y < jsonObj[jsonTypeList[x]].length; y++){
 			    sequenceSetsBtn();
-			    fillCustomSequenceSet(y, jsonObj[jsonTypeList[x]][y].split(":"));    
+			    fillCustomSequenceSet(y, jsonObj[jsonTypeList[x]][y].split(":"));
 			}
 			document.getElementById(jsonTypeList[x]+'_exp_body').setAttribute('style', 'display: block');
 		    }else{
-			//pipeline	    
+			//pipeline
 			document.getElementById(jsonTypeList[x]+'_exp').setAttribute('class', 'box box-default');
-			document.getElementById(jsonTypeList[x]+'_exp_btn').setAttribute('class', 'fa fa-minus');			
-			
+			document.getElementById(jsonTypeList[x]+'_exp_btn').setAttribute('class', 'fa fa-minus');
+
 			var splt1 = jsonObj[jsonTypeList[x]];
 			for (var i = 0; i < splt1.length; i++){
 			    var splt2 = splt1[i].split(":");
@@ -138,7 +138,7 @@ function rerunLoad() {
 				document.getElementById('select_3_'+i).value = splt2[6];
 				document.getElementById('select_4_'+i).value = splt2[7];
 			    }
-			    
+
 			}
 			document.getElementById(jsonTypeList[x]+'_exp_body').setAttribute('style', 'display: block');
 		    }
@@ -167,30 +167,30 @@ function pipelineSelect(num){
     {
 	//pipelineDict: global variable containing selections
 	if (pipeType == pipelineDict[0]) {
-	    //RNASeq RSEM		    
+	    //RNASeq RSEM
 	    divAdj.appendChild( createElement('label', ['class','TEXTNODE'], ['box-title', 'RSEM parameters:']));
 	    var testText = createElement('textarea', ['id', 'class'], ['textarea_'+num,'form-control'])
 	    testText.value = '--bowtie-e 70 --bowtie-chunkmbs 100';
 	    divAdj.appendChild( testText );
 	    divAdj = mergeTidy(divAdj, 6,
-				[ [createElement('label', ['class','TEXTNODE'], ['box-title', 'IGV/TDF Conversion:']), 
-				createElement('select', ['id','class', 'OPTION', 'OPTION'], ['select_1_'+num, 'form-control', 'no', 'yes'])], 
-	    
+				[ [createElement('label', ['class','TEXTNODE'], ['box-title', 'IGV/TDF Conversion:']),
+				createElement('select', ['id','class', 'OPTION', 'OPTION'], ['select_1_'+num, 'form-control', 'no', 'yes'])],
+
 				[createElement('label', ['class','TEXTNODE'], ['box-title', 'BigWig Conversion:']),
 				createElement('select', ['id', 'class', 'OPTION', 'OPTION'], ['select_2_'+num, 'form-control', 'no', 'yes'])] ]);
 	    rsemSwitch = true;
-	    
+
 	}else if (pipeType == pipelineDict[1]) {
 	    //Tophat Pipeline
 	    divAdj.appendChild( createElement('label', ['class','TEXTNODE'], ['box-title', 'Tophat parameters:']));
 	    divAdj.appendChild( createElement('textarea', ['id', 'class'], ['textarea_'+num, 'form-control']));
 	    divAdj = mergeTidy(divAdj, 6,
-				[ [createElement('label', ['class','TEXTNODE'], ['box-title', 'IGV/TDF Conversion:']), 
+				[ [createElement('label', ['class','TEXTNODE'], ['box-title', 'IGV/TDF Conversion:']),
 				createElement('select', ['id', 'class', 'OPTION', 'OPTION'], ['select_1_'+num, 'form-control', 'no', 'yes'])],
 				[createElement('label', ['class','TEXTNODE'], ['box-title', 'BigWig Conversion:']),
 				createElement('select', ['id', 'class', 'OPTION', 'OPTION'], ['select_2_'+num, 'form-control', 'no', 'yes'])] ]);
 	}else if (pipeType == pipelineDict[2]) {
-	    //ChipSeq Pipeline		    
+	    //ChipSeq Pipeline
 	    divAdj.appendChild( createElement('label', ['class','TEXTNODE'], ['box-title', 'Chip Input Definitions:']));
 	    divAdj.appendChild( createElement('textarea', ['id', 'class'], ['textarea_'+num, 'form-control']));
 	    divAdj = mergeTidy(divAdj, 6,
@@ -211,7 +211,7 @@ function pipelineSelect(num){
 	}
 	//replace div
 	$('#select_child_'+num).replaceWith(divAdj);
-	
+
 	//adjust global pipeline counter
 	if (currentPipelineID.indexOf(num) == -1) {
 	    currentPipelineID.push(num);
@@ -229,7 +229,7 @@ function pipelineSelect(num){
 
 /*##### SUBMIT PIPELINE RUN #####*/
 function submitPipeline(type) {
-    
+
     //Static
     var genome = document.getElementById("genomebuild").value;
     var matepair = document.getElementById("spaired").value;
@@ -238,7 +238,7 @@ function submitPipeline(type) {
     var fastqc = document.getElementById("fastqc").value;
     var run_name = document.getElementById("run_name").value;
     var description = document.getElementById("description").value;
-    
+
     //Expanding
     var doBarcode = findRadioChecked("barcodes");
     var doAdapter = findRadioChecked("adapter");
@@ -246,7 +246,7 @@ function submitPipeline(type) {
     var doTrimming = findRadioChecked("trim");
     var doRNA = findRadioChecked("commonind");
     var doSplit = findRadioChecked("split");
-    
+
     var barcode = findAdditionalInfoValues(doBarcode, ["distance", "format"]);
     var adapter = findAdditionalInfoValues(doAdapter, ["adapter"]);
     var quality = findAdditionalInfoValues(doQuality, ["window size", "required quality", "leading", "trailing", "minlen"]);
@@ -256,7 +256,7 @@ function submitPipeline(type) {
 
     //Pipeline
     var pipelines = findPipelineValues();
-    
+
     //Grab sample ids
     var ids = getSampleIDs(phpGrab.theSearch);
     var previous = 'none';
@@ -276,7 +276,7 @@ function submitPipeline(type) {
 	previous = 'resume';
     }
     json = json + ',"fastqc":"' + fastqc + '"'
-    
+
     //expanding
     //barcode
     if (doBarcode == "yes") {
@@ -315,7 +315,7 @@ function submitPipeline(type) {
 	previous = 'split';
     }
     json = json + ',"split":"' + split[0] + '"';
-    
+
     //expanding multiple queries
     if (doRNA == "yes"){
 	json = json + ',"commonind":"'
@@ -340,7 +340,7 @@ function submitPipeline(type) {
     json = json + customSeqSet;
     json = json + pipelines + '}'
     //end json construction
-    
+
     //insert new values into ngs_runparams
     var runparamsInsert = postInsertRunparams(json, outputdir, run_name, description);
     //insert new values into ngs_runlist
@@ -364,7 +364,7 @@ function backFromDetails(back_type){
     var search = hrefSplit[hrefSplit.length - 1];
     var id = hrefSplit[hrefSplit.length - 2];
     var type = hrefSplit[hrefSplit.length - 3];
-    
+
     if (back_type == 'Sample') {
 	hrefSplit[hrefSplit.length - 2] = getLaneIdFromSample(hrefSplit[hrefSplit.length - 2]);
 	hrefSplit[hrefSplit.length - 3] = 'experiments'
@@ -374,7 +374,7 @@ function backFromDetails(back_type){
     }else{
        searchSplit = hrefSplit[hrefSplit.length - 1].split('$');
        lastSearch = searchSplit[searchSplit.length - 1].split('=');
-       
+
        if (lastSearch[1] != undefined) {
 	    hrefSplit[hrefSplit.length - 2] = lastSearch[1];
 	    hrefSplit[hrefSplit.length - 3] = lastSearch[0];
@@ -386,7 +386,7 @@ function backFromDetails(back_type){
 	    hrefSplit[hrefSplit.length -1] = 'index';
        }
     }
-    
+
     for (var x = 0; x < hrefSplit.length; x++) {
 	if (x == (hrefSplit.length - 1)) {
 	    changeHTML += hrefSplit[x];
@@ -406,7 +406,7 @@ function manageChecklists(name, type){
 	    checklist_samples.splice(checklist_samples.indexOf(name), 1);
 	    removeFromDolphinBasket(name);
 	    removeBasketInfo();
-	    
+
 	    var lane_check = getLaneIdFromSample(name);
 	    if (checklist_lanes.indexOf(lane_check) > -1) {
 		if (document.getElementById('lane_checkbox_' + lane_check) != undefined) {
@@ -427,11 +427,11 @@ function manageChecklists(name, type){
 	    checklist_samples.push(name);
 	    addToDolphinBasket(name);
 	    sendBasketInfo(name);
-	    
+
 	    var lane_check = getLaneIdFromSample(name);
 	    var lane_samples = getLanesToSamples(lane_check);
 	    var lanes_bool = true;
-	    
+
 	    if (document.getElementById('clear_basket').disabled) {
 		document.getElementById('clear_basket').disabled = false;
 	    }
@@ -515,7 +515,7 @@ function reloadBasket(){
 function addToDolphinBasket(sampleID){
     var tblBody = document.getElementById("dolphin_basket_body");
     var sample_info = getSingleSample(sampleID);
-    
+
     var tblrow = document.createElement("tr");
 	tblrow.id = sampleID;
     var tblcol1 = document.createElement("td");
@@ -529,7 +529,7 @@ function addToDolphinBasket(sampleID){
 	remove_button.appendChild(createElement('i', ['class'], ['fa fa-times']));
 	tblcol3.appendChild(remove_button);
 	tblrow.appendChild(tblcol3);
-	
+
     tblBody.appendChild(tblrow);
 }
 
@@ -548,7 +548,7 @@ function clearBasket(){
 function checkOffAllSamples(){
     var hrefSplit = window.location.href.split("/");
     var searchLoc = $.inArray('search', hrefSplit);
-    
+
     if (searchLoc != -1) {
 	var pagination = document.getElementById('jsontable_samples_paginate');
 	var pagination_ul = pagination.childNodes;
@@ -562,7 +562,7 @@ function checkOffAllSamples(){
 function checkOffAllLanes(){
     var hrefSplit = window.location.href.split("/");
     var searchLoc = $.inArray('search', hrefSplit);
-    
+
     if (searchLoc != -1) {
 	var pagination = document.getElementById('jsontable_lanes_paginate');
 	var pagination_ul = pagination.childNodes;
@@ -742,7 +742,7 @@ function findCustomSequenceSets(previous){
 		if (x == 5) {
 		    placeholdName = e.value;
 		}
-	    } 
+	    }
 	}
 	if (customSeqNumCheck[y] == customSeqNumCheck[customSeqNumCheck.length - 1]) {
 	    pipeJSON += ':' + previous + '"]';
@@ -754,39 +754,39 @@ function findCustomSequenceSets(previous){
     return pipeJSON;
 }
 
-function sequenceSetsBtn(){ 
+function sequenceSetsBtn(){
     var outerDiv = document.getElementById('custom_seq_outer');
     var innerDiv = createElement('div', ['id', 'class'], ['custom_seq_inner_'+customSeqNum, 'callout callout-info margin']);
-    
+
     var babyDiv1 = createElement('div', [], []);
     var babyDiv2 = createElement('div', [], []);
     var babyDiv3 = createElement('div', [], []);
     var babyDiv4 = createElement('div', [], []);
     var babyDiv5 = createElement('div', [], []);
-    
+
     babyDiv1.appendChild(createElement('label', ['class','TEXTNODE'], ['box-title', 'Custom sequence index file (full path)']));
     babyDiv1.appendChild(createElement('input', ['id', 'class', 'type', 'value'], ['custom_1_'+customSeqNum, 'form-control', 'text', '']));
     innerDiv.appendChild(babyDiv1);
-    
+
     babyDiv2.appendChild(createElement('label', ['class','TEXTNODE'], ['box-title', 'Name of the index']));
     babyDiv2.appendChild(createElement('input', ['id', 'class', 'type', 'value'], ['custom_2_'+customSeqNum, 'form-control', 'text', '']));
     innerDiv.appendChild(babyDiv2);
-    
+
     babyDiv3.appendChild(createElement('label', ['class','TEXTNODE'], ['box-title', 'Bowtie parameters']));
     babyDiv3.appendChild(createElement('input', ['id', 'class', 'type', 'value'], ['custom_3_'+customSeqNum, 'form-control', 'text', '']));
     innerDiv.appendChild(babyDiv3);
-    
+
     babyDiv4.appendChild(createElement('label', ['class','TEXTNODE'], ['box-title', 'Description']));
     babyDiv4.appendChild(createElement('input', ['id', 'class', 'type', 'value'], ['custom_4_'+customSeqNum, 'form-control', 'text', '']));
     innerDiv.appendChild(babyDiv4);
-    
+
     babyDiv5.appendChild(createElement('label', ['class','TEXTNODE'], ['box-title', 'Filter Out']));
     babyDiv5.appendChild(createElement('select', ['id', 'class', 'value', 'OPTION', 'OPTION'], ['custom_5_'+customSeqNum, 'form-control', '', 'yes', 'no']));
     innerDiv.appendChild(babyDiv5);
-    
+
     innerDiv.appendChild(createElement('input', ['id', 'class', 'type', 'value', 'onclick'],['remove_custom_'+customSeqNum, 'btn btn-primary', 'button', 'Remove Custom Sequence Set', 'removeSequenceSetsBtn('+customSeqNum+')']));
     outerDiv.appendChild(innerDiv);
-    
+
     customSeqNumCheck.push(customSeqNum);
     customSeqNum++;
 }
@@ -812,13 +812,13 @@ function removeSequenceSetsBtn(num){
 function changeRNAParamsBtn(){
     if(document.getElementById('change_params_inner') != undefined){
 	document.getElementById('change_params_outer').removeChild(document.getElementById('change_params_inner'));
-    }else{   
+    }else{
 	var outerDiv = document.getElementById('change_params_outer');
-	
+
 	var innerDiv = createElement('div', ['id', 'style'], ['change_params_inner', 'display:"none"']);
 	var label = createElement('label', ['class','TEXTNODE'], ['box-title', 'Bowtie Parameters']);
 	var textBox = createElement('input', ['id', 'class', 'type', 'value'], ['change_params_val', 'form-control', 'text', '-N 1']);
-	
+
 	innerDiv.appendChild(label);
 	innerDiv.appendChild(textBox);
 	outerDiv.appendChild(innerDiv);
@@ -830,15 +830,15 @@ function selectTrimming(select_id, five_num, three_num) {
     var trim_parent_parent = trim_select.parentNode.parentNode
     var single_option = trim_select.childNodes[0];
     var paired_option = trim_select.childNodes[1];
-    
+
     if (trim_select.value == paired_option.value) {
 	var five_len = createElement('div', ['class'], ['col-md-6']);
 	var three_len = createElement('div', ['class'], ['col-md-6']);
-	
+
 	five_len.appendChild(createElement('label', ['class','TEXTNODE'], ['box-title', '5 length 2']));
 	five_len.appendChild(createElement('input', ['id', 'class', 'type', 'value'], ['5 length 2_val', 'form-control', 'text', five_num]));
 	trim_parent_parent.appendChild(five_len);
-	
+
 	three_len.appendChild(createElement('label', ['class','TEXTNODE'], ['box-title', '3 length 2']));
 	three_len.appendChild(createElement('input', ['id', 'class', 'type', 'value'], ['3 length 2_val', 'form-control', 'text', three_num]));
 	trim_parent_parent.appendChild(three_len);

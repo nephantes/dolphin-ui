@@ -17,17 +17,17 @@ class Ngsimport extends VanillaModel {
         $this->sheetData=$sheetData;
 	$this->sid=$sid;
 	$this->gid=$gid;
-	
+
         $text='<li>'.$this->worksheet['worksheetName'].'<br />';
-                                
+
         $text.='Rows: '.$this->worksheet['totalRows'].' Columns: '.$this->worksheet['totalColumns'].'<br />';
         $text.='Cell Range: A1:'.$this->worksheet['lastColumnLetter'].$this->worksheet['totalRows'];
         $text.='</li>';
-        
+
         $this->username=$_SESSION['user'];
         $sql="select id from biocore.users where `username`='$this->username'";
         $this->uid=$this->query($sql, 1);
-	
+
         if ( $this->worksheet['worksheetName']=="METADATA"){
             $text.=$this->getMeta();
         }
@@ -44,13 +44,13 @@ class Ngsimport extends VanillaModel {
             $text.=$this->getFiles();
         }
 	return $text;
-        
+
     }
-    
+
     function getMeta() {
         //var_dump($sheetData);
         $conts=[];
-	
+
         for ($i=1;$i<=$this->worksheet['totalRows'];$i++)
         {
            if($this->sheetData[$i]["A"]=="title"){$experiment_name=$this->esc($this->sheetData[$i]["B"]);}
@@ -61,7 +61,7 @@ class Ngsimport extends VanillaModel {
 	   if($this->sheetData[$i]["A"]=="backup directory"){$this->backup_dir=$this->esc($this->sheetData[$i]["B"]);}
 	   if($this->sheetData[$i]["A"]=="amazon bucket"){$this->amazon_bucket=$this->esc($this->sheetData[$i]["B"]);}
         }
-        $new_series = new series($this, $experiment_name,$summary,$design);    
+        $new_series = new series($this, $experiment_name,$summary,$design);
         $this->series_id=$new_series->getId();
         $text="SERIES:".$new_series->getStat()."<BR>";
         $new_conts = new contributors($this, $conts);
@@ -73,14 +73,14 @@ class Ngsimport extends VanillaModel {
 
 	return $text;
     }
-    
+
     function getLanes(){
         $lane_arr = [];
         for ($i=4;$i<=$this->worksheet['totalRows'];$i++)
         {
            $lane = new lane();
            for ($j='A';$j<=$this->worksheet['lastColumnLetter'];$j++)
-           {              
+           {
               if($this->sheetData[3][$j]=="Lane name"){$lane->name=$this->esc($this->sheetData[$i][$j]);}
               if($this->sheetData[3][$j]=="Lane id"){$lane->lane_id=$this->esc($this->sheetData[$i][$j]);}
               if($this->sheetData[3][$j]=="Sequencing facility"){$lane->facility=$this->esc($this->sheetData[$i][$j]);}
@@ -89,7 +89,7 @@ class Ngsimport extends VanillaModel {
               if($this->sheetData[3][$j]=="Date received"){$lane->date_received=$this->esc($this->sheetData[$i][$j]);}
               if($this->sheetData[3][$j]=="Total reads"){$lane->total_reads=$this->esc($this->sheetData[$i][$j]);}
               if($this->sheetData[3][$j]=="% PhiX requested"){$lane->phix_requested=$this->esc($this->sheetData[$i][$j]);}
-              if($this->sheetData[3][$j]=="% PhiX in lane"){$lane->phix_in_lane=$this->esc($this->sheetData[$i][$j]);} 
+              if($this->sheetData[3][$j]=="% PhiX in lane"){$lane->phix_in_lane=$this->esc($this->sheetData[$i][$j]);}
               if($this->sheetData[3][$j]=="# of Samples"){$lane->total_samples=$this->esc($this->sheetData[$i][$j]);}
               if($this->sheetData[3][$j]=="Resequenced?"){$lane->resequenced=$this->esc($this->sheetData[$i][$j]);}
               if($this->sheetData[3][$j]=="Notes"){$lane->notes=$this->esc($this->sheetData[$i][$j]);}
@@ -98,13 +98,13 @@ class Ngsimport extends VanillaModel {
            if($lane->name){$lane_arr[$lane->name]=$lane;}
         }
         //echo json_encode($lane_arr);
-        
+
         $new_lanes = new lanes($this, $lane_arr);
-        $text="LANE:".$new_lanes->getStat()."</br>";   
-        #$text.="LANE:".$new_lanes->getSQL();   
+        $text="LANE:".$new_lanes->getStat()."</br>";
+        #$text.="LANE:".$new_lanes->getSQL();
 	return $text;
     }
-    
+
     function getProtocols(){
         $prot_arr = [];
         for ($i=4;$i<=$this->worksheet['totalRows'];$i++)
@@ -123,12 +123,12 @@ class Ngsimport extends VanillaModel {
            }
         }
         //echo json_encode($prot_arr);
-        
+
         $new_protocol = new protocols($this, $prot_arr);
-        return "PROT:".$new_protocol->getStat();   
+        return "PROT:".$new_protocol->getStat();
         //var_dump($sheetData);
     }
-    
+
     function getSamples(){
         $sample_arr = [];
         $char_arr=[];
@@ -147,7 +147,7 @@ class Ngsimport extends VanillaModel {
               if($this->sheetData[3][$j]=="organism"){$samp->organism=$this->esc($this->sheetData[$i][$j]);}
               if($this->sheetData[3][$j]=="molecule"){$samp->molecule=$this->esc($this->sheetData[$i][$j]);}
               if($this->sheetData[3][$j]=="description"){$samp->description=$this->esc($this->sheetData[$i][$j]);}
-              if($this->sheetData[3][$j]=="instrument model"){$samp->instrument_model=$this->esc($this->sheetData[$i][$j]);} 
+              if($this->sheetData[3][$j]=="instrument model"){$samp->instrument_model=$this->esc($this->sheetData[$i][$j]);}
               if($this->sheetData[3][$j]=="average insert size"){$samp->avg_insert_size=$this->esc($this->sheetData[$i][$j]);}
               if($this->sheetData[3][$j]=="read length"){$samp->read_length=$this->esc($this->sheetData[$i][$j]);}
               if($this->sheetData[3][$j]=="Genotype"){$samp->genotype=$this->esc($this->sheetData[$i][$j]);}
@@ -158,7 +158,7 @@ class Ngsimport extends VanillaModel {
               if($this->sheetData[3][$j]=="Notes"){$samp->notes=$this->esc($this->sheetData[$i][$j]);}
 
               $valid = "/^characteristics:\s+?(.*)/";
-              
+
               if(preg_match( $valid, $this->sheetData[3][$j], $matches) == 1)
               {
                 if ($matches[1] != "tag" && $this->sheetData[$i][$j]!="")
@@ -190,14 +190,14 @@ class Ngsimport extends VanillaModel {
               if($this->sheetData[3][$j]=="Sample or Lane Name (Enter same name for multiple files)"){$file->name=$this->esc($this->sheetData[$i][$j]);}
               if($this->sheetData[3][$j]=="file name(comma separated for paired ends)"){$file->file_name=$this->esc($this->sheetData[$i][$j]);$file->file_name=preg_replace('/\s/', '', $file->file_name);}
               if($this->sheetData[3][$j]=="file checksum"){$file->checksum=$this->esc($this->sheetData[$i][$j]);}
-              
-           } 
+
+           }
            if($file->file_name){$file_arr[$file->file_name]=$file;}
         }
         //echo json_encode($file_arr);
-        
+
         $new_files = new files($this, $file_arr, $this->samples);
-        return "FILES:".$new_files->getStat();   
+        return "FILES:".$new_files->getStat();
         //var_dump($sheetData);
     }
 }
@@ -208,9 +208,9 @@ class main{
     public $insert=0;
     public $update=0;
     public $sql;
-    
-    function process($my) {        
-        return ($my->getId()>0 ? $my->update(): $my->insert()); 
+
+    function process($my) {
+        return ($my->getId()>0 ? $my->update(): $my->insert());
     }
 
     function processArr($arr) {
@@ -237,9 +237,9 @@ class series extends main{
     private $experiment_name;
     private $summary;
     private $design;
-    
 
-    function __construct($model, $experiment_name, $summary, $design) 
+
+    function __construct($model, $experiment_name, $summary, $design)
     {
         $this->experiment_name=$experiment_name;
         $this->summary=$summary;
@@ -251,7 +251,7 @@ class series extends main{
     {
         return "Update:$this->update, Insert:$this->insert";
     }
-    
+
     function getId()
     {
         $sql="select id from biocore.ngs_experiment_series where `experiment_name`='$this->experiment_name'";
@@ -265,7 +265,7 @@ class series extends main{
               values('$this->experiment_name', '$this->summary', '$this->design',
 	      '".$this->model->uid."', '".$this->model->gid."', '".$this->model->sid."',
 	      now(), now(), '".$this->model->uid."');";
-	      
+
         $this->insert++;
         return $this->model->query($sql);
     }
@@ -284,21 +284,21 @@ class series extends main{
 /* Contributors class */
 class contributors extends main{
     private $conts=[];
-    
-    function __construct($model, $conts = []) 
+
+    function __construct($model, $conts = [])
     {
         $this->conts = $conts;
 	$this->model=$model;
-        
+
         $this->processArr($conts);
     }
-    
+
     function getStat()
     {
         return "Update:$this->update, Insert:$this->insert";
     }
-    
-    
+
+
     function getId($val)
     {
         $sql="select id from biocore.ngs_contributors where `contributor`='$val'";
@@ -311,7 +311,7 @@ class contributors extends main{
         $this->insert++;
         return $this->model->query($sql);
     }
-    
+
     function update($val)
     {
         $sql="update biocore.ngs_contributors set `contributor`='$val',
@@ -321,7 +321,7 @@ class contributors extends main{
 
         return $this->model->query($sql);
     }
-  
+
 }
 
 
@@ -337,12 +337,12 @@ class lanes extends main{
 
         $this->processArr($lane_arr);
     }
-    
+
     function getStat()
     {
         return "Update:$this->update, Insert:$this->insert";
     }
-    
+
     function getId($lane)
     {
         $sql="select id from biocore.ngs_lanes where `name`='$lane->name' and `series_id`='".$this->model->series_id."'";
@@ -353,7 +353,7 @@ class lanes extends main{
     {
         return $this->sql;
     }
-    
+
     function insert($lane)
     {
         $sql="insert into `biocore`.`ngs_lanes`(`series_id`, `name`, `lane_id`, `facility`, `cost`,
@@ -362,9 +362,9 @@ class lanes extends main{
 		   `owner_id`, `group_id`, `perms`, `date_created`,
                    `date_modified`, `last_modified_user`)
               values('".$this->model->series_id."',  '$lane->name',  '$lane->lane_id', '$lane->facility',  '$lane->cost',
-                    ".$this->correct_date($lane->date_submitted).",  ".$this->correct_date($lane->date_received).",  
+                    ".$this->correct_date($lane->date_submitted).",  ".$this->correct_date($lane->date_received).",
 		    '$lane->total_reads',  '$lane->phix_requested',
-                    '$lane->phix_in_lane',  '$lane->total_samples',  
+                    '$lane->phix_in_lane',  '$lane->total_samples',
 		    ".$this->correct_bool($lane->resequenced).",  '$lane->notes',
 		    '".$this->model->uid."', '".$this->model->gid."', '".$this->model->sid."',
                     now(), now(), '".$this->model->uid."');";
@@ -392,7 +392,7 @@ class lanes extends main{
 		`group_id`='".$this->model->gid."',
 		`perms`='".$this->model->sid."',
 		`date_modified`=now(),
-		`last_modified_user`='".$this->model->uid."' 
+		`last_modified_user`='".$this->model->uid."'
                 where `id` = ".$this->getId($lane);
         $this->update++;
 
@@ -411,15 +411,15 @@ class protocols extends main{
     {
         $this->prot_arr = $prot_arr;
         $this->model=$model;
-        
+
         $this->processArr($prot_arr);
     }
-    
+
     function getStat()
     {
         return "Update:$this->update, Insert:$this->insert";
     }
-    
+
     function getId($prot)
     {
         $sql="select id from biocore.ngs_protocols where `name`='$prot->name'";
@@ -446,7 +446,7 @@ class protocols extends main{
             `library_strategy`='$prot->library_strategy',
 	    `owner_id`='".$this->model->uid."', `group_id`='".$this->model->gid."', `perms`='".$this->model->sid."',
 	    `group_id`='".$this->model->gid."', `perms`='".$this->model->sid."',
-	    `date_modified`=now(), `last_modified_user`='".$this->model->uid."' 
+	    `date_modified`=now(), `last_modified_user`='".$this->model->uid."'
             where `id` = ".$this->getId($prot);
         $this->update++;
 
@@ -464,20 +464,20 @@ class samples extends main{
     {
         $this->sample_arr=$sample_arr;
         $this->model=$model;
-        
+
         $this->processArr($sample_arr);
     }
-    
+
     function getSQL()
     {
         return $this->sql;
     }
-    
+
     function getStat()
     {
         return "Update:$this->update, Insert:$this->insert";
     }
-    
+
     function getId($sample)
     {
         $lane_id=$this->getLaneId($sample->lane_name);
@@ -495,12 +495,12 @@ class samples extends main{
         $sql="select id from biocore.ngs_protocols where `name`='$name'";
         return $this->model->query($sql,1);
     }
-    
+
     function insert($sample)
     {
         $lane_id=$this->getLaneId($sample->lane_name);
         $protocol_id=$this->getProtocolId($sample->protocol_name);
-        
+
         $sql="INSERT INTO `biocore`.`ngs_samples`
             (`series_id`, `protocol_id`, `lane_id`,
             `name`, `barcode`, `title`, `source`, `organism`,
@@ -554,7 +554,7 @@ class samples extends main{
 	    `group_id`='".$this->model->gid."',
 	    `perms`='".$this->model->sid."',
 	    `date_modified`=now(),
-	    `last_modified_user`='".$this->model->uid."' 
+	    `last_modified_user`='".$this->model->uid."'
             where `id` = ".$this->getId($sample);
         $this->update++;
 
@@ -573,15 +573,15 @@ class characteristics extends main{
     {
         $this->char_arr=$char_arr;
         $this->model=$model;
-        
+
         $this->processArr($char_arr);
     }
-    
+
     function getStat()
     {
         return "Update:$this->update, Insert:$this->insert";
     }
-    
+
     function getSampleId($name)
     {
         $sql="select id from biocore.ngs_samples where `name`='$name' and `series_id`='$this->model->series_id'";
@@ -607,12 +607,12 @@ class characteristics extends main{
         //return $sql;
         return $this->model->query($sql);
     }
-    
+
     function update($tag)
     {
         $sql="update `biocore`.`ngs_characteristics` set `value`='$tag->value',
 	    `group_id`='".$this->model->gid."', `perms`='".$this->model->sid."',
-	    `date_modified`=now(), `last_modified_user`='".$this->model->uid."' 
+	    `date_modified`=now(), `last_modified_user`='".$this->model->uid."'
             where `id` = ".$this->getId($tag);
         $this->update++;
 
@@ -641,12 +641,12 @@ class files extends main{
 
         $this->processArr($files_arr);
     }
-       
+
     function getStat()
     {
         return "Update:$this->update, Insert:$this->insert";
     }
-    
+
     function getLaneId($name)
     {
         $sql="select id from biocore.ngs_lanes where `name`='$name' and `series_id`='".$this->model->series_id."'";
@@ -708,14 +708,14 @@ class files extends main{
         //return $sql;
         return $this->model->query($sql);
     }
-    
+
     function update($file)
     {
-        
+
         $sql="update `biocore`.`$this->tablename` set
             `fieldname`='$this->value', `dir_id`='$this->dir_id',
             `group_id`='".$this->model->gid."', `perms`='".$this->model->sid."',
-	    `date_modified`=now(), `last_modified_user`='".$this->model->uid."' 
+	    `date_modified`=now(), `last_modified_user`='".$this->model->uid."'
             where `id` = ".$this->getId($file);
         $this->update++;
 
@@ -725,7 +725,7 @@ class files extends main{
 
 /* diretories for the files class */
 class dirs extends main{
-    
+
     function __construct($model)
     {
         $this->model=$model;
@@ -736,18 +736,18 @@ class dirs extends main{
     {
         return $this->sql;
     }
-    
+
     function getStat()
     {
         return "Update:$this->update, Insert:$this->insert";
     }
-    
+
     function getId()
     {
         $sql="select id from biocore.ngs_dirs where `fastq_dir`='".$this->model->fastq_dir."'";
         return $this->model->query($sql,1);
     }
-    
+
     function insert()
     {
 
@@ -761,13 +761,13 @@ class dirs extends main{
 	$this->sql=$sql;
         return $this->model->query($sql);
     }
-    
+
     function update()
     {
         $sql="update `biocore`.`ngs_dirs` set
 	      `backup_dir`='".$this->model->backup_dir."', `amazon_bucket`='".$this->model->amazon_bucket."',
 	      `group_id`='".$this->model->gid."', `perms`='".$this->model->sid."',
-	      `date_modified`=now(), `last_modified_user`='".$this->model->uid."' 
+	      `date_modified`=now(), `last_modified_user`='".$this->model->uid."'
                where `id` = ".$this->getId();
         $this->update++;
 

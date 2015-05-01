@@ -43,7 +43,7 @@ if($search != "" && !in_array($p, $pDictionary)){
     }
     //browse (search incnluded)
     if($seg == "browse")
-    {    
+    {
         if($p == "getLanes")
         {
             $time="";
@@ -87,7 +87,7 @@ if($search != "" && !in_array($p, $pDictionary)){
             $data=$query->queryTable("
             SELECT id,  name, facility, total_reads, total_samples
             FROM biocore.ngs_lanes
-            WHERE biocore.ngs_lanes.id 
+            WHERE biocore.ngs_lanes.id
             IN (SELECT biocore.ngs_samples.lane_id FROM biocore.ngs_samples WHERE $searchQuery)
             AND biocore.ngs_lanes.series_id = $q $time
             ");
@@ -131,7 +131,7 @@ else if (!in_array($p, $pDictionary))
 {
     //browse (no search)
     if($seg == "browse")
-    {   
+    {
         if($p == "getExperimentSeries")
         {
             $time="";
@@ -170,14 +170,14 @@ else if (!in_array($p, $pDictionary))
             if (isset($start)){$time="WHERE `date_created`>='$start' and `date_created`<='$end'";}
             $data=$query->queryTable("
             SELECT id, name, growth, treatment
-            FROM biocore.ngs_protocols 
+            FROM biocore.ngs_protocols
             WHERE biocore.ngs_samples.$q = \"$r\" $time
             ");
         }
     }
     else
     {
-        //details (no search)   
+        //details (no search)
         if($p == "getLanes" && $q != "")
         {
             $time="";
@@ -227,7 +227,7 @@ else if (!in_array($p, $pDictionary))
             FROM biocore.ngs_protocols $time
             ");
         }
-        
+
         else if($p == "getLanes")
         {
             $time="";
@@ -250,7 +250,7 @@ else if (!in_array($p, $pDictionary))
 }
 else if ($p == "getSelectedSamples")
 {
-    
+
     //Prepare selected sample search query
     $searchQuery = "";
     $splitIndex = ['id','lane_id'];
@@ -316,7 +316,7 @@ else if($p == 'getRunSamples')
     //Grab Variables
     if (isset($_GET['runID'])){$runID = $_GET['runID'];}
     if (isset($_GET['groupID'])){$groupID = $_GET['groupID'];}
-    
+
     $data=$query->queryTable("
     SELECT sample_id
     FROM biocore.ngs_runlist
@@ -327,7 +327,7 @@ else if ($p == 'grabReload')
 {
     //Grab variables
     if (isset($_GET['groupID'])){$groupID = $_GET['groupID'];}
-    
+
     $data=$query->queryTable("
     SELECT outdir, json_parameters, run_name, run_description
     FROM biocore.ngs_runparams
@@ -346,7 +346,7 @@ else if ($p == 'getReportNames')
             $sampleQuery.= ' OR ';
         }
     }
-    
+
     $data=$query->queryTable("
         SELECT distinct(ngs_fastq_files.file_name), ngs_runparams.outdir
         FROM ngs_fastq_files, ngs_runparams, ngs_runlist
@@ -354,7 +354,7 @@ else if ($p == 'getReportNames')
 	    AND ngs_runparams.id = ngs_fastq_files.lane_id
                 AND ngs_fastq_files.lane_id = $runid
 		    AND ( $sampleQuery );
-    "); 
+    ");
 }
 else if ($p == 'lanesToSamples')
 {
@@ -363,14 +363,14 @@ else if ($p == 'lanesToSamples')
         SELECT id
         FROM ngs_samples
         WHERE ngs_samples.lane_id = $lane
-    "); 
+    ");
 }
 else if ($p == 'getAllSampleIds')
 {
     $data=$query->queryTable("
         SELECT id
         FROM ngs_samples
-    "); 
+    ");
 }
 else if ($p == 'getAllLaneIds')
 {

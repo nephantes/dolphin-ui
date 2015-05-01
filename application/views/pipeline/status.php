@@ -1,7 +1,7 @@
 <!-- Content Header (Page header) -->
                 <section class="content-header">
                     <h1>
-                        NGS Pipeline 
+                        NGS Pipeline
                         <small>Workflow creation</small>
                     </h1>
                     <ol class="breadcrumb">
@@ -18,4 +18,4 @@
 			<?php echo $html->getRespBoxTable_ng("Current Run Status", "runparams", "<th>ID</th><th>Run Group</th><th>Name</th><th>Output Directory</th><th>Description</th><th>Status</th><th>Options</th>"); ?>
                     </div><!-- /.row -->
                 </section><!-- /.content -->
-                
+

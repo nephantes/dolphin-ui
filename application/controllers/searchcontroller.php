@@ -1,11 +1,11 @@
 <?php
- 
+
 class SearchController extends VanillaController {
 
     function beforeAction() {
 
     }
- 
+
     function index() {
         $this->set('field', "Search");
         $this->set('segment', "index");
@@ -15,7 +15,7 @@ class SearchController extends VanillaController {
         $this->set('source', $this->Search->getAccItems("source", "ngs_samples"));
         $this->set('genotype', $this->Search->getAccItems("genotype", "ngs_samples"));
     }
-    
+
     function browse($field, $value, $search) {
         $this->set('field', "Search");
         $this->set('segment', "browse");
@@ -39,7 +39,7 @@ class SearchController extends VanillaController {
         $this->set('molecule', $this->Search->getAccItemsCont("molecule", "ngs_samples", $search), $search);
         $this->set('source', $this->Search->getAccItemsCont("source", "ngs_samples", $search), $search);
         $this->set('genotype', $this->Search->getAccItemsCont("genotype", "ngs_samples", $search), $search);
-        
+
         if ($table=='experiment_series')
         {
            $this->set('experiment_series', $this->Search->getValues($value, 'ngs_experiment_series'));
@@ -49,7 +49,7 @@ class SearchController extends VanillaController {
         {
            $this->set('experiment_series_fields', $this->Search->getFields('ngs_experiment_series'));
            $this->set('experiment_fields', $this->Search->getFields('ngs_lanes'));
-           
+
            $this->set('experiment_series', $this->Search->getValues($this->Search->getId($value, 'series_id', 'ngs_lanes'), 'ngs_experiment_series'));
            $this->set('experiments', $this->Search->getValues($value, 'ngs_lanes'));
         }
@@ -58,7 +58,7 @@ class SearchController extends VanillaController {
            $this->set('experiment_series_fields', $this->Search->getFields('ngs_experiment_series'));
            $this->set('experiment_fields', $this->Search->getFields('ngs_lanes'));
            $this->set('sample_fields', $this->Search->getFields('ngs_samples'));
-           
+
            $this->set('experiment_series', $this->Search->getValues($this->Search->getId($value, 'series_id', 'ngs_samples'), 'ngs_experiment_series'));
            $this->set('experiments', $this->Search->getValues($this->Search->getId($value, 'lane_id', 'ngs_samples'), 'ngs_lanes'));
            $this->set('samples', $this->Search->getValues($value, 'ngs_samples'));
