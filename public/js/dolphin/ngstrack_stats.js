@@ -215,6 +215,13 @@ $(function() {
 					 success : function(s)
 					 {
 						samplesTable.fnClearTable();
+						var changeHTML = '';
+						var hrefSplit = window.location.href.split("/");
+						var typeLocSelected = $.inArray('selected', hrefSplit);
+						var typeLocRerun = $.inArray('rerun', hrefSplit);
+						if (typeLocSelected > 0 || typeLocRerun > 0) {
+							theSearch = '';
+						}
 						for(var i = 0; i < s.length; i++) {
 						samplesTable.fnAddData([
 						s[i].id,
