@@ -5,23 +5,22 @@
  */
 
  function postInsertRunparams(json, outputdir, name, description){
-
+	
 	var successCheck = false;
 	var runlistCheck = "";
 	var runID = "";
-	var checkedRunGroupID = "";
-
+	
 	//check to make sure values are not empty
 	if (outputdir == "") {
-	outputdir = "/test/directory/change/me/";
+		outputdir = "/test/directory/change/me/";
 	}
 	if (name == "") {
-	name = "My Run";
+		name = "My Run";
 	}
 	if (description == "") {
-	description = "My Description";
+		description = "My Description";
 	}
-
+	
 	//find the run group ID
 	var hrefSplit = window.location.href.split("/");
 	var rerunLoc = $.inArray('rerun', hrefSplit)
@@ -32,46 +31,44 @@
 		//if not a rerun
 		runGroupID = 'new';
 	}
-
+	
 	$.ajax({
 			type: 	'POST',
 			url: 	'/dolphin/public/ajax/ngsalterdb.php',
-			data:	{ p: "submitPipeline", json: json, outdir: outputdir, name: name, desc: description, runGroupID: runGroupID },
+			data:  	{ p: "submitPipeline", json: json, outdir: outputdir, name: name, desc: description, runGroupID: runGroupID },
 			async:	false,
 			success: function(r)
 			{
 				successCheck = true;
 				if (runGroupID == 'new') {
-				runlistCheck = 'insertRunlist';
-				runID = r;
-				checkedRunGroupID = r;
+					runlistCheck = 'insertRunlist';
+					runID = r;
 				}else{
-				runlistCheck = 'insertRunlist';
-				runID = (parseInt(runGroupID) + r);
-				checkedRunGroupID = runGroupID;
+					runlistCheck = 'insertRunlist';
+					runID = (parseInt(runGroupID) + r);
 				}
 			}
 		});
 	if (successCheck) {
-	return [ runlistCheck, runID, checkedRunGroupID ];
+		return [ runlistCheck, runID ];
 	}else{
-	return undefined;
+		return undefined;
 	}
  }
 
-function postInsertRunlist(runlistCheck, sample_ids, runID, runGroupID){
+function postInsertRunlist(runlistCheck, sample_ids, runID){
 	var successCheck = false;
-	if (runlistCheck == 'insertRunlist') {
-		 $.ajax({
-			 type: 	'POST',
-			 url: 	'/dolphin/public/ajax/ngsalterdb.php',
-			 data:	{ p: runlistCheck, sampID: sample_ids, runID: runID, runGroupID: runGroupID },
-			 async:	false,
-			 success: function(r)
-			 {
-				successCheck = true;
-			 }
-		 });
-	}
+		if (runlistCheck == 'insertRunlist') {
+			$.ajax({
+				type: 	'POST',
+				url: 	'/dolphin/public/ajax/ngsalterdb.php',
+				data:  	{ p: runlistCheck, sampID: sample_ids, runID: runID},
+				async:	false,
+				success: function(r)
+				{
+					successCheck = true;
+				}
+			});
+		}
 	return successCheck;
 }
