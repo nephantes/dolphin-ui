@@ -19,7 +19,9 @@ class Ngsimport extends VanillaModel {
 	public $design;
 	public $conts = [];
 	
-	public $LANES;
+	//	LANES
+	public $lane_arr = [];
+	
 	public $PROTOCOLS;
 	public $SAMPLES;
 	public $FILES;
@@ -42,7 +44,8 @@ class Ngsimport extends VanillaModel {
 		$this->username=$_SESSION['user'];
 		$sql="select id from biocore.users where `username`='$this->username'";
 		$this->uid=$this->query($sql, 1);
-
+		
+		//	Check Data
 		if ( $this->worksheet['worksheetName']=="METADATA"){
 			$text.=$this->getMeta();
 		}
@@ -61,7 +64,13 @@ class Ngsimport extends VanillaModel {
 		
 		//	Process Data
 		if($this->final_check){
-			$text.=$this->processMeta();
+			if ( $this->worksheet['worksheetName']=="METADATA"){
+				$text.=$this->processMeta();
+			}elseif ( $worksheet['worksheetName']=="LANES"){
+				$text.=$this->processLanes();
+			}
+		}else{
+			
 		}
 		
 	return $text;
@@ -71,7 +80,7 @@ class Ngsimport extends VanillaModel {
 		return "<font color='red'>" . $text . "</font><BR>";
 	}
 	
-	function warningtEXT($text){
+	function warningText($text){
 		return "<font color='orange'>" . $text . "</font><BR>";
 	}
 	
@@ -168,34 +177,75 @@ class Ngsimport extends VanillaModel {
 	}
 
 	function getLanes(){
-		$lane_arr = [];
+		$text = "";
+		/*
+		 *	For each row in the lanes worksheet
+		 */
 		for ($i=4;$i<=$this->worksheet['totalRows'];$i++)
 		{
+			/*
+			 *	Read data columns
+			 */
 			$lane = new lane();
 			for ($j='A';$j<=$this->worksheet['lastColumnLetter'];$j++)
 			{
-			if($this->sheetData[3][$j]=="Lane name"){$lane->name=$this->esc($this->sheetData[$i][$j]);}
-			if($this->sheetData[3][$j]=="Lane id"){$lane->lane_id=$this->esc($this->sheetData[$i][$j]);}
-			if($this->sheetData[3][$j]=="Sequencing facility"){$lane->facility=$this->esc($this->sheetData[$i][$j]);}
-			if($this->sheetData[3][$j]=="Cost"){$lane->cost=$this->esc($this->sheetData[$i][$j]);}
-			if($this->sheetData[3][$j]=="Date submitted"){$lane->date_submitted=$this->esc($this->sheetData[$i][$j]);}
-			if($this->sheetData[3][$j]=="Date received"){$lane->date_received=$this->esc($this->sheetData[$i][$j]);}
-			if($this->sheetData[3][$j]=="Total reads"){$lane->total_reads=$this->esc($this->sheetData[$i][$j]);}
-			if($this->sheetData[3][$j]=="% PhiX requested"){$lane->phix_requested=$this->esc($this->sheetData[$i][$j]);}
-			if($this->sheetData[3][$j]=="% PhiX in lane"){$lane->phix_in_lane=$this->esc($this->sheetData[$i][$j]);}
-			if($this->sheetData[3][$j]=="# of Samples"){$lane->total_samples=$this->esc($this->sheetData[$i][$j]);}
-			if($this->sheetData[3][$j]=="Resequenced?"){$lane->resequenced=$this->esc($this->sheetData[$i][$j]);}
-			if($this->sheetData[3][$j]=="Notes"){$lane->notes=$this->esc($this->sheetData[$i][$j]);}
+				if($this->sheetData[3][$j]=="Lane name"){$lane->name=$this->esc($this->sheetData[$i][$j]);}
+				if($this->sheetData[3][$j]=="Lane id"){$lane->lane_id=$this->esc($this->sheetData[$i][$j]);}
+				if($this->sheetData[3][$j]=="Sequencing facility"){$lane->facility=$this->esc($this->sheetData[$i][$j]);}
+				if($this->sheetData[3][$j]=="Cost"){$lane->cost=$this->esc($this->sheetData[$i][$j]);}
+				if($this->sheetData[3][$j]=="Date submitted"){$lane->date_submitted=$this->esc($this->sheetData[$i][$j]);}
+				if($this->sheetData[3][$j]=="Date received"){$lane->date_received=$this->esc($this->sheetData[$i][$j]);}
+				if($this->sheetData[3][$j]=="Total reads"){$lane->total_reads=$this->esc($this->sheetData[$i][$j]);}
+				if($this->sheetData[3][$j]=="% PhiX requested"){$lane->phix_requested=$this->esc($this->sheetData[$i][$j]);}
+				if($this->sheetData[3][$j]=="% PhiX in lane"){$lane->phix_in_lane=$this->esc($this->sheetData[$i][$j]);}
+				if($this->sheetData[3][$j]=="# of Samples"){$lane->total_samples=$this->esc($this->sheetData[$i][$j]);}
+				if($this->sheetData[3][$j]=="Resequenced?"){$lane->resequenced=$this->esc($this->sheetData[$i][$j]);}
+				if($this->sheetData[3][$j]=="Notes"){$lane->notes=$this->esc($this->sheetData[$i][$j]);}
 			}
-			if (!isset($lane->lane_id)){$lane->lane_id=0;}
-			if($lane->name){$lane_arr[$lane->name]=$lane;}
+			
+			/*
+			 *	Check for proper data input
+			 */
+			//	Lane Name
+			if(isset($lane->name)){
+				if($this->checkAlphaNumWithAddChars('_', $lane->name)){
+					$this->lane_arr[$lane->name]=$lane;
+				}else{
+					$text.= $this->errorText("Lane name does not contain proper characters, please use alpha-numeric characters and underscores (row " . $i . ")");
+					$this->final_check = false;
+				}
+			}else{
+				$text.= $this->errorText("Lane name is required for submission (row " . $i . ")");
+				$this->final_check = false;
+			}
+			
+			//	Lane id
+			if(isset($lane->lane_id)){
+				if(!$this->checkAlphaNumWithAddChars('_-', $lane->lane_id)){
+					$text.= $this->errorText("Lane id does not contain proper characters, please use alpha-numeric characters and underscores (row " . $i . ")");
+					$this->final_check = false;
+				}
+			}else{
+				$text.= $this->warningText("Lane id not specified.  Specific lane id set to 0, please change (row " . $i . ")");
+				$lane->lane_id=0;
+			}
+			
+			//	Other Values
+			if($lane->facility == null || $lane->cost == null || $lane->date_submitted ==  null || $lane->date_received == null || $lane->total_reads == null || $lane->phix_requested == null
+				|| $lane->phix_in_lane == null || $lane->total_samples == null || $lane->resequenced == null || $lane->notes == null){
+				$text.= $this->warningText("Some optional columns missing data, please make sure to add them later if desired (row " . $i . ")");
+			}
 		}
-		//echo json_encode($lane_arr);
-
-		$new_lanes = new lanes($this, $lane_arr);
+		return $text;
+	}
+	
+	function processLanes(){
+		$text = "";
+		//echo json_encode($this->lane_arr);
+		$new_lanes = new lanes($this, $this->lane_arr);
 		$text="LANE:".$new_lanes->getStat()."</br>";
 		#$text.="LANE:".$new_lanes->getSQL();
-	return $text;
+		return $text;
 	}
 
 	function getProtocols(){
