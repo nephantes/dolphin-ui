@@ -22,9 +22,12 @@ class Ngsimport extends VanillaModel {
 	//	LANES
 	public $lane_arr = [];
 	
-	public $PROTOCOLS;
-	public $SAMPLES;
-	public $FILES;
+	//	PROTOCOLS
+	public $prot_arr = [];
+	
+	//	SAMPLES
+	
+	//	FILES
 	
 	//	Sheet Check bools
 	public $final_check = true;
@@ -68,6 +71,12 @@ class Ngsimport extends VanillaModel {
 				$text.=$this->processMeta();
 			}elseif ( $worksheet['worksheetName']=="LANES"){
 				$text.=$this->processLanes();
+			}elseif ( $worksheet['worksheetName']=="PROTOCOLS"){
+				$text.=$this->processProtocols();
+			}elseif ( $worksheet['worksheetName']=="SAMPLES"){
+			
+			}elseif ( $worksheet['worksheetName']=="FILES"){
+				
 			}
 		}else{
 			
@@ -249,27 +258,56 @@ class Ngsimport extends VanillaModel {
 	}
 
 	function getProtocols(){
-		$prot_arr = [];
+		/*
+		 *	For each row in the protocols worksheet
+		 */
 		for ($i=4;$i<=$this->worksheet['totalRows'];$i++)
 		{
+			/*
+			 *	Read data columns
+			 */
 			$prot = new prot();
 			for ($j='A';$j<=$this->worksheet['lastColumnLetter'];$j++)
 			{
-			if($this->sheetData[3][$j]=="protocol name"){$prot->name= $this->esc($this->sheetData[$i][$j]);}
-			if($this->sheetData[3][$j]=="growth protocol"){$prot->growth= $this->esc($this->sheetData[$i][$j]);}
-			if($this->sheetData[3][$j]=="treatment protocol"){$prot->treatment= $this->esc($this->sheetData[$i][$j]);}
-			if($this->sheetData[3][$j]=="extract protocol"){$prot->extraction= $this->esc($this->sheetData[$i][$j]);}
-			if($this->sheetData[3][$j]=="library construction protocol"){$prot->library_construction= $this->esc($this->sheetData[$i][$j]);}
-			if($this->sheetData[3][$j]=="library strategy"){$prot->library_strategy= $this->esc($this->sheetData[$i][$j]);}
-
-			if($prot->name){$prot_arr[$prot->name]=$prot;}
+				if($this->sheetData[3][$j]=="protocol name"){$prot->name= $this->esc($this->sheetData[$i][$j]);}
+				if($this->sheetData[3][$j]=="growth protocol"){$prot->growth= $this->esc($this->sheetData[$i][$j]);}
+				if($this->sheetData[3][$j]=="treatment protocol"){$prot->treatment= $this->esc($this->sheetData[$i][$j]);}
+				if($this->sheetData[3][$j]=="extract protocol"){$prot->extraction= $this->esc($this->sheetData[$i][$j]);}
+				if($this->sheetData[3][$j]=="library construction protocol"){$prot->library_construction= $this->esc($this->sheetData[$i][$j]);}
+				if($this->sheetData[3][$j]=="library strategy"){$prot->library_strategy= $this->esc($this->sheetData[$i][$j]);}
+			}
+			
+			/*
+			 *	Check for proper data input
+			 */
+			//	Protocol Name
+			if(isset($prot->name)){
+				if($this->checkAlphaNumWithAddChars(' ', $prot->name)){
+					$this->prot_arr[$prot->name]=$prot;	
+				}else{
+					$text.= $this->errorText("protocol name does not contain proper characters, please use alpha-numeric characters and spaces (row " . $i . ")");
+					$this->final_check = false;
+				}
+			}else{
+				$text.= $this->errorText("protocol name is required for submission (row " . $i . ")");
+				$this->final_check = false;
+			}
+			
+			//	Other Values
+			if($prot->growth == null || $prot->treatment == null || $prot->extraction == null || $prot->library_construction == null || $prot->library_strategy == null){
+				$text.= $this->warningText("Some optional columns missing data, please make sure to add them later if desired (row " . $i . ")");
 			}
 		}
-		//echo json_encode($prot_arr);
-
-		$new_protocol = new protocols($this, $prot_arr);
-		return "PROT:".$new_protocol->getStat();
+		return $text;
+	}
+	
+	function processProtocols(){
+		$text = "";
+		//echo json_encode($this->prot_arr);
+		$new_protocol = new protocols($this, $this->prot_arr);
+		$text.= "PROT:".$new_protocol->getStat();
 		//var_dump($sheetData);
+		return $text;
 	}
 
 	function getSamples(){
