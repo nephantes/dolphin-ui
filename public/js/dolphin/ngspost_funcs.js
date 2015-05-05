@@ -5,11 +5,11 @@
  */
 
  function postInsertRunparams(json, outputdir, name, description){
-	
+
 	var successCheck = false;
 	var runlistCheck = "";
 	var runID = "";
-	
+
 	//check to make sure values are not empty
 	if (outputdir == "") {
 		outputdir = "/test/directory/change/me/";
@@ -20,7 +20,7 @@
 	if (description == "") {
 		description = "My Description";
 	}
-	
+
 	//find the run group ID
 	var hrefSplit = window.location.href.split("/");
 	var rerunLoc = $.inArray('rerun', hrefSplit)
@@ -31,7 +31,7 @@
 		//if not a rerun
 		runGroupID = 'new';
 	}
-	
+
 	$.ajax({
 			type: 	'POST',
 			url: 	'/dolphin/public/ajax/ngsalterdb.php',
