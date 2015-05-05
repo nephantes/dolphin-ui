@@ -15,14 +15,14 @@ class Ngsimport extends VanillaModel {
 	function parseExcel($gid, $sid, $worksheet, $sheetData) {
 		$this->worksheet=$worksheet;
 		$this->sheetData=$sheetData;
-	$this->sid=$sid;
-	$this->gid=$gid;
+		$this->sid=$sid;
+		$this->gid=$gid;
 
 		$text='<li>'.$this->worksheet['worksheetName'].'<br />';
 
-		$text.='Rows: '.$this->worksheet['totalRows'].' Columns: '.$this->worksheet['totalColumns'].'<br />';
-		$text.='Cell Range: A1:'.$this->worksheet['lastColumnLetter'].$this->worksheet['totalRows'];
-		$text.='</li>';
+		//$text.='Rows: '.$this->worksheet['totalRows'].' Columns: '.$this->worksheet['totalColumns'].'<br />';
+		//$text.='Cell Range: A1:'.$this->worksheet['lastColumnLetter'].$this->worksheet['totalRows'];
+		//$text.='</li>';
 
 		$this->username=$_SESSION['user'];
 		$sql="select id from biocore.users where `username`='$this->username'";
@@ -57,9 +57,9 @@ class Ngsimport extends VanillaModel {
 			if($this->sheetData[$i]["A"]=="summary"){$summary=$this->esc($this->sheetData[$i]["B"]);}
 			if($this->sheetData[$i]["A"]=="overall design"){$design=$this->esc($this->sheetData[$i]["B"]);}
 			if($this->sheetData[$i]["A"]=="contributor"){array_push($conts, $this->esc($this->sheetData[$i]["B"]));}
-		if($this->sheetData[$i]["A"]=="fastq directory"){$this->fastq_dir=$this->esc($this->sheetData[$i]["B"]);}
-		if($this->sheetData[$i]["A"]=="backup directory"){$this->backup_dir=$this->esc($this->sheetData[$i]["B"]);}
-		if($this->sheetData[$i]["A"]=="amazon bucket"){$this->amazon_bucket=$this->esc($this->sheetData[$i]["B"]);}
+			if($this->sheetData[$i]["A"]=="fastq directory"){$this->fastq_dir=$this->esc($this->sheetData[$i]["B"]);}
+			if($this->sheetData[$i]["A"]=="backup directory"){$this->backup_dir=$this->esc($this->sheetData[$i]["B"]);}
+			if($this->sheetData[$i]["A"]=="amazon bucket"){$this->amazon_bucket=$this->esc($this->sheetData[$i]["B"]);}
 		}
 		$new_series = new series($this, $experiment_name,$summary,$design);
 		$this->series_id=$new_series->getId();

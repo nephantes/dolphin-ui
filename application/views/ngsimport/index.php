@@ -16,6 +16,7 @@
                                             <label for="excelInputFile">Excel file input</label>
                                             <input type="file" name="excelFile" id="excelFile">
                                             <p class="help-block">Please choose excel file from your device.</p>
+											<a href="">Download example excel input</a>
                                         </div>
                                     </div><!-- /.box-body -->
                                     <div class="box-body">
