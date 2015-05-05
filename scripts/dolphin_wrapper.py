@@ -82,13 +82,13 @@ def getAmazonCredentials(username):
     return results
 
 def getDirs(runparamsid, isbarcode):
- 
+
     tablename="ngs_fastq_files"
     fields="d.backup_dir fastq_dir, d.backup_dir, d.amazon_bucket, rp.outdir, s.organism, s.library_type"
     sql = "SELECT DISTINCT %(fields)s FROM biocore.ngs_runlist nr, biocore.ngs_samples s, biocore.%(tablename)s tl, biocore.ngs_dirs d, biocore.ngs_runparams rp where nr.sample_id=s.id and rp.run_status=0 and s.id=tl.sample_id and d.id=tl.dir_id and  rp.id=nr.run_id and nr.run_id='"+str(runparamsid)+"';"
-    
+
     results=runSQL(sql%locals())
-    
+
     if (not results):
        fields="d.fastq_dir, d.backup_dir, d.amazon_bucket, rp.outdir, s.organism, s.library_type"
        if (isbarcode):
@@ -96,7 +96,7 @@ def getDirs(runparamsid, isbarcode):
        else:
            tablename="ngs_temp_sample_files"
        results=runSQL(sql%locals())
-     
+
     return results[0]
 
 def getSampleList(runparamsid):
@@ -129,7 +129,7 @@ def getLaneList(runparamsid):
     if (not result):
         tablename="ngs_fastq_files"
         result=runSQL(sql%locals())
-    
+
     inputparams=""
     for row in result:
         if (inputparams):
@@ -144,7 +144,7 @@ def getLaneList(runparamsid):
     if (not result):
         tablename="ngs_fastq_files"
         result=runSQL(sql%locals())
-        
+
     barcode="Distance,1:Format,5"
     for row in result:
         barcode=barcode+":"+row[0]+","+row[1]
@@ -168,7 +168,7 @@ def main():
         rpid    = options.rpid
         if (not rpid):
            rpid=-1
-  
+
         runparamsids=getRunParamsID(rpid)
 
         for runparams_arr in runparamsids:
@@ -176,7 +176,7 @@ def main():
            username=runparams_arr[1]
            isbarcode=runparams_arr[2]
            print runparams_arr
-    
+
            amazon = getAmazonCredentials(username)
            backupS3=None
            if (amazon != ()):
@@ -188,21 +188,21 @@ def main():
               gettotalreads = None
            else:
               gettotalreads = "Yes"
- 
+
            print "%s %s %s %s %s %s"%(inputdir, backup_dir, amazon_bucket, outdir, organism, library_type )
-    
+
            genomebuild=organism+","+gbuild[organism]
-  
+
            if (isbarcode):
                spaired, inputparams, barcodes=getLaneList(runparamsid)
            else:
                spaired, inputparams=getSampleList(runparamsid)
                barcodes    = None
- 
+
            runparams = getRunParams(runparamsid)
-           
+
            input_fn      = "../tmp/files/input.txt"
-    
+
            fastqc      = runparams.get('fastqc')
            adapter     = runparams.get('adapter')
            quality     = runparams.get('quality')
@@ -219,11 +219,11 @@ def main():
            #print inputparams
            #print barcodes
            #print spaired
-           
+
            if customind :
               customind     = [i for i in customind]
-    
-          
+
+
            if pipeline:
               pipeline     = [i for i in pipeline]
            print pipeline
@@ -231,7 +231,7 @@ def main():
            if not outdir :
               print >>stderr, 'Error: Output dir is NULL.'
               exit( 128 )
-    
+
            content = parse_content( inputparams )
            if (commonind):
               commonind = re.sub('test', '', commonind)
@@ -241,21 +241,21 @@ def main():
            workflow = join( bin_dir, 'seqmapping_workflow.txt' )
 
            write_workflow(resume, gettotalreads, backupS3, runparamsid, customind, commonind, pipeline, barcodes, fastqc, adapter, quality, trim, split, workflow, clean)
- 
+
            galaxyhost='localhost'
-    
+
            print cmd % locals()
            print "\n\n\n"
            '''
            p = subprocess.Popen(cmd % locals(), shell=True, stdout=subprocess.PIPE)
-    
+
            for line in p.stdout:
            #   print(str(line.rstrip()))
               p.stdout.flush()
               if (re.search('failed\n', line) or re.search('Err\n', line) ):
                 stop_err("failed")
         '''
- 
+
    except Exception, ex:
         stop_err('Error running dolphin_wrapper.py\n' + str(ex))
 
@@ -417,8 +417,8 @@ def write_workflow( resume, gettotalreads, backupS3, runparamsid, customind, com
        stepline=stepBackupS3 % locals()
        print >> fp, '%s'%stepline
 
-   
-   
+
+
    if (fastqc):
       stepline=stepFastQC % locals()
       print >>fp, '%s'%stepline
