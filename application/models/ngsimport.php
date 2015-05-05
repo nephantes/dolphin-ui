@@ -258,6 +258,7 @@ class Ngsimport extends VanillaModel {
 	}
 
 	function getProtocols(){
+		$text = "";
 		/*
 		 *	For each row in the protocols worksheet
 		 */
