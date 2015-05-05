@@ -11,7 +11,22 @@ class Ngsimport extends VanillaModel {
 	public $backup_dir;
 	public $amazon_bucket;
 	public $samples=[];
-
+	
+	//	Variable Classes
+	//	METADATA
+	public $experiment_name;
+	public $summary;
+	public $design;
+	public $conts = [];
+	
+	public $LANES;
+	public $PROTOCOLS;
+	public $SAMPLES;
+	public $FILES;
+	
+	//	Sheet Check bools
+	public $final_check = true;
+	
 	function parseExcel($gid, $sid, $worksheet, $sheetData) {
 		$this->worksheet=$worksheet;
 		$this->sheetData=$sheetData;
@@ -43,35 +58,113 @@ class Ngsimport extends VanillaModel {
 		elseif ( $worksheet['worksheetName']=="FILES"){
 			$text.=$this->getFiles();
 		}
+		
+		//	Process Data
+		if($this->final_check){
+			$text.=$this->processMeta();
+		}
+		
 	return $text;
-
 	}
-
+	
+	function errorText($text){
+		return "<font color='red'>" . $text . "</font><BR>";
+	}
+	
+	function warningtEXT($text){
+		return "<font color='orange'>" . $text . "</font><BR>";
+	}
+	
+	function checkAlphaNumWithAddChars($extraChars, $data){
+		return preg_match('/^[a-zA-Z0-9' . $extraChars . ']+$/', $data);
+	}
+	
 	function getMeta() {
 		//var_dump($sheetData);
-		$conts=[];
-
+		$text = "";
+		/*
+		 *	Read data columns
+		 */
 		for ($i=1;$i<=$this->worksheet['totalRows'];$i++)
 		{
-			if($this->sheetData[$i]["A"]=="title"){$experiment_name=$this->esc($this->sheetData[$i]["B"]);}
-			if($this->sheetData[$i]["A"]=="summary"){$summary=$this->esc($this->sheetData[$i]["B"]);}
-			if($this->sheetData[$i]["A"]=="overall design"){$design=$this->esc($this->sheetData[$i]["B"]);}
-			if($this->sheetData[$i]["A"]=="contributor"){array_push($conts, $this->esc($this->sheetData[$i]["B"]));}
+			if($this->sheetData[$i]["A"]=="title"){$this->experiment_name=$this->esc($this->sheetData[$i]["B"]);}
+			if($this->sheetData[$i]["A"]=="summary"){$this->summary=$this->esc($this->sheetData[$i]["B"]);}
+			if($this->sheetData[$i]["A"]=="overall design"){$this->design=$this->esc($this->sheetData[$i]["B"]);}
+			if($this->sheetData[$i]["A"]=="contributor"){array_push($this->conts, $this->esc($this->sheetData[$i]["B"]));}
 			if($this->sheetData[$i]["A"]=="fastq directory"){$this->fastq_dir=$this->esc($this->sheetData[$i]["B"]);}
 			if($this->sheetData[$i]["A"]=="backup directory"){$this->backup_dir=$this->esc($this->sheetData[$i]["B"]);}
 			if($this->sheetData[$i]["A"]=="amazon bucket"){$this->amazon_bucket=$this->esc($this->sheetData[$i]["B"]);}
 		}
-		$new_series = new series($this, $experiment_name,$summary,$design);
-		$this->series_id=$new_series->getId();
-		$text="SERIES:".$new_series->getStat()."<BR>";
-		$new_conts = new contributors($this, $conts);
-		$text.= "CONT:".$new_conts->getStat()."<BR>";
-	if (isset($this->fastq_dir)){
-		$new_dirs = new dirs($this);
-		$text.= "DIRS:".$new_dirs->getStat()."<BR>";
+		
+		/*
+		 *	Check for proper data input
+		 */
+		//	Experiment Name
+		if(isset($this->experiment_name)){
+			if(!$this->checkAlphaNumWithAddChars(' ', $this->experiment_name)){
+				$text.= $this->errorText("title does not contain proper characters, please use alpha-numeric characters and spaces");
+				$this->final_check = false;
+			}
+		}else{
+			$text.= $this->errorText("title is required for submission");
+			$this->final_check = false;
+		}
+		
+		//	Summary
+		if(!isset($this->summary)){
+			$text.= $this->errorText("summary is required for submission");
+			$this->final_check = false;
+		}
+		
+		//	Design
+		if(!isset($this->design)){
+			$text.= $this->errorText("overall design is required for submission");
+			$this->final_check = false;
+		}
+		
+		//	Contributors
+		if($this->conts == []){
+			$text.= $this->warningText("No contributors specified, please make sure to add them later if desired");
+		}
+		
+		//	Fastq Directory
+		if($this->fastq_dir != null){
+			//	fastq directory check to be implemented later
+		}else{
+			$text.= $this->errorText("fastq directory is required for submission");
+			$this->final_check = false;
+		}
+		
+		//	Backup Directory
+		if($this->backup_dir != null){
+			//	backup directory check to be implemented
+		}else{
+			$text.= $this->errorText("backup directory is required for submission");
+			$this->final_check = false;
+		}
+		
+		//	Amazon Bucket
+		if($this->amazon_bucket != null){
+			//	amazon bucket check to be implemented
+		}else{
+			$text.= $this->warningText("amazon bucket not specified, please make sure to add it later if desired");
+		}
+		
+		return $text;
 	}
-
-	return $text;
+	
+	function processMeta(){
+		$text = "";
+		$new_series = new series($this, $this->experiment_name,$this->summary,$this->design);
+		$this->series_id=$new_series->getId();
+		$text.="SERIES:".$new_series->getStat()."<BR>";
+		$new_conts = new contributors($this, $this->conts);
+		$text.= "CONT:".$new_conts->getStat()."<BR>";
+		if (isset($this->fastq_dir)){
+			$new_dirs = new dirs($this);
+			$text.= "DIRS:".$new_dirs->getStat()."<BR>";
+		}
+		return $text;
 	}
 
 	function getLanes(){
@@ -244,7 +337,7 @@ class series extends main{
 		$this->experiment_name=$experiment_name;
 		$this->summary=$summary;
 		$this->design=$design;
-	$this->model = $model;
+		$this->model = $model;
 		$this->process($this);
 	}
 	function getStat()
