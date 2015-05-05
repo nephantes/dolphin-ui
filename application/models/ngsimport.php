@@ -26,18 +26,22 @@ class Ngsimport extends VanillaModel {
 	public $prot_arr = [];
 	
 	//	SAMPLES
+	public $sample_arr = [];
+	public $char_arr=[];
 	
 	//	FILES
+	public $file_arr = [];
 	
 	//	Sheet Check bools
-	public $final_check = true;
+	public $final_check;
 	
-	function parseExcel($gid, $sid, $worksheet, $sheetData) {
+	function parseExcel($gid, $sid, $worksheet, $sheetData, $passed_final_check) {
 		$this->worksheet=$worksheet;
 		$this->sheetData=$sheetData;
 		$this->sid=$sid;
 		$this->gid=$gid;
-
+		$this->final_check = $passed_final_check;
+		
 		$text='<li>'.$this->worksheet['worksheetName'].'<br />';
 
 		//$text.='Rows: '.$this->worksheet['totalRows'].' Columns: '.$this->worksheet['totalColumns'].'<br />';
@@ -74,15 +78,19 @@ class Ngsimport extends VanillaModel {
 			}elseif ( $worksheet['worksheetName']=="PROTOCOLS"){
 				$text.=$this->processProtocols();
 			}elseif ( $worksheet['worksheetName']=="SAMPLES"){
-			
+				$text.=$this->processSamples();
 			}elseif ( $worksheet['worksheetName']=="FILES"){
-				
+				$text.=$this->processFiles();
+				$text.=$this->successText("<BR><BR>Excel import successful!<BR>");
 			}
 		}else{
-			
+			if ( $worksheet['worksheetName']=="FILES"){
+				$text.=$this->errorText("<BR><BR>Excel import aborted due to errors, see above<BR>");
+			}
 		}
+		$returned_array = [$this->final_check, $text];
 		
-	return $text;
+		return $returned_array;
 	}
 	
 	function errorText($text){
@@ -91,6 +99,10 @@ class Ngsimport extends VanillaModel {
 	
 	function warningText($text){
 		return "<font color='orange'>" . $text . "</font><BR>";
+	}
+	
+	function successText($text){
+		return "<font color='green'>" . $text . "</font><BR>";
 	}
 	
 	function checkAlphaNumWithAddChars($extraChars, $data){
@@ -312,75 +324,128 @@ class Ngsimport extends VanillaModel {
 	}
 
 	function getSamples(){
-		$sample_arr = [];
-		$char_arr=[];
+		$text = "";
+		/*
+		 *	For each row in the samples worksheet
+		 */
 		for ($i=4;$i<=$this->worksheet['totalRows'];$i++)
 		{
+			/*
+			 *	Read data columns
+			 */
 			$samp = new sample();
 			$tag = new tag();
 			for ($j='A';$j<=$this->worksheet['lastColumnLetter'];$j++)
 			{
-			if($this->sheetData[3][$j]=="Sample name"){$samp->name=$this->esc($this->sheetData[$i][$j]);}
-			if($this->sheetData[3][$j]=="Lane name"){$samp->lane_name=$this->esc($this->sheetData[$i][$j]);}
-			if($this->sheetData[3][$j]=="Protocol name"){$samp->protocol_name=$this->esc($this->sheetData[$i][$j]);}
-			if($this->sheetData[3][$j]=="barcode"){$samp->barcode=$this->esc($this->sheetData[$i][$j]);}
-			if($this->sheetData[3][$j]=="title"){$samp->title=$this->esc($this->sheetData[$i][$j]);}
-			if($this->sheetData[3][$j]=="source name"){$samp->source=$this->esc($this->sheetData[$i][$j]);}
-			if($this->sheetData[3][$j]=="organism"){$samp->organism=$this->esc($this->sheetData[$i][$j]);}
-			if($this->sheetData[3][$j]=="molecule"){$samp->molecule=$this->esc($this->sheetData[$i][$j]);}
-			if($this->sheetData[3][$j]=="description"){$samp->description=$this->esc($this->sheetData[$i][$j]);}
-			if($this->sheetData[3][$j]=="instrument model"){$samp->instrument_model=$this->esc($this->sheetData[$i][$j]);}
-			if($this->sheetData[3][$j]=="average insert size"){$samp->avg_insert_size=$this->esc($this->sheetData[$i][$j]);}
-			if($this->sheetData[3][$j]=="read length"){$samp->read_length=$this->esc($this->sheetData[$i][$j]);}
-			if($this->sheetData[3][$j]=="Genotype"){$samp->genotype=$this->esc($this->sheetData[$i][$j]);}
-			if($this->sheetData[3][$j]=="Condition"){$samp->condition=$this->esc($this->sheetData[$i][$j]);}
-			if($this->sheetData[3][$j]=="Library type"){$samp->library_type=$this->esc($this->sheetData[$i][$j]);}
-			if($this->sheetData[3][$j]=="3' Adapter sequence"){$samp->adapter=$this->esc($this->sheetData[$i][$j]);}
-			if($this->sheetData[3][$j]=="Notebook reference"){$samp->notebook_ref=$this->esc($this->sheetData[$i][$j]);}
-			if($this->sheetData[3][$j]=="Notes"){$samp->notes=$this->esc($this->sheetData[$i][$j]);}
-
-			$valid = "/^characteristics:\s+?(.*)/";
-
-			if(preg_match( $valid, $this->sheetData[3][$j], $matches) == 1)
-			{
-				if ($matches[1] != "tag" && $this->sheetData[$i][$j]!="")
+				if($this->sheetData[3][$j]=="Sample name"){$samp->name=$this->esc($this->sheetData[$i][$j]);}
+				if($this->sheetData[3][$j]=="Lane name"){$samp->lane_name=$this->esc($this->sheetData[$i][$j]);}
+				if($this->sheetData[3][$j]=="Protocol name"){$samp->protocol_name=$this->esc($this->sheetData[$i][$j]);}
+				if($this->sheetData[3][$j]=="barcode"){$samp->barcode=$this->esc($this->sheetData[$i][$j]);}
+				if($this->sheetData[3][$j]=="title"){$samp->title=$this->esc($this->sheetData[$i][$j]);}
+				if($this->sheetData[3][$j]=="source name"){$samp->source=$this->esc($this->sheetData[$i][$j]);}
+				if($this->sheetData[3][$j]=="organism"){$samp->organism=$this->esc($this->sheetData[$i][$j]);}
+				if($this->sheetData[3][$j]=="molecule"){$samp->molecule=$this->esc($this->sheetData[$i][$j]);}
+				if($this->sheetData[3][$j]=="description"){$samp->description=$this->esc($this->sheetData[$i][$j]);}
+				if($this->sheetData[3][$j]=="instrument model"){$samp->instrument_model=$this->esc($this->sheetData[$i][$j]);}
+				if($this->sheetData[3][$j]=="average insert size"){$samp->avg_insert_size=$this->esc($this->sheetData[$i][$j]);}
+				if($this->sheetData[3][$j]=="read length"){$samp->read_length=$this->esc($this->sheetData[$i][$j]);}
+				if($this->sheetData[3][$j]=="Genotype"){$samp->genotype=$this->esc($this->sheetData[$i][$j]);}
+				if($this->sheetData[3][$j]=="Condition"){$samp->condition=$this->esc($this->sheetData[$i][$j]);}
+				if($this->sheetData[3][$j]=="Library type"){$samp->library_type=$this->esc($this->sheetData[$i][$j]);}
+				if($this->sheetData[3][$j]=="3' Adapter sequence"){$samp->adapter=$this->esc($this->sheetData[$i][$j]);}
+				if($this->sheetData[3][$j]=="Notebook reference"){$samp->notebook_ref=$this->esc($this->sheetData[$i][$j]);}
+				if($this->sheetData[3][$j]=="Notes"){$samp->notes=$this->esc($this->sheetData[$i][$j]);}
+	
+				$valid = "/^characteristics:\s+?(.*)/";
+	
+				if(preg_match( $valid, $this->sheetData[3][$j], $matches) == 1)
 				{
-				$tag->tag=$matches[1];
-				$tag->value=$this->sheetData[$i][$j];
-				$tag->sample_name=$samp->name;
-				$char_arr[$samp->name]=$tag;
+					if ($matches[1] != "tag" && $this->sheetData[$i][$j]!="")
+					{
+						$tag->tag=$matches[1];
+						$tag->value=$this->sheetData[$i][$j];
+						$tag->sample_name=$samp->name;
+						$this->char_arr[$samp->name]=$tag;
+					}
 				}
 			}
-			if($samp->name){$sample_arr[$samp->name]=$samp;}
+			
+			/*
+			 *	Check for proper data input
+			 */
+			//	Sample Name
+			if(isset($samp->name)){
+				if($this->checkAlphaNumWithAddChars('_', $samp->name)){
+					//	Need to check the database for similar names as well at a later date
+					if(isset($this->sample_arr[$samp->name])){
+						$text.= $this->errorText("Sample name already exists in that lane (row " . $i . ")");
+						$this->final_check = false;
+					}else{
+						$this->sample_arr[$samp->name]=$samp;
+					}
+				}else{
+					$text.= $this->errorText("Sample name does not contain proper characters, please use alpha-numeric characters and underscores (row " . $i . ")");
+					$this->final_check = false;
+				}
+			}else{
+				$text.= $this->errorText("Sample name is required for submission (row " . $i . ")");
+				$this->final_check = false;
 			}
+			
+			//	Lane Name
+			//	For now, it's just checking the Lane given in the excel file, possible to check the database later
+			if(isset($samp->lane_name)){
+				if(!$this->lane_arr[$samp->lane_name]){
+					$text.= $this->errorText("Lane name does not match any lane given in the excel file (row " . $i . ")");
+					$this->final_check = false;
+				}
+			}else{
+				$text.= $this->errorText("Lane name is required for submission (row " . $i . ")");
+				$this->final_check = false;
+			}
+			
+			//	Other Values
+			
 		}
-		//echo json_encode($sample_arr);
-		$this->samples=$sample_arr;
-		$new_samples = new samples($this, $sample_arr);
+		return $text;
+	}
+	
+	function processSamples(){
+		$text = "";
+		//echo json_encode($this->sample_arr);
+		$this->samples=$this->sample_arr;
+		$new_samples = new samples($this, $this->sample_arr);
 		$text="SAMPLE:".$new_samples->getStat()."<BR>";
-		$new_chars = new characteristics($this, $char_arr);
+		$new_chars = new characteristics($this, $this->char_arr);
 		$text.="CHAR:".$new_chars->getStat();
 		return $text;
 	}
+	
 	function getFiles(){
-		$file_arr = [];
+		$text = "";
 		for ($i=4;$i<=$this->worksheet['totalRows'];$i++)
 		{
 			$file = new file();
 			for ($j='A';$j<=$this->worksheet['lastColumnLetter'];$j++)
 			{
-			if($this->sheetData[3][$j]=="Sample or Lane Name (Enter same name for multiple files)"){$file->name=$this->esc($this->sheetData[$i][$j]);}
-			if($this->sheetData[3][$j]=="file name(comma separated for paired ends)"){$file->file_name=$this->esc($this->sheetData[$i][$j]);$file->file_name=preg_replace('/\s/', '', $file->file_name);}
-			if($this->sheetData[3][$j]=="file checksum"){$file->checksum=$this->esc($this->sheetData[$i][$j]);}
-
+				if($this->sheetData[3][$j]=="Sample or Lane Name (Enter same name for multiple files)"){$file->name=$this->esc($this->sheetData[$i][$j]);}
+				if($this->sheetData[3][$j]=="file name(comma separated for paired ends)"){$file->file_name=$this->esc($this->sheetData[$i][$j]);$file->file_name=preg_replace('/\s/', '', $file->file_name);}
+				if($this->sheetData[3][$j]=="file checksum"){$file->checksum=$this->esc($this->sheetData[$i][$j]);}
 			}
-			if($file->file_name){$file_arr[$file->file_name]=$file;}
+			if($file->file_name){
+				$this->file_arr[$file->file_name]=$file;
+			}
 		}
+		return $text;
+	}
+	
+	function processFiles(){
+		$text = "";
 		//echo json_encode($file_arr);
-
-		$new_files = new files($this, $file_arr, $this->samples);
-		return "FILES:".$new_files->getStat();
+		$new_files = new files($this, $this->file_arr, $this->samples);
+		$text.="FILES:".$new_files->getStat();
 		//var_dump($sheetData);
+		return $text;
 	}
 }
 

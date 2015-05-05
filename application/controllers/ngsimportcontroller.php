@@ -40,11 +40,14 @@ class NgsimportController extends VanillaController {
 
 				$text.='<h3>Worksheet Information</h3>';
 				$text.='<ol>';
+                $passed_final_check = true;
 				$ngs=new Ngsimport();
 				foreach ($worksheetData as $worksheet) {
 					$objPHPExcel->setActiveSheetIndexByName($worksheet['worksheetName']);
 					$sheetData = $objPHPExcel->getActiveSheet()->toArray(null,true,true,true);
-					$text.=$ngs->parseExcel($_POST["group_id"], $_POST["security_id"], $worksheet, $sheetData);
+					$parseArray=$ngs->parseExcel($_POST["group_id"], $_POST["security_id"], $worksheet, $sheetData, $passed_final_check);
+                    $passed_final_check = $parseArray[0];
+                    $text.= $parseArray[1];
 				}
 				$text.='</ol>';
 
