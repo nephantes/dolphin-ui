@@ -42,7 +42,7 @@ class Ngsimport extends VanillaModel {
 		$this->gid=$gid;
 		$this->final_check = $passed_final_check;
 		
-		$text='<li>'.$this->worksheet['worksheetName'].'<br />';
+		$text = '<li>'.$this->worksheet['worksheetName'].'<br />';
 
 		//$text.='Rows: '.$this->worksheet['totalRows'].' Columns: '.$this->worksheet['totalColumns'].'<br />';
 		//$text.='Cell Range: A1:'.$this->worksheet['lastColumnLetter'].$this->worksheet['totalRows'];
@@ -70,7 +70,16 @@ class Ngsimport extends VanillaModel {
 		}
 		
 		//	Process Data
-		if($this->final_check){
+		$parseArray = [$this->final_check, $text];
+		return $parseArray;
+	}
+	
+	function finalizeExcel($worksheet, $sheetData){
+		$this->worksheet=$worksheet;
+		$this->sheetData=$sheetData;
+		$text = "";
+		echo $this->worksheet['worksheetName'];
+		$text='<li>'.$this->worksheet['worksheetName'].'<br />';
 			if ( $this->worksheet['worksheetName']=="METADATA"){
 				$text.=$this->processMeta();
 			}elseif ( $worksheet['worksheetName']=="LANES"){
@@ -83,14 +92,7 @@ class Ngsimport extends VanillaModel {
 				$text.=$this->processFiles();
 				$text.=$this->successText("<BR><BR>Excel import successful!<BR>");
 			}
-		}else{
-			if ( $worksheet['worksheetName']=="FILES"){
-				$text.=$this->errorText("<BR><BR>Excel import aborted due to errors, see above<BR>");
-			}
-		}
-		$returned_array = [$this->final_check, $text];
-		
-		return $returned_array;
+		return $text;
 	}
 	
 	function errorText($text){
@@ -111,6 +113,7 @@ class Ngsimport extends VanillaModel {
 	
 	function getMeta() {
 		//var_dump($sheetData);
+		$meta_check = true;
 		$text = "";
 		/*
 		 *	Read data columns
@@ -134,22 +137,26 @@ class Ngsimport extends VanillaModel {
 			if(!$this->checkAlphaNumWithAddChars(' ', $this->experiment_name)){
 				$text.= $this->errorText("title does not contain proper characters, please use alpha-numeric characters and spaces");
 				$this->final_check = false;
+				$meta_check = false;
 			}
 		}else{
 			$text.= $this->errorText("title is required for submission");
 			$this->final_check = false;
+			$meta_check = false;
 		}
 		
 		//	Summary
 		if(!isset($this->summary)){
 			$text.= $this->errorText("summary is required for submission");
 			$this->final_check = false;
+			$meta_check = false;
 		}
 		
 		//	Design
 		if(!isset($this->design)){
 			$text.= $this->errorText("overall design is required for submission");
 			$this->final_check = false;
+			$meta_check = false;
 		}
 		
 		//	Contributors
@@ -163,6 +170,7 @@ class Ngsimport extends VanillaModel {
 		}else{
 			$text.= $this->errorText("fastq directory is required for submission");
 			$this->final_check = false;
+			$meta_check = false;
 		}
 		
 		//	Backup Directory
@@ -171,6 +179,7 @@ class Ngsimport extends VanillaModel {
 		}else{
 			$text.= $this->errorText("backup directory is required for submission");
 			$this->final_check = false;
+			$meta_check = false;
 		}
 		
 		//	Amazon Bucket
@@ -180,6 +189,9 @@ class Ngsimport extends VanillaModel {
 			$text.= $this->warningText("amazon bucket not specified, please make sure to add it later if desired");
 		}
 		
+		if($meta_check){
+			$text.= $this->successText('Formatting passed inspection!');
+		}
 		return $text;
 	}
 	
@@ -198,6 +210,7 @@ class Ngsimport extends VanillaModel {
 	}
 
 	function getLanes(){
+		$lane_check = true;
 		$text = "";
 		/*
 		 *	For each row in the lanes worksheet
@@ -234,10 +247,12 @@ class Ngsimport extends VanillaModel {
 				}else{
 					$text.= $this->errorText("Lane name does not contain proper characters, please use alpha-numeric characters and underscores (row " . $i . ")");
 					$this->final_check = false;
+					$lane_check = false;
 				}
 			}else{
 				$text.= $this->errorText("Lane name is required for submission (row " . $i . ")");
 				$this->final_check = false;
+				$lane_check = false;
 			}
 			
 			//	Lane id
@@ -245,6 +260,7 @@ class Ngsimport extends VanillaModel {
 				if(!$this->checkAlphaNumWithAddChars('_-', $lane->lane_id)){
 					$text.= $this->errorText("Lane id does not contain proper characters, please use alpha-numeric characters and underscores (row " . $i . ")");
 					$this->final_check = false;
+					$lane_check = false;
 				}
 			}else{
 				$text.= $this->warningText("Lane id not specified.  Specific lane id set to 0, please change (row " . $i . ")");
@@ -256,6 +272,9 @@ class Ngsimport extends VanillaModel {
 				|| $lane->phix_in_lane == null || $lane->total_samples == null || $lane->resequenced == null || $lane->notes == null){
 				$text.= $this->warningText("Some optional columns missing data, please make sure to add them later if desired (row " . $i . ")");
 			}
+		}
+		if($lane_check){
+			$text.= $this->successText('Formatting passed inspection!');
 		}
 		return $text;
 	}
@@ -270,6 +289,7 @@ class Ngsimport extends VanillaModel {
 	}
 
 	function getProtocols(){
+		$prot_check = true;
 		$text = "";
 		/*
 		 *	For each row in the protocols worksheet
@@ -300,16 +320,21 @@ class Ngsimport extends VanillaModel {
 				}else{
 					$text.= $this->errorText("protocol name does not contain proper characters, please use alpha-numeric characters and spaces (row " . $i . ")");
 					$this->final_check = false;
+					$prot_check = false;
 				}
 			}else{
 				$text.= $this->errorText("protocol name is required for submission (row " . $i . ")");
 				$this->final_check = false;
+				$prot_check = false;
 			}
 			
 			//	Other Values
 			if($prot->growth == null || $prot->treatment == null || $prot->extraction == null || $prot->library_construction == null || $prot->library_strategy == null){
 				$text.= $this->warningText("Some optional columns missing data, please make sure to add them later if desired (row " . $i . ")");
 			}
+		}
+		if($prot_check){
+			$text.= $this->successText('Formatting passed inspection!');
 		}
 		return $text;
 	}
@@ -324,6 +349,7 @@ class Ngsimport extends VanillaModel {
 	}
 
 	function getSamples(){
+		$samp_check = true;
 		$text = "";
 		/*
 		 *	For each row in the samples worksheet
@@ -380,16 +406,19 @@ class Ngsimport extends VanillaModel {
 					if(isset($this->sample_arr[$samp->name])){
 						$text.= $this->errorText("Sample name already exists in that lane (row " . $i . ")");
 						$this->final_check = false;
+						$samp_check = false;
 					}else{
 						$this->sample_arr[$samp->name]=$samp;
 					}
 				}else{
 					$text.= $this->errorText("Sample name does not contain proper characters, please use alpha-numeric characters and underscores (row " . $i . ")");
 					$this->final_check = false;
+					$samp_check = false;
 				}
 			}else{
 				$text.= $this->errorText("Sample name is required for submission (row " . $i . ")");
 				$this->final_check = false;
+				$samp_check = false;
 			}
 			
 			//	Lane Name
@@ -398,14 +427,19 @@ class Ngsimport extends VanillaModel {
 				if(!$this->lane_arr[$samp->lane_name]){
 					$text.= $this->errorText("Lane name does not match any lane given in the excel file (row " . $i . ")");
 					$this->final_check = false;
+					$samp_check = false;
 				}
 			}else{
 				$text.= $this->errorText("Lane name is required for submission (row " . $i . ")");
 				$this->final_check = false;
+				$samp_check = false;
 			}
 			
 			//	Other Values
 			
+		}
+		if($samp_check){
+			$text.= $this->successText('Formatting passed inspection!');
 		}
 		return $text;
 	}
@@ -422,6 +456,7 @@ class Ngsimport extends VanillaModel {
 	}
 	
 	function getFiles(){
+		$file_check = true;
 		$text = "";
 		for ($i=4;$i<=$this->worksheet['totalRows'];$i++)
 		{
@@ -435,6 +470,9 @@ class Ngsimport extends VanillaModel {
 			if($file->file_name){
 				$this->file_arr[$file->file_name]=$file;
 			}
+		}
+		if($file_check){
+			$text.= $this->successText('Formatting passed inspection!');
 		}
 		return $text;
 	}

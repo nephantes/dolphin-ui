@@ -39,18 +39,34 @@ class NgsimportController extends VanillaController {
 				$objPHPExcel = $objReader->load($inputFileName);
 
 				$text.='<h3>Worksheet Information</h3>';
+                $text.= '<h5>Checking for proper excel formatting:</h5><BR>';
 				$text.='<ol>';
+                
                 $passed_final_check = true;
+                
 				$ngs=new Ngsimport();
 				foreach ($worksheetData as $worksheet) {
 					$objPHPExcel->setActiveSheetIndexByName($worksheet['worksheetName']);
 					$sheetData = $objPHPExcel->getActiveSheet()->toArray(null,true,true,true);
 					$parseArray=$ngs->parseExcel($_POST["group_id"], $_POST["security_id"], $worksheet, $sheetData, $passed_final_check);
                     $passed_final_check = $parseArray[0];
-                    $text.= $parseArray[1];
+                    $text.=$parseArray[1];
 				}
-				$text.='</ol>';
-
+                $text.= '</ol>';
+                
+                if($passed_final_check == true){
+                    $text.= '<h5>Importing/Updating the database</h5><BR>';
+                    $text.= '<ol>';
+                    foreach ($worksheetData as $worksheet) {
+                        echo $worksheet['worksheetName'];
+                        $objPHPExcel->setActiveSheetIndexByName($worksheet['worksheetName']);
+                        $sheetData = $objPHPExcel->getActiveSheet()->toArray(null,true,true,true);
+                        $text.=$ngs->finalizeExcel($worksheet, $sheetData);
+                    }
+                    $text.='</ol>';
+                }else{
+                    $text.=$ngs->errorText("<BR><BR>Excel import aborted due to errors, see above<BR>");
+                }
 			}
 			$this->set('mytext', $text);
 	}
