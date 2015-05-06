@@ -78,20 +78,19 @@ class Ngsimport extends VanillaModel {
 		$this->worksheet=$worksheet;
 		$this->sheetData=$sheetData;
 		$text = "";
-		echo $this->worksheet['worksheetName'];
 		$text='<li>'.$this->worksheet['worksheetName'].'<br />';
-			if ( $this->worksheet['worksheetName']=="METADATA"){
-				$text.=$this->processMeta();
-			}elseif ( $worksheet['worksheetName']=="LANES"){
-				$text.=$this->processLanes();
-			}elseif ( $worksheet['worksheetName']=="PROTOCOLS"){
-				$text.=$this->processProtocols();
-			}elseif ( $worksheet['worksheetName']=="SAMPLES"){
-				$text.=$this->processSamples();
-			}elseif ( $worksheet['worksheetName']=="FILES"){
-				$text.=$this->processFiles();
-				$text.=$this->successText("<BR><BR>Excel import successful!<BR>");
-			}
+		if ( $this->worksheet['worksheetName']=="METADATA"){
+			$text.=$this->processMeta();
+		}elseif ( $worksheet['worksheetName']=="LANES"){
+			$text.=$this->processLanes();
+		}elseif ( $worksheet['worksheetName']=="PROTOCOLS"){
+			$text.=$this->processProtocols();
+		}elseif ( $worksheet['worksheetName']=="SAMPLES"){
+			$text.=$this->processSamples();
+		}elseif ( $worksheet['worksheetName']=="FILES"){
+			$text.=$this->processFiles();
+			$text.=$this->successText("<BR><BR>Excel import successful!<BR>");
+		}
 		return $text;
 	}
 	
@@ -100,7 +99,7 @@ class Ngsimport extends VanillaModel {
 	}
 	
 	function warningText($text){
-		return "<font color='orange'>" . $text . "</font><BR>";
+		return "<font color='#B45F04'>" . $text . "</font><BR>";
 	}
 	
 	function successText($text){
@@ -190,7 +189,7 @@ class Ngsimport extends VanillaModel {
 		}
 		
 		if($meta_check){
-			$text.= $this->successText('Formatting passed inspection!');
+			$text.= $this->successText('Formatting passed inspection!<BR>');
 		}
 		return $text;
 	}
@@ -211,6 +210,7 @@ class Ngsimport extends VanillaModel {
 
 	function getLanes(){
 		$lane_check = true;
+		$lane_warning_check = false;
 		$text = "";
 		/*
 		 *	For each row in the lanes worksheet
@@ -270,11 +270,14 @@ class Ngsimport extends VanillaModel {
 			//	Other Values
 			if($lane->facility == null || $lane->cost == null || $lane->date_submitted ==  null || $lane->date_received == null || $lane->total_reads == null || $lane->phix_requested == null
 				|| $lane->phix_in_lane == null || $lane->total_samples == null || $lane->resequenced == null || $lane->notes == null){
-				$text.= $this->warningText("Some optional columns missing data, please make sure to add them later if desired (row " . $i . ")");
+				$lane_warning_check = true;
 			}
 		}
+		if($lane_warning_check){
+			$text.= $this->warningText("Some optional columns missing data, please make sure to add them later if desired");
+		}
 		if($lane_check){
-			$text.= $this->successText('Formatting passed inspection!');
+			$text.= $this->successText('Formatting passed inspection!<BR>');
 		}
 		return $text;
 	}
@@ -290,6 +293,7 @@ class Ngsimport extends VanillaModel {
 
 	function getProtocols(){
 		$prot_check = true;
+		$prot_warning_check = false;
 		$text = "";
 		/*
 		 *	For each row in the protocols worksheet
@@ -330,11 +334,14 @@ class Ngsimport extends VanillaModel {
 			
 			//	Other Values
 			if($prot->growth == null || $prot->treatment == null || $prot->extraction == null || $prot->library_construction == null || $prot->library_strategy == null){
-				$text.= $this->warningText("Some optional columns missing data, please make sure to add them later if desired (row " . $i . ")");
+				$prot_warning_check = true;
 			}
 		}
+		if($prot_warning_check){
+			$text.= $this->warningText("Some optional columns missing data, please make sure to add them later if desired");
+		}
 		if($prot_check){
-			$text.= $this->successText('Formatting passed inspection!');
+			$text.= $this->successText('Formatting passed inspection!<BR>');
 		}
 		return $text;
 	}
@@ -350,6 +357,7 @@ class Ngsimport extends VanillaModel {
 
 	function getSamples(){
 		$samp_check = true;
+		$samp_warning_check = false;
 		$text = "";
 		/*
 		 *	For each row in the samples worksheet
@@ -435,11 +443,22 @@ class Ngsimport extends VanillaModel {
 				$samp_check = false;
 			}
 			
-			//	Other Values
+			//	Protocol Name
 			
+			//	Barcode
+			
+			//	Other Values
+			if($samp->title == null || $samp->source == null || $samp->organism == null || $samp->molecule == null || $samp->description == null || $samp->instrument_model == null
+				|| $samp->avg_insert_size == null || $samp->read_length == null || $samp->genotype == null || $samp->condition == null || $samp->adapter == null || $samp->notebook_ref == null
+				|| $samp->notes == null){
+				$samp_warning_check = true;
+			}
+		}
+		if($samp_warning_check){
+			$text.= $this->warningText("Some optional columns missing data, please make sure to add them later if desired");
 		}
 		if($samp_check){
-			$text.= $this->successText('Formatting passed inspection!');
+			$text.= $this->successText('Formatting passed inspection!<BR>');
 		}
 		return $text;
 	}
@@ -458,8 +477,14 @@ class Ngsimport extends VanillaModel {
 	function getFiles(){
 		$file_check = true;
 		$text = "";
+		/*
+		 *	For each row in the samples worksheet
+		 */
 		for ($i=4;$i<=$this->worksheet['totalRows'];$i++)
 		{
+			/*
+			 *	Read data columns
+			 */
 			$file = new file();
 			for ($j='A';$j<=$this->worksheet['lastColumnLetter'];$j++)
 			{
@@ -467,12 +492,40 @@ class Ngsimport extends VanillaModel {
 				if($this->sheetData[3][$j]=="file name(comma separated for paired ends)"){$file->file_name=$this->esc($this->sheetData[$i][$j]);$file->file_name=preg_replace('/\s/', '', $file->file_name);}
 				if($this->sheetData[3][$j]=="file checksum"){$file->checksum=$this->esc($this->sheetData[$i][$j]);}
 			}
-			if($file->file_name){
+			
+			/*
+			 *	Check for proper data input
+			 */
+			//	Sample/Lane Name
+			if(isset($file->name)){
+				if($this->checkAlphaNumWithAddChars('_', $file->name)){
+					if(!(isset($this->sample_arr[$file->name])) & !(isset($this->lane_arr[$file->name]))){
+						$text.= $this->errorText("sample/lane name does not match the samples/lanes given (row " . $i . ")");
+						$this->final_check = false;
+						$file_check = false;
+					}
+				}else{
+					$text.= $this->errorText("sample/lane name does not contain proper characters, please use alpha-numeric characters and underscores (row " . $i . ")");
+					$this->final_check = false;
+					$file_check = false;
+				}
+			}else{
+				$text.= $this->errorText("sample/lane name is required for submission (row " . $i . ")");
+				$this->final_check = false;
+				$file_check = false;
+			}
+			
+			//	File Name
+			if(isset($file->file_name)){
 				$this->file_arr[$file->file_name]=$file;
+			}else{
+				$text.= $this->errorText("file name is required for submission (row " . $i . ")");
+				$this->final_check = false;
+				$file_check = false;
 			}
 		}
 		if($file_check){
-			$text.= $this->successText('Formatting passed inspection!');
+			$text.= $this->successText('Formatting passed inspection!<BR>');
 		}
 		return $text;
 	}
@@ -573,7 +626,7 @@ class contributors extends main{
 	function __construct($model, $conts = [])
 	{
 		$this->conts = $conts;
-	$this->model=$model;
+		$this->model = $model;
 
 		$this->processArr($conts);
 	}
@@ -600,8 +653,8 @@ class contributors extends main{
 	function update($val)
 	{
 		$sql="update biocore.ngs_contributors set `contributor`='$val',
-	`group_id`='".$this->model->gid."', `perms`='".$this->model->sid."',
-	`date_modified`=now(), `last_modified_user`='".$this->model->uid."'where `id` =".$this->getId($val);
+		`group_id`='".$this->model->gid."', `perms`='".$this->model->sid."',
+		`date_modified`=now(), `last_modified_user`='".$this->model->uid."'where `id` =".$this->getId($val);
 		$this->update++;
 
 		return $this->model->query($sql);
@@ -654,7 +707,8 @@ class lanes extends main{
 			'".$this->model->uid."', '".$this->model->gid."', '".$this->model->sid."',
 					now(), now(), '".$this->model->uid."');";
 		$this->insert++;
-	$this->sql=$sql;
+		$this->sql=$sql;
+		
 		return $this->model->query($sql);
 	}
 

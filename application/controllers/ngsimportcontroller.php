@@ -54,11 +54,10 @@ class NgsimportController extends VanillaController {
 				}
                 $text.= '</ol>';
                 
-                if($passed_final_check == true){
-                    $text.= '<h5>Importing/Updating the database</h5><BR>';
+                if($passed_final_check){
+                    $text.= '<h5>Updating/Inserting the database</h5><BR>';
                     $text.= '<ol>';
                     foreach ($worksheetData as $worksheet) {
-                        echo $worksheet['worksheetName'];
                         $objPHPExcel->setActiveSheetIndexByName($worksheet['worksheetName']);
                         $sheetData = $objPHPExcel->getActiveSheet()->toArray(null,true,true,true);
                         $text.=$ngs->finalizeExcel($worksheet, $sheetData);
