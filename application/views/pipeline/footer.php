@@ -33,6 +33,7 @@
 		<script src="<?php echo BASE_PATH?>/js/dolphin/ngstrack_stats.js" type="text/javascript"></script>
 		<script src="<?php echo BASE_PATH?>/js/dolphin/sessionget_funcs.js" type="text/javascript"></script>
         <script src="<?php echo BASE_PATH?>/js/dolphin/ngsfastlane_funcs.js" type="text/javascript"></script>
+        <script src="<?php echo BASE_PATH?>/js/dolphin/ngsfastlane_post_funcs.js" type="text/javascript"></script>
 	</body>
 
 </html>

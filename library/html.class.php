@@ -531,7 +531,7 @@ e range"><i class="fa fa-calendar"></i></button>
 		$html.= 						'<input type="text" class="form-control" id="'.$id.'">';
 	}else if($selection == "TEXTBOX"){
 		if($id == 'input_files'){
-				$placeholder = "Paired End Example:\nExample_pair1 Example_pair1.1 Example_pair1.2\nSingle End Example:\nExample_single1 Example_single1.fastq";
+				$placeholder = "Paired End Example:\nlibrary_name_rep1 lib_rep1_R1.fastq lib_rep1_R2.fastq\nSingle End Example:\nlibrary_name_rep1 lib_rep1.fastq";
 		}else{
 				$placeholder = "...";
 		}
