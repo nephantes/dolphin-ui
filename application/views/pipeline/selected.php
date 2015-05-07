@@ -51,7 +51,7 @@
 			<?php echo $html->endExpandingSelectionBox()?>
 
 			<?php echo $html->startExpandingSelectionBox(6)?>
-						<?php echo $html->getExpandingCommonRNABox("Common RNAs", "commonind", 7, 12, ["ercc","rrna","mirna","trna","snrna","rmsk","genome"],
+						<?php echo $html->getExpandingCommonRNABox("Common RNAs", "commonind", 7, 12, ["ercc","rRNA","miRNA","tRNA","snRNA","rmsk","genome"],
 																	[["no","yes"],["no","yes"],["no","yes"],["no","yes"],["no","yes"],["no","yes"],["no","yes"]])?>
 						<?php echo $html->getExpandingSelectionBox("Split FastQ", "split", 1, 12, ["number of reads per file"], [["TEXT","5000000"]])?>
 						<?php echo $html->getExpandingSelectionBox("Quality Filtering", "quality", 5, 12, ["window size","required quality","leading","trailing","minlen"],
