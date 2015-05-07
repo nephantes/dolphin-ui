@@ -530,7 +530,12 @@ e range"><i class="fa fa-calendar"></i></button>
 	if ($selection == "TEXT"){
 		$html.= 						'<input type="text" class="form-control" id="'.$id.'">';
 	}else if($selection == "TEXTBOX"){
-		$html.=							'<textarea id="'.$id.'" type="text" class="form-control" rows="5" placeholder="..."></textarea>';
+		if($id == 'input_files'){
+				$placeholder = "Paired End Example:\nExample_pair1 Example_pair1.1 Example_pair1.2\nSingle End Example:\nExample_single1 Example_single1.fastq";
+		}else{
+				$placeholder = "...";
+		}
+		$html.=							'<textarea id="'.$id.'" type="text" class="form-control" rows="5" placeholder="'.$placeholder.'"></textarea>';
 	}else{
 		$html.=							'<select class="form-control" id="'.$id.'">
 									'.$selection.'

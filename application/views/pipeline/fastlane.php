@@ -14,7 +14,7 @@
 				<?php echo $html->sendJScript("fastlane", "", "", ""); ?>
 				<section class="content">
 					<div class="row">
-						<div id="static_info" class="col-md-12">
+						<div id="static_info_selection" class="col-md-12">
 							<?php echo $html->getStaticSelectionBox("Genome Build", "genomebuild", "<option>human,hg19</option>
 																				<option>hamster,cho-k1</option>
 																				<option>rat,rn5</option>
@@ -29,15 +29,25 @@
 																				<option>yes</option>", 3)?>
 							<?php echo $html->getStaticSelectionBox("Mate-paired", "spaired", "<option>yes</option>
 																				<option>no</option>", 3)?>
-							<?php echo $html->getStaticSelectionBox("Input Directory (Full path)", "input_dir", "TEXT", 9)?>
 						</div><!-- /.col (RIGHT) -->
 						<div id="barcode_div" class="col-md-12"></div>
+						<div id="name_div" class="col-md-9">
+							<?php echo $html->getStaticSelectionBox("Experiment Series Name", "series_name", "TEXT", 6)?>
+							<?php echo $html->getStaticSelectionBox("Experiment Name", "lane_name", "TEXT", 6)?>
+						</div>
 						<div id="input_files" class="col-md-12">
+							<?php echo $html->getStaticSelectionBox("Input Directory (Full path)", "input_dir", "TEXT", 9)?>
 							<?php echo $html->getStaticSelectionBox("Input Files", "input_files", "TEXTBOX", 9)?>
+						</div>
+						<div id="output_files" class="col-md-12">
+							<?php echo $html->getStaticSelectionBox("Backup Directory (Full path)", "backup_dir", "TEXT", 9)?>
+							<?php echo $html->getStaticSelectionBox("Amazon Bucket", "amazon_bucket", "TEXT", 9)?>
 						</div>
 					</div><!-- /.row -->
 					<div class="row">
-
+						<div class="col-md-12">
+							<input type="button" id="submit_fastlane" class="btn btn-primary" value="Submit Fastlane" onClick="submitFastlane()"/>
+						</div>
 					</div><!-- /.row -->
 				</section><!-- /.content -->
 				

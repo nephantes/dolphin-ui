@@ -50,7 +50,7 @@ function expandBarcodeSep(){
 					select.appendChild(option);
 				}
 			}else{
-				textbox = createElement('textarea', ['id', 'type', 'class', 'rows', 'placeholder'], ['barcode_defs', 'text', 'form-control', '5', '...']);
+				textbox = createElement('textarea', ['id', 'type', 'class', 'rows', 'placeholder'], ['barcode_defs', 'text', 'form-control', '5', 'Example_name1 GATACA\nExample_name2 CATATC ']);
 				select = null;
 			}
 			
@@ -70,4 +70,8 @@ function expandBarcodeSep(){
 	}else{
 		barcodeDiv.innerHTML = "";
 	}
+}
+
+function submitFastlane() {
+	
 }
