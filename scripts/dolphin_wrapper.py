@@ -20,7 +20,7 @@ warnings.filterwarnings('ignore', '.*the sets module is deprecated.*',
 from workflowdefs import *
 
 bin_dir = dirname(argv[0])
-cmd = 'python /project/umw_biocore/bin/runWorkflow.py -i %(input_fn)s -d %(galaxyhost)s -w %(workflow)s -p /project/umw_biocore/bin/workflow/scripts/tools/workflows/Dolphin_v1.3_default.txt -u %(username)s -o %(outdir)s'
+cmd = 'python %(dolphin_tools_dir)s/runWorkflow.py -i %(input_fn)s -d %(galaxyhost)s -w %(workflow)s -p %(dolphin_default_params)s/Dolphin_v1.3_default.txt -u %(username)s -o %(outdir)s'
 
 
 gbuild = {
@@ -39,8 +39,8 @@ def runSQL(sql):
     port=3306
     db = MySQLdb.connect(
       host = 'localhost',
-      user = 'biocore',
-      passwd = 'biocore2013',
+      user = 'bioinfo',
+      passwd = 'bioinfo2013',
       db = 'biocore',
       port = port)
     try:
@@ -219,21 +219,24 @@ def main():
            #print inputparams
            #print barcodes
            #print spaired
+           #print "adapter:"+adapter
+           #print "quality:"+quality
+           #print "trim:"+trim
+           #print "fastqc:"+fastqc
 
-           if customind :
+           if customind:
               customind     = [i for i in customind]
-
 
            if pipeline:
               pipeline     = [i for i in pipeline]
-           print pipeline
+           #print pipeline
 
            if not outdir :
               print >>stderr, 'Error: Output dir is NULL.'
               exit( 128 )
 
            content = parse_content( inputparams )
-           if (commonind):
+           if commonind:
               commonind = re.sub('test', '', commonind)
 
            write_input(input_fn, inputdir, content, genomebuild, spaired, barcodes, adapter, quality, trim, trimpaired, split, commonind, advparams, customind, pipeline )
@@ -243,18 +246,18 @@ def main():
            write_workflow(resume, gettotalreads, backupS3, runparamsid, customind, commonind, pipeline, barcodes, fastqc, adapter, quality, trim, split, workflow, clean)
 
            galaxyhost='localhost'
+           dolphin_tools_dir=os.environ["DOLPHIN_TOOLS_PATH"]+"/src"
+           dolphin_default_params=os.environ["DOLPHIN_TOOLS_PATH"]+"/default_params"
 
            print cmd % locals()
            print "\n\n\n"
-           '''
            p = subprocess.Popen(cmd % locals(), shell=True, stdout=subprocess.PIPE)
 
            for line in p.stdout:
-           #   print(str(line.rstrip()))
+              print(str(line.rstrip()))
               p.stdout.flush()
               if (re.search('failed\n', line) or re.search('Err\n', line) ):
                 stop_err("failed")
-        '''
 
    except Exception, ex:
         stop_err('Error running dolphin_wrapper.py\n' + str(ex))
@@ -285,28 +288,29 @@ def write_input( input_fn, data_dir, content,genomebuild,spaired,barcodes,adapte
    print >>fp, '@GENOMEBUILD=%s,%s'%(gb[0],gb[1])
    print >>fp, '@SPAIRED=%s'%spaired
    barcodeflag=0
-   if (barcodes):
+
+   if (barcodes and barcodes.lower() != 'none'):
      print >>fp, '@BARCODES=%s'%parse_content(barcodes)
      barcodeflag=1
      previous="BARCODE"
    else:
      print >>fp, '@BARCODES=NONE'
 
-   if (adapter):
+   if (adapter and adapter.lower() != 'none'):
      print >>fp, '@ADAPTER=%s'%parse_content(adapter)
      print >>fp, '@PREVIOUSADAPTER=%s'%previous
      previous="ADAPTER"
    else:
      print >>fp, '@ADAPTER=NONE'
 
-   if (quality):
+   if (quality and quality.lower() != 'none'):
      print >>fp, '@QUALITY=%s'%parse_content(quality)
      print >>fp, '@PREVIOUSQUALITY=%s'%previous
      previous="QUALITY"
    else:
      print >>fp, '@QUALITY=NONE'
 
-   if (trim):
+   if (trim and trim.lower() != 'none'):
      print >>fp, '@TRIM=%s'%trim
      print >>fp, '@TRIMPAIRED=%s'%trimpaired
      print >>fp, '@PREVIOUSTRIM=%s'%previous
@@ -314,7 +318,7 @@ def write_input( input_fn, data_dir, content,genomebuild,spaired,barcodes,adapte
    else:
      print >>fp, '@TRIM=NONE'
 
-   if(split):
+   if(split and trim.lower() != 'none'):
      print >>fp, '@PREVIOUSSPLIT=%s'%previous
      previous="SPLIT"
    else:
@@ -322,7 +326,7 @@ def write_input( input_fn, data_dir, content,genomebuild,spaired,barcodes,adapte
 
 
    if (commonind):
-     arr=parse_content(commonind).split(',')
+     arr=parse_content(commonind).split(',:')
 
      for i in arr:
        if(len(i)>1):
@@ -405,35 +409,33 @@ def write_workflow( resume, gettotalreads, backupS3, runparamsid, customind, com
 
    stepline=stepCheck % locals()
    print >>fp, '%s'%stepline
-   if (barcodes):
+   if (barcodes and barcodes.lower() != 'none'):
        stepline=stepBarcode % locals()
        print >>fp, '%s'%stepline
 
-   if (gettotalreads):
+   if (gettotalreads and gettotalreads.lower() != 'none'):
        stepline=stepGetTotalReads % locals()
        print >> fp, '%s'%stepline
 
-   if (backupS3):
+   if (backupS3 and backupS3.lower() != 'none'):
        stepline=stepBackupS3 % locals()
        print >> fp, '%s'%stepline
 
-
-
-   if (fastqc):
+   if (fastqc and fastqc.lower() != 'none'):
       stepline=stepFastQC % locals()
       print >>fp, '%s'%stepline
       stepline=stepMergeFastQC % locals()
       print >>fp, '%s'%stepline
 
-   if (adapter):
+   if (adapter and adapter.lower() != 'none'):
       stepline=stepAdapter % locals()
       print >>fp, '%s'%stepline
 
-   if (quality):
+   if (quality and quality.lower() != 'none'):
       stepline=stepQuality % locals()
       print >>fp, '%s'%stepline
 
-   if (trim):
+   if (trim and trim.lower() != 'none'):
       stepline=stepTrim % locals()
       print >>fp, '%s'%stepline
 
@@ -454,7 +456,7 @@ def write_workflow( resume, gettotalreads, backupS3, runparamsid, customind, com
          stepline=stepSeqMapping % locals()
          print >>fp, '%s'%stepline
 
-   if (split):
+   if (split and split.lower() != 'none'):
       thenumberofreads=str(split)
       stepline=stepSplit % locals()
       print >>fp, '%s'%stepline
