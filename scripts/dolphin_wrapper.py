@@ -225,7 +225,7 @@ def main():
            #print "fastqc:"+fastqc
 
            if customind:
-              customind     = [i for i in customind]
+              customind    = [i for i in customind]
 
            if pipeline:
               pipeline     = [i for i in pipeline]
@@ -326,7 +326,7 @@ def write_input( input_fn, data_dir, content,genomebuild,spaired,barcodes,adapte
 
 
    if (commonind):
-     arr=parse_content(commonind).split(',:')
+     arr=re.split(r'[,:]+', parse_content(commonind))
 
      for i in arr:
        if(len(i)>1):
@@ -346,7 +346,7 @@ def write_input( input_fn, data_dir, content,genomebuild,spaired,barcodes,adapte
       mapnames="";
    if (customind):
       for i in customind:
-        arr=i.split(',')
+        arr=re.split(r'[,:]+', parse_content(customind))
         index=parse_content(arr[0])
         name=parse_content(replace_space(arr[1]))
         mapnames=str(mapnames)+name+":"+index+","
@@ -369,6 +369,8 @@ def write_input( input_fn, data_dir, content,genomebuild,spaired,barcodes,adapte
               paramsrsem="NONE"
            print >>fp, '@PARAMSRSEM=%s'%(parse_content(paramsrsem))
            print >>fp, '@TSIZE=50';
+           print >>fp, '@PREVIOUSPIPE=%s'%(previous)
+
          if (pipename=="Tophat"):
            paramstophat=arr[1];
            if (not paramstophat):
@@ -441,7 +443,8 @@ def write_workflow( resume, gettotalreads, backupS3, runparamsid, customind, com
 
    if (commonind):
 
-      arr=parse_content(commonind).split(',')
+      arr=re.split(r'[,:]+', parse_content(commonind))
+
       for i in arr:
          if(len(i)>1):
            indexname=i
