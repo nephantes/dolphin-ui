@@ -46,7 +46,7 @@
 																	"paired end both reads 5 end"]])?>
 						<?php echo $html->getExpandingSelectionBox("Adapter Removal", "adapter", 1, 12, ["adapter"], [["TEXTBOX"]])?>
 
-			<?php echo $html->getExpandingSelectionbOX("Custom Sequence Set", "custom", 1, 12, ["Add new Custom Sequence Set"], [["BUTTON"]])?>
+			<?php echo $html->getExpandingSelectionBox("Custom Sequence Set", "custom", 1, 12, ["Add new Custom Sequence Set"], [["BUTTON"]])?>
 			<?php echo $html->getExpandingSelectionBox("Additional Pipelines", "pipeline", 1, 12, ["Add a Pipeline"], [["BUTTON"]])?>
 			<?php echo $html->endExpandingSelectionBox()?>
 

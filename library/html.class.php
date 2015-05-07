@@ -528,11 +528,11 @@ e range"><i class="fa fa-calendar"></i></button>
 						<form role="form">
 							<div class="form-group">';
 	if ($selection == "TEXT"){
-	$html.= 						'<input type="text" class="form-control" id="'.$id.'">';
-	}
-	else
-	{
-	$html.=							'<select class="form-control" id="'.$id.'">
+		$html.= 						'<input type="text" class="form-control" id="'.$id.'">';
+	}else if($selection == "TEXTBOX"){
+		$html.=							'<textarea id="'.$id.'" type="text" class="form-control" rows="5" placeholder="..."></textarea>';
+	}else{
+		$html.=							'<select class="form-control" id="'.$id.'">
 									'.$selection.'
 								</select>';
 	}	

@@ -11,14 +11,33 @@
 					</ol>
 				</section>
 				<!-- Main content -->
+				<?php echo $html->sendJScript("fastlane", "", "", ""); ?>
 				<section class="content">
 					<div class="row">
-						<div class="col-md-12">
-
+						<div id="static_info" class="col-md-12">
+							<?php echo $html->getStaticSelectionBox("Genome Build", "genomebuild", "<option>human,hg19</option>
+																				<option>hamster,cho-k1</option>
+																				<option>rat,rn5</option>
+																				<option>zebrafish,danrer7</option>
+																				<option>mouse,mm10</option>
+																				<option>mousetest,mm10</option>
+																				<option>s_cerevisiae,saccer3</option>
+																				<option>c_elegans,ce10</option>
+																				<option>cow,bostau7</option>
+																				<option>d_melanogaster,dm3</option>", 3)?>
+							<?php echo $html->getStaticSelectionBox("Barcode Seperation", "barcode_sep\" onchange=\"expandBarcodeSep()", "<option>no</option>
+																				<option>yes</option>", 3)?>
+							<?php echo $html->getStaticSelectionBox("Mate-paired", "spaired", "<option>yes</option>
+																				<option>no</option>", 3)?>
+							<?php echo $html->getStaticSelectionBox("Input Directory (Full path)", "input_dir", "TEXT", 9)?>
 						</div><!-- /.col (RIGHT) -->
+						<div id="barcode_div" class="col-md-12"></div>
+						<div id="input_files" class="col-md-12">
+							<?php echo $html->getStaticSelectionBox("Input Files", "input_files", "TEXTBOX", 9)?>
+						</div>
 					</div><!-- /.row -->
 					<div class="row">
 
 					</div><!-- /.row -->
 				</section><!-- /.content -->
-
+				

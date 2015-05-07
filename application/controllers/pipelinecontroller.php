@@ -31,9 +31,8 @@ class PipelineController extends VanillaController {
 		$this->set('field', 'Status');
 	}
 
-	function fastlane($selection){
+	function fastlane(){
 		$this->set('field', 'Fastlane');
-		$this->set('selection', $selection);
 	}
 
 	function plots($selection){
