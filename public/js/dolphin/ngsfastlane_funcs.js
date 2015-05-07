@@ -50,8 +50,12 @@ function submitFastlane() {
 	var value_array = [];
 	for(var x = 0; x < id_array.length; x++){
 		if (document.getElementById(id_array[x]) != null) {
-			value_array.push(document.getElementById(id_array[x]).value);
+			value_array.push((document.getElementById(id_array[x]).value).trim());
 		}
 	}
 	postFastlane(value_array);
+}
+
+function postFastlane(info_array) {
+	checkFastlaneInput(info_array);
 }
