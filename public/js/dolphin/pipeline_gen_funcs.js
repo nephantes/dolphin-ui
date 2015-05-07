@@ -14,7 +14,7 @@ var pipelineNum = 0;
 var customSeqNum = 0;
 var customSeqNumCheck = [];
 var pipelineDict = ['RNASeqRSEM', 'Tophat', 'ChipSeq'];
-var rnaList = ["ercc","rrna","mirna","trna","snrna","rmsk","genome","change_params"];
+var rnaList = ["ercc","rRNA","miRNA","tRNA","snRNA","rmsk","genome","change_params"];
 var qualityDict = ["window size","required quality","leading","trailing","minlen"];
 var trimmingDict = ["single or paired-end", "5 length 1", "3 length 1", "5 length 2", "3 length 2"];
 var currentPipelineID = [];
@@ -35,114 +35,111 @@ function rerunLoad() {
 	//repopulate page
 	for (var x = 0; x < (jsonTypeList.length); x++) {
 		if (jsonObj.hasOwnProperty(jsonTypeList[x]) && jsonObj[jsonTypeList[x]] != 'none') {
-		var element = document.getElementById(jsonTypeList[x]);
-		if (element != null) {
-			if (element.id == "spaired") {
-			if ( jsonObj[jsonTypeList[x]] == 'paired') {
-				element.value = 'yes'
-			}else{
-				element.value = 'no';
-			}
-			}else if (element.id == "resume"){
-				element.value = 'no';
-			}else{
-			element.value = jsonObj[jsonTypeList[x]];
-			}
-		}else{
-			//try radio
-			if (radioTypeCheckList.indexOf(jsonTypeList[x]) == -1) {
-			//expand the altered fields
-			$( '#'+jsonTypeList[x]+'_yes' ).iCheck('check');
-			document.getElementById(jsonTypeList[x]+'_exp').setAttribute('class', 'box box-default');
-			document.getElementById(jsonTypeList[x]+'_exp_btn').setAttribute('class', 'fa fa-minus');
-			document.getElementById(jsonTypeList[x]+'_exp_body').setAttribute('style', 'display: block');
-
-			//fill the fields that have been expanded
-
-			var splt1 = jsonObj[jsonTypeList[x]].split(":");
-			if (splt1.length == 1) {
-				if (jsonTypeList[x] == 'split') {
-				document.getElementById('number of reads per file_val').value = jsonObj[jsonTypeList[x]];
+			var element = document.getElementById(jsonTypeList[x]);
+			if (element != null) {
+				if (element.id == "spaired") {
+				if ( jsonObj[jsonTypeList[x]] == 'paired') {
+					element.value = 'yes'
 				}else{
-				document.getElementById(jsonTypeList[x]+'_val').value = jsonObj[jsonTypeList[x]];
+					element.value = 'no';
 				}
-			}else{
-				for (var z = 0; z < splt1.length; z++) {
-				var splt2 = splt1[z].split(",");
-				if (jsonTypeList[x] == 'quality') {
-					document.getElementById( qualityDict[z]+'_val' ).value = splt2[0];
-				}else if (jsonTypeList[x] == 'trim'){
-					if (z == 0 && jsonObj.hasOwnProperty('trimpaired')) {
-					document.getElementById( trimmingDict[z]+'_val').value = 'paired-end';
-					selectTrimming('single or paired-end_val', 0, 0);
-					}else if(z == 0 && !jsonObj.hasOwnProperty('trimpaired')){
-					document.getElementById( trimmingDict[z]+'_val').value = 'single-end';
-					}
-					document.getElementById( trimmingDict[z+1]+'_val' ).value = splt2[0];
-				}else if (jsonTypeList[x] == 'commonind'){
-					for(var y = 0; y < splt2.length; y++){
-					$( '#'+splt2[y]+'_yes' ).iCheck('check');
-					}
+				}else if (element.id == "resume"){
+					element.value = 'no';
 				}else{
-					document.getElementById( splt2[0]+'_val' ).value = splt2[1];
+					element.value = jsonObj[jsonTypeList[x]];
 				}
-
-				}
-			}
-			}else if (jsonTypeList[x] == 'advparams') {
-			changeRNAParamsBtn();
-			document.getElementById('change_params_val').value = jsonObj[jsonTypeList[x]];
-			}else if (jsonTypeList[x] == 'custom') {
-			document.getElementById(jsonTypeList[x]+'_exp').setAttribute('class', 'box box-default');
-			document.getElementById(jsonTypeList[x]+'_exp_btn').setAttribute('class', 'fa fa-minus');
-			for(var y = 0; y < jsonObj[jsonTypeList[x]].length; y++){
-				sequenceSetsBtn();
-				fillCustomSequenceSet(y, jsonObj[jsonTypeList[x]][y].split(":"));
-			}
-			document.getElementById(jsonTypeList[x]+'_exp_body').setAttribute('style', 'display: block');
 			}else{
-			//pipeline
-			document.getElementById(jsonTypeList[x]+'_exp').setAttribute('class', 'box box-default');
-			document.getElementById(jsonTypeList[x]+'_exp_btn').setAttribute('class', 'fa fa-minus');
-
-			var splt1 = jsonObj[jsonTypeList[x]];
-			for (var i = 0; i < splt1.length; i++){
-				var splt2 = splt1[i].split(":");
-				if (splt2[0] == pipelineDict[0]) {
-				//RSEM
-				additionalPipes();
-				document.getElementById('select_'+i).value = pipelineDict[0];
-				pipelineSelect(i);
-				document.getElementById('textarea_'+i).value = splt2[1];
-				document.getElementById('select_1_'+i).value = splt2[2];
-				document.getElementById('select_2_'+i).value = splt2[3];
-				rsemSwitch = true;
-				}else if (splt2[0] == pipelineDict[1]) {
-				//Tophat
-				additionalPipes();
-				document.getElementById('select_'+i).value = pipelineDict[1];
-				pipelineSelect(i);
-				document.getElementById('textarea_'+i).value = splt2[1];
-				document.getElementById('select_1_'+i).value = splt2[2];
-				document.getElementById('select_2_'+i).value = splt2[3];
-				}else if (splt2[0] == pipelineDict[2]){
-				//Chipseq
-				additionalPipes();
-				document.getElementById('select_'+i).value = pipelineDict[2];
-				pipelineSelect(i);
-				document.getElementById('textarea_'+i).value = splt2[1];
-				document.getElementById('text_1_'+i).value = splt2[2];
-				document.getElementById('text_2_'+i).value = splt2[3];
-				document.getElementById('select_1_'+i).value = splt2[4];
-				document.getElementById('select_2_'+i).value = splt2[5];
-				document.getElementById('select_3_'+i).value = splt2[6];
-				document.getElementById('select_4_'+i).value = splt2[7];
+				//try radio
+				if (radioTypeCheckList.indexOf(jsonTypeList[x]) == -1) {
+					//expand the altered fields
+					$( '#'+jsonTypeList[x]+'_yes' ).iCheck('check');
+					document.getElementById(jsonTypeList[x]+'_exp').setAttribute('class', 'box box-default');
+					document.getElementById(jsonTypeList[x]+'_exp_btn').setAttribute('class', 'fa fa-minus');
+					document.getElementById(jsonTypeList[x]+'_exp_body').setAttribute('style', 'display: block');
+					
+					//fill the fields that have been expanded
+					var splt1 = jsonObj[jsonTypeList[x]].split(":");
+					if (splt1.length == 1 && jsonTypeList[x] != 'commonind') {
+						if (jsonTypeList[x] == 'split') {
+							document.getElementById('number of reads per file_val').value = jsonObj[jsonTypeList[x]];
+						}else{
+							document.getElementById(jsonTypeList[x]+'_val').value = jsonObj[jsonTypeList[x]];
+						}
+					}else{
+						for (var z = 0; z < splt1.length; z++) {
+							var splt2 = splt1[z].split(",");
+							if (jsonTypeList[x] == 'quality') {
+								document.getElementById( qualityDict[z]+'_val' ).value = splt2[0];
+							}else if (jsonTypeList[x] == 'trim'){
+								if (z == 0 && jsonObj.hasOwnProperty('trimpaired')) {
+								document.getElementById( trimmingDict[z]+'_val').value = 'paired-end';
+								selectTrimming('single or paired-end_val', 0, 0);
+								}else if(z == 0 && !jsonObj.hasOwnProperty('trimpaired')){
+								document.getElementById( trimmingDict[z]+'_val').value = 'single-end';
+								}
+								document.getElementById( trimmingDict[z+1]+'_val' ).value = splt2[0];
+							}else if (jsonTypeList[x] == 'commonind'){
+								for(var y = 0; y < splt2.length; y++){
+								$( '#'+splt2[y]+'_yes' ).iCheck('check');
+								}
+							}else{
+								document.getElementById( splt2[0]+'_val' ).value = splt2[1];
+							}
+						}
+					}
+				}else if (jsonTypeList[x] == 'advparams') {
+					changeRNAParamsBtn();
+					document.getElementById('change_params_val').value = jsonObj[jsonTypeList[x]];
+				}else if (jsonTypeList[x] == 'custom') {
+					document.getElementById(jsonTypeList[x]+'_exp').setAttribute('class', 'box box-default');
+					document.getElementById(jsonTypeList[x]+'_exp_btn').setAttribute('class', 'fa fa-minus');
+					for(var y = 0; y < jsonObj[jsonTypeList[x]].length; y++){
+						sequenceSetsBtn();
+						fillCustomSequenceSet(y, jsonObj[jsonTypeList[x]][y].split(":"));
+					}
+					document.getElementById(jsonTypeList[x]+'_exp_body').setAttribute('style', 'display: block');
+				}else{
+					//pipeline
+					document.getElementById(jsonTypeList[x]+'_exp').setAttribute('class', 'box box-default');
+					document.getElementById(jsonTypeList[x]+'_exp_btn').setAttribute('class', 'fa fa-minus');
+	
+					var splt1 = jsonObj[jsonTypeList[x]];
+					for (var i = 0; i < splt1.length; i++){
+						var splt2 = splt1[i].split(":");
+						if (splt2[0] == pipelineDict[0]) {
+							//RSEM
+							additionalPipes();
+							document.getElementById('select_'+i).value = pipelineDict[0];
+							pipelineSelect(i);
+							document.getElementById('textarea_'+i).value = splt2[1];
+							document.getElementById('select_1_'+i).value = splt2[2];
+							document.getElementById('select_2_'+i).value = splt2[3];
+							rsemSwitch = true;
+						}else if (splt2[0] == pipelineDict[1]) {
+							//Tophat
+							additionalPipes();
+							document.getElementById('select_'+i).value = pipelineDict[1];
+							pipelineSelect(i);
+							document.getElementById('textarea_'+i).value = splt2[1];
+							document.getElementById('select_1_'+i).value = splt2[2];
+							document.getElementById('select_2_'+i).value = splt2[3];
+						}else if (splt2[0] == pipelineDict[2]){
+							//Chipseq
+							additionalPipes();
+							document.getElementById('select_'+i).value = pipelineDict[2];
+							pipelineSelect(i);
+							document.getElementById('textarea_'+i).value = splt2[1];
+							document.getElementById('text_1_'+i).value = splt2[2];
+							document.getElementById('text_2_'+i).value = splt2[3];
+							document.getElementById('select_1_'+i).value = splt2[4];
+							document.getElementById('select_2_'+i).value = splt2[5];
+							document.getElementById('select_3_'+i).value = splt2[6];
+							document.getElementById('select_4_'+i).value = splt2[7];
+						}
+					}
+					document.getElementById(jsonTypeList[x]+'_exp_body').setAttribute('style', 'display: block');
 				}
-
 			}
-			document.getElementById(jsonTypeList[x]+'_exp_body').setAttribute('style', 'display: block');
-			}
-		}
 		}
 	}
 	document.getElementById('outdir').value = infoArray[1];
@@ -264,77 +261,77 @@ function submitPipeline(type) {
 	//static
 	var json = '{"genomebuild":"' + genome + '"'
 	if (matepair == "yes") {
-	json = json + ',"spaired":"paired"'
-	previous = 'spaired';
+		json = json + ',"spaired":"paired"'
+		previous = 'spaired';
 	}else{
-	json = json + ',"spaired":"no"';
+		json = json + ',"spaired":"no"';
 	}
 	if (freshrun != "yes") {
-	json = json + ',"resume":"no"'
+		json = json + ',"resume":"no"'
 	}else{
-	json = json + ',"resume":"resume"'
-	previous = 'resume';
+		json = json + ',"resume":"resume"'
+		previous = 'resume';
 	}
 	json = json + ',"fastqc":"' + fastqc + '"'
 
 	//expanding
 	//barcode
 	if (doBarcode == "yes") {
-	json = json + ',"barcodes":"distance,' + barcode[0] + ':format,' + barcode[1] + '"';
-	previous = 'barcodes';
+		json = json + ',"barcodes":"distance,' + barcode[0] + ':format,' + barcode[1] + '"';
+		previous = 'barcodes';
 	}else{
-	json = json + ',"barcodes":"none"';
+		json = json + ',"barcodes":"none"';
 	}
 	//adapter
 	if (doAdapter == "yes") {
-	previous = 'adapter';
+		previous = 'adapter';
 	}
 	json = json + ',"adapter":"' + adapter[0] + '"';
 	//quality
 	if (doQuality == "yes") {
-	json = json + ',"quality":"' + quality[0] + ':' + quality[1] + ':' + quality[2] + ':' + quality[3] + ':' + quality[4] + '"';
-	previous = 'quality';
+		json = json + ',"quality":"' + quality[0] + ':' + quality[1] + ':' + quality[2] + ':' + quality[3] + ':' + quality[4] + '"';
+		previous = 'quality';
 	}else{
-	json = json + ',"quality":"none"'
+		json = json + ',"quality":"none"'
 	}
 	//trim
 	if (doTrimming == "yes") {
-	json = json + ',"trim":"' + trimming[1] + ':' + trimming[2];
-	previous = 'trim';
+		json = json + ',"trim":"' + trimming[1] + ':' + trimming[2];
+		previous = 'trim';
 	}else{
-	json = json + ',"trim":"none"';
+		json = json + ',"trim":"none"';
 	}
 	if (trimming[0] == 'paired-end' && doTrimming == 'yes') {
-	json = json + ':' + trimming[3] + ':' + trimming[4] + '","trimpaired":"paired'
+		json = json + ':' + trimming[3] + ':' + trimming[4] + '","trimpaired":"paired'
 	}
 	if (doTrimming == "yes") {
-	json = json + '"';
+		json = json + '"';
 	}
 	//split
 	if (doSplit == "yes") {
-	previous = 'split';
+		previous = 'split';
 	}
 	json = json + ',"split":"' + split[0] + '"';
 
 	//expanding multiple queries
 	if (doRNA == "yes"){
-	json = json + ',"commonind":"'
-	var rnacheck = true;
-	for (var i = 0; i < rna.length; i++) {
-		if (rnacheck) {
-		json = json + rna[i];
-		previous = rna[i];
-		rnacheck = false;
-		}else if (rna[i] != undefined && rnaList.indexOf(rna[i]) == -1){
-		json = json + '","advparams":"' + rna[i];
-		}else if (rna[i] != undefined) {
-		json = json + ':' + rna[i]
-		previous = rna[i];
+		json = json + ',"commonind":"'
+		var rnacheck = true;
+		for (var i = 0; i < rna.length; i++) {
+			if (rnacheck) {
+				json = json + rna[i];
+				previous = rna[i];
+				rnacheck = false;
+			}else if (rna[i] != undefined && rnaList.indexOf(rna[i]) == -1){
+				json = json + '","advparams":"' + rna[i];
+			}else if (rna[i] != undefined) {
+				json = json + ',' + rna[i]
+				previous = rna[i];
+			}
 		}
-	}
-	json = json + '"'
+		json = json + '"'
 	}else{
-	json = json + ',"commonind":"none"'
+		json = json + ',"commonind":"none"'
 	}
 	var customSeqSet = findCustomSequenceSets(previous);
 	json = json + customSeqSet;
