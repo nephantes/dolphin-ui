@@ -46,7 +46,7 @@ function expandBarcodeSep(){
 	}
 }
 
-function submitFastlane() {
+function submitFastlaneButton() {
 	var value_array = [];
 	for(var x = 0; x < id_array.length; x++){
 		if (document.getElementById(id_array[x]) != null) {

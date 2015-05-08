@@ -46,7 +46,7 @@
 					</div><!-- /.row -->
 					<div class="row">
 						<div class="col-md-12">
-							<input type="button" id="submit_fastlane" class="btn btn-primary" value="Submit Fastlane" onClick="submitFastlane()"/>
+							<input type="button" id="submit_fastlane" class="btn btn-primary" value="Submit Fastlane" onClick="submitFastlaneButton()"/>
 						</div>
 					</div><!-- /.row -->
 				</section><!-- /.content -->
