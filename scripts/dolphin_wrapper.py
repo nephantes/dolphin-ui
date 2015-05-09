@@ -325,16 +325,16 @@ def write_input( input_fn, data_dir, content,genomebuild,spaired,barcodes,adapte
      print >>fp, '@PREVIOUSSPLIT=NONE'
 
 
-   if (commonind):
+   if (commonind and commonind.lower() != 'none'):
      arr=re.split(r'[,:]+', parse_content(commonind))
 
      for i in arr:
        if(len(i)>1):
-           default_bowtie_params="@DEFBOWTIE2PARAM"
-           default_description="@DEFDESCRIPTION"
+          default_bowtie_params="@DEFBOWTIE2PARAM"
+          default_description="@DEFDESCRIPTION"
        print >>fp, '@PARAM%s=@GCOMMONDB/%s/%s,%s,%s,%s,1,%s'%(i,i,i,i,default_bowtie_params,default_description,previous)
        if (i != "ucsc" and i != gb[1]):
-           previous=i
+          previous=i
 
      if (advparams):
         print >>fp, '@ADVPARAMS=%s'%(parse_content(advparams))
@@ -441,7 +441,7 @@ def write_workflow( resume, gettotalreads, backupS3, runparamsid, customind, com
       stepline=stepTrim % locals()
       print >>fp, '%s'%stepline
 
-   if (commonind):
+   if (commonind and commonind.lower() != 'none'):
 
       arr=re.split(r'[,:]+', parse_content(commonind))
 
@@ -489,12 +489,12 @@ def write_workflow( resume, gettotalreads, backupS3, runparamsid, customind, com
             stepline=stepRSEMCount % locals()
             print >>fp, '%s'%stepline
             igv=arr[2]
-            if (igv=="Yes"):
+            if (igv.lower()=="yes"):
                type="RSEM"
                stepline=stepIGVTDF % locals()
                print >>fp, '%s'%stepline
             bam2bw=arr[3]
-            if (bam2bw=="Yes"):
+            if (bam2bw.lower()=="yes"):
                type="RSEM"
                stepline=stepBam2BW % locals()
                print >>fp, '%s'%stepline
@@ -503,12 +503,12 @@ def write_workflow( resume, gettotalreads, backupS3, runparamsid, customind, com
             stepline=stepTophat % locals()
             print >>fp, '%s'%stepline
             igv=arr[2]
-            if (igv=="Yes"):
+            if (igv.lower()=="yes"):
                type="Tophat"
                stepline=stepIGVTDF % locals()
                print >>fp, '%s'%stepline
             bam2bw=arr[3]
-            if (bam2bw=="Yes"):
+            if (bam2bw.lower()=="yes"):
                type="Tophat"
                stepline=stepBam2BW % locals()
                print >>fp, '%s'%stepline
@@ -533,7 +533,7 @@ def write_workflow( resume, gettotalreads, backupS3, runparamsid, customind, com
             print >>fp, '%s'%stepline
 
             igv=str(arr[6])
-            if (igv=="Yes"):
+            if (igv.lower()=="yes"):
                 type="chip"
                 if (split):
                     type="mergechip"
@@ -541,7 +541,7 @@ def write_workflow( resume, gettotalreads, backupS3, runparamsid, customind, com
                 print >>fp, '%s'%stepline
 
             bam2bw=str(arr[7])
-            if (bam2bw=="Yes"):
+            if (bam2bw.lower()=="yes"):
                 type="chip"
                 if (split):
                     type="mergechip"
