@@ -400,10 +400,10 @@ def write_input( input_fn, data_dir, content,genomebuild,spaired,barcodes,adapte
            print >>fp, '@GSIZE=%s'%(remove_space(str(arr[5])));
 
 
-           print >>fp, '@MAPNAMES=%s'%(mapnames)
-           print >>fp, '@PREVIOUSPIPE=%s'%(previous)
+       print >>fp, '@MAPNAMES=%s'%(mapnames)
+       print >>fp, '@PREVIOUSPIPE=%s'%(previous)
 
-           fp.close()
+       fp.close()
 
 def write_workflow( resume, gettotalreads, backupS3, runparamsid, customind, commonind, pipeline, barcodes, fastqc, adapter, quality, trim, split, file, clean ):
    fp = open ( file, 'w')
