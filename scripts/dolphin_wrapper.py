@@ -342,7 +342,7 @@ def write_input( input_fn, data_dir, content,genomebuild,spaired,barcodes,adapte
         print >>fp, '@ADVPARAMS=NONE'
 
    mapnames=commonind
-   if (not mapnames):
+   if (not mapnames or mapnames.lower() == 'none'):
       mapnames="";
    if (customind):
       for i in customind:
