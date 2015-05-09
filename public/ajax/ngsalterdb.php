@@ -38,6 +38,8 @@ if ($p == "submitPipeline" )
 		$idKey= $idKey - $runGroupID;
 	}
 	$data=$idKey;
+        $command = 'cd ../../scripts && python dolphin_wrapper.py -r '.$runGroupID.' 2 >&1 >> ../tmp/run.log &';
+        $output = shell_exec($command);
 }
 else if ($p == 'insertRunlist')
 {
