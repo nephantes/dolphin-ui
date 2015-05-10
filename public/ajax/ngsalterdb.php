@@ -29,6 +29,8 @@ if ($p == "submitPipeline" )
 	VALUES (-1, '$outdir', 0, 0, '$json', '$name', '$desc')");
 	//need to grab the id for runlist insertion
 	$idKey=$query->queryAVal("SELECT id FROM biocore.ngs_runparams WHERE run_group_id = -1");
+        $cmd = 'cd ../../scripts && python dolphin_wrapper.py -r '.$idKey.' 2 >&1 >> ../tmp/run.log &';
+        pclose(popen( $cmd, "r"));
 	//update required to make run_group_id equal to it's primary key "id".Replace the arbitrary -1 with the id
 	if (isset($_POST['runid'])){$runGroupID = $_POST['runid'];}
 	if( $runGroupID == 'new'){
@@ -38,8 +40,6 @@ if ($p == "submitPipeline" )
 		$idKey= $idKey - $runGroupID;
 	}
 	$data=$idKey;
-        $command = 'cd ../../scripts && python dolphin_wrapper.py -r '.$runGroupID.' 2 >&1 >> ../tmp/run.log &';
-        $output = shell_exec($command);
 }
 else if ($p == 'insertRunlist')
 {
