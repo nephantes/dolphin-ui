@@ -348,7 +348,7 @@ function submitPipeline(type) {
 }
 
 function sendToFastlane(){
-	window.location.href = "/dolphin/pipeline/fastlane/" + checklist_samples + "$";
+	window.location.href = "/dolphin/fastlane";
 }
 
 function sendToStatus(){

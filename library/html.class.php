@@ -525,19 +525,22 @@ e range"><i class="fa fa-calendar"></i></button>
 				</div><!-- /.box-header -->
 				<div class="box-body">
 					<div class="input-group margin col-md-11">
-						<form role="form">
-							<div class="form-group">';
+						<form role="form">';
 	if ($selection == "TEXT"){
-	$html.= 						'<input type="text" class="form-control" id="'.$id.'">';
-	}
-	else
-	{
-	$html.=							'<select class="form-control" id="'.$id.'">
+		$html.= 						'<input type="text" class="form-control" id="'.$id.'">';
+	}else if($selection == "TEXTBOX"){
+		if($id == 'input_files'){
+				$placeholder = "Paired End Example:\nlibrary_name_rep1 lib_rep1_R1.fastq lib_rep1_R2.fastq\nSingle End Example:\nlibrary_name_rep1 lib_rep1.fastq";
+		}else{
+				$placeholder = "...";
+		}
+		$html.=							'<textarea id="'.$id.'" type="text" class="form-control" rows="5" placeholder="'.$placeholder.'"></textarea>';
+	}else{
+		$html.=							'<select class="form-control" id="'.$id.'">
 									'.$selection.'
 								</select>';
 	}	
-	$html.= 						'</div>
-						</form>
+	$html.= 						'</form>
 					</div>
 				</div><!-- /.box-body -->
 			</div><!-- /.box -->
