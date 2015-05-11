@@ -1,24 +1,31 @@
 <?php
- 
 /** Configuration Variables **/
+/** If DOLPHIN_PARAMS_SECTION environment variable set into any parameter section in config.ini file 
+The configuration parameters will be read from that section**/
+
+$param_section = "Default";
+
+if (!empty(getenv('DOLPHIN_PARAMS_SECTION'))){
+   $param_section=getenv('DOLPHIN_PARAMS_SECTION');
+}
  
+$ini = parse_ini_file("config.ini", true);
+$ini_array = $ini[$param_section];
+
 define ('DEVELOPMENT_ENVIRONMENT',true);
 
-date_default_timezone_set('America/New_York');
+date_default_timezone_set($ini_array['TIMEZONE']);
 
-
-define('DB_NAME', 'biocore');
-define('DB_USER', 'bioinfo');
-define('DB_PASSWORD', 'bioinfo2013');
-#define('DB_HOST', 'galaxy.umassmed.edu');
-define('DB_HOST', 'localhost');
+define('DB_NAME', $ini_array['DB_NAME']);
+define('DB_USER', $ini_array['DB_USER']);
+define('DB_PASSWORD', $ini_array['DB_PASSWORD']);
+define('DB_HOST', $ini_array['DB_HOST']);
 if (!isset($_SESSION) || !is_array($_SESSION)) session_start();
 if (isset($_SESSION['user']))
 {
-define('USERNAME', $_SESSION['user']);
-define('UID', $_SESSION['uid']);
+  define('USERNAME', $_SESSION['user']);
+  define('UID', $_SESSION['uid']);
 }
 
-#define('BASE_PATH','http://biocore.umassmed.edu/dolphin');
-#define('BASE_PATH','http://dolphin.umassmed.edu:8080/dolphin');
-define('BASE_PATH','http://127.0.0.1/dolphin');
+define('BASE_PATH', $ini_array['BASE_PATH']);
+

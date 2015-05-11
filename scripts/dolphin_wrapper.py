@@ -13,6 +13,7 @@ from os import system
 import subprocess
 from subprocess import Popen, PIPE
 import json
+import ConfigParser
 
 warnings.filterwarnings('ignore', '.*the sets module is deprecated.*',
          DeprecationWarning, 'MySQLdb')
@@ -21,6 +22,8 @@ from workflowdefs import *
 
 bin_dir = dirname(argv[0])
 cmd = 'python %(dolphin_tools_dir)s/runWorkflow.py -i %(input_fn)s -d %(galaxyhost)s -w %(workflow)s -p %(dolphin_default_params)s/Dolphin_v1.3_default.txt -u %(username)s -o %(outdir)s'
+Config = ConfigParser.ConfigParser()
+params_section = 'Default'
 
 
 gbuild = {
@@ -36,13 +39,12 @@ gbuild = {
 }
 
 def runSQL(sql):
-    port=3306
     db = MySQLdb.connect(
-      host = 'localhost',
-      user = 'bioinfo',
-      passwd = 'bioinfo2013',
-      db = 'biocore',
-      port = port)
+      host = Config.get(params_section, "db_host"),
+      user = Config.get(params_section, "db_user"),
+      passwd = Config.get(params_section, "db_password"),
+      db = Config.get(params_section, "db_name"),
+      port = int(Config.get(params_section, "db_port")))
     try:
       cursor = db.cursor()
       cursor.execute(sql)
@@ -170,8 +172,13 @@ def main():
         if (not rpid):
            rpid=-1
 
+        Config.read("../config/config.ini")
+        #print Config.get("Docker", "db_name")
+        params_section = "Default"
+        if (os.environ.has_key('DOLPHIN_PARAMS_SECTION')):
+            params_section=os.environ['DOLPHIN_PARAMS_SECTION']
+        
         runparamsids=getRunParamsID(rpid)
-
         for runparams_arr in runparamsids:
            runparamsid=runparams_arr[0]
            username=runparams_arr[1]
@@ -246,12 +253,13 @@ def main():
 
            write_workflow(resume, gettotalreads, backupS3, runparamsid, customind, commonind, pipeline, barcodes, fastqc, adapter, quality, trim, split, workflow, clean)
 
-           galaxyhost='localhost'
-           dolphin_tools_dir=os.environ["DOLPHIN_TOOLS_PATH"]+"/src"
-           dolphin_default_params=os.environ["DOLPHIN_TOOLS_PATH"]+"/default_params"
+           galaxyhost=Config.get(params_section, "galaxyhost")
+           dolphin_tools_dir=Config.get(params_section, "dolphin_tools_src_path") 
+           dolphin_default_params=Config.get(params_section, "dolphin_default_params_path")
 
            print cmd % locals()
            print "\n\n\n"
+           '''
            p = subprocess.Popen(cmd % locals(), shell=True, stdout=subprocess.PIPE)
 
            for line in p.stdout:
@@ -259,7 +267,7 @@ def main():
               p.stdout.flush()
               if (re.search('failed\n', line) or re.search('Err\n', line) ):
                 stop_err("failed")
-
+           '''
    except Exception, ex:
         stop_err('Error running dolphin_wrapper.py\n' + str(ex))
 
