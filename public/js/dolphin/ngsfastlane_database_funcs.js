@@ -188,9 +188,20 @@ function checkFastlaneInput(info_array){
 				}
 			}
 		}
-		
+
 		//	Insert directory information
+		insertDirectories(input_array[5], input_array[7], input_array[8]);
+		input_directory_id = directoryCheck(input_array[5], input_array[7], input_array[8]);
 		
+		//	Insert temp files
+		for(var g = 0; g < sample_ids.length; g++){
+			if (input_array[g].length == 2) {
+				insertTempSampleFiles(input_array[g][1], sample_ids[g], input_directory_id);
+			}else{
+				insertTempSampleFiles(input_array[g][1], sample_ids[g], input_directory_id);
+				insertTempSampleFiles(input_array[g][2], sample_ids[g], input_directory_id);
+			}
+		}
 		return sample_ids;
 	}
 }
@@ -235,6 +246,30 @@ function insertSample(experiment_id, lane_id, sample_name, organism, barcode){
 	return id;
 }
 
+function insertDirectories(input, backup, amazon){
+	$.ajax({
+			type: 	'POST',
+			url: 	'/dolphin/public/ajax/ngsfastlanedb.php',
+			data:  	{ p: 'insertDirectories', input: input, backup: backup, amazon: amazon },
+			async:	false,
+			success: function(s)
+			{
+			}
+	});
+}
+
+function insertTempSampleFiles(filename, sample_id, input_directory_id){
+	$.ajax({
+			type: 	'POST',
+			url: 	'/dolphin/public/ajax/ngsfastlanedb.php',
+			data:  	{ p: 'insertTempSample', filename: filename, sample_id: sample_id, input: input_directory_id },
+			async:	false,
+			success: function(s)
+			{
+			}
+	});
+}
+
 function experimentSeriesCheck(experiment_name){
 	var id;
 	$.ajax({
@@ -271,6 +306,21 @@ function sampleCheck(experiment_id, lane_id, sample_name){
 			type: 	'GET',
 			url: 	'/dolphin/public/ajax/ngsfastlanedb.php',
 			data:  	{ p: 'sampleCheck', experiment: experiment_id, lane: lane_id, sample: sample_name },
+			async:	false,
+			success: function(s)
+			{
+				id = s;
+			}
+	});
+	return id;
+}
+
+function directoryCheck(input, backup, amazon){
+	var id;
+	$.ajax({
+			type: 	'GET',
+			url: 	'/dolphin/public/ajax/ngsfastlanedb.php',
+			data:  	{ p: 'directoryCheck', input: input, backup: backup, amazon: amazon},
 			async:	false,
 			success: function(s)
 			{
