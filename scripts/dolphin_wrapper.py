@@ -13,6 +13,7 @@ from os import system
 import subprocess
 from subprocess import Popen, PIPE
 import json
+import ConfigParser
 
 warnings.filterwarnings('ignore', '.*the sets module is deprecated.*',
          DeprecationWarning, 'MySQLdb')
@@ -21,6 +22,8 @@ from workflowdefs import *
 
 bin_dir = dirname(argv[0])
 cmd = 'python %(dolphin_tools_dir)s/runWorkflow.py -i %(input_fn)s -d %(galaxyhost)s -w %(workflow)s -p %(dolphin_default_params)s/Dolphin_v1.3_default.txt -u %(username)s -o %(outdir)s'
+Config = ConfigParser.ConfigParser()
+params_section = 'Default'
 
 
 gbuild = {
@@ -36,13 +39,12 @@ gbuild = {
 }
 
 def runSQL(sql):
-    port=3306
     db = MySQLdb.connect(
-      host = 'localhost',
-      user = 'bioinfo',
-      passwd = 'bioinfo2013',
-      db = 'biocore',
-      port = port)
+      host = Config.get(params_section, "db_host"),
+      user = Config.get(params_section, "db_user"),
+      passwd = Config.get(params_section, "db_password"),
+      db = Config.get(params_section, "db_name"),
+      port = int(Config.get(params_section, "db_port")))
     try:
       cursor = db.cursor()
       cursor.execute(sql)
@@ -100,11 +102,11 @@ def getDirs(runparamsid, isbarcode):
     return results[0]
 
 def getSampleList(runparamsid):
-    tablename="ngs_temp_sample_files"
+    tablename="ngs_fastq_files"
     sql = "SELECT s.name, s.adapter, s.genotype, s.name, ts.file_name FROM biocore.ngs_runparams nrp, biocore.ngs_runlist nr, biocore.ngs_samples s, biocore.%(tablename)s ts, biocore.ngs_dirs d where nr.run_id=nrp.id and nr.sample_id=s.id and nrp.run_status=0 and s.id=ts.sample_id and d.id=ts.dir_id and nr.run_id='"+str(runparamsid)+"';"
     samplelist=runSQL(sql%locals())
     if (not samplelist):
-        tablename="ngs_fastq_files"
+        tablename="ngs_temp_sample_files"
         samplelist=runSQL(sql%locals())
     return getInputParams(samplelist)
 
@@ -120,14 +122,13 @@ def getInputParams(samplelist):
     return (spaired, inputparams)
 
 def getLaneList(runparamsid):
-
+    tablename="ngs_fastq_files"
     sql = "SELECT DISTINCT %(fields)s FROM biocore.ngs_runlist nrl, biocore.ngs_runparams nrp, biocore.ngs_samples s, biocore.%(tablename)s tl where nrl.run_id=nrp.run_id and nrp.run_status=0 and s.lane_id = tl.lane_id and s.id=nrl.sample_id and nrp.id='"+str(runparamsid)+"';"
     fields='tl.file_name'
-    tablename="ngs_temp_lane_files"
 
     result=runSQL(sql%locals())
     if (not result):
-        tablename="ngs_fastq_files"
+        tablename="ngs_temp_lane_files"
         result=runSQL(sql%locals())
 
     inputparams=""
@@ -162,15 +163,22 @@ def main():
          #define options
         parser = OptionParser()
         parser.add_option("-r", "--rungroupid", dest="rpid")
+        parser.add_option("-b", "--backup", dest="backup")
         # parse
         options, args = parser.parse_args()
         # retrieve options
         rpid    = options.rpid
+        BACKUP    = options.backup
         if (not rpid):
            rpid=-1
 
+        Config.read("../config/config.ini")
+        #print Config.get("Docker", "db_name")
+        params_section = "Default"
+        if (os.environ.has_key('DOLPHIN_PARAMS_SECTION')):
+            params_section=os.environ['DOLPHIN_PARAMS_SECTION']
+        
         runparamsids=getRunParamsID(rpid)
-
         for runparams_arr in runparamsids:
            runparamsid=runparams_arr[0]
            username=runparams_arr[1]
@@ -179,7 +187,7 @@ def main():
 
            amazon = getAmazonCredentials(username)
            backupS3=None
-           if (amazon != ()):
+           if (amazon != () and BACKUP):
               backupS3     = "Yes"
 
            (inputdir, backup_dir, amazon_bucket, outdir, organism, library_type) = getDirs(runparamsid, isbarcode)
@@ -245,12 +253,13 @@ def main():
 
            write_workflow(resume, gettotalreads, backupS3, runparamsid, customind, commonind, pipeline, barcodes, fastqc, adapter, quality, trim, split, workflow, clean)
 
-           galaxyhost='localhost'
-           dolphin_tools_dir=os.environ["DOLPHIN_TOOLS_PATH"]+"/src"
-           dolphin_default_params=os.environ["DOLPHIN_TOOLS_PATH"]+"/default_params"
+           galaxyhost=Config.get(params_section, "galaxyhost")
+           dolphin_tools_dir=Config.get(params_section, "dolphin_tools_src_path") 
+           dolphin_default_params=Config.get(params_section, "dolphin_default_params_path")
 
            print cmd % locals()
            print "\n\n\n"
+           '''
            p = subprocess.Popen(cmd % locals(), shell=True, stdout=subprocess.PIPE)
 
            for line in p.stdout:
@@ -258,7 +267,7 @@ def main():
               p.stdout.flush()
               if (re.search('failed\n', line) or re.search('Err\n', line) ):
                 stop_err("failed")
-
+           '''
    except Exception, ex:
         stop_err('Error running dolphin_wrapper.py\n' + str(ex))
 
@@ -325,16 +334,16 @@ def write_input( input_fn, data_dir, content,genomebuild,spaired,barcodes,adapte
      print >>fp, '@PREVIOUSSPLIT=NONE'
 
 
-   if (commonind):
+   if (commonind and commonind.lower() != 'none'):
      arr=re.split(r'[,:]+', parse_content(commonind))
 
      for i in arr:
        if(len(i)>1):
-           default_bowtie_params="@DEFBOWTIE2PARAM"
-           default_description="@DEFDESCRIPTION"
+          default_bowtie_params="@DEFBOWTIE2PARAM"
+          default_description="@DEFDESCRIPTION"
        print >>fp, '@PARAM%s=@GCOMMONDB/%s/%s,%s,%s,%s,1,%s'%(i,i,i,i,default_bowtie_params,default_description,previous)
        if (i != "ucsc" and i != gb[1]):
-           previous=i
+          previous=i
 
      if (advparams):
         print >>fp, '@ADVPARAMS=%s'%(parse_content(advparams))
@@ -342,7 +351,7 @@ def write_input( input_fn, data_dir, content,genomebuild,spaired,barcodes,adapte
         print >>fp, '@ADVPARAMS=NONE'
 
    mapnames=commonind
-   if (not mapnames):
+   if (not mapnames or mapnames.lower() == 'none'):
       mapnames="";
    if (customind):
       for i in customind:
@@ -400,10 +409,10 @@ def write_input( input_fn, data_dir, content,genomebuild,spaired,barcodes,adapte
            print >>fp, '@GSIZE=%s'%(remove_space(str(arr[5])));
 
 
-           print >>fp, '@MAPNAMES=%s'%(mapnames)
-           print >>fp, '@PREVIOUSPIPE=%s'%(previous)
+       print >>fp, '@MAPNAMES=%s'%(mapnames)
+       print >>fp, '@PREVIOUSPIPE=%s'%(previous)
 
-           fp.close()
+       fp.close()
 
 def write_workflow( resume, gettotalreads, backupS3, runparamsid, customind, commonind, pipeline, barcodes, fastqc, adapter, quality, trim, split, file, clean ):
    fp = open ( file, 'w')
@@ -441,7 +450,7 @@ def write_workflow( resume, gettotalreads, backupS3, runparamsid, customind, com
       stepline=stepTrim % locals()
       print >>fp, '%s'%stepline
 
-   if (commonind):
+   if (commonind and commonind.lower() != 'none'):
 
       arr=re.split(r'[,:]+', parse_content(commonind))
 
@@ -489,12 +498,12 @@ def write_workflow( resume, gettotalreads, backupS3, runparamsid, customind, com
             stepline=stepRSEMCount % locals()
             print >>fp, '%s'%stepline
             igv=arr[2]
-            if (igv=="Yes"):
+            if (igv.lower()=="yes"):
                type="RSEM"
                stepline=stepIGVTDF % locals()
                print >>fp, '%s'%stepline
             bam2bw=arr[3]
-            if (bam2bw=="Yes"):
+            if (bam2bw.lower()=="yes"):
                type="RSEM"
                stepline=stepBam2BW % locals()
                print >>fp, '%s'%stepline
@@ -503,12 +512,12 @@ def write_workflow( resume, gettotalreads, backupS3, runparamsid, customind, com
             stepline=stepTophat % locals()
             print >>fp, '%s'%stepline
             igv=arr[2]
-            if (igv=="Yes"):
+            if (igv.lower()=="yes"):
                type="Tophat"
                stepline=stepIGVTDF % locals()
                print >>fp, '%s'%stepline
             bam2bw=arr[3]
-            if (bam2bw=="Yes"):
+            if (bam2bw.lower()=="yes"):
                type="Tophat"
                stepline=stepBam2BW % locals()
                print >>fp, '%s'%stepline
@@ -533,7 +542,7 @@ def write_workflow( resume, gettotalreads, backupS3, runparamsid, customind, com
             print >>fp, '%s'%stepline
 
             igv=str(arr[6])
-            if (igv=="Yes"):
+            if (igv.lower()=="yes"):
                 type="chip"
                 if (split):
                     type="mergechip"
@@ -541,7 +550,7 @@ def write_workflow( resume, gettotalreads, backupS3, runparamsid, customind, com
                 print >>fp, '%s'%stepline
 
             bam2bw=str(arr[7])
-            if (bam2bw=="Yes"):
+            if (bam2bw.lower()=="yes"):
                 type="chip"
                 if (split):
                     type="mergechip"
