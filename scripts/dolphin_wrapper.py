@@ -100,11 +100,11 @@ def getDirs(runparamsid, isbarcode):
     return results[0]
 
 def getSampleList(runparamsid):
-    tablename="ngs_temp_sample_files"
+    tablename="ngs_fastq_files"
     sql = "SELECT s.name, s.adapter, s.genotype, s.name, ts.file_name FROM biocore.ngs_runparams nrp, biocore.ngs_runlist nr, biocore.ngs_samples s, biocore.%(tablename)s ts, biocore.ngs_dirs d where nr.run_id=nrp.id and nr.sample_id=s.id and nrp.run_status=0 and s.id=ts.sample_id and d.id=ts.dir_id and nr.run_id='"+str(runparamsid)+"';"
     samplelist=runSQL(sql%locals())
     if (not samplelist):
-        tablename="ngs_fastq_files"
+        tablename="ngs_temp_sample_files"
         samplelist=runSQL(sql%locals())
     return getInputParams(samplelist)
 
@@ -120,14 +120,13 @@ def getInputParams(samplelist):
     return (spaired, inputparams)
 
 def getLaneList(runparamsid):
-
+    tablename="ngs_fastq_files"
     sql = "SELECT DISTINCT %(fields)s FROM biocore.ngs_runlist nrl, biocore.ngs_runparams nrp, biocore.ngs_samples s, biocore.%(tablename)s tl where nrl.run_id=nrp.run_id and nrp.run_status=0 and s.lane_id = tl.lane_id and s.id=nrl.sample_id and nrp.id='"+str(runparamsid)+"';"
     fields='tl.file_name'
-    tablename="ngs_temp_lane_files"
 
     result=runSQL(sql%locals())
     if (not result):
-        tablename="ngs_fastq_files"
+        tablename="ngs_temp_lane_files"
         result=runSQL(sql%locals())
 
     inputparams=""
@@ -162,10 +161,12 @@ def main():
          #define options
         parser = OptionParser()
         parser.add_option("-r", "--rungroupid", dest="rpid")
+        parser.add_option("-b", "--backup", dest="backup")
         # parse
         options, args = parser.parse_args()
         # retrieve options
         rpid    = options.rpid
+        BACKUP    = options.backup
         if (not rpid):
            rpid=-1
 
@@ -179,7 +180,7 @@ def main():
 
            amazon = getAmazonCredentials(username)
            backupS3=None
-           if (amazon != ()):
+           if (amazon != () and BACKUP):
               backupS3     = "Yes"
 
            (inputdir, backup_dir, amazon_bucket, outdir, organism, library_type) = getDirs(runparamsid, isbarcode)
