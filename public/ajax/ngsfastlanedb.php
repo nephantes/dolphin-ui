@@ -9,6 +9,8 @@ require_once("../../includes/dbfuncs.php");
 $query = new dbfuncs();
 //header
 
+$data = '';
+
 if (isset($_GET['p'])){$p = $_GET['p'];}
 if (isset($_POST['p'])){$p = $_POST['p'];}
 
@@ -65,6 +67,11 @@ if ($p == 'experimentSeriesCheck'){
 		VALUES ($experiment, $lane, '$sample', '$sample', '$barcode', '$organism',
 		".$_SESSION['uid'].", 1, 15, now(), now(), ".$_SESSION['uid'].");
 	");
+}else if ($p == 'sendProcessData'){
+	if (isset($_GET['info_array'])){$info_array = $_GET['info_array'];}
+	if (isset($_GET['post'])){$post = $_GET['post'];}
+	
+	$_SESSION[$post] = implode(",",$info_array);
 }
 
 //footer

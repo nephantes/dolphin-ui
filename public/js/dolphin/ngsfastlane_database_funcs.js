@@ -4,22 +4,23 @@
  *Ascription:
  */
 
+var bad_samples = [];
+
 function checkFastlaneInput(info_array){
 	//	Declair variables
 	var barcode_array = [];
 	var input_array = [];
-	var non_database_checks = [];
 	var database_checks = [];
+	var sample_ids = [];
 	
 	//	Non-database checks
 	//	For each input passed
 	for(var x = 0; x < (id_array.length - 1); x ++){
 		if (info_array[x] == '' && id_array[x] != 'amazon_bucket') {
 			//	Left a field blank
-			non_database_checks.push(false);
+			database_checks.push(false);
 		}else if (id_array[x] == 'barcode_sep' && info_array[x] == 'yes') {
 			//	Check Barcode Separation
-			alert(x);
 			var split_barcodes = info_array[id_array.length - 1].split('\n');
 			split_check = true;
 			for (var y = 0; y < split_barcodes.length; y++) {
@@ -32,27 +33,29 @@ function checkFastlaneInput(info_array){
 				}
 			}
 			if (split_check) {
-				non_database_checks.push(true);
+				database_checks.push(true);
 			}else{
-				non_database_checks.push(false);
+				database_checks.push(false);
 			}
 			
 		}else if (id_array[x] == 'input_files'){
 			//	Paired-end libraries
 			var split_inputs = info_array[6].split('\n');
+			var input_bool_check = true;
 			for (var y = 0; y < split_inputs.length; y++) {
 				var single_input_array = split_inputs[y].split(' ');
 				if (single_input_array.length != 3  && info_array[2] == 'yes') {
 					//	Not proper file input (paired end)
-					non_database_checks.push(false);
+					input_bool_check = false;
 				}else if (single_input_array.length != 2  && info_array[2] == 'no') {
 					//	Not proper file input (single end)
-					non_database_checks.push(false);
+					input_bool_check = false;
 				}else{
 					input_array.push(single_input_array);
-					non_database_checks.push(true);
 				}
 			}
+			database_checks.push(input_bool_check);
+			
 			//	Make sure barcodes add up
 			if (barcode_array.length > 0) {
 				var barcode_check_array = [];
@@ -66,24 +69,26 @@ function checkFastlaneInput(info_array){
 					barcode_check_array.push(input_check);
 				}
 				if (barcode_check_array.indexOf(false) > -1) {
-					non_database_checks.push(false);
+					database_checks.push(false);
 				}else{
-					non_database_checks.push(true);
+					database_checks.push(true);
 				}
+			}else{
+				database_checks.push(true);
 			}
 			
 		}else if (id_array[x] == 'lane_name' || id_array[x] == 'input_dir' || id_array[x] == 'backup_dir'){
 			//	Check inputs that should not contain whitespace
 			if (/\s/g.test(info_array[x])) {
 				//	Contains whitespace
-				non_database_checks.push(false);
+				database_checks.push(false);
 			}else{
-				non_database_checks.push(true);
+				database_checks.push(true);
 			}
 			
 		}else{
 			//	No errors
-			non_database_checks.push(true);
+			database_checks.push(true);
 		}
 	}
 	
@@ -98,17 +103,18 @@ function checkFastlaneInput(info_array){
 	
 	//	Samples
 	if (experiment_series_id > 0 && lane_id > 0) {
-		var alreadySamples = [];
+		var passed_samples = [];
 		for(z in input_array){
-			alert(sampleCheck(experiment_series_id, lane_id, z[0]))
-			if(sampleCheck(experiment_series_id, lane_id, z[0]) > 0){
-				alreadySamples.push(z[0]);
+			if(sampleCheck(experiment_series_id, lane_id, input_array[z][0]) == 0){
+				passed_samples.push(input_array[z][0]);
+			}else{
+				bad_samples.push(input_array[z][0]);
 			}
 		}
-		if (alreadySamples.length > 0) {
-			database_checks.push(true);
-		}else{
+		if (bad_samples.length > 0) {
 			database_checks.push(false);
+		}else{
+			database_checks.push(true);
 		}
 	}else{
 		database_checks.push(true);
@@ -119,9 +125,9 @@ function checkFastlaneInput(info_array){
 	//	Files
 		//	Make sure files are real?
 	
-	if (non_database_checks.indexOf(false) > -1 || database_checks.indexOf(false) > -1) {
+	if (database_checks.indexOf(false) > -1) {
 		//	Error in submission, do not submit into database
-		alert('Errors have occured');
+		return database_checks;
 	}else{
 		//	May submit into database
 		var organism = info_array[0].split(",")[0];
@@ -132,14 +138,14 @@ function checkFastlaneInput(info_array){
 				if (info_array[1] == 'yes') {
 					//	If seperating barcodes
 					for (var a = 0; a < input_array.length; a++) {
-						insertSample(experiment_series_id, lane_id, input_array[a][0],
-									organism, barcode_array[barcode_array.indexOf(input_array[x][0])][1]);
+						sample_ids.push(insertSample(experiment_series_id, lane_id, input_array[a][0],
+										organism, barcode_array[barcode_array.indexOf(input_array[x][0])][1]));
 					}
 				}else{
 					//	If not separating barcodes
 					for (var a = 0; a < input_array.length; a++) {
-						insertSample(experiment_series_id, lane_id, input_array[a][0],
-									organism, 'nobarcode');
+						sample_ids.push(insertSample(experiment_series_id, lane_id, input_array[a][0],
+										organism, 'nobarcode'));
 					}
 				}
 			}else{
@@ -149,14 +155,14 @@ function checkFastlaneInput(info_array){
 				if (info_array[1] == 'yes') {
 					//	If separating barcodes
 					for (var a = 0; a < input_array.length; a++) {
-						insertSample(experiment_series_id, lane_id, input_array[a][0],
-									organism, barcode_array[barcode_array.indexOf(input_array[x][0])][1]);
+						sample_ids.push(insertSample(experiment_series_id, lane_id, input_array[a][0],
+										organism, barcode_array[barcode_array.indexOf(input_array[x][0])][1]));
 					}
 				}else{
 					//	If not separating barcodes
 					for (var a = 0; a < input_array.length; a++) {
-						insertSample(experiment_series_id, lane_id, input_array[a][0],
-									organism, 'nobarcode');
+						sample_ids.push(insertSample(experiment_series_id, lane_id, input_array[a][0],
+										organism, 'nobarcode'));
 					}
 				}
 			}
@@ -171,19 +177,21 @@ function checkFastlaneInput(info_array){
 			if (info_array[1] == 'yes') {
 				//	If separating barcodes
 				for (var a = 0; a < input_array.length; a++) {
-					insertSample(experiment_series_id, lane_id, input_array[a][0],
-								organism, barcode_array[barcode_array.indexOf(input_array[x][0])][1]);
+					sample_ids.push(insertSample(experiment_series_id, lane_id, input_array[a][0],
+									organism, barcode_array[barcode_array.indexOf(input_array[x][0])][1]));
 				}
 			}else{
 				//	If not separating barcodes
 				for (var a = 0; a < input_array.length; a++) {
-					insertSample(experiment_series_id, lane_id, input_array[a][0],
-								organism, 'nobarcode');
+					sample_ids.push(insertSample(experiment_series_id, lane_id, input_array[a][0],
+									organism, 'nobarcode'));
 				}
 			}
 		}
 		
 		//	Insert directory information
+		
+		return sample_ids;
 	}
 }
 
@@ -212,6 +220,7 @@ function insertLane(experiment_id, lane_name){
 }
 
 function insertSample(experiment_id, lane_id, sample_name, organism, barcode){
+	var id;
 	$.ajax({
 			type: 	'POST',
 			url: 	'/dolphin/public/ajax/ngsfastlanedb.php',
@@ -222,6 +231,8 @@ function insertSample(experiment_id, lane_id, sample_name, organism, barcode){
 			{
 			}
 	});
+	id = sampleCheck(experiment_id, lane_id, sample_name)
+	return id;
 }
 
 function experimentSeriesCheck(experiment_name){
@@ -267,5 +278,21 @@ function sampleCheck(experiment_id, lane_id, sample_name){
 			}
 	});
 	return id;
+}
+
+function sendProcessData(info_array, post_name){
+	$.ajax({
+			type: 	'GET',
+			url: 	'/dolphin/public/ajax/ngsfastlanedb.php',
+			data:  	{ p: 'sendProcessData', info_array: info_array, post: post_name},
+			async:	false,
+			success: function(s)
+			{
+			}
+	});
+}
+
+function getBadSamples(){
+	return bad_samples;
 }
 

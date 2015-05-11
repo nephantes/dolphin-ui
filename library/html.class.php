@@ -525,8 +525,7 @@ e range"><i class="fa fa-calendar"></i></button>
 				</div><!-- /.box-header -->
 				<div class="box-body">
 					<div class="input-group margin col-md-11">
-						<form role="form">
-							<div class="form-group">';
+						<form role="form">';
 	if ($selection == "TEXT"){
 		$html.= 						'<input type="text" class="form-control" id="'.$id.'">';
 	}else if($selection == "TEXTBOX"){
@@ -541,8 +540,7 @@ e range"><i class="fa fa-calendar"></i></button>
 									'.$selection.'
 								</select>';
 	}	
-	$html.= 						'</div>
-						</form>
+	$html.= 						'</form>
 					</div>
 				</div><!-- /.box-body -->
 			</div><!-- /.box -->

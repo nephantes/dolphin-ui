@@ -53,9 +53,22 @@ function submitFastlaneButton() {
 			value_array.push((document.getElementById(id_array[x]).value).trim());
 		}
 	}
-	postFastlane(value_array);
+	
+	sendProcessData(value_array, 'fastlane_values');
+	var checked_values = checkFastlaneInput(value_array);
+	sendProcessData(checked_values, 'pass_fail_values');
+	var bad_samples = getBadSamples();
+	sendProcessData(bad_samples, 'bad_samples');
 }
 
-function postFastlane(info_array) {
-	checkFastlaneInput(info_array);
+function backToFastlane(){
+	window.history.back();
+}
+
+function sentToNewFastlane() {
+	window.location.href = "/dolphin/fastlane";
+}
+
+function fastlaneToPipeline(sample_ids){
+	window.location.href = "/dolphin/pipeline/selected/" + sample_ids + "$";
 }
