@@ -474,7 +474,6 @@ e range"><i class="fa fa-calendar"></i></button>
 	$html = '';
 	$html.= '<div id="btn-group">';
 	$html.= '<input type="button" class="btn btn-primary" name="pipeline_button" value="Send to Pipeline" onClick="submitSelected();"/>
-		<input type="button" class="btn btn-primary" name="fastlane_button" value="Send to Fastlane" onClick="sendToFastlane()"/>
 		<input type="button" class="btn btn-primary" name="send_to_status_button" value="Pipeline Status" onClick="sendToStatus()"/>';
 	$html.= '</div>';
 	return $html;

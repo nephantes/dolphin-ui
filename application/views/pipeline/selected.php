@@ -51,13 +51,13 @@
 			<?php echo $html->endExpandingSelectionBox()?>
 
 			<?php echo $html->startExpandingSelectionBox(6)?>
-						<?php echo $html->getExpandingCommonRNABox("Common RNAs", "commonind", 7, 12, ["ercc","rRNA","miRNA","tRNA","snRNA","rmsk","genome"],
-																	[["no","yes"],["no","yes"],["no","yes"],["no","yes"],["no","yes"],["no","yes"],["no","yes"]])?>
 						<?php echo $html->getExpandingSelectionBox("Split FastQ", "split", 1, 12, ["number of reads per file"], [["TEXT","5000000"]])?>
 						<?php echo $html->getExpandingSelectionBox("Quality Filtering", "quality", 5, 12, ["window size","required quality","leading","trailing","minlen"],
 																	[["TEXT","10"],["TEXT","15"],["TEXT","5"],["TEXT","5"],["TEXT","36"]])?>
 						<?php echo $html->getExpandingSelectionBox("Trimming", "trim", 3, 12, ["single or paired-end", "5 length 1", "3 length 1"],
 																	[["ONCHANGE", "single-end", "paired-end"],["TEXT","0"],["TEXT","0"]])?>
+						<?php echo $html->getExpandingCommonRNABox("Common RNAs", "commonind", 7, 12, ["ercc","rRNA","miRNA","tRNA","snRNA","rmsk","genome"],
+																	[["no","yes"],["no","yes"],["no","yes"],["no","yes"],["no","yes"],["no","yes"],["no","yes"]])?>
 			<?php echo $html->endExpandingSelectionBox()?>
 
 			<div class="col-md-12">
