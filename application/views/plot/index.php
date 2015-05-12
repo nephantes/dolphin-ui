@@ -22,7 +22,7 @@
 										<tr>
 											<td>X axis<br>(Log)<input type="checkbox" id="xi_scale" value="log scale" checked> </td>
 											<td>
-												<select type="text" id="xi"></select>
+												<select type="text" id="xi" class="form-control"></select>
 											</td>
 										</tr>
 										<tr>
@@ -30,23 +30,23 @@
 											(Log)<input type="checkbox" id="yi_scale" value="log scale" checked> 
 											</td>
 											<td>
-												<select type="text" id="yi"></select>
+												<select type="text" id="yi" class="form-control"></select>
 											</td>
 										</tr>
 										<tr>
 											<td>Pseudo Count</td>
-											<td><input type="number" id="pseudocount" placeholder=1></input></td>
+											<td><input type="number" id="pseudocount" placeholder=1 class="form-control"></input></td>
 										</tr>
 										<tr>
 											<td> Color axis</td>
 											<td>
-												<select type="text" id="zi"></select>
+												<select type="text" id="zi" class="form-control"></select>
 											</td>
 										</tr>
 										<tr>
 											<td>Color axis type</td>
 											<td>
-												<select type="text" id="zi_type">
+												<select type="text" id="zi_type" class="form-control">
 													<option value="value">value</option>
 													<option value="category">category</option>
 												</select>
@@ -56,7 +56,7 @@
 											<td>Color axis threshold</td>
 											<td>
 												<label for=cutoff>Threshold</label>
-												<input id="zi_value_cutoff" type=range min=0 max=1 value=0.01 step=0.001 id=cutoff>
+												<input id="zi_value_cutoff" type=range min=0 max=1 value=0.01 step=0.001 id=cutoff class="form-control">
 											</td>
 										</tr>
 										<tr>
@@ -71,7 +71,7 @@
 												<label>Selected Columns</label>
 											</td>
 											<td>
-												<select id="selected_cols" size="8" multiple="multiple" tabindex="1"></select>
+												<select id="selected_cols" class="form-control" size="8" multiple="multiple" tabindex="1"></select>
 											</td>
 										</tr>
 										</tbody>
@@ -83,8 +83,8 @@
 											<br>
 										</div>
 										<div>
-											<input id="highlight_gene" type="button" class="btn btn-primary" value="submit"/>
-											<input id="reset_gene" type="button" class="btn btn-primary" value="reset"/>
+											<input id="highlight_gene" type="button" class="btn btn-primary" value="Submit"/>
+											<input id="reset_gene" type="button" class="btn btn-primary" value="Reset"/>
 										</div>
 									</div>
 									<div id="sconsole">
@@ -113,7 +113,7 @@
 									<div class="box-body">
 										<div id="canvas" class="margin"></div>
 										<div id="table">
-											<h2>Table</h2>
+											<h3>Table</h3>
 											<table id="output_table" class="table table-striped"></table>
 										</div>
 									</div><!-- /.box-body -->

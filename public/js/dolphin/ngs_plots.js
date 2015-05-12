@@ -143,17 +143,15 @@ $("#zi_value_cutoff").on("change",function(d) {
             heatmap(samples[1],"#heatmap2",n)
 */
             table(td,"#output_table_tbody")
-
-
-
-
         }
         var _render_table=function(d,el)
         {
             var sl=d3.select(el).selectAll(".td").data(d)
+            
             sl.selectAll("td")
                     .data(function(d0,i){return d0})
                     .text(function(d,i) {if (i==2 || i==3 ) {return Math.round(d.v*100)/100} else {return d.v}})
+            
             sl.enter()
                     .append("tr")
                     .attr("class","td")
@@ -163,12 +161,12 @@ $("#zi_value_cutoff").on("change",function(d) {
                     .append("td")
                     .text(function(d,i){if (i==2 || i==3 ) {return Math.round(d.v*100)/100} else {return d.v}})
             sl.exit().remove();
-
+            
             var $table = $('#output_table'),
                     $headCells = $table.find('thead tr:first').children(),
                     headColWidth,bodyColWidth,colWidth,
                     $bodyCells = $table.find('tbody tr:first').children();
-
+            
 // Adjust the width of thead cells when window resizes
             $(window).resize(function() {
                 // Get the tbody columns width array
@@ -188,33 +186,29 @@ $("#zi_value_cutoff").on("change",function(d) {
                     {
                         colWidth.push(bodyColWidth[i])
                     }
-
                 }
                 var s=0; for(i in colWidth) {s+=colWidth[i]};
                 // Set the width of tbody columns
                 $table.find('tbody tr').children().each(function(i, v) {
                     $(v).width(colWidth[i%colWidth.length]);
 
-
                 });
                 $table.find('thead tr').children().each(function(i, v) {
                            $(v).width(colWidth[i]);
-
-
                         } );
                 // $table.setAttribute("width",s+50)
 
                 ;
             }).resize(); // Trigger resize handler
-
+            
         }
         var table=function(d,el) {
-
+            
             if(d.length>100)
             {
                 var sl=d3.select(el).selectAll(".td").data([]).exit().remove();
                 _render_table(d.slice(0,100),el);
-                var a=d3.select("#table").selectAll("button").data(["show all table"]).enter().append("button").attr("value",function(d0){return d0}).text(function(d0){return d0});
+                var a=d3.select("#table").selectAll("button").data(["Show entire table"]).enter().append("button").attr("value",function(d0){return d0}).attr("class", "btn btn-primary").text(function(d0){return d0});
                 a.data(["show_table"]).on("click",function(d0){_render_table(d,el);d3.select(this).remove();})
             }
             else
@@ -222,8 +216,6 @@ $("#zi_value_cutoff").on("change",function(d) {
                 d3.select("#table").selectAll("button").remove();
                 _render_table(d,el);
             }
-
-
         }
         var mouseoverHandler = function (d) {
 
@@ -249,7 +241,6 @@ $("#zi_value_cutoff").on("change",function(d) {
             })
             
             bar(values,"#barplot1",colnames,a[0].v);
-            
             
         }
         var legendMouseoverHandler = function (array, name) {
