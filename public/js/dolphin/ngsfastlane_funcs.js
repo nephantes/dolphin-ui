@@ -41,8 +41,11 @@ function expandBarcodeSep(){
 		box.appendChild(box_body);
 		master.appendChild(box);
 		barcodeDiv.appendChild(master);
+		
+		document.getElementById('input_files').placeholder = "Paired End Example:\nlane_001_R1.fastq.gz lane_001_R2.fastq\nSingle End Example:\nlane_001.fastq.gz";
 	}else{
 		barcodeDiv.innerHTML = "";
+		document.getElementById('input_files').placeholder = "Paired End Example:\nlibrary_name_rep1 lib_rep1_R1.fastq.gz lib_rep1_R2.fastq.gz\nSingle End Example:\nlibrary_name_rep1 lib_rep1.fastq.gz";
 	}
 }
 
