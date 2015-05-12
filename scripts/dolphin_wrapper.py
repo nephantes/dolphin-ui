@@ -173,11 +173,11 @@ def main():
            rpid=-1
 
         Config.read("../config/config.ini")
-        #print Config.get("Docker", "db_name")
         params_section = "Default"
         if (os.environ.has_key('DOLPHIN_PARAMS_SECTION')):
             params_section=os.environ['DOLPHIN_PARAMS_SECTION']
-        
+        print params_section
+ 
         runparamsids=getRunParamsID(rpid)
         for runparams_arr in runparamsids:
            runparamsid=runparams_arr[0]
@@ -259,7 +259,6 @@ def main():
 
            print cmd % locals()
            print "\n\n\n"
-           '''
            p = subprocess.Popen(cmd % locals(), shell=True, stdout=subprocess.PIPE)
 
            for line in p.stdout:
@@ -267,7 +266,6 @@ def main():
               p.stdout.flush()
               if (re.search('failed\n', line) or re.search('Err\n', line) ):
                 stop_err("failed")
-           '''
    except Exception, ex:
         stop_err('Error running dolphin_wrapper.py\n' + str(ex))
 
@@ -450,11 +448,13 @@ def write_workflow( resume, gettotalreads, backupS3, runparamsid, customind, com
       stepline=stepTrim % locals()
       print >>fp, '%s'%stepline
 
+   countstep = False
    if (commonind and commonind.lower() != 'none'):
 
       arr=re.split(r'[,:]+', parse_content(commonind))
 
       for i in arr:
+         countstep = True
          if(len(i)>1):
            indexname=i
          stepline=stepSeqMapping % locals()
@@ -463,6 +463,7 @@ def write_workflow( resume, gettotalreads, backupS3, runparamsid, customind, com
 
    if (customind):
       for i in customind:
+         countstep = True
          arr=i.split(',')
          indexname=arr[1]
          stepline=stepSeqMapping % locals()
@@ -557,7 +558,7 @@ def write_workflow( resume, gettotalreads, backupS3, runparamsid, customind, com
                 stepline=stepBam2BW % locals()
                 print >>fp, '%s'%stepline
 
-   if (commonind or customind):
+   if (countstep):
       stepline=stepCounts % locals()
       print >>fp, '%s'%stepline
       stepline=stepMakeReport % locals()
