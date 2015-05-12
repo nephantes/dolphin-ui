@@ -210,6 +210,7 @@ def main():
            runparams = getRunParams(runparamsid)
 
            input_fn      = "../tmp/files/input.txt"
+           p = subprocess.Popen('mkdir -p ../tmp/files', shell=True, stdout=subprocess.PIPE)
 
            fastqc      = runparams.get('fastqc')
            adapter     = runparams.get('adapter')
