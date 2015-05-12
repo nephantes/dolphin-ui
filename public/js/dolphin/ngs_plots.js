@@ -79,7 +79,7 @@ $("#zi_value_cutoff").on("change",function(d) {
     $("#zi_value").html($("#zi_value_cutoff").val());
     view()})
 
-        var svg = d3.select("#canvas").append("svg").attr("id","svg").attr("height", 700).attr("width", 1800).attr("id", "svg");
+        var svg = d3.select("#canvas").append("svg").attr("id","svg").attr("height", 700).attr("width", 1200).attr("id", "svg");
         var xi, yi, zi;
         
         window.view = function () {
@@ -125,7 +125,7 @@ $("#zi_value_cutoff").on("change",function(d) {
                 td.push(a);
             })
             console.log(samples);
-            $("#console").html("Number: <b>"+ n.length+"</b><br>"+n.join());
+            $("#console").html("Number: <b>"+ n.length+"</b><br><textarea id='mytextarea' rows='24' class='form-control'>" + n.join() + "</textarea>");
             var m = {}
             d.forEach(function (d0) {
                 m[d0] = 1

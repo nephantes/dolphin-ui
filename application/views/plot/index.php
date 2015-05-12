@@ -16,7 +16,7 @@
 										<tr>
 											<td id="source_input"><b>Source</b><br><span style="font-size:8px">URL or Google Sheet ID</span></td>
 											<td>
-												 <textarea id="source" rows="5" cols="20" placeholder="http://galaxyweb.umassmed.edu/galaxy/ak97w/dene/all.tsv">http://galaxyweb.umassmed.edu/galaxy/ak97w/dene/alldetected.tsv</textarea>
+												 <textarea id="source" class="form-control" rows="5" cols="20" placeholder="http://galaxyweb.umassmed.edu/galaxy/ak97w/dene/all.tsv">http://galaxyweb.umassmed.edu/galaxy/ak97w/dene/alldetected.tsv</textarea>
 											</td>
 										</tr>
 										<tr>
@@ -64,31 +64,38 @@
 											<td>
 												<input type="hidden" id="sql" style="width:250px" placeholder="select * "></input>
 												<text id="zi_value"></text>
-												</td>
-												</tr>
+											</td>
+										</tr>
 										<tr>
-											<td></td>
 											<td>
 												<label>Selected Columns</label>
+											</td>
+											<td>
 												<select id="selected_cols" size="8" multiple="multiple" tabindex="1"></select>
 											</td>
 										</tr>
 										</tbody>
 									</table>
-									<h3>QUERY GENES</h3>
-									<textarea id="mytextarea" rows="10" cols="37"></textarea>
-									<input id="highlight_gene" type="button" value="submit"/>
-									<input id="reset_gene" type="button" value="reset"/>
-									<div id="sconsole">
-										<h2 id="gene_source">SOURCE</h2>
-									<div id="console"></div>
-									</div>
-										<div id="console2">
-											
+									<div>
+										<h3>Query Genes</h3>
+										<div>
+											<textarea id="mytextarea" class="form-control" rows="10"></textarea>
+											<br>
 										</div>
+										<div>
+											<input id="highlight_gene" type="button" class="btn btn-primary" value="submit"/>
+											<input id="reset_gene" type="button" class="btn btn-primary" value="reset"/>
+										</div>
+									</div>
+									<div id="sconsole">
+										<h3 id="gene_source">Selection Source</h3>
+										<div id="console">
+											<div id="console3"></div>
+										</div>
+									</div>
+										<div id="console2"></div>
 								</div>
-								
-								
+					
 								</form>
 								</div>
 							</div>
@@ -104,10 +111,10 @@
 								<!-- form start -->
 								<form>
 									<div class="box-body">
-										<div id="canvas"></div>
+										<div id="canvas" class="margin"></div>
 										<div id="table">
 											<h2>Table</h2>
-											<table id="output_table"></table>
+											<table id="output_table" class="table table-striped"></table>
 										</div>
 									</div><!-- /.box-body -->
 
