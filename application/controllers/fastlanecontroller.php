@@ -71,7 +71,7 @@ class FastlaneController extends VanillaController {
 		}else{
 			$text.= '<div>
 				<input type="button" class="btn btn-primary" value="Return to Fastlane" onclick="sentToNewFastlane()">
-				<input type="button" class="btn btn-primary" value="Send to Pipeline" onclick="fastlaneToPipeline('.$pass_fail_values.')">
+				<input type="button" class="btn btn-primary" value="Send to Pipeline" onclick="fastlaneToPipeline(\''.$pass_fail_values.'\')">
 				</div>';
 		}
 		

@@ -474,7 +474,6 @@ e range"><i class="fa fa-calendar"></i></button>
 	$html = '';
 	$html.= '<div id="btn-group">';
 	$html.= '<input type="button" class="btn btn-primary" name="pipeline_button" value="Send to Pipeline" onClick="submitSelected();"/>
-		<input type="button" class="btn btn-primary" name="fastlane_button" value="Send to Fastlane" onClick="sendToFastlane()"/>
 		<input type="button" class="btn btn-primary" name="send_to_status_button" value="Pipeline Status" onClick="sendToStatus()"/>';
 	$html.= '</div>';
 	return $html;
@@ -530,7 +529,7 @@ e range"><i class="fa fa-calendar"></i></button>
 		$html.= 						'<input type="text" class="form-control" id="'.$id.'">';
 	}else if($selection == "TEXTBOX"){
 		if($id == 'input_files'){
-				$placeholder = "Paired End Example:\nlibrary_name_rep1 lib_rep1_R1.fastq lib_rep1_R2.fastq\nSingle End Example:\nlibrary_name_rep1 lib_rep1.fastq";
+				$placeholder = "Paired End Example:\nlibrary_name_rep1 lib_rep1_R1.fastq.gz lib_rep1_R2.fastq.gz\nSingle End Example:\nlibrary_name_rep1 lib_rep1.fastq.gz";
 		}else{
 				$placeholder = "...";
 		}

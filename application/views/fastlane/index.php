@@ -32,7 +32,7 @@
 						<div id="barcode_div" class="col-md-12"></div>
 						<div id="name_div" class="col-md-9">
 							<?php echo $html->getStaticSelectionBox("Experiment Series Name", "series_name", "TEXT", 6)?>
-							<?php echo $html->getStaticSelectionBox("Experiment Name", "lane_name", "TEXT", 6)?>
+							<?php echo $html->getStaticSelectionBox("Experiment/Lane Name", "lane_name", "TEXT", 6)?>
 						</div>
 						<div id="input_files_div" class="col-md-12">
 							<?php echo $html->getStaticSelectionBox("Input Directory (Full path)", "input_dir", "TEXT", 9)?>
@@ -46,7 +46,6 @@
 					<div class="row">
 						<div class="col-md-12">
 							<input type="submit" name="submitted_fastlane" id="submit_fastlane" class="btn btn-primary" onclick="submitFastlaneButton()" innerHTML="Submit Fastlane"/>
-							<button type="submit" id="submit_fastlane" class="btn btn-primary" onClick="submitFastlaneButton()"/>Submit Fastlane</button>
 						</div>
 					</div><!-- /.row -->
 				</section><!-- /.content -->
