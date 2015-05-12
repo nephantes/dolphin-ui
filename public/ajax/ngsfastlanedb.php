@@ -81,10 +81,10 @@ if ($p == 'experimentSeriesCheck'){
 	if (isset($_POST['backup'])){$backup = $_POST['backup'];}
 	if (isset($_POST['amazon'])){$amazon = $_POST['amazon'];}
 	$data=$query->runSQL("
-	INSERT INTO ngs_samples
+	INSERT INTO ngs_dirs
 		(fastq_dir, backup_dir, amazon_bucket,
 		owner_id, group_id, perms, date_created, date_modified, last_modified_user)
-		VALUES ($input, $backup, '$amazon',
+		VALUES ('$input', '$backup', '$amazon',
 		".$_SESSION['uid'].", 1, 15, now(), now(), ".$_SESSION['uid'].");
 	");
 }else if ($p == 'insertTempSample'){
@@ -93,9 +93,20 @@ if ($p == 'experimentSeriesCheck'){
 	if (isset($_POST['input'])){$input = $_POST['input'];}
 	$data=$query->runSQL("
 	INSERT INTO ngs_temp_sample_files
-		(file_name, sample_id, dir_id
+		(file_name, sample_id, dir_id,
 		owner_id, group_id, perms, date_created, date_modified, last_modified_user)
-		VALUES ($filename, $sample_id, $input,
+		VALUES ('$filename', $sample_id, $input,
+		".$_SESSION['uid'].", 1, 15, now(), now(), ".$_SESSION['uid'].");
+	");
+}else if ($p == 'insertTempLane'){
+	if (isset($_POST['file_name'])){$file_name = $_POST['file_name'];}
+	if (isset($_POST['lane_id'])){$lane_id = $_POST['lane_id'];}
+	if (isset($_POST['dir_id'])){$dir_id = $_POST['dir_id'];}
+	$data=$query->runSQL("
+	INSERT INTO ngs_temp_lane_files
+		(file_name, lane_id, dir_id,
+		owner_id, group_id, perms, date_created, date_modified, last_modified_user)
+		VALUES ('$file_name', $lane_id, $dir_id,
 		".$_SESSION['uid'].", 1, 15, now(), now(), ".$_SESSION['uid'].");
 	");
 }else if ($p == 'sendProcessData'){

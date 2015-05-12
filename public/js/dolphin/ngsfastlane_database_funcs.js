@@ -199,16 +199,30 @@ function checkFastlaneInput(info_array){
 		}
 
 		//	Insert directory information
-		insertDirectories(input_array[5], input_array[7], input_array[8]);
-		input_directory_id = directoryCheck(input_array[5], input_array[7], input_array[8]);
+		insertDirectories(info_array[5], info_array[7], info_array[8]);
+		input_directory_id = directoryCheck(info_array[5], info_array[7], info_array[8]);
 		
 		//	Insert temp files
 		for(var g = 0; g < sample_ids.length; g++){
-			if (input_array[g].length == 2) {
-				insertTempSampleFiles(input_array[g][1], sample_ids[g], input_directory_id);
+			if (info_array[1] == 'yes') {
+				//	If Barcode sep
+				if (input_array[g].length == 2) {
+					insertTempLaneFiles(input_array[g][1], lane_id, input_directory_id);
+				}else{
+					var combined_files = input_array[g][1] + "," + input_array[g][2];
+					alert(combined_files);
+					alert(lane_id);
+					alert(input_directory_id);
+					insertTempLaneFiles(combined_files, lane_id, input_directory_id);
+				}
 			}else{
-				insertTempSampleFiles(input_array[g][1], sample_ids[g], input_directory_id);
-				insertTempSampleFiles(input_array[g][2], sample_ids[g], input_directory_id);
+				//	If no Barcode sep
+				if (input_array[g].length == 2) {
+					insertTempSampleFiles(input_array[g][1], sample_ids[g], input_directory_id);
+				}else{
+					insertTempSampleFiles(input_array[g][1], sample_ids[g], input_directory_id);
+					insertTempSampleFiles(input_array[g][2], sample_ids[g], input_directory_id);
+				}
 			}
 		}
 		return sample_ids;
@@ -272,6 +286,18 @@ function insertTempSampleFiles(filename, sample_id, input_directory_id){
 			type: 	'POST',
 			url: 	'/dolphin/public/ajax/ngsfastlanedb.php',
 			data:  	{ p: 'insertTempSample', filename: filename, sample_id: sample_id, input: input_directory_id },
+			async:	false,
+			success: function(s)
+			{
+			}
+	});
+}
+
+function insertTempLaneFiles(file_name, lane_id, dir_id){
+	$.ajax({
+			type: 	'POST',
+			url: 	'/dolphin/public/ajax/ngsfastlanedb.php',
+			data:  	{ p: 'insertTempLane', file_name: file_name, lane_id: lane_id, dir_id: dir_id },
 			async:	false,
 			success: function(s)
 			{
