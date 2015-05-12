@@ -160,6 +160,9 @@ def stop_err( msg ):
 # main
 def main():
    try:
+        tmpdir = '../tmp/files'
+        if not os.path.exists(tmpdir):
+           os.makedirs(tmpdir)
          #define options
         parser = OptionParser()
         parser.add_option("-r", "--rungroupid", dest="rpid")
@@ -210,6 +213,7 @@ def main():
            runparams = getRunParams(runparamsid)
 
            input_fn      = "../tmp/files/input.txt"
+
 
            fastqc      = runparams.get('fastqc')
            adapter     = runparams.get('adapter')
