@@ -1,8 +1,0 @@
-stepCheck	@RUNCHECK -i @INPUT -b @BARCODES -w @WKEY -p 24 -d @DBCOMMCMD -a @ADAPTER -t @TRIM -o @OUTDIR -r resume -s stepCheck -j @JGEN	1
-stepFastQC	@PERL @RUNFASTQC -b @BARCODES -o @OUTDIR -p @FASTQCPROG -s stepFastQC -j @JGEN	1
-stepMergeFastQC	@PERL @RUNFASTQCMERGE -o @OUTDIR	0
-stepRSEM	@RUNRSEM -c @RSEMCMD -r @RSEMREF -d @SPAIRED -pa @PARAMSRSEM -pr @PREVIOUSPIPE -o @OUTDIR -b @BOWTIEPATH -s stepRSEM -j @JRSEM	10
-stepRSEMCountgenestpm	@RUNRSEMCOUNT -o @OUTDIR -t tpm -g genes -s stepRSEMCountgenestpm -j @JGEN	0
-stepRSEMCountgenesexpected_count	@RUNRSEMCOUNT -o @OUTDIR -t expected_count -g genes -s stepRSEMCountgenesexpected_count -j @JGEN	0
-stepRSEMCountisoformstpm	@RUNRSEMCOUNT -o @OUTDIR -t tpm -g isoforms -s stepRSEMCountisoformstpm -j @JGEN	0
-stepRSEMCountisoformsexpected_count	@RUNRSEMCOUNT -o @OUTDIR -t expected_count -g isoforms -s stepRSEMCountisoformsexpected_count -j @JGEN	0
