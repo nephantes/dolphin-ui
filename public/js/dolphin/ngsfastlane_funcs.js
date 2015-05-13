@@ -17,34 +17,10 @@ function expandBarcodeSep(){
 	
 	//	Check the expand type
 	if (expandType == 'yes') {
-		//	Create Box
-		var master = createElement('div', ['class'], ['col-md-9']);
-		var box = createElement('div', ['class'], ['box box-default']);
-		//	Box Header
-		var box_head = createElement('div', ['class'], ['box-header with-border']);
-		var header = createElement('h3', ['class', 'value'], ['box-title', id_array[9]]);
-		header.innerHTML = id_array[9];
-		box_head.appendChild(header);
-		box.appendChild(box_head);
-		//	Box Body
-		var box_body = createElement('div', ['class'], ['box-body']);
-		var input_group = createElement('div', ['class'], ['input-group margin col-md-11']);
-		var form = createElement('form', ['role'], ['form']);
-		var form_group = createElement('div', ['class'], ['form-group']);
-		//	Textbox Generation
-		var	textbox = createElement('textarea', ['id', 'type', 'class', 'rows', 'placeholder'], [id_array[9], 'text', 'form-control', '5', 'lib_rep1 GATACA\nlib_rep2 CATATC ']);
-		form_group.appendChild(textbox);
-		//	Merge all the divs
-		form.appendChild(form_group);
-		input_group.appendChild(form);
-		box_body.appendChild(input_group);
-		box.appendChild(box_body);
-		master.appendChild(box);
-		barcodeDiv.appendChild(master);
-		
+		barcodeDiv.style.display = 'inline';
 		document.getElementById('input_files').placeholder = "Paired End Example:\nlane_001_R1.fastq.gz lane_001_R2.fastq\nSingle End Example:\nlane_001.fastq.gz";
 	}else{
-		barcodeDiv.innerHTML = "";
+		barcodeDiv.style.display = 'none';
 		document.getElementById('input_files').placeholder = "Paired End Example:\nlibrary_name_rep1 lib_rep1_R1.fastq.gz lib_rep1_R2.fastq.gz\nSingle End Example:\nlibrary_name_rep1 lib_rep1.fastq.gz";
 	}
 }
@@ -75,3 +51,10 @@ function sentToNewFastlane() {
 function fastlaneToPipeline(sample_ids){
 	window.location.href = "/dolphin/pipeline/selected/" + sample_ids + "$";
 }
+
+$(function() {
+	if(document.getElementById('barcode_sep').value == 'yes'){
+		var barcodeDiv = document.getElementById('barcode_div');
+		barcodeDiv.style.display = 'inline';
+	}
+});
