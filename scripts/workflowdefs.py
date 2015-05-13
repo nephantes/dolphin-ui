@@ -2,7 +2,7 @@
 stepCheck = 'stepCheck%(sep)s@RUNCHECK -i @INPUT -b @BARCODES -w @WKEY -p %(runparamsid)s -d @DBCOMMCMD -a @ADAPTER -t @TRIM -o @OUTDIR -r %(resume)s -s stepCheck -j @JGEN%(sep)s1'
 stepSeqMapping = 'stepSeqMapping%(indexname)s%(sep)s@RUNRECMAPPING -i @INPUT -a @AWKDIR -d @SPAIRED -m @SAMTOOLS -o @OUTDIR -b @PARAM%(indexname)s -c @BOWTIE2CMD -s stepSeqMapping%(indexname)s -r @ADVPARAMS -j @JMAPPING%(sep)s1'
 stepBarcode = 'stepBarcode%(sep)s@RUNBARCODE -i @INPUT -d @SPAIRED -b @BARCODES -o @OUTDIR -c @SINGLEBSPLITTERCMD:@PAIREDBSPLITTERCMD -s stepBarcode -j @JGEN%(sep)s1'
-stepGetTotalReads = 'stepGetTotalReads%(sep)s@RUNGETTOTALREADS -b @BARCODES -g %(runparamsid)s -p @SPAIRED -o @OUTDIR -u @USERNAME -j @JGEN%(sep)s10'
+stepGetTotalReads = 'stepGetTotalReads%(sep)s@RUNGETTOTALREADS -b @BARCODES -r %(runparamsid)s -p @SPAIRED -o @OUTDIR -u @USERNAME -j @JGEN%(sep)s10'
 stepBackupS3 = 'stepBackupS3%(sep)s@RUNBACKUPS3 -b @BARCODES -g %(runparamsid)s -p @SPAIRED -o @OUTDIR -u @USERNAME -j @JGEN%(sep)s10'
 stepFastQC = 'stepFastQC%(sep)s@PERL @RUNFASTQC -b @BARCODES -o @OUTDIR -p @FASTQCPROG -s stepFastQC -j @JGEN%(sep)s1'
 stepMergeFastQC = 'stepMergeFastQC%(sep)s@PERL @RUNFASTQCMERGE -p @PUBDIR -w @WKEY -o @OUTDIR%(sep)s0'
