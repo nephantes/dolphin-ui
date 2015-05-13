@@ -434,7 +434,7 @@ def write_workflow( resume, gettotalreads, backupS3, runparamsid, customind, com
        stepline=stepBackupS3 % locals()
        print >> fp, '%s'%stepline
 
-   if (fastqc and fastqc.lower() != 'none'):
+   if (fastqc and fastqc.lower() == 'yes'):
       stepline=stepFastQC % locals()
       print >>fp, '%s'%stepline
       stepline=stepMergeFastQC % locals()

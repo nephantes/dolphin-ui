@@ -2,6 +2,8 @@ config/config.php
 tmp/files/a.xlsx
 tmp/run.log
 public/pub
+.DS_Store
+.com.greenworldsoft.syncfolderspro
 
 /blib/
 /.build/
