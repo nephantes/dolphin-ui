@@ -29,7 +29,9 @@
 							<?php echo $html->getStaticSelectionBox("Mate-paired", "spaired", "<option>yes</option>
 																				<option>no</option>", 3)?>
 						</div>
-						<div id="barcode_div" class="col-md-12"></div>
+						<div id="barcode_div" class="col-md-12" style="display: none">
+							<?php echo $html->getStaticSelectionBox("Barcode Definitions", "Barcode Definitions", "TEXTBOX", 9)?>
+						</div>
 						<div id="name_div" class="col-md-9">
 							<?php echo $html->getStaticSelectionBox("Experiment Series Name", "series_name", "TEXT", 6)?>
 							<?php echo $html->getStaticSelectionBox("Experiment/Lane Name", "lane_name", "TEXT", 6)?>
