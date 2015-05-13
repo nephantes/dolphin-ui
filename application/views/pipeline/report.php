@@ -12,7 +12,7 @@
 				</section>
 				<!-- Main content -->
 				<section class="content">
-			<?php echo $html->sendJScript("report", "", "", $selection); ?>
+					<?php echo $html->sendJScript("report", "", "", $selection, $uid, $gids); ?>
 					<div class="row">
 						<div class="col-md-12">
 						<div class="panel panel-default">

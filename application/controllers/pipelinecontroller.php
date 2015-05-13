@@ -11,31 +11,47 @@ class PipelineController extends VanillaController {
 	}
 
 	function selected($selection) {
+        $this->set('uid', $_SESSION['uid']);
+        $gids = $this->Pipeline->getGroup($_SESSION['user']);
+        $this->set('gids', $gids);
+        
 		$this->set('field', "Selected");
 		$this->set('selection', $selection);
 	}
 
 	function status(){
-		$this->set('field', 'Status');
+		$this->set('uid', $_SESSION['uid']);
+        $gids = $this->Pipeline->getGroup($_SESSION['user']);
+        $this->set('gids', $gids);
+        
+        $this->set('field', 'Status');
 	}
 
 	function rerun($run_id, $selection){
-		$this->set('selection', $selection);
+		$this->set('uid', $_SESSION['uid']);
+        $gids = $this->Pipeline->getGroup($_SESSION['user']);
+        $this->set('gids', $gids);
+        
+        $this->set('selection', $selection);
 		$this->set('run_id', $run_id);
 		$this->set('field', 'Status');
 	}
 
 	function report($run_id, $selection){
-		$this->set('run_id', $run_id);
+		$this->set('uid', $_SESSION['uid']);
+        $gids = $this->Pipeline->getGroup($_SESSION['user']);
+        $this->set('gids', $gids);
+        
+        $this->set('run_id', $run_id);
 		$this->set('selection', $selection);
 		$this->set('field', 'Status');
 	}
 
-	function fastlane(){
-		$this->set('field', 'Fastlane');
-	}
-
 	function plots($selection){
+        $this->set('uid', $_SESSION['uid']);
+        $gids = $this->Pipeline->getGroup($_SESSION['user']);
+        $this->set('gids', $gids);
+        
 		$this->set('field', 'Plots');
 		$this->set('selection', $selection);
 	}

@@ -14,14 +14,14 @@
 				<section class="content">
 					<div class="row">
 						<div class="col-md-12">
+							<?php echo $html->sendJScript("selected", "", "", $selection, $uid, $gids); ?>
 							<?php echo $html->getRespBoxTable_ng("Samples Selected", "samples", "<th>id</th><th>Title</th><th>Source</th><th>Organism</th><th>Molecule</th>"); ?>
 						</div><!-- /.col (RIGHT) -->
 					</div><!-- /.row -->
 					<div class="row">
-			<?php echo $html->sendJScript("selected", "", "", $selection); ?>
 						<?php echo $html->getStaticSelectionBox("Name the Run", "run_name", "TEXT", 4)?>
-			<?php echo $html->getStaticSelectionBox("Description", "description", "TEXT", 8)?>
-			<?php echo $html->getStaticSelectionBox("Genome Build", "genomebuild", "<option>human,hg19</option>
+						<?php echo $html->getStaticSelectionBox("Description", "description", "TEXT", 8)?>
+						<?php echo $html->getStaticSelectionBox("Genome Build", "genomebuild", "<option>human,hg19</option>
 																				<option>hamster,cho-k1</option>
 																				<option>rat,rn5</option>
 																				<option>zebrafish,danrer7</option>

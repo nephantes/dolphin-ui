@@ -22,11 +22,15 @@ if ($p == "submitPipeline" )
 	if (isset($_POST['name'])){$name = $_POST['name'];}
 	if (isset($_POST['desc'])){$desc = $_POST['desc'];}
 	if (isset($_POST['runGroupID'])){$runGroupID = $_POST['runGroupID'];}
-
+    if (isset($_POST['uid'])){$uid = $_POST['uid'];}
+    if (isset($_POST['gids'])){$gids = $_POST['gids'];}
+    
 	//run_group_id set to -1 as a placeholder.Cannot grab primary key as it's being made, so a placeholder is needed.
 	$data=$query->runSQL("
-	INSERT INTO biocore.ngs_runparams (run_group_id, outdir, run_status, barcode, json_parameters, run_name, run_description)
-	VALUES (-1, '$outdir', 0, 0, '$json', '$name', '$desc')");
+	INSERT INTO biocore.ngs_runparams (run_group_id, outdir, run_status, barcode, json_parameters, run_name, run_description,
+    owner_id, group_id, perms, date_created, date_modified, last_modified_user)
+	VALUES (-1, '$outdir', 0, 0, '$json', '$name', '$desc',
+    $uid, NULL, 3, now(), now(), $uid)");
 	//need to grab the id for runlist insertion
         $idKey=$query->queryAVal("SELECT id FROM biocore.ngs_runparams WHERE run_group_id = -1 and run_name = '$name' order by id desc limit 1");
         $cmd = "cd ../../scripts && python dolphin_wrapper.py -r $idKey 2>&1 >> ../tmp/run.log &";
@@ -46,12 +50,14 @@ else if ($p == 'insertRunlist')
 	//Grab the inputs
 	if (isset($_POST['sampID'])){$sampID = $_POST['sampID'];}
 	if (isset($_POST['runID'])){$runID = $_POST['runID'];}
+    if (isset($_POST['uid'])){$uid = $_POST['uid'];}
+    if (isset($_POST['gids'])){$gids = $_POST['gids'];}
 
 	$searchQuery = "INSERT INTO ngs_runlist
 		(run_id, sample_id, owner_id, group_id, perms, date_created, date_modified, last_modified_user)
 		VALUES ";
 	foreach ($sampID as $s){
-				$searchQuery .= "($runID, $s, 1, 1, 15, NOW(), NOW(), 1)";
+				$searchQuery .= "($runID, $s, $uid, NULL, 3, NOW(), NOW(), $uid)";
 				if($s != end($sampID)){
 					$searchQuery .= ",";
 				}

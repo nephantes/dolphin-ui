@@ -76,7 +76,7 @@ $(function() {
 				s[i].outdir,
 				s[i].run_description,
 				runstat,
-				'<div class="btn-group">' +
+				'<div class="btn-group pull-right">' +
 				'<input type="button" id="'+s[i].id+'" name="'+s[i].run_group_id+'" class="btn btn-xs btn-primary" value="Report Details" onClick="reportSelected(this.id, this.name)"/>' +
 				'<input type="button" id="'+s[i].id+'" name="'+s[i].run_group_id+'" class="btn btn-xs btn-primary disabled" value="Pause" onClick=""/>' +
 				'<input type="button" id="'+s[i].id+'" name="'+s[i].run_group_id+'" class="btn btn-xs btn-primary" value="Re-run" onClick="rerunSelected(this.id, this.name)"/>' +
@@ -123,7 +123,7 @@ $(function() {
 				s[i].outdir,
 				s[i].run_description,
 				runstat,
-				'<div class="btn-group">' +
+				'<div class="btn-group pull-right">' +
 				'<input type="button" id="'+s[i].id+'" name="'+s[i].run_group_id+'" class="btn btn-xs btn-primary" value="Report Details" onClick="reportSelected(this.id, this.name)"/>' +
 				'<input type="button" id="'+s[i].id+'" name="'+s[i].run_group_id+'" class="btn btn-xs btn-primary disabled" value="Pause" onClick=""/>' +
 				'<input type="button" id="'+s[i].id+'" name="'+s[i].run_group_id+'" class="btn btn-xs btn-primary" value="Re-run" onClick="rerunSelected(this.id, this.name)"/>' +

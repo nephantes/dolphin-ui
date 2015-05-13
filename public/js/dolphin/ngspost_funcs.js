@@ -10,6 +10,9 @@
 	var runlistCheck = "";
 	var runID = "";
 
+    var uid = phpGrab.uid;
+    var gids = phpGrab.gids;
+
 	//check to make sure values are not empty
 	if (outputdir == "") {
 		outputdir = "/test/directory/change/me/";
@@ -35,7 +38,7 @@
 	$.ajax({
 			type: 	'POST',
 			url: 	'/dolphin/public/ajax/ngsalterdb.php',
-			data:  	{ p: "submitPipeline", json: json, outdir: outputdir, name: name, desc: description, runGroupID: runGroupID },
+			data:  	{ p: "submitPipeline", json: json, outdir: outputdir, name: name, desc: description, runGroupID: runGroupID, uid: uid, gids: gids},
 			async:	false,
 			success: function(r)
 			{
@@ -57,18 +60,20 @@
  }
 
 function postInsertRunlist(runlistCheck, sample_ids, runID){
-	var successCheck = false;
-		if (runlistCheck == 'insertRunlist') {
-			$.ajax({
-				type: 	'POST',
-				url: 	'/dolphin/public/ajax/ngsalterdb.php',
-				data:  	{ p: runlistCheck, sampID: sample_ids, runID: runID},
-				async:	false,
-				success: function(r)
-				{
-					successCheck = true;
-				}
-			});
-		}
-	return successCheck;
+   var uid = phpGrab.uid;
+   var gids = phpGrab.gids;
+   var successCheck = false;
+       if (runlistCheck == 'insertRunlist') {
+           $.ajax({
+               type: 	'POST',
+               url: 	'/dolphin/public/ajax/ngsalterdb.php',
+               data:  	{ p: runlistCheck, sampID: sample_ids, runID: runID, uid: uid, gids: gids},
+               async:	false,
+               success: function(r)
+               {
+                   successCheck = true;
+               }
+           });
+       }
+   return successCheck;
 }
