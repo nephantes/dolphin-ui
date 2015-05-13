@@ -713,12 +713,14 @@ e range"><i class="fa fa-calendar"></i></button>
 			</div>';
 	return $html;
 	}
-	function sendJScript($segment, $field, $value, $search){
+	function sendJScript($segment, $field, $value, $search, $uid, $gids){
 	$html="";
 	$jsData['theSegment'] = $segment;
 		$jsData['theField'] = $field;
 		$jsData['theValue'] = $value;
 	$jsData['theSearch'] = $search;
+	$jsData['uid'] = $uid;
+	$jsData['gids'] = $gids;
 	$jsData = json_encode($jsData);
 	if (!empty($jsData)) {
 		$html.="<script type='text/javascript'>\n";
