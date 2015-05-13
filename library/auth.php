@@ -13,7 +13,7 @@ if ($_SESSION['user'] == "")
     require_once("../includes/login.php");
   }
 }
-if ($_GET['p'] == "logout" )
+if (isset($_GET['p']) && $_GET['p'] == "logout" )
 {
   session_destroy();
   require_once("../includes/loginform.php");
