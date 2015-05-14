@@ -64,7 +64,7 @@
 
 				}
 				else{
-							echo $html->getRespBoxTable_ng("Samples", "samples", "<th>id</th><th>Title</th><th>Source</th><th>Organism</th><th>Molecule</th><th>Selected</th>");
+							echo $html->getRespBoxTable_ng("Samples", "samples", "<th>id</th><th>Sample Name</th><th>Title</th><th>Source</th><th>Organism</th><th>Molecule</th><th>Selected</th>");
 				echo $html->getSubmitBrowserButton();
 				}
 				?>

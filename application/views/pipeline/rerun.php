@@ -15,7 +15,7 @@
 					<div class="row">
 						<div class="col-md-12">
 							<?php echo $html->sendJScript("selected", "", "", $selection, $uid, $gids); ?>
-							<?php echo $html->getRespBoxTable_ng("Samples Selected", "samples", "<th>id</th><th>Title</th><th>Source</th><th>Organism</th><th>Molecule</th>"); ?>
+							<?php echo $html->getRespBoxTable_ng("Samples Selected", "samples", "<th>id</th><th>Sample Name</th><th>Title</th><th>Source</th><th>Organism</th><th>Molecule</th>"); ?>
 						</div><!-- /.col (RIGHT) -->
 					</div><!-- /.row -->
 					<div class="row">
@@ -45,9 +45,8 @@
 																	"no barcode on read 1 of a pair (read 2 must have on 5 end)",
 																	"paired end both reads 5 end"]])?>
 						<?php echo $html->getExpandingSelectionBox("Adapter Removal", "adapter", 1, 12, ["adapter"], [["TEXTBOX"]])?>
-
-			<?php echo $html->getExpandingSelectionbOX("Custom Sequence Set", "custom", 1, 12, ["Add new Custom Sequence Set"], [["BUTTON"]])?>
-			<?php echo $html->getExpandingSelectionBox("Additional Pipelines", "pipeline", 1, 12, ["Add a Pipeline"], [["BUTTON"]])?>
+						<?php echo $html->getExpandingSelectionbOX("Custom Sequence Set", "custom", 1, 12, ["Add new Custom Sequence Set"], [["BUTTON"]])?>
+						<?php echo $html->getExpandingSelectionBox("Additional Pipelines", "pipeline", 1, 12, ["Add a Pipeline"], [["BUTTON"]])?>
 			<?php echo $html->endExpandingSelectionBox()?>
 
 			<?php echo $html->startExpandingSelectionBox(6)?>

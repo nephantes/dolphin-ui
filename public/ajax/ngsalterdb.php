@@ -22,6 +22,7 @@ if ($p == "submitPipeline" )
 	if (isset($_POST['name'])){$name = $_POST['name'];}
 	if (isset($_POST['desc'])){$desc = $_POST['desc'];}
 	if (isset($_POST['runGroupID'])){$runGroupID = $_POST['runGroupID'];}
+    if (isset($_POST['barcode'])){$barcode = $_POST['barcode'];}
     if (isset($_POST['uid'])){$uid = $_POST['uid'];}
     if (isset($_POST['gids'])){$gids = $_POST['gids'];}
     
@@ -29,7 +30,7 @@ if ($p == "submitPipeline" )
 	$data=$query->runSQL("
 	INSERT INTO biocore.ngs_runparams (run_group_id, outdir, run_status, barcode, json_parameters, run_name, run_description,
     owner_id, group_id, perms, date_created, date_modified, last_modified_user)
-	VALUES (-1, '$outdir', 0, 0, '$json', '$name', '$desc',
+	VALUES (-1, '$outdir', 0, $barcode, '$json', '$name', '$desc',
     $uid, NULL, 3, now(), now(), $uid)");
 	//need to grab the id for runlist insertion
         $idKey=$query->queryAVal("SELECT id FROM biocore.ngs_runparams WHERE run_group_id = -1 and run_name = '$name' order by id desc limit 1");

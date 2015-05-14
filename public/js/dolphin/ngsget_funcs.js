@@ -52,6 +52,22 @@ function getSampleIDs(search){
 	return ids;
 }
 
+function getSampleNames(samples_string){
+    var sample_name_array = [];
+    $.ajax({ type: "GET",
+		url: "/dolphin/public/ajax/ngsquerydb.php",
+		data: { p: "getSampleNames", samples: samples_string },
+		async: false,
+		success : function(s)
+		{
+			for(var i = 0; i < s.length; i++) {
+                sample_name_array.push(s[i].name);
+            }
+		}
+	});
+    return sample_name_array
+}
+
 function grabReload(groupID){
 	jsonArray = [];
 	$.ajax({ type: "GET",
@@ -60,8 +76,8 @@ function grabReload(groupID){
 		async: false,
 		success : function(s)
 		{
-					var jsonObj = JSON.parse(s[0].json_parameters);
-			jsonArray.push(jsonObj);
+			var jsonObj = JSON.parse(s[0].json_parameters);
+            jsonArray.push(jsonObj);
 			jsonArray.push(s[0].outdir);
 			jsonArray.push(s[0].run_name);
 			jsonArray.push(s[0].run_description);

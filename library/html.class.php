@@ -605,9 +605,7 @@ e range"><i class="fa fa-calendar"></i></button>
 					<button class="btn btn-box-tool btn-primary" data-widget="collapse"><i id="'.$id.'_exp_btn" class="fa fa-plus"></i></button>
 					</div><!-- /.box-tools -->
 				</div><!-- /.box-header -->
-				<div id="'.$id.'_exp_body" class="box-body compact" style="display: none;" onchange="">
-					<input id="'.$id.'_yes" type="radio" name="'.$id.'" value="yes"> yes</input>
-					<input id="'.$id.'_no" type="radio" name="'.$id.'" value="no" checked> no</input>';
+				<div id="'.$id.'_exp_body" class="box-body compact" style="display: none;" onchange="">';
 	
 	$html.= 			'<div class="input-group col-md-12">
 						<form role="form">';

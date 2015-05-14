@@ -45,7 +45,7 @@
 				<?php echo $html->getRespBoxTable_ng("Experiment Series", "experiment_series", "<th>id</th><th>Name</th><th>Summary</th><th>Design</th>"); ?>
 
 				<?php echo $html->getRespBoxTable_ng("Experiments", "lanes", "<th>id</th><th>Experiment name</th><th>Facility</th><th>Total Reads</th><th>Total Samples</th><th>Selected</th>"); ?>
-							<?php echo $html->getRespBoxTable_ng("Samples", "samples", "<th>id</th><th>Title</th><th>Source</th><th>Organism</th><th>Molecule</th><th>Selected</th>"); ?>
+							<?php echo $html->getRespBoxTable_ng("Samples", "samples", "<th>id</th><th>Sample Name</th><th>Title</th><th>Source</th><th>Organism</th><th>Molecule</th><th>Selected</th>"); ?>
 				<?php echo $html->getSubmitBrowserButton()?>
 						</div><!-- /.col (RIGHT) -->
 					</div><!-- /.row -->

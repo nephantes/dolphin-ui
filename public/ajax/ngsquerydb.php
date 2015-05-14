@@ -9,7 +9,8 @@ if (!isset($_SESSION) || !is_array($_SESSION)) session_start();
 $query = new dbfuncs();
 
 $pDictionary = ['getSelectedSamples', 'submitPipeline', 'getStatus', 'getRunSamples', 'grabReload', 'getReportNames', 'lanesToSamples',
-				'checkMatePaired', 'getAllSampleIds', 'getLaneIdFromSample', 'getSingleSample', 'getSeriesIdFromLane', 'getAllLaneIds', 'getGIDs'];
+				'checkMatePaired', 'getAllSampleIds', 'getLaneIdFromSample', 'getSingleSample', 'getSeriesIdFromLane', 'getAllLaneIds',
+                'getGIDs', 'getSampleNames'];
 
 $q = "";
 $r = "";
@@ -72,7 +73,7 @@ if($search != "" && !in_array($p, $pDictionary)){
 			$time="";
 			if (isset($start)){$time="and `date_created`>='$start' and `date_created`<='$end'";}
 			$data=$query->queryTable("
-			SELECT id, title, source, organism, molecule
+			SELECT id, name, title, source, organism, molecule
 			FROM biocore.ngs_samples
 			WHERE $searchQuery $andPerms $time
 			");
@@ -109,7 +110,7 @@ if($search != "" && !in_array($p, $pDictionary)){
 			$time="";
 			if (isset($start)){$time="and `date_created`>='$start' and `date_created`<='$end'";}
 			$data=$query->queryTable("
-			SELECT id, title, source, organism, molecule
+			SELECT id, name, title, source, organism, molecule
 			FROM biocore.ngs_samples
 			WHERE $searchQuery
 			AND biocore.ngs_samples.lane_id = $r $andPerms $time
@@ -120,7 +121,7 @@ if($search != "" && !in_array($p, $pDictionary)){
 			$time="";
 			if (isset($start)){$time="and `date_created`>='$start' and `date_created`<='$end'";}
 			$data=$query->queryTable("
-			SELECT id, title, source, organism, molecule
+			SELECT id, name, title, source, organism, molecule
 			FROM biocore.ngs_samples
 			WHERE $searchQuery
 			AND biocore.ngs_samples.series_id = $q $andPerms $time
@@ -171,7 +172,7 @@ else if (!in_array($p, $pDictionary))
 			$time="";
 			if (isset($start)){$time="and `date_created`>='$start' and `date_created`<='$end'";}
 			$data=$query->queryTable("
-			SELECT id, title, source, organism, molecule
+			SELECT id, name, title, source, organism, molecule
 			FROM biocore.ngs_samples
 			WHERE biocore.ngs_samples.$q = \"$r\" $andPerms $time
 			");
@@ -205,7 +206,7 @@ else if (!in_array($p, $pDictionary))
 			$time="";
 			if (isset($start)){$time="and `date_created`>='$start' and `date_created`<='$end'";}
 			$data=$query->queryTable("
-			SELECT id, title, source, organism, molecule
+			SELECT id, name, title, source, organism, molecule
 			FROM biocore.ngs_samples
 			WHERE biocore.ngs_samples.lane_id = $r $andPerms $time
 			");
@@ -215,7 +216,7 @@ else if (!in_array($p, $pDictionary))
 			$time="";
 			if (isset($start)){$time="and `date_created`>='$start' and `date_created`<='$end'";}
 			$data=$query->queryTable("
-			SELECT id, title, source, organism, molecule
+			SELECT id, name, title, source, organism, molecule
 			FROM biocore.ngs_samples
 			WHERE biocore.ngs_samples.series_id = $q $andPerms $time
 			");
@@ -254,7 +255,7 @@ else if (!in_array($p, $pDictionary))
 			$time="";
 			if (isset($start)){$time="and `date_created`>='$start' and `date_created`<='$end'";}
 			$data=$query->queryTable("
-			SELECT id, title, source, organism, molecule
+			SELECT id, name, title, source, organism, molecule
 			FROM biocore.ngs_samples $perms $time
 			");
 		}
@@ -308,7 +309,7 @@ else if ($p == "getSelectedSamples")
 	$time="";
 	if (isset($start)){$time="and `date_created`>='$start' and `date_created`<='$end'";}
 	$data=$query->queryTable("
-	SELECT id, title, source, organism, molecule
+	SELECT id, name, title, source, organism, molecule
 	FROM biocore.ngs_samples
 	WHERE $searchQuery $andPerms $time
 	");
@@ -430,6 +431,15 @@ else if ($p == 'checkMatePaired')
 		FROM ngs_runparams
 		where id = $runid $andPerms
 	"); 
+}
+else if ($p == 'getSampleNames')
+{
+    if (isset($_GET['samples'])){$samples = $_GET['samples'];}
+	$data=$query->queryTable("
+		SELECT name
+		FROM ngs_samples
+		where id in ($samples) $andPerms
+	");  
 }
 
 header('Cache-Control: no-cache, must-revalidate');
