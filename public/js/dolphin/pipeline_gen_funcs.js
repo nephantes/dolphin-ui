@@ -147,7 +147,7 @@ function rerunLoad() {
 							var select1_values = [];
 							var select2_values = [];
 							for(var f = 0; f < select_locations.length; f++){
-								if (select_locations[f] == 'Con1') {
+								if (select_locations[f] == 'Cond1') {
 									select1_values.push(select_values[f]);
 								}else{
 									select2_values.push(select_values[f]);
@@ -251,7 +251,7 @@ function pipelineSelect(num){
 				[ [createElement('label', ['class','TEXTNODE'], ['box-title', 'Fit Type:']),
 				createElement('select', ['id', 'class', 'OPTION', 'OPTION', 'OPTION'], ['select_3_'+num, 'form-control', 'parametric', 'local', 'mean'])],
 				[createElement('label', ['class','TEXTNODE'], ['box-title', 'Heatmap:']),
-				createElement('select', ['id', 'class', 'OPTION', 'OPTION'], ['select_4_'+num, 'form-control', 'yes', 'no'])] ]);
+				createElement('select', ['id', 'class', 'OPTION', 'OPTION'], ['select_4_'+num, 'form-control', 'Yes', 'No'])] ]);
 		divAdj = mergeTidy(divAdj, 6,
 				[ [createElement('label', ['class','TEXTNODE'], ['box-title', 'pAdj cutoff']),
 				createElement('input', ['id', 'class', 'type', 'value'], ['text_1_'+num, 'form-control', 'text', '0.01'])],
@@ -816,13 +816,13 @@ function findPipelineValues(){
 						var current_cond = getMultipleSelectionBox(e);
 						for(z in current_cond){
 							conditions_array.push(current_cond[z]);
-							conditions_type_array.push('Con1');
+							conditions_type_array.push('Cond1');
 						}
 					}else{
 						var current_cond2 = getMultipleSelectionBox(e);
 						for(z in current_cond2){
 							conditions_array.push(current_cond2[z]);
-							conditions_type_array.push('Con2');
+							conditions_type_array.push('Cond2');
 						}
 						pipeJSON += ':' + conditions_array.toString() + ':' + conditions_type_array.toString();
 					}
