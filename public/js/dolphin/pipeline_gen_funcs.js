@@ -80,7 +80,7 @@ function rerunLoad() {
 								document.getElementById( trimmingDict[z+1]+'_val' ).value = splt2[0];
 							}else if (jsonTypeList[x] == 'commonind'){
 								for(var y = 0; y < splt2.length; y++){
-								$( '#'+splt2[y]+'_yes' ).iCheck('check');
+									$( '#'+splt2[y]+'_yes' ).iCheck('check');
 								}
 							}else{
 								document.getElementById( splt2[0]+'_val' ).value = splt2[1];
@@ -241,7 +241,7 @@ function submitPipeline(type) {
 	var doAdapter = findRadioChecked("adapter");
 	var doQuality = findRadioChecked("quality");
 	var doTrimming = findRadioChecked("trim");
-	var doRNA = findRadioChecked("commonind");
+	var doRNA = findRNAChecked(rnaList);
 	var doSplit = findRadioChecked("split");
 
 	var barcode = findAdditionalInfoValues(doBarcode, ["distance", "format"]);
@@ -343,7 +343,7 @@ function submitPipeline(type) {
 	//insert new values into ngs_runlist
 	var submitted = postInsertRunlist(runparamsInsert[0], ids, runparamsInsert[1]);
 	if (submitted) {
-	window.location.href = "/dolphin/pipeline/status";
+		window.location.href = "/dolphin/pipeline/status";
 	}
 }
 
@@ -433,9 +433,9 @@ function manageChecklists(name, type){
 		document.getElementById('clear_basket').disabled = false;
 		}
 		if (document.getElementById('sample_checkbox_' + name) != undefined) {
-		if (document.getElementById('sample_checkbox_' + name).checked != true) {
-			document.getElementById('sample_checkbox_' + name).checked = true;
-		}
+			if (document.getElementById('sample_checkbox_' + name).checked != true) {
+				document.getElementById('sample_checkbox_' + name).checked = true;
+			}
 		}
 		if (checklist_lanes.indexOf(lane_check) == -1) {
 		for(var x = 0; x < lane_samples.length; x++){
@@ -625,9 +625,22 @@ function submitSelected(){
 function findRadioChecked(title){
 	var value = ""
 	if (document.getElementById(title+"_yes").checked) {
-	value = document.getElementById(title+"_yes").value;
+		value = document.getElementById(title+"_yes").value;
 	}else{
-	value = document.getElementById(title+"_no").value;
+		value = document.getElementById(title+"_no").value;
+	}
+	return value;
+}
+
+function findRNAChecked(titles){
+	var value = ""
+	for(var x = 0; x < titles.length - 1; x++){
+		if (document.getElementById(titles[x]+"_yes").checked) {
+			value = document.getElementById(titles[x]+"_yes").value;
+		}
+	}
+	if (value == "") {
+		value = "no"
 	}
 	return value;
 }
