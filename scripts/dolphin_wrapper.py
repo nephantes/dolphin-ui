@@ -25,19 +25,6 @@ cmd = 'python %(dolphin_tools_dir)s/runWorkflow.py -i %(input_fn)s -d %(galaxyho
 Config = ConfigParser.ConfigParser()
 params_section = 'Default'
 
-
-gbuild = {
- "human"        : "hg19",
- "mouse"        : "mm10",
- "mousetest"    : "mm10",
- "rat"          : "rn5",
- "c.elegans"    : "ce10",
- "drosophila"   : "dm3",
- "zebrafish"    : "danRer7",
- "s.cerevisiae" : "sacCer3",
- "cow"          : "bosTau7"
-}
-
 def runSQL(sql):
     db = MySQLdb.connect(
       host = Config.get(params_section, "db_host"),
@@ -201,8 +188,6 @@ def main():
 
            print "%s %s %s %s %s %s"%(inputdir, backup_dir, amazon_bucket, outdir, organism, library_type )
 
-           genomebuild=organism+","+gbuild[organism]
-
            if (isbarcode):
                spaired, inputparams, barcodes=getLaneList(runparamsid)
            else:
@@ -225,6 +210,7 @@ def main():
            resume      = runparams.get('resume')
            customind   = runparams.get('customind')
            pipeline    = runparams.get('pipeline')
+           genomebuild = runparams.get('genomebuild')
 
            #print inputparams
            #print barcodes
