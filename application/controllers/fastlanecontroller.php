@@ -24,6 +24,10 @@ class FastlaneController extends VanillaController {
 		$pass_fail_array = explode(",",$pass_fail_values);
 		$bad_samples_array = explode(",",$bad_samples);
 		
+		unset($_SESSION['fastlane_values']);
+		unset($_SESSION['pass_fail_values']);
+		unset($_SESSION['bad_samples']);
+		
 		if($pass_fail_array[0] == "true" || $pass_fail_array == "false"){
 			$text.= "<h4>Errors found during submission:</h4><br>";
 		}else{
@@ -44,10 +48,8 @@ class FastlaneController extends VanillaController {
 				}else if($key == 6){
 					$text.="Input files are either empty or do not fit the correct format for the current selection<br>";
 				}else if($key == 7){
-					$text.="Input files do not match up with barcodes<br>";
-				}else if($key == 8){
 					$text.="Backup directory is either empty or contains improper white space<br>";
-				}else if($key >= 10){
+				}else if($key >= 9){
 					$database_sample_bool = true;
 				}
 			}else if($index != 'true' && $index != 'false'){
