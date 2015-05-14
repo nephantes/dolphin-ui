@@ -26,7 +26,7 @@ function checkFastlaneInput(info_array){
 			var split_check = true;
 			for (var y = 0; y < split_barcodes.length; y++) {
 				split_barcodes[y].replace('\t', '');
-				if (/[\\|\!\@\#\$\%\^\&\*\+\=\[\]\;\:\<\>\<\?\{\}]/g.test(split_barcodes[y])) {
+				if (/[\\|\!\@\#\$\%\^\&\*\+\=\[\]\;\:\<\>\<\?\{\}\(\)]/g.test(split_barcodes[y])) {
 					split_check = false;
 				}else{
 					var single_barcode_array = split_barcodes[y].split(' ');
@@ -51,7 +51,7 @@ function checkFastlaneInput(info_array){
 			split_inputs = split_inputs.filter(function(n){return n != ''});
 			var input_bool_check = true;
 			for (var y = 0; y < split_inputs.length; y++) {
-				if (/[\\|\!\@\#\$\%\^\&\*\+\=\[\]\;\:\<\>\<\?\{\}]/g.test(split_inputs[y])) {
+				if (/[\\|\!\@\#\$\%\^\&\*\+\=\[\]\;\:\<\>\<\?\{\}\(\)]/g.test(split_inputs[y])) {
 					input_bool_check = false;
 				}else{
 					var single_input_array = split_inputs[y].split(' ');
@@ -83,17 +83,6 @@ function checkFastlaneInput(info_array){
 			}
 			database_checks.push(input_bool_check);
 			
-			//	Make sure barcodes add up
-			if (barcode_array.length > 0) {
-				if (barcode_array.length != input_array.length) {
-					database_checks.push(false);
-				}else{
-					database_checks.push(true);
-				}
-			}else{
-				database_checks.push(true);
-			}
-			
 		}else if (id_array[x] == 'input_dir' || id_array[x] == 'backup_dir'){
 			//	Check inputs that should not contain whitespace
 			if (/[\\|\ \!\@\#\$\%\^\&\*\(\)\+\=\[\]\;\:\<\>\<	\?\{\}]/g.test(info_array[x])) {
@@ -120,12 +109,17 @@ function checkFastlaneInput(info_array){
 	
 	//	Samples
 	if (experiment_series_id > 0 && lane_id > 0) {
-		var passed_samples = [];
-		for(z in input_array){
-			if(sampleCheck(experiment_series_id, lane_id, input_array[z][0]) == 0){
-				passed_samples.push(input_array[z][0]);
-			}else{
-				bad_samples.push(input_array[z][0]);
+		if (input_array[1] == 'yes') {
+			for(z in barcode_array){
+				if(!sampleCheck(experiment_series_id, lane_id, barcode_array[z][0]) == 0){
+					bad_samples.push(barcode_array[z][0]);
+				}
+			}
+		}else{
+			for(z in input_array){
+				if(!sampleCheck(experiment_series_id, lane_id, input_array[z][0]) == 0){
+					bad_samples.push(input_array[z][0]);
+				}
 			}
 		}
 		if (bad_samples.length > 0) {
@@ -154,8 +148,8 @@ function checkFastlaneInput(info_array){
 				//	If adding to a lane
 				if (info_array[1] == 'yes') {
 					//	If seperating barcodes
-					for (var a = 0; a < input_array.length; a++) {
-						sample_ids.push(insertSample(experiment_series_id, lane_id, input_array[a][0],
+					for (var a = 0; a < barcode_array.length; a++) {
+						sample_ids.push(insertSample(experiment_series_id, lane_id, barcode_array[a][0],
 										organism, barcode_array[a][1]));
 					}
 				}else{
@@ -171,8 +165,8 @@ function checkFastlaneInput(info_array){
 				var lane_id = laneCheck(experiment_series_id, info_array[4]);
 				if (info_array[1] == 'yes') {
 					//	If separating barcodes
-					for (var a = 0; a < input_array.length; a++) {
-						sample_ids.push(insertSample(experiment_series_id, lane_id, input_array[a][0],
+					for (var a = 0; a < barcode_array.length; a++) {
+						sample_ids.push(insertSample(experiment_series_id, lane_id, barcode_array[a][0],
 										organism, barcode_array[a][1]));
 					}
 				}else{
@@ -193,8 +187,8 @@ function checkFastlaneInput(info_array){
 			
 			if (info_array[1] == 'yes') {
 				//	If separating barcodes
-				for (var a = 0; a < input_array.length; a++) {
-					sample_ids.push(insertSample(experiment_series_id, lane_id, input_array[a][0],
+				for (var a = 0; a < barcode_array.length; a++) {
+					sample_ids.push(insertSample(experiment_series_id, lane_id, barcode_array[a][0],
 									organism, barcode_array[a][1]));
 				}
 			}else{
@@ -205,13 +199,13 @@ function checkFastlaneInput(info_array){
 				}
 			}
 		}
-
+		
 		//	Insert directory information
 		insertDirectories(info_array[5], info_array[7], info_array[8]);
 		input_directory_id = directoryCheck(info_array[5], info_array[7], info_array[8]);
 		
 		//	Insert temp files
-		for(var g = 0; g < sample_ids.length; g++){
+		for(var g = 0; g < input_array.length; g++){
 			if (info_array[1] == 'yes') {
 				//	If Barcode sep
 				if (input_array[g].length == 2) {
