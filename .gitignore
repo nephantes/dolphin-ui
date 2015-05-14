@@ -4,6 +4,9 @@ tmp/run.log
 public/pub
 .DS_Store
 .com.greenworldsoft.syncfolderspro
+scripts/seqmapping_workflow.txt
+scripts/workflowdefs.pyc
+tmp/files/input.txt
 
 /blib/
 /.build/

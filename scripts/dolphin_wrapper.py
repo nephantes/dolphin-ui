@@ -87,18 +87,18 @@ def getDirs(runparamsid, isbarcode):
 
     tablename="ngs_fastq_files"
     fields="d.backup_dir fastq_dir, d.backup_dir, d.amazon_bucket, rp.outdir, s.organism, s.library_type"
-    sql = "SELECT DISTINCT %(fields)s FROM biocore.ngs_runlist nr, biocore.ngs_samples s, biocore.%(tablename)s tl, biocore.ngs_dirs d, biocore.ngs_runparams rp where nr.sample_id=s.id and rp.run_status=0 and s.id=tl.sample_id and d.id=tl.dir_id and  rp.id=nr.run_id and nr.run_id='"+str(runparamsid)+"';"
+    idmatch="s.id=tl.sample_id"
+    sql = "SELECT DISTINCT %(fields)s FROM biocore.ngs_runlist nr, biocore.ngs_samples s, biocore.%(tablename)s tl, biocore.ngs_dirs d, biocore.ngs_runparams rp where nr.sample_id=s.id and rp.run_status=0 and %(idmatch)s and d.id=tl.dir_id and rp.id=nr.run_id and nr.run_id='"+str(runparamsid)+"';"
 
     results=runSQL(sql%locals())
-
     if (not results):
        fields="d.fastq_dir, d.backup_dir, d.amazon_bucket, rp.outdir, s.organism, s.library_type"
        if (isbarcode):
+           idmatch="s.lane_id=tl.lane_id"
            tablename="ngs_temp_lane_files"
        else:
            tablename="ngs_temp_sample_files"
        results=runSQL(sql%locals())
-
     return results[0]
 
 def getSampleList(runparamsid):
@@ -123,7 +123,7 @@ def getInputParams(samplelist):
 
 def getLaneList(runparamsid):
     tablename="ngs_fastq_files"
-    sql = "SELECT DISTINCT %(fields)s FROM biocore.ngs_runlist nrl, biocore.ngs_runparams nrp, biocore.ngs_samples s, biocore.%(tablename)s tl where nrl.run_id=nrp.run_id and nrp.run_status=0 and s.lane_id = tl.lane_id and s.id=nrl.sample_id and nrp.id='"+str(runparamsid)+"';"
+    sql = "SELECT DISTINCT %(fields)s FROM biocore.ngs_runlist nrl, biocore.ngs_runparams nrp, biocore.ngs_samples s, biocore.%(tablename)s tl where nrl.run_id=nrp.id and nrp.run_status=0 and s.lane_id = tl.lane_id and s.id=nrl.sample_id and nrp.id='"+str(runparamsid)+"';"
     fields='tl.file_name'
 
     result=runSQL(sql%locals())
@@ -180,7 +180,6 @@ def main():
         if (os.environ.has_key('DOLPHIN_PARAMS_SECTION')):
             params_section=os.environ['DOLPHIN_PARAMS_SECTION']
         print params_section
- 
         runparamsids=getRunParamsID(rpid)
         for runparams_arr in runparamsids:
            runparamsid=runparams_arr[0]
@@ -213,7 +212,6 @@ def main():
            runparams = getRunParams(runparamsid)
 
            input_fn      = "../tmp/files/input.txt"
-
 
            fastqc      = runparams.get('fastqc')
            adapter     = runparams.get('adapter')
