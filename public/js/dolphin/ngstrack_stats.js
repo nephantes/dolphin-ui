@@ -227,7 +227,8 @@ $(function() {
 						for(var i = 0; i < s.length; i++) {
 						samplesTable.fnAddData([
 						s[i].id,
-			"<a href=\"/dolphin/search/details/samples/"+s[i].id+'/'+theSearch+"\">"+s[i].title+"</a>",
+			"<a href=\"/dolphin/search/details/samples/"+s[i].id+'/'+theSearch+"\">"+s[i].name+"</a>",
+			s[i].title,
 			s[i].source,
 			s[i].organism,
 			s[i].molecule,

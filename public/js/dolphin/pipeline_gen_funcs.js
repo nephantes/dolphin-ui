@@ -13,7 +13,7 @@ var checklist_lanes = [];
 var pipelineNum = 0;
 var customSeqNum = 0;
 var customSeqNumCheck = [];
-var pipelineDict = ['RNASeqRSEM', 'Tophat', 'ChipSeq'];
+var pipelineDict = ['RNASeqRSEM', 'Tophat', 'ChipSeq', 'DESeq'];
 var rnaList = ["ercc","rRNA","miRNA","tRNA","snRNA","rmsk","genome","change_params"];
 var qualityDict = ["window size","required quality","leading","trailing","minlen"];
 var trimmingDict = ["single or paired-end", "5 length 1", "3 length 1", "5 length 2", "3 length 2"];
@@ -135,6 +135,41 @@ function rerunLoad() {
 							document.getElementById('select_2_'+i).value = splt2[5];
 							document.getElementById('select_3_'+i).value = splt2[6];
 							document.getElementById('select_4_'+i).value = splt2[7];
+						}else if (splt2[0] == pipelineDict[3]) {
+							//DESEQ
+							additionalPipes();
+							document.getElementById('select_'+i).value = pipelineDict[3];
+							pipelineSelect(i);
+							
+							//handle for multiple selections
+							var select_values = splt2[1].split(",");
+							var select_locations = splt2[2].split(",");
+							var select1_values = [];
+							var select2_values = [];
+							for(var f = 0; f < select_locations.length; f++){
+								if (select_locations[f] == 'Con1') {
+									select1_values.push(select_values[f]);
+								}else{
+									select2_values.push(select_values[f]);
+								}
+							}
+							
+							var select1 = document.getElementById('multi_select_1_'+i);
+							for(var h = 0; h < select1.options.length; h++){
+								if (select1_values.indexOf(select1.options[h].value) != -1) {
+									select1.options[h].selected = true;
+								}
+							}
+							var select2 = document.getElementById('multi_select_2_'+i);
+							for(var h = 0; h < select1.options.length; h++){
+								if (select2_values.indexOf(select2.options[h].value) != -1) {
+									select2.options[h].selected = true;
+								}
+							}
+							document.getElementById('select_3_'+i).value = splt2[3];
+							document.getElementById('select_4_'+i).value = splt2[4];
+							document.getElementById('text_1_'+i).value = splt2[5];
+							document.getElementById('text_2_'+i).value = splt2[6];
 						}
 					}
 					document.getElementById(jsonTypeList[x]+'_exp_body').setAttribute('style', 'display: block');
@@ -205,9 +240,37 @@ function pipelineSelect(num){
 				createElement('select', ['id', 'class', 'OPTION', 'OPTION'], ['select_3_'+num, 'form-control', 'no', 'yes'])],
 				[createElement('label', ['class','TEXTNODE'], ['box-title', 'BigWig Conversion:']),
 				createElement('select', ['id', 'class', 'OPTION', 'OPTION'], ['select_4_'+num, 'form-control', 'no', 'yes'])] ]);
+	}else if (pipeType == pipelineDict[3]) {
+		//DESEQ
+		divAdj = mergeTidy(divAdj, 6,
+				[ [createElement('label', ['class','TEXTNODE'], ['box-title', 'Condition 1']),
+				createElement('select',['id', 'class', 'multiple', 'size', 'onchange'],['multi_select_1_'+num, 'form-control', 'multiple', '8', 'deselectCondition(1, '+num+')'])],
+				[createElement('label', ['class','TEXTNODE'], ['box-title', 'Condition 2']),
+				createElement('select',['id', 'class', 'multiple', 'size', 'onchange'],['multi_select_2_'+num, 'form-control', 'multiple', '8', 'deselectCondition(2, '+num+')'])] ]);
+		divAdj = mergeTidy(divAdj, 6,
+				[ [createElement('label', ['class','TEXTNODE'], ['box-title', 'Fit Type:']),
+				createElement('select', ['id', 'class', 'OPTION', 'OPTION', 'OPTION'], ['select_3_'+num, 'form-control', 'parametric', 'local', 'mean'])],
+				[createElement('label', ['class','TEXTNODE'], ['box-title', 'Heatmap:']),
+				createElement('select', ['id', 'class', 'OPTION', 'OPTION'], ['select_4_'+num, 'form-control', 'yes', 'no'])] ]);
+		divAdj = mergeTidy(divAdj, 6,
+				[ [createElement('label', ['class','TEXTNODE'], ['box-title', 'pAdj cutoff']),
+				createElement('input', ['id', 'class', 'type', 'value'], ['text_1_'+num, 'form-control', 'text', '0.01'])],
+				[createElement('label', ['class','TEXTNODE'], ['box-title', 'Fold Change cutoff']),
+				createElement('input', ['id', 'class', 'type', 'value'], ['text_2_'+num, 'form-control', 'text', '2'])] ]);
 	}
 	//replace div
 	$('#select_child_'+num).replaceWith(divAdj);
+	
+	//if DESEQ
+	if (document.getElementById('multi_select_1_'+num) != null) {
+		var sample_names = getSampleNames(window.location.href.split('/')[window.location.href.split('/').length - 1].replace('$', ''));
+		for(var x = 0; x < sample_names.length; x++){
+				document.getElementById('multi_select_1_'+num).appendChild(createElement('option', ['id', 'value'], [num+'_1_'+sample_names[x], sample_names[x]]));
+				document.getElementById(num+'_1_'+sample_names[x]).innerHTML = sample_names[x]
+				document.getElementById('multi_select_2_'+num).appendChild(createElement('option', ['id', 'value'], [num+'_2_'+sample_names[x], sample_names[x]]));
+				document.getElementById(num+'_2_'+sample_names[x]).innerHTML = sample_names[x]
+		}
+	}
 
 	//adjust global pipeline counter
 	if (currentPipelineID.indexOf(num) == -1) {
@@ -666,9 +729,9 @@ function additionalPipes(){
 	var innerDiv = document.createElement( 'div' );
 	//attach children to parent
 	innerDiv.appendChild( createElement('select',
-					['id', 'class', 'onchange', 'OPTION_DIS_SEL', 'OPTION', 'OPTION', 'OPTION'],
+					['id', 'class', 'onchange', 'OPTION_DIS_SEL', 'OPTION', 'OPTION', 'OPTION', 'OPTION'],
 					['select_'+pipelineNum, 'form-control', 'pipelineSelect('+pipelineNum+')', '--- Select a Pipeline ---',
-					pipelineDict[0], pipelineDict[1], pipelineDict[2] ]));
+					pipelineDict[0], pipelineDict[1], pipelineDict[2], pipelineDict[3] ]));
 	innerDiv.appendChild( createElement('div', ['id'], ['select_child_'+pipelineNum]));
 	outerDiv.appendChild( innerDiv );
 	outerDiv.appendChild( createElement('input', ['id', 'type', 'class', 'style', 'value', 'onclick'],
@@ -677,6 +740,38 @@ function additionalPipes(){
 	//attach to master
 	master.appendChild( outerDiv );
 	pipelineNum = pipelineNum + 1;
+}
+
+function deselectCondition(condition, pipeNum){
+	var selection = document.getElementById('multi_select_'+condition+'_'+pipeNum);
+	if (condition == 1) {
+		var opposite = 2;
+	}else{
+		var opposite = 1;
+	}
+	var opposite_selection = document.getElementById('multi_select_'+opposite+'_'+pipeNum);
+	for (var x = 0; x < selection.options.length; x++) {
+		var opt = selection.options[x];
+		var opposite_opt = opposite_selection.options[x];
+		if (opt.selected) {
+			opposite_opt.disabled = true;
+			opposite_opt.style.opacity = 0.4;
+		}else{
+			opposite_opt.disabled = false;
+			opposite_opt.style.opacity = 1;
+		}
+	}
+}
+
+function getMultipleSelectionBox(selection) {
+	var selected = [];
+	for (var x = 0; x < selection.options.length; x++) {
+		var opt = selection.options[x];
+		if (opt.selected) {
+			selected.push(opt.value);
+		}
+	}
+	return selected;
 }
 
  /*##### PUSH IF SELECTED FUNCTION #####*/
@@ -705,22 +800,42 @@ function findAdditionalInfoValues(goWord, additionalArray){
 function findPipelineValues(){
 	var pipeJSON = "";
 	if (currentPipelineID.length > 0) {
-	pipeJSON = ',"pipeline":["'
+		pipeJSON = ',"pipeline":["'
 	}
 	for (var y = 0; y < currentPipelineID.length; y++) {
-	pipeJSON += currentPipelineVal[y];
-	var masterDiv = document.getElementById('select_child_'+currentPipelineID[y]).getElementsByTagName('*');
-	for (var x = 0; x < masterDiv.length; x++) {
-		var e = masterDiv[x]
-		if (e.type != undefined) {
-		pipeJSON += ':' + e.value;
+		pipeJSON += currentPipelineVal[y];
+		var masterDiv = document.getElementById('select_child_'+currentPipelineID[y]).getElementsByTagName('*');
+		
+		var conditions_array = [];
+		var conditions_type_array = [];
+		for (var x = 0; x < masterDiv.length; x++) {
+			var e = masterDiv[x];
+			if (e.type != undefined) {
+				if (e.type == "select-multiple") {
+					if (conditions_array.length == 0) {
+						var current_cond = getMultipleSelectionBox(e);
+						for(z in current_cond){
+							conditions_array.push(current_cond[z]);
+							conditions_type_array.push('Con1');
+						}
+					}else{
+						var current_cond2 = getMultipleSelectionBox(e);
+						for(z in current_cond2){
+							conditions_array.push(current_cond2[z]);
+							conditions_type_array.push('Con2');
+						}
+						pipeJSON += ':' + conditions_array.toString() + ':' + conditions_type_array.toString();
+					}
+				}else{
+					pipeJSON += ':' + e.value;
+				}
+			}
 		}
-	}
-	if (currentPipelineID[y] == currentPipelineID[currentPipelineID.length - 1]) {
-		pipeJSON += '"]';
-	}else{
-		pipeJSON += '","';
-	}
+		if (currentPipelineID[y] == currentPipelineID[currentPipelineID.length - 1]) {
+			pipeJSON += '"]';
+		}else{
+			pipeJSON += '","';
+		}
 	}
 	return pipeJSON;
 }

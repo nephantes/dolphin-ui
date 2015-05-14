@@ -40,8 +40,6 @@ function postInsertRunparams(json, outputdir, name, description){
       barcode = 0;
    }
    
-   alert(json.indexOf("\"barcodes\":\"none\""));
-   
    $.ajax({
            type: 	'POST',
            url: 	'/dolphin/public/ajax/ngsalterdb.php',
