@@ -973,6 +973,10 @@ function selectTrimming(select_id, five_num, three_num) {
 	}
 }
 
+function sendToPlot(){
+	window.location.href = '/dolphin/plot';
+}
+
 function sendToAdvancedStatus(run_id){
 	window.location.href = '/dolphin/pipeline/advstatus/' + run_id;
 }
