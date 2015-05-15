@@ -27,6 +27,15 @@ class PipelineController extends VanillaController {
         $this->set('field', 'Status');
 	}
 
+    function advstatus($run_id){
+        $this->set('uid', $_SESSION['uid']);
+        $gids = $this->Pipeline->getGroup($_SESSION['user']);
+        $this->set('gids', $gids);
+        
+        $this->set('run_id', $run_id);
+        $this->set('field', 'Status');
+    }
+    
 	function rerun($run_id, $selection){
 		$this->set('uid', $_SESSION['uid']);
         $gids = $this->Pipeline->getGroup($_SESSION['user']);

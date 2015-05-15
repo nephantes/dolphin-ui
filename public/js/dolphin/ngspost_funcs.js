@@ -82,3 +82,25 @@ function postInsertRunlist(runlistCheck, sample_ids, runID){
        }
    return successCheck;
 }
+
+function deleteRunparams(run_id) {
+   $('#delModal').modal({
+      show: true
+   });
+   document.getElementById('delRunId').value = run_id;
+   document.getElementById('delRunId').innerHTML = run_id;
+   document.getElementById('confirm_del_btn').value = run_id;
+}
+
+function confirmDeleteRunparams(run_id){
+   $.ajax({
+            type: 	'POST',
+            url: 	'/dolphin/public/ajax/ngsalterdb.php',
+            data:  	{ p: 'deleteRunparams', run_id: run_id },
+            async:	false,
+            success: function(r)
+            {
+               location.reload();
+            }
+   });
+}
