@@ -65,6 +65,15 @@ else if ($p == 'insertRunlist')
 			}
 	$data=$query->runSQL($searchQuery);
 }
+else if ($p == 'deleteRunparams')
+{
+    if (isset($_POST['run_id'])){$run_id = $_POST['run_id'];}
+    $data=$query->runSQL("
+	UPDATE ngs_runparams
+    SET run_status=4
+    WHERE id = $run_id
+    ");
+}
 
 //footer
 header('Cache-Control: no-cache, must-revalidate');

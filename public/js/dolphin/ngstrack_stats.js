@@ -62,26 +62,31 @@ $(function() {
 			 {
 				runparams.fnClearTable();
 				for(var i = 0; i < s.length; i++) {
-				var runstat = "";
-				if (s[i].run_status == 0) {
-				runstat = '<button type="button" class="btn btn-xs disabled"><i class="fa fa-refresh">\tRunning...</i></button>';
-				}else if (s[i].run_status == 1) {
-				runstat = '<button type="button" class="btn btn-success btn-xs disabled"><i class="fa fa-check">\tComplete!</i></button>';
-				}else{
-				runstat = '<button type="button" class="btn btn-danger btn-xs disabled"><i class="fa fa-warning">\tError</i></button>';
-				}
-				runparams.fnAddData([
-				s[i].id,
-				s[i].run_name,
-				s[i].outdir,
-				s[i].run_description,
-				runstat,
-				'<div class="btn-group pull-right">' +
-				'<input type="button" id="'+s[i].id+'" name="'+s[i].run_group_id+'" class="btn btn-xs btn-primary" value="Report Details" onClick="reportSelected(this.id, this.name)"/>' +
-				'<input type="button" id="'+s[i].id+'" name="'+s[i].run_group_id+'" class="btn btn-xs btn-primary disabled" value="Pause" onClick=""/>' +
-				'<input type="button" id="'+s[i].id+'" name="'+s[i].run_group_id+'" class="btn btn-xs btn-primary" value="Re-run" onClick="rerunSelected(this.id, this.name)"/>' +
-				'</div>',
-				]);
+					var runstat = "";
+					if (s[i].run_status == 0) {
+						runstat = '<button type="button" class="btn btn-xs disabled"><i class="fa fa-refresh">\tQueued</i></button>';
+					}else if (s[i].run_status == 1) {
+						runstat = '<button type="button" class="btn btn-success btn-xs"><i class="fa fa-check">\tComplete!</i></button>';
+					}else if (s[i].run_status == 2){
+						runstat = '<button type="button" class="btn btn-warning btn-xs"><i class="fa fa-refresh">\tRunning...</i></button>';
+					}else if (s[i].run_status == 3){
+						runstat = '<button type="button" class="btn btn-danger btn-xs"><i class="fa fa-warning">\tError</i></button>';
+					}
+					
+					if (runstat != "") {
+						runparams.fnAddData([
+						s[i].id,
+						s[i].run_name,
+						s[i].outdir,
+						s[i].run_description,
+						runstat,
+						'<div class="btn-group pull-right">' +
+						'<input type="button" id="'+s[i].id+'" name="'+s[i].run_group_id+'" class="btn btn-xs btn-primary" value="Report Details" onClick="reportSelected(this.id, this.name)"/>' +
+						'<input type="button" id="'+s[i].id+'" name="'+s[i].run_group_id+'" class="btn btn-xs btn-primary" value="Re-run" onClick="rerunSelected(this.id, this.name)"/>' +
+						'<input type="button" id="'+s[i].id+'" name="'+s[i].run_group_id+'" class="btn btn-xs btn-danger" value="Delete" onClick="deleteRunparams(\''+s[i].id+'\')"/>' +
+						'</div>',
+						]);
+					}
 				} // End For
 			}
 		});

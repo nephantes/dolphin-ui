@@ -82,3 +82,19 @@ function postInsertRunlist(runlistCheck, sample_ids, runID){
        }
    return successCheck;
 }
+
+function deleteRunparams(run_id) {
+   var x=window.confirm("Are you sure you want to delete this run?");
+   if (x) {
+      $.ajax({
+               type: 	'POST',
+               url: 	'/dolphin/public/ajax/ngsalterdb.php',
+               data:  	{ p: 'deleteRunparams', run_id: run_id },
+               async:	false,
+               success: function(r)
+               {
+                  location.reload();
+               }
+           });
+   }
+}
