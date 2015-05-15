@@ -1,6 +1,5 @@
-
-rdata = array();
-r_reporting(E_ALL);
+<?
+error_reporting(E_ALL);
 ini_set('report_errors','on');
 
 require_once("../../config/config.php");
@@ -11,7 +10,7 @@ $id = $_GET['id'];
 $query = new dbfuncs();
 
 $data=$query->queryTable('
-SELECT j.jobname, jo.jobout FROM biocore.jobs j, biocore.jobsout jo 
+SELECT j.jobname, jo.jobout FROM biocore.jobs j, biocore.jobsout jo
 where j.wkey=jo.wkey and j.job_num=jo.jobnum and j.job_id='.$id
 );
 
