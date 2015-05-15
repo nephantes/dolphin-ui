@@ -63,10 +63,13 @@ $(function() {
 				runparams.fnClearTable();
 				for(var i = 0; i < s.length; i++) {
 					var runstat = "";
+					var disabled = '';
 					if (s[i].run_status == 0) {
 						runstat = '<button type="button" class="btn btn-xs disabled"><i class="fa fa-refresh">\tQueued</i></button>';
 					}else if (s[i].run_status == 1) {
 						runstat = '<button type="button" class="btn btn-success btn-xs"><i class="fa fa-check">\tComplete!</i></button>';
+						disabled = '<li><a href="#" id="'+s[i].id+'" name="'+s[i].run_group_id+'" onClick="reportSelected(this.id, this.name)">Report Details</a></li>' +
+									'<li><a href="#" id="'+s[i].id+'" name="'+s[i].run_group_id+'" onClick="">Generate Plots</a></li>';
 					}else if (s[i].run_status == 2){
 						runstat = '<button type="button" class="btn btn-warning btn-xs"><i class="fa fa-refresh">\tRunning...</i></button>';
 					}else if (s[i].run_status == 3){
@@ -81,9 +84,14 @@ $(function() {
 						s[i].run_description,
 						runstat,
 						'<div class="btn-group pull-right">' +
-						'<input type="button" id="'+s[i].id+'" name="'+s[i].run_group_id+'" class="btn btn-xs btn-primary" value="Report Details" onClick="reportSelected(this.id, this.name)"/>' +
-						'<input type="button" id="'+s[i].id+'" name="'+s[i].run_group_id+'" class="btn btn-xs btn-primary" value="Re-run" onClick="rerunSelected(this.id, this.name)"/>' +
-						'<input type="button" id="'+s[i].id+'" name="'+s[i].run_group_id+'" class="btn btn-xs btn-danger" value="Delete" onClick="deleteRunparams(\''+s[i].id+'\')"/>' +
+						'<button type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown" aria-expanded="true">Options <span class="fa fa-caret-down"></span></button>' +
+						'</button>' +
+						'<ul class="dropdown-menu" role="menu">' +
+							disabled +
+							'<li><a href="#" id="'+s[i].id+'" name="'+s[i].run_group_id+'" onclick="rerunSelected(this.id, this.name)">Re-run this Run</a></li>' +
+							'<li class="divider"></li>' +
+							'<li><a href="#" id="'+s[i].id+'" name="'+s[i].run_group_id+'" onClick="deleteRunparams(\''+s[i].id+'\')">Delete this Run</a></li>' +
+						'</ul>' +
 						'</div>',
 						]);
 					}
