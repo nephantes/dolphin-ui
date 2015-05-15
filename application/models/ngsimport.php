@@ -319,13 +319,7 @@ class Ngsimport extends VanillaModel {
 			 */
 			//	Protocol Name
 			if(isset($prot->name)){
-				if($this->checkAlphaNumWithAddChars(' ', $prot->name)){
-					$this->prot_arr[$prot->name]=$prot;	
-				}else{
-					$text.= $this->errorText("protocol name does not contain proper characters, please use alpha-numeric characters and spaces (row " . $i . ")");
-					$this->final_check = false;
-					$prot_check = false;
-				}
+				$this->prot_arr[$prot->name]=$prot;	
 			}else{
 				$text.= $this->errorText("protocol name is required for submission (row " . $i . ")");
 				$this->final_check = false;
@@ -860,8 +854,7 @@ class samples extends main{
 		'".$this->model->uid."', '".$this->model->gid."', '".$this->model->sid."',
 		 now(), now(), '".$this->model->uid."');";
 		$this->insert++;
-		$this->insert=$sql;
-
+		
 		return $this->model->query($sql);
 	}
 

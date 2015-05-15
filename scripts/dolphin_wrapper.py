@@ -175,9 +175,10 @@ def main():
            print runparams_arr
 
            amazon = getAmazonCredentials(username)
-           backupS3=None
+           backupS3="Yes"
+           amazonupload="No"
            if (amazon != () and BACKUP):
-              backupS3     = "Yes"
+              amazonupload     = "Yes"
 
            (inputdir, backup_dir, amazon_bucket, outdir, organism, library_type) = getDirs(runparamsid, isbarcode)
            if(inputdir == backup_dir):
@@ -239,7 +240,7 @@ def main():
 
            workflow = join( bin_dir, 'seqmapping_workflow.txt' )
 
-           write_workflow(resume, gettotalreads, backupS3, runparamsid, customind, commonind, pipeline, barcodes, fastqc, adapter, quality, trim, split, workflow, clean)
+           write_workflow(resume, gettotalreads, amazonupload, backupS3, runparamsid, customind, commonind, pipeline, barcodes, fastqc, adapter, quality, trim, split, workflow, clean)
 
            galaxyhost=Config.get(params_section, "galaxyhost")
            dolphin_tools_dir=Config.get(params_section, "dolphin_tools_src_path") 
@@ -400,7 +401,7 @@ def write_input( input_fn, data_dir, content,genomebuild,spaired,barcodes,adapte
 
        fp.close()
 
-def write_workflow( resume, gettotalreads, backupS3, runparamsid, customind, commonind, pipeline, barcodes, fastqc, adapter, quality, trim, split, file, clean ):
+def write_workflow( resume, gettotalreads, amazonupload, backupS3, runparamsid, customind, commonind, pipeline, barcodes, fastqc, adapter, quality, trim, split, file, clean ):
    fp = open ( file, 'w')
    sep='\t'
 
