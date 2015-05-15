@@ -972,3 +972,7 @@ function selectTrimming(select_id, five_num, three_num) {
 	trim_parent_parent.removeChild(trim_parent_parent.childNodes[4]);
 	}
 }
+
+function sendToAdvancedStatus(run_id){
+	window.location.href = '/dolphin/pipeline/advstatus/' + run_id;
+}

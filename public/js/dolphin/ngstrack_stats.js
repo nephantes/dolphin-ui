@@ -5,6 +5,21 @@
  * Ascription:
  **/
 
+$(document).on('click', '#confirmDelBtn', function(){
+      	//get id
+      	var id = document.getElementById("formDelId").value;
+       	$.ajax({
+          	type: 	'POST',
+           	url: 	'http://localhost/test/ajax/querydb.php',
+          	data:  	{ p: "delPost", q: id },
+       		success: function(r)
+           	{
+				alert("Data has been deleted.");
+				location.reload();
+           	}
+    	});
+  	});
+
 $(function() {
 	"use strict";
 
@@ -65,15 +80,15 @@ $(function() {
 					var runstat = "";
 					var disabled = '';
 					if (s[i].run_status == 0) {
-						runstat = '<button type="button" class="btn btn-xs disabled"><i class="fa fa-refresh">\tQueued</i></button>';
+						runstat = '<button id="'+s[i].id+'" class="btn btn-xs disabled"><i class="fa fa-refresh">\tQueued</i></button>';
 					}else if (s[i].run_status == 1) {
-						runstat = '<button type="button" class="btn btn-success btn-xs"><i class="fa fa-check">\tComplete!</i></button>';
+						runstat = '<button id="'+s[i].id+'" class="btn btn-success btn-xs"  onclick="sendToAdvancedStatus(this.id)"><i class="fa fa-check">\tComplete!</i></button>';
 						disabled = '<li><a href="#" id="'+s[i].id+'" name="'+s[i].run_group_id+'" onClick="reportSelected(this.id, this.name)">Report Details</a></li>' +
 									'<li><a href="#" id="'+s[i].id+'" name="'+s[i].run_group_id+'" onClick="">Generate Plots</a></li>';
 					}else if (s[i].run_status == 2){
-						runstat = '<button type="button" class="btn btn-warning btn-xs"><i class="fa fa-refresh">\tRunning...</i></button>';
+						runstat = '<button id="'+s[i].id+'" class="btn btn-warning btn-xs" onclick="sendToAdvancedStatus(this.id)"><i class="fa fa-refresh">\tRunning...</i></button>';
 					}else if (s[i].run_status == 3){
-						runstat = '<button type="button" class="btn btn-danger btn-xs"><i class="fa fa-warning">\tError</i></button>';
+						runstat = '<button id="'+s[i].id+'" class="btn btn-danger btn-xs" onclick="sendToAdvancedStatus(this.id)"><i class="fa fa-warning">\tError</i></button>';
 					}
 					
 					if (runstat != "") {
