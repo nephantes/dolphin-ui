@@ -5,8 +5,6 @@ ini_set('report_errors','on');
 require_once("../../config/config.php");
 require_once("../../includes/dbfuncs.php");
 
-$wkey = $_GET['wkey'];
-
 $query = new dbfuncs();
 
 $id = $_GET['id'];
