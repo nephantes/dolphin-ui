@@ -10,12 +10,11 @@ var nameAndDirArray = [];
 var currentResultSelection = '--- Select a Result ---';
 
 function parseTSV(report, jsonName, nameAndDirArray){
-	var basePath = 'http://galaxyweb.umassmed.edu/csv-to-api/?source=/project/umw_biocore/pub/ngstrack_pub';
 	var URL = nameAndDirArray[1][0] + 'counts/' + report + '.summary.tsv&fields=' + jsonName;
 	var parsed = [];
 	var parsePushed = [];
 	$.ajax({ type: "GET",
-			url: basePath + URL,
+			url: BASE_PATH + URL,
 			async: false,
 			success : function(s)
 			{
@@ -172,7 +171,7 @@ function showSelectTable(){
 		newTableData.fnClearTable();
 		var objList = getCountsTableData(currentResultSelection).map(JSON.stringify);
 		for(var x = 0; x < objList.length; x++){
-			var parsed = JSON.parse(objList[x]);
+			 
 			var jsonArray = [];
 			for( var i in parsed){
 				if (parsed[i] != null) {
@@ -252,21 +251,69 @@ function downloadReports(type){
 	}
 }
 
+function getWKey(run_id){
+	var wkey = "";
+	$.ajax({ type: "GET",
+			url: "/dolphin/public/ajax/ngsquerydb.php",
+			data: { p: 'getWKey', run_id: run_id },
+			async: false,
+			success : function(s)
+			{
+			   wkey = s[0].wkey;
+			}
+	});
+	return wkey;
+}
+
+function readTextFile(file)
+{
+	var text = '';
+    var rawFile = new XMLHttpRequest();
+    rawFile.open("GET", file, false);
+    rawFile.onreadystatechange = function ()
+    {
+        if(rawFile.readyState === 4)
+        {
+            if(rawFile.status === 200 || rawFile.status == 0)
+            {
+                text = rawFile.responseText;
+            }
+        }
+		return text;
+    }
+	rawFile.send(null);
+	return text;
+}
+
 $(function() {
 	"use strict";
 	if (phpGrab.theSegment == 'report') {
 	var reports_table = $('#jsontable_initial_mapping').dataTable();
-	var basePath = 'http://galaxyweb.umassmed.edu/csv-to-api/?source=/project/umw_biocore/pub/ngstrack_pub';
 
 	var hrefSplit = window.location.href.split("/");
-	
-	wkey = 'mousetest'; //hrefSplit[hrefSplit.length - 2];
-	
-	var runId = hrefSplit[hrefSplit.length - 2];
-	var samples = hrefSplit[hrefSplit.length - 1].substring(0, hrefSplit[hrefSplit.length - 1].length - 1).split(",");
-	nameAndDirArray = getSummaryInfo(runId, samples);
-	nameAndDirArray = [['control_rep1','control_rep2','control_rep3','exper_rep1','exper_rep2','exper_rep3'],['mousetest','','','','','']];
 
+	var runId = hrefSplit[hrefSplit.length - 2];
+	wkey = getWKey(runId);
+	var samples = hrefSplit[hrefSplit.length - 1].substring(0, hrefSplit[hrefSplit.length - 1].length - 1).split(",");
+	
+	$.ajax({ type: "GET",
+			url: BASE_PATH + "/public/api/?source=" + BASE_PATH + "/public/pub/" + wkey + "/reports.tsv",
+			async: false,
+			success : function(s)
+			{
+			   alert(s);
+			}
+	});
+	
+	var raw_report_info = readTextFile(BASE_PATH + '/public/pub/' + wkey + '/reports.tsv');
+	var report_info = raw_report_info.split('\n');
+	for (var y = 0; y < report_info.length; y++){
+		report_info[y] = report_info[y].split('\t');
+		console.log(report_info[y]);
+	}
+	
+	
+	
 	for(var x = 0; x < nameAndDirArray[1].length; x++){
 		nameAndDirArray[1][x] = checkFrontAndEndDir(nameAndDirArray[1][x]);
 	}

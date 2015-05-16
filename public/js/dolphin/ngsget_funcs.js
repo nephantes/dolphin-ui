@@ -91,10 +91,11 @@ function getSummaryInfo(runid, sampleids){
 	var dirArray = [];
 	$.ajax({ type: "GET",
 		url: "/dolphin/public/ajax/ngsquerydb.php",
-		data: { p: "getReportNames", runid: runid, samp: sampleids },
+		data: { p: "getReportNames", runid: runid, samp: sampleids.toString() },
 		async: false,
 		success : function(s)
 		{
+            console.log(s);
 			for(var x = 0; x < s.length; x++){
 				nameArray.push(s[x].file_name);
 				dirArray.push(s[x].outdir);

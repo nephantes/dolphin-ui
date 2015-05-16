@@ -348,13 +348,14 @@ else if ($p == 'grabReload')
 }
 else if ($p == 'getReportNames')
 {
-	if (isset($_GET['samp'])){$samp = $_GET['samp'];}
 	if (isset($_GET['runid'])){$runid = $_GET['runid'];}
-
+    if (isset($_GET['samp'])){$samp = $_GET['samp'];}
 	$sampleQuery = '';
-	foreach($samp as $s){
+    $samples = explode(",", $samp);
+    
+	foreach($samples as $s){
 		$sampleQuery.= 'ngs_runlist.sample_id = '+ $s;
-		if($s != end($samp)){
+		if($s != end($samples)){
 			$sampleQuery.= ' OR ';
 		}
 	}
