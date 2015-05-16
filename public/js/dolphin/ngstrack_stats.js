@@ -178,10 +178,18 @@ $(function() {
 				runparams.fnClearTable();
 				var parsed = JSON.parse(s);
 				for(var i = 0; i < parsed.length; i++) {
+					if (parsed[i].result == 1) {
+						var bartype = 'success';
+						var colortype = 'green'
+					}else{
+						var bartype = 'danger';
+						var colortype = 'red';
+					}
 					runparams.fnAddData([
 						parsed[i].title,
 						parsed[i].duration,
-						parsed[i].percentComplete,
+						'<span class="pull-right badge bg-'+colortype+'">'+parsed[i].percentComplete+'%</span>',
+						'<div class="progress progress-xs"><div class="progress-bar progress-bar-'+bartype+'" style="width: '+parsed[i].percentComplete+'%"></div></div>',
 						parsed[i].start,
 						parsed[i].finish,
 						'<button id="'+parsed[i].num+'" class="btn btn-primary btn-xs pull-right" onclick="selectService(this.id)">Select Service</button>'
