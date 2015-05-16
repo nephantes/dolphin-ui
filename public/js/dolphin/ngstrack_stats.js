@@ -5,21 +5,6 @@
  * Ascription:
  **/
 
-$(document).on('click', '#confirmDelBtn', function(){
-      	//get id
-      	var id = document.getElementById("formDelId").value;
-       	$.ajax({
-          	type: 	'POST',
-           	url: 	'http://localhost/test/ajax/querydb.php',
-          	data:  	{ p: "delPost", q: id },
-       		success: function(r)
-           	{
-				alert("Data has been deleted.");
-				location.reload();
-           	}
-    	});
-  	});
-
 $(function() {
 	"use strict";
 
@@ -178,6 +163,32 @@ $(function() {
 
 	runparams.fnSort( [ [0,'des'] ] );
 	runparams.fnAdjustColumnSizing(true);
+	
+	}else if (segment == 'advstatus') {
+	
+	var wkey = getWKey(window.location.href.split("/")[window.location.href.split("/").length - 1]);
+	var runparams = $('#jsontable_services').dataTable();
+	console.log(wkey);
+	
+	$.ajax({ type: "GET",
+			 url: BASE_PATH + "/public/ajax/dataservice.php?wkey=" + wkey,
+			 async: false,
+			 success : function(s)
+			 {
+				runparams.fnClearTable();
+				var parsed = JSON.parse(s);
+				for(var i = 0; i < parsed.length; i++) {
+					runparams.fnAddData([
+						parsed[i].title,
+						parsed[i].duration,
+						parsed[i].percentComplete,
+						parsed[i].start,
+						parsed[i].finish,
+						'<button id="'+parsed[i].num+'" class="btn btn-primary btn-xs pull-right" onclick="selectService(this.id)">Select Service</button>'
+					]);
+				} // End For
+			}
+		});
 	}
 
 

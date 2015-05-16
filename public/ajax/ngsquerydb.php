@@ -10,7 +10,7 @@ $query = new dbfuncs();
 
 $pDictionary = ['getSelectedSamples', 'submitPipeline', 'getStatus', 'getRunSamples', 'grabReload', 'getReportNames', 'lanesToSamples',
 				'checkMatePaired', 'getAllSampleIds', 'getLaneIdFromSample', 'getSingleSample', 'getSeriesIdFromLane', 'getAllLaneIds',
-                'getGIDs', 'getSampleNames'];
+                'getGIDs', 'getSampleNames', 'getWKey'];
 
 $q = "";
 $r = "";
@@ -440,6 +440,17 @@ else if ($p == 'getSampleNames')
 		FROM ngs_samples
 		where id in ($samples) $andPerms
 	");  
+}
+else if ($p == 'getWKey')
+{
+    if (isset($_GET['run_id'])){$run_id = $_GET['run_id'];}
+    $time="";
+    if (isset($start)){$time="WHERE `date_created`>='$start' and `date_created`<='$end'";}
+    $data=$query->queryTable("
+    SELECT wkey
+    FROM ngs_runparams
+    WHERE id = $run_id $time
+    ");
 }
 
 header('Cache-Control: no-cache, must-revalidate');
