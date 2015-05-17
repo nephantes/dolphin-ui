@@ -550,8 +550,6 @@ def write_workflow( resume, gettotalreads, amazonupload, backupS3, runparamsid, 
    if (countstep):
       stepline=stepCounts % locals()
       print >>fp, '%s'%stepline
-      stepline=stepMakeReport % locals()
-      print >>fp, '%s'%stepline
    
    level=0
    if (clean):
