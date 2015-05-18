@@ -503,10 +503,12 @@ $(function() {
 	var DESEQ_files = [];
 	
 	$.ajax({ type: "GET",
-			url: BASE_PATH + "/public/api/?source=" + BASE_PATH + "/public/pub/" + wkey + "/reports.tsv",
+			url: "/dolphin/public/ajax/ngsquerydb.php",
+			data: { p: 'getReportList', wkey: wkey },
 			async: false,
 			success : function(s)
 			{
+				console.log(s);
 				for(var x = 0; x < s.length; x++){
 					if(s[x].type == 'rsem'){
 						RSEM_files.push(s[x]);
