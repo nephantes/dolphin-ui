@@ -22,8 +22,8 @@
 				</div>
 				<div class="panel-body">
 					<?php echo $html->getExpandingAnalysisBox('Initial Mapping Results', "initial_mapping", true); ?>
-					<?php echo $html->getExpandingAnalysisBox('Summary', "summary", false); ?>
-					<?php echo $html->getExpandingAnalysisBox('Detailed Results', "details", false); ?>
+					<?php echo $html->getExpandingAnalysisBox('FastQC Summary', "summary", false); ?>
+					<?php echo $html->getExpandingAnalysisBox('Detailed FastQC Results', "details", false); ?>
 				</div>
 			</div>
 						</div><!-- /.col (RIGHT) -->

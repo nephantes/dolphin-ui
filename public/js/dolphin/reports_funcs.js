@@ -41,38 +41,40 @@ function parseMoreTSV(jsonNameArray, url_path){
 	return parsed;
 }
 
-function createSummary(nameAndDirArray) {
-	var linkRef = [ '/per_base_quality.html', '/per_base_sequence_content.html', '/per_sequence_quality.html'];
-	var linkRefName = ['Per Base Quality Summary', 'Per Base Sequence Content Summary', 'Per Sequence Quality Summary'];
-
-	var masterDiv = document.getElementById('summary_exp_body');
-
-	for(var x = 0; x < linkRefName.length; x++){
-	var link = createElement('a', ['href'], [basePath + linkRef[x]]);
-	link.appendChild(document.createTextNode(linkRefName[x]));
-	masterDiv.appendChild(link);
-	masterDiv.appendChild(createElement('div', [],[]));
+function createSummary(fastqc_summary) {
+	if (fastqc_summary) {
+		var linkRef = [ '/per_base_quality.html', '/per_base_sequence_content.html', '/per_sequence_quality.html'];
+		var linkRefName = ['Per Base Quality Summary', 'Per Base Sequence Content Summary', 'Per Sequence Quality Summary'];
+	
+		var masterDiv = document.getElementById('summary_exp_body');
+	
+		for(var x = 0; x < linkRefName.length; x++){
+			var link = createElement('a', ['href'], [BASE_PATH + '/public/pub/' + wkey + '/fastqc/UNITED' + linkRef[x]]);
+			link.appendChild(document.createTextNode(linkRefName[x]));
+			masterDiv.appendChild(link);
+			masterDiv.appendChild(createElement('div', [],[]));
+		}
 	}
 }
 
-function createDetails(nameAndDirArray) {
+function createDetails(libraries) {
 	var masterDiv = document.getElementById('details_exp_body');
 	var hrefSplit = window.location.href.split("/");
 	var runId = hrefSplit[hrefSplit.length - 2];
 	var pairCheck = findIfMatePaired(runId);
 	
-	for(var x = 0; x < nameAndDirArray[0].length; x++){
+	for(var x = 0; x < libraries.length; x++){
 		if (pairCheck) {
-			var link1 = createElement('a', ['href'], [basePath + nameAndDirArray[0][x] + '.1/' + nameAndDirArray[0][x] + '.1_fastqc/fastqc_report.html']);
-			link1.appendChild(document.createTextNode(nameAndDirArray[0][x] + ".1"));
-			var link2 = createElement('a', ['href'], [basePath + nameAndDirArray[0][x] + '.2/' + nameAndDirArray[0][x] + '.2_fastqc/fastqc_report.html']);
-			link2.appendChild(document.createTextNode(nameAndDirArray[0][x] + ".2"));
+			var link1 = createElement('a', ['href'], [BASE_PATH + '/public/pub/' + wkey + '/fastqc/' + libraries[x] + '.1/' + libraries[x] + '.1_fastqc/fastqc_report.html']);
+			link1.appendChild(document.createTextNode(libraries[x] + ".1"));
+			var link2 = createElement('a', ['href'], [BASE_PATH + '/public/pub/' + wkey + '/fastqc/' + libraries[x] + '.2/' + libraries[x] + '.2_fastqc/fastqc_report.html']);
+			link2.appendChild(document.createTextNode(libraries[x] + ".2"));
 			masterDiv.appendChild(link1);
 			masterDiv.appendChild(createElement('div', [],[]));
 			masterDiv.appendChild(link2);
 			masterDiv.appendChild(createElement('div', [],[]));
 		}else{
-			var link = createElement('a', ['href'], [basePath + nameAndDirArray[0][x] + '/' + nameAndDirArray[0][x] + '.fastqc/fastqc_report.html']);
+			var link = createElement('a', ['href'], [BASE_PATH + '/public/pub/' + wkey + '/fastqc/' + libraries[x] + '/' + libraries[x] + '.fastqc/fastqc_report.html']);
 			link.appendChild(document.createTextNode(nameAndDirArray[0][x]));
 			masterDiv.appendChild(link);
 			masterDiv.appendChild(createElement('div', [],[]));
@@ -310,11 +312,13 @@ $(function() {
 
 	//Initial Mapping Results
 	var reports_table = $('#jsontable_initial_mapping').dataTable();
+	var libraries = [];
 	reports_table.fnClearTable();
 	for (var x = 0; x < ((table_array[0].length/3) - 1); x++) {
 		var row_array = [];
 		for (var y = 0; y < table_array.length; y++){
 			if (y == 0) {
+				libraries.push(table_array[y][(x*3)]);
 				row_array.push(table_array[y][(x*3)]);
 				row_array.push(table_array[y][(x*3) + 1]);
 				row_array.push(table_array[y][(x*3) + 2].split(" ")[0]);
@@ -330,8 +334,11 @@ $(function() {
 	}
 	reports_table.fnAdjustColumnSizing(true);
 	
-	createSummary();
-	createDetails();
+	//Create a check for FASTQC output????
+	createSummary(true);
+	
+	createDetails(libraries);
+	
 	createDropdown(libnames);
 
 	reports_table.fnSort( [ [0,'asc'] ] );
