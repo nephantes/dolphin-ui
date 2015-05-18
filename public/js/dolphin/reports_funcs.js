@@ -382,7 +382,7 @@ function showDESEQTable(){
 		buttonDivInner.appendChild(clearButton);
 		buttonDiv.appendChild(buttonDivInner);
 		buttonDiv.appendChild(createDownloadDESEQReportButtons());
-		downloads_link_div.appendChild(createElement('input', ['id', 'class', 'type'], ['downloadable_deseq', 'form-control', 'text']));
+		downloads_link_div.appendChild(createElement('input', ['id', 'class', 'type', 'style'], ['downloadable_deseq', 'form-control', 'text', 'width:100%']));
 		buttonDiv.appendChild(downloads_link_div);
 		masterDiv.appendChild(buttonDiv);
 		
@@ -493,7 +493,6 @@ $(function() {
 	if (phpGrab.theSegment == 'report') {
 
 	var hrefSplit = window.location.href.split("/");
-
 	var runId = hrefSplit[hrefSplit.length - 2];
 	wkey = getWKey(runId);
 	var samples = hrefSplit[hrefSplit.length - 1].substring(0, hrefSplit[hrefSplit.length - 1].length - 1).split(",");
