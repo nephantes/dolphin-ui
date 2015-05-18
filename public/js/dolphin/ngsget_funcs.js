@@ -184,6 +184,7 @@ function getLaneIdFromSample(sample){
 }
 
 function getFastQCBool(id){
+    var bool = false;
     $.ajax({ type: "GET",
 		url: "/dolphin/public/ajax/ngsquerydb.php",
 		data: { p: "getFastQCBool", id: id },
@@ -193,13 +194,13 @@ function getFastQCBool(id){
 			var json = s[0].json_parameters;
             var jsonObj = JSON.parse(json);
             if (jsonObj.fastqc == 'yes') {
-                return true;
+                bool = true;
             }else{
-                return false;
+                bool = false;
             }
 		}
 	});
-    return false;
+    return bool;
 }
 
 function getSingleSample(sampleID){

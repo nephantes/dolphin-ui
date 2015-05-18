@@ -6,7 +6,6 @@
 
 var wkey = '';
 var lib_checklist = [];
-var nameAndDirArray = [];
 var currentResultSelection = '--- Select a Result ---';
 
 function parseTSV(jsonName, url_path){
@@ -159,18 +158,18 @@ function showSelectTable(){
 	
 		var newTableData = $('#jsontable_selected_results').dataTable();
 		newTableData.fnClearTable();
-		var objList = getCountsTableData(currentResultSelection).map(JSON.stringify);
-		for(var x = 0; x < objList.length; x++){
-			 
-			var jsonArray = [];
-			for( var i in parsed){
-				if (parsed[i] != null) {
-					jsonArray.push(parsed[i]);
-				}
+		var objList = getCountsTableData(currentResultSelection);
+		var selection_array = [];
+		for (var x = 0; x < objList.length; x++){
+			var objList_row = [objList[x].id];
+			for (var y = 0; y < lib_checklist.length; y++){
+				objList_row.push(objList[x][lib_checklist[y]]);
 			}
-			if (jsonArray.length > 0) {
-				newTableData.fnAddData(jsonArray);
-			}
+			selection_array.push(objList_row);
+		}
+		console.log(selection_array)
+		for(var x = 0; x < selection_array.length - 1; x++){
+			newTableData.fnAddData(selection_array[x]);
 		}
 		//newTableData.fnSort( [ [0,'asc'] ] );
 		newTableData.fnAdjustColumnSizing(true);
@@ -201,13 +200,9 @@ function generateSelectionTable(){
 }
 
 function getCountsTableData(currentResultSelection){
-	var basePath = 'http://galaxyweb.umassmed.edu/csv-to-api/?source=/project/umw_biocore/pub/ngstrack_pub';
-	var URL = nameAndDirArray[1][0] + 'counts/' + currentResultSelection + '.counts.tsv&fields=id,' + lib_checklist;
-
 	var objList = [];
-
 	$.ajax({ type: "GET",
-			url: basePath + URL,
+			url: BASE_PATH + "/public/api/?source=" + BASE_PATH + '/public/pub/' + wkey + '/counts/' + currentResultSelection + '.counts.tsv&fields=id,' + lib_checklist.toString(),
 			async: false,
 			success : function(s)
 			{
