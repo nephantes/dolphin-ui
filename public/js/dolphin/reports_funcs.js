@@ -6,7 +6,9 @@
 
 var wkey = '';
 var lib_checklist = [];
+var libraries = [];
 var currentResultSelection = '--- Select a Result ---';
+var currentResultRSEM = '--- Select a Result ---';
 
 function parseTSV(jsonName, url_path){
 	var parsed = [];
@@ -114,7 +116,7 @@ function storeLib(name){
 	}
 }
 
-function createDropdown(mapping_list){
+function createInitialDropdown(mapping_list){
 	var masterDiv = document.getElementById('initial_mapping_exp_body');
 	var childDiv = createElement('div', ['id', 'class'], ['select_div', 'input-group margin col-md-4']);
 	var selectDiv = createElement('div', ['id', 'class'], ['inner_select_div', 'input-group-btn margin']);
@@ -132,57 +134,126 @@ function createDropdown(mapping_list){
 }
 
 function showSelectTable(){
+	var temp_libs = [];
 	if (lib_checklist.length < 1) {
-		alert("Libraries must be selected to view these reports")
-		document.getElementById('select_report').value = currentResultSelection;
-	}else{
-		currentResultSelection = document.getElementById('select_report').value;
-		var masterDiv = document.getElementById('initial_mapping_exp_body');
-		
-		if (document.getElementById('jsontable_selected_results') == null) {
-			var buttonDiv = createElement('div', ['id', 'class'], ['clear_button_div', 'input-group margin']);
-			var buttonDivInner = createElement('div', ['id', 'class'], ['clear_button_inner_div', 'input-group margin pull-left']);
-			var clearButton = createElement('input', ['id', 'type', 'value', 'class', 'onclick'], ['clear_button', 'button', 'Clear Selection', 'btn btn-primary', 'clearSelection()']);
-			var downloads_link_div = createElement('div', ['id', 'class'], ['downloads_link_div', 'input-group margin pull-right']);
-			buttonDivInner.appendChild(clearButton);
-			buttonDiv.appendChild(buttonDivInner);
-			buttonDiv.appendChild(createDownloadReportButtons());
-			downloads_link_div.appendChild(createElement('input', ['id', 'class', 'type'], ['downloadable', 'form-control', 'text']));
-			buttonDiv.appendChild(downloads_link_div);
-			masterDiv.appendChild(buttonDiv);
-			
-			var table = generateSelectionTable();
-			masterDiv.appendChild(table);
-		}else{
-			var table = document.getElementById('jsontable_selected_results');
-			var newTable = generateSelectionTable();
-			$('#jsontable_selected_results_wrapper').replaceWith(newTable);
-		}
-	
-		var newTableData = $('#jsontable_selected_results').dataTable();
-		newTableData.fnClearTable();
-		var objList = getCountsTableData(currentResultSelection);
-		var selection_array = [];
-		for (var x = 0; x < objList.length; x++){
-			var objList_row = [objList[x].id];
-			for (var y = 0; y < lib_checklist.length; y++){
-				objList_row.push(objList[x][lib_checklist[y]]);
-			}
-			selection_array.push(objList_row);
-		}
-		console.log(selection_array)
-		for(var x = 0; x < selection_array.length - 1; x++){
-			newTableData.fnAddData(selection_array[x]);
-		}
-		//newTableData.fnSort( [ [0,'asc'] ] );
-		newTableData.fnAdjustColumnSizing(true);
+		temp_libs = lib_checklist;
+		lib_checklist = libraries;
 	}
+	
+	currentResultSelection = document.getElementById('select_report').value;
+	var masterDiv = document.getElementById('initial_mapping_exp_body');
+	
+	if (document.getElementById('jsontable_selected_results') == null) {
+		var buttonDiv = createElement('div', ['id', 'class'], ['clear_button_div', 'input-group margin']);
+		var buttonDivInner = createElement('div', ['id', 'class'], ['clear_button_inner_div', 'input-group margin pull-left']);
+		var clearButton = createElement('input', ['id', 'type', 'value', 'class', 'onclick'], ['clear_button', 'button', 'Clear Selection', 'btn btn-primary', 'clearSelection()']);
+		var downloads_link_div = createElement('div', ['id', 'class'], ['downloads_link_div', 'input-group margin pull-right']);
+		buttonDivInner.appendChild(clearButton);
+		buttonDiv.appendChild(buttonDivInner);
+		buttonDiv.appendChild(createDownloadReportButtons());
+		downloads_link_div.appendChild(createElement('input', ['id', 'class', 'type'], ['downloadable', 'form-control', 'text']));
+		buttonDiv.appendChild(downloads_link_div);
+		masterDiv.appendChild(buttonDiv);
+		
+		var table = generateSelectionTable();
+		masterDiv.appendChild(table);
+	}else{
+		var table = document.getElementById('jsontable_selected_results');
+		var newTable = generateSelectionTable();
+		$('#jsontable_selected_results_wrapper').replaceWith(newTable);
+	}
+
+	var newTableData = $('#jsontable_selected_results').dataTable();
+	newTableData.fnClearTable();
+	var objList = getCountsTableData(currentResultSelection);
+	var selection_array = [];
+	for (var x = 0; x < objList.length; x++){
+		var objList_row = [objList[x].id];
+		for (var y = 0; y < lib_checklist.length; y++){
+			objList_row.push(objList[x][lib_checklist[y]]);
+		}
+		selection_array.push(objList_row);
+	}
+	for(var x = 0; x < selection_array.length - 1; x++){
+		newTableData.fnAddData(selection_array[x]);
+	}
+	newTableData.fnAdjustColumnSizing(true);
+	
+	if (lib_checklist.length < 1) {
+		lib_checklist = temp_libs;
+	}
+}
+
+function createRSEMDropdown(rsem_files){
+	var masterDiv = document.getElementById('rsem_exp_body');
+	var childDiv = createElement('div', ['id', 'class'], ['rsem_select_div', 'input-group margin col-md-4']);
+	var selectDiv = createElement('div', ['id', 'class'], ['inner_rsem_select_div', 'input-group-btn margin']);
+
+	selectDiv.appendChild( createElement('select',
+					['id', 'class', 'onchange', 'OPTION_DIS_SEL'],
+					['rsem_select_report', 'form-control', 'showRSEMTable()', '--- Select a Result ---']));
+	childDiv.appendChild(selectDiv);
+	masterDiv.appendChild(childDiv);
+	for (var x = 0; x < rsem_files.length; x++){
+		var opt = createElement('option', ['id','value'], [rsem_files[x], rsem_files[x]]);
+		opt.innerHTML = rsem_files[x];
+		document.getElementById('rsem_select_report').appendChild(opt);
+	}
+}
+
+function showRSEMTable(){
+	currentResultRSEM = document.getElementById('rsem_select_report').value;
+	var masterDiv = document.getElementById('rsem_exp_body');
+	
+	if (document.getElementById('jsontable_rsem_results') == null) {
+		var buttonDiv = createElement('div', ['id', 'class'], ['clear_rsem_button_div', 'input-group margin']);
+		var buttonDivInner = createElement('div', ['id', 'class'], ['clear_rsem_button_inner_div', 'input-group margin pull-left']);
+		var clearButton = createElement('input', ['id', 'type', 'value', 'class', 'onclick'], ['clear_rsem_button', 'button', 'Clear Selection', 'btn btn-primary', 'clearRSEM()']);
+		var downloads_link_div = createElement('div', ['id', 'class'], ['rsem_downloads_link_div', 'input-group margin pull-right']);
+		
+		buttonDivInner.appendChild(clearButton);
+		buttonDiv.appendChild(buttonDivInner);
+		buttonDiv.appendChild(createDownloadRSEMReportButtons());
+		downloads_link_div.appendChild(createElement('input', ['id', 'class', 'type'], ['downloadable_rsem', 'form-control', 'text']));
+		buttonDiv.appendChild(downloads_link_div);
+		masterDiv.appendChild(buttonDiv);
+		
+		var table = generateRSEMTable();
+		masterDiv.appendChild(table);
+	}else{
+		var table = document.getElementById('jsontable_rsem_results');
+		var newTable = generateRSEMTable();
+		$('#jsontable_rsem_results_wrapper').replaceWith(newTable);
+	}
+
+	var newTableData = $('#jsontable_rsem_results').dataTable();
+	newTableData.fnClearTable();
+	var objList = getRSEMTableData(currentResultRSEM);
+	var selection_array = [];
+	for (var x = 0; x < objList.length; x++){
+		var objList_row = [objList[x]['gene'], objList[x]['transcript']];
+		for (var y = 0; y < libraries.length; y++){
+			objList_row.push(objList[x][libraries[y]]);
+		}
+		objList_row.push("");
+		selection_array.push(objList_row);
+	}
+	for(var x = 0; x < selection_array.length - 1; x++){
+		newTableData.fnAddData(selection_array[x]);
+	}
+	newTableData.fnAdjustColumnSizing(true);
 }
 
 function clearSelection(){
 	document.getElementById('jsontable_selected_results_wrapper').remove();
 	document.getElementById('clear_button_div').remove();
 	document.getElementById('select_report').value = '--- Select a Result ---';
+}
+
+function clearRSEM(){
+	document.getElementById('jsontable_rsem_results_wrapper').remove();
+	document.getElementById('clear_rsem_button_div').remove();
+	document.getElementById('rsem_select_report').value = '--- Select a Result ---';
 }
 
 function generateSelectionTable(){
@@ -195,6 +266,26 @@ function generateSelectionTable(){
 	for(var x = 0; x < lib_checklist.length; x++){
 		var th = createElement('th', [], []);
 		th.innerHTML = lib_checklist[x];
+		header.appendChild(th);
+	}
+	thead.appendChild(header);
+	newTable.appendChild(thead);
+	return newTable;
+}
+
+function generateRSEMTable(){
+	var newTable = createElement('table', ['id', 'class'], ['jsontable_rsem_results', 'table table-hover compact']);
+	var thead = createElement('thead', [], []);
+	var header = createElement('tr', ['id'], ['rsem_header']);
+	var gene = createElement('th', [], []);
+		gene.innerHTML = 'Gene';
+		header.appendChild(gene);
+	var trans = createElement('th', [], []);
+		trans.innerHTML = 'Transcript'
+		header.appendChild(trans);
+	for(var x = 0; x < libraries.length; x++){
+		var th = createElement('th', [], []);
+		th.innerHTML = libraries[x];
 		header.appendChild(th);
 	}
 	thead.appendChild(header);
@@ -215,6 +306,20 @@ function getCountsTableData(currentResultSelection){
 	return objList;
 }
 
+function getRSEMTableData(currentResultRSEM){
+	var objList = [];
+	$.ajax({ type: "GET",
+			url: BASE_PATH + "/public/api/?source=" + BASE_PATH + '/public/pub/' + wkey + '/' + currentResultRSEM,
+			async: false,
+			success : function(s)
+			{
+				objList = s;
+			}
+	});
+	console.log(objList);
+	return objList;
+}
+
 function createDownloadReportButtons(){
 	var downloadDiv = createElement('div', ['id', 'class'], ['downloads_div', 'btn-group margin']);
 	var buttonType = ['JSON','JSON2', 'XML', 'HTML'];
@@ -228,8 +333,23 @@ function createDownloadReportButtons(){
 
 function downloadReports(type){
 	var URL = BASE_PATH + "/public/api/?source=" + BASE_PATH + '/public/pub/' + wkey + '/counts/' + currentResultSelection + '.counts.tsv&fields=id,' + lib_checklist.toString() + '&format=' + type;
-	
 	document.getElementById('downloadable').value = URL;
+}
+
+function createDownloadRSEMReportButtons(){
+	var downloadDiv = createElement('div', ['id', 'class'], ['downloads_div', 'btn-group margin']);
+	var buttonType = ['JSON','JSON2', 'XML', 'HTML'];
+	for (var x = 0; x < buttonType.length; x++){
+		var button = createElement('input', ['id', 'class', 'type', 'value', 'onclick'], [buttonType[x], 'btn btn-primary', 'button', buttonType[x], 'downloadRSEMReports("'+buttonType[x]+'")']);
+		downloadDiv.appendChild(button);
+	}
+
+	return downloadDiv;
+}
+
+function downloadRSEMReports(type){
+	var URL = BASE_PATH + "/public/api/?source=" + BASE_PATH + '/public/pub/' + wkey + '/' + currentResultRSEM + '&format=' + type;
+	document.getElementById('downloadable_rsem').value = URL;
 }
 
 function getWKey(run_id){
@@ -307,7 +427,6 @@ $(function() {
 
 	//Initial Mapping Results
 	var reports_table = $('#jsontable_initial_mapping').dataTable();
-	var libraries = [];
 	reports_table.fnClearTable();
 	for (var x = 0; x < ((table_array[0].length/3) - 1); x++) {
 		var row_array = [];
@@ -328,6 +447,7 @@ $(function() {
 		reports_table.fnAddData(row_array);
 	}
 	reports_table.fnAdjustColumnSizing(true);
+	createInitialDropdown(summary_rna_type);
 	
 	//Create a check for FASTQC output????
 	if (getFastQCBool(runId)) {
@@ -337,6 +457,22 @@ $(function() {
 		document.getElementById('summary_exp').remove();
 		document.getElementById('details_exp').remove();
 	}
-	createDropdown(summary_rna_type);
+	
+	if (DESeq_files.length > 0) {
+		//code
+	}else{
+		document.getElementById('deseq_exp').remove();
+	}
+	
+	if (RSEM_files.length > 0) {
+		var rsem_file_paths = [];
+		for (var z = 0; z < RSEM_files.length; z++){
+			rsem_file_paths.push(RSEM_files[z].file);
+		}
+		createRSEMDropdown(rsem_file_paths);
+	}else{
+		document.getElementById('rsem_exp').remove();
+	}
+	
 	}
 });

@@ -95,7 +95,6 @@ function getSummaryInfo(runid, sampleids){
 		async: false,
 		success : function(s)
 		{
-            console.log(s);
 			for(var x = 0; x < s.length; x++){
 				nameArray.push(s[x].file_name);
 				dirArray.push(s[x].outdir);
