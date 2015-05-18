@@ -183,6 +183,25 @@ function getLaneIdFromSample(sample){
 	return lane_id_returned;
 }
 
+function getFastQCBool(id){
+    $.ajax({ type: "GET",
+		url: "/dolphin/public/ajax/ngsquerydb.php",
+		data: { p: "getFastQCBool", id: id },
+		async: false,
+		success : function(s)
+		{
+			var json = s[0].json_parameters;
+            var jsonObj = JSON.parse(json);
+            if (jsonObj.fastqc == 'yes') {
+                return true;
+            }else{
+                return false;
+            }
+		}
+	});
+    return false;
+}
+
 function getSingleSample(sampleID){
 	var sample_info = [];
 	$.ajax({ type: "GET",

@@ -115,17 +115,21 @@ function storeLib(name){
 	}
 }
 
-function createDropdown(nameList){
+function createDropdown(mapping_list){
 	var masterDiv = document.getElementById('initial_mapping_exp_body');
 	var childDiv = createElement('div', ['id', 'class'], ['select_div', 'input-group margin col-md-4']);
 	var selectDiv = createElement('div', ['id', 'class'], ['inner_select_div', 'input-group-btn margin']);
 
 	selectDiv.appendChild( createElement('select',
-					['id', 'class', 'onchange', 'OPTION_DIS_SEL', 'OPTION', 'OPTION', 'OPTION', 'OPTION', 'OPTION'],
-					['select_report', 'form-control', 'showSelectTable()', '--- Select a Result ---',
-					nameList[0], nameList[1], nameList[2], nameList[3], nameList[4] ]));
+					['id', 'class', 'onchange', 'OPTION_DIS_SEL'],
+					['select_report', 'form-control', 'showSelectTable()', '--- Select a Result ---']));
 	childDiv.appendChild(selectDiv);
 	masterDiv.appendChild(childDiv);
+	for (var x = 0; x < mapping_list.length; x++){
+		var opt = createElement('option', ['id','value'], [mapping_list[x], mapping_list[x]]);
+		opt.innerHTML = mapping_list[x];
+		document.getElementById('select_report').appendChild(opt);
+	}
 }
 
 function showSelectTable(){
@@ -335,13 +339,10 @@ $(function() {
 	reports_table.fnAdjustColumnSizing(true);
 	
 	//Create a check for FASTQC output????
-	createSummary(true);
+	createSummary(getFastQCBool(runId));
 	
 	createDetails(libraries);
 	
-	createDropdown(libnames);
-
-	reports_table.fnSort( [ [0,'asc'] ] );
-	reports_table.fnAdjustColumnSizing(true);
+	createDropdown(summary_rna_type);
 	}
 });

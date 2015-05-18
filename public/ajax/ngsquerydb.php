@@ -10,7 +10,7 @@ $query = new dbfuncs();
 
 $pDictionary = ['getSelectedSamples', 'submitPipeline', 'getStatus', 'getRunSamples', 'grabReload', 'getReportNames', 'lanesToSamples',
 				'checkMatePaired', 'getAllSampleIds', 'getLaneIdFromSample', 'getSingleSample', 'getSeriesIdFromLane', 'getAllLaneIds',
-                'getGIDs', 'getSampleNames', 'getWKey'];
+                'getGIDs', 'getSampleNames', 'getWKey', 'getFastQCBool'];
 
 $q = "";
 $r = "";
@@ -451,6 +451,15 @@ else if ($p == 'getWKey')
     SELECT wkey
     FROM ngs_runparams
     WHERE id = $run_id $time
+    ");
+}
+else if ($p == 'getFastQCBool')
+{
+    if (isset($_GET['id'])){$id = $_GET['id'];}
+    $data=$query->queryTable("
+    SELECT json_parameters
+    FROM ngs_runparams
+    WHERE id = $id
     ");
 }
 
