@@ -91,7 +91,7 @@ function getSummaryInfo(runid, sampleids){
 	var dirArray = [];
 	$.ajax({ type: "GET",
 		url: "/dolphin/public/ajax/ngsquerydb.php",
-		data: { p: "getReportNames", runid: runid, samp: sampleids },
+		data: { p: "getReportNames", runid: runid, samp: sampleids.toString() },
 		async: false,
 		success : function(s)
 		{
@@ -180,6 +180,26 @@ function getLaneIdFromSample(sample){
 		}
 	});
 	return lane_id_returned;
+}
+
+function getFastQCBool(id){
+    var bool = false;
+    $.ajax({ type: "GET",
+		url: "/dolphin/public/ajax/ngsquerydb.php",
+		data: { p: "getFastQCBool", id: id },
+		async: false,
+		success : function(s)
+		{
+			var json = s[0].json_parameters;
+            var jsonObj = JSON.parse(json);
+            if (jsonObj.fastqc == 'yes') {
+                bool = true;
+            }else{
+                bool = false;
+            }
+		}
+	});
+    return bool;
 }
 
 function getSingleSample(sampleID){

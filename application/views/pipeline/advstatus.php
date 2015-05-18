@@ -1,9 +1,9 @@
-			<div class="modal fade" id="joboutData" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
-				<div class="modal-dialog">
+			<div class="modal fade" id="joboutData" aria-labelledby="myModalLabel" aria-hidden="true">
+				<div class="modal-dialog" style="width:75%">
 				  <div class="modal-content">
 					<div class="modal-header">
 					  <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-					  <h4 class="modal-title" id="myModalLabel">Delete Run</h4>
+					  <h4 class="modal-title" id="myModalLabel">Job Output</h4>
 					</div>
 					<form name="editForm" role="form" method="post">
 						<div class="modal-body">
@@ -38,7 +38,7 @@
 						<div class="col-md-11">
 						<?php echo $html->sendJScript('advstatus', "", "", "", $uid, $gids); ?>
 						<?php echo $html->getBasePath(BASE_PATH); ?>
-						<?php echo $html->getRespBoxTable_ng("Services", "services", "<th>Name</th><th>Duration</th><th>% Complete</th><th>Start</th><th>Finish</th><th>Select</th>"); ?>
+						<?php echo $html->getRespBoxTable_ng("Services", "services", "<th>Name</th><th>Duration</th><th style=\"width: 75px\">% Complete</th><th>Progress</th><th>Start</th><th>Finish</th><th>Select</th>"); ?>
 							<div id="service_jobs" style="display:none">
 								<?php echo $html->getRespBoxTable_ng("Jobs", "jobs", "<th>Name</th><th>Duration</th><th>Job #</th><th>Submission Time</th><th>Start</th><th>Finish</th><th>Select</th>"); ?>
 							</div>

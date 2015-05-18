@@ -10,7 +10,7 @@ $query = new dbfuncs();
 
 $pDictionary = ['getSelectedSamples', 'submitPipeline', 'getStatus', 'getRunSamples', 'grabReload', 'getReportNames', 'lanesToSamples',
 				'checkMatePaired', 'getAllSampleIds', 'getLaneIdFromSample', 'getSingleSample', 'getSeriesIdFromLane', 'getAllLaneIds',
-                'getGIDs', 'getSampleNames', 'getWKey'];
+                'getGIDs', 'getSampleNames', 'getWKey', 'getFastQCBool'];
 
 $q = "";
 $r = "";
@@ -348,13 +348,14 @@ else if ($p == 'grabReload')
 }
 else if ($p == 'getReportNames')
 {
-	if (isset($_GET['samp'])){$samp = $_GET['samp'];}
 	if (isset($_GET['runid'])){$runid = $_GET['runid'];}
-
+    if (isset($_GET['samp'])){$samp = $_GET['samp'];}
 	$sampleQuery = '';
-	foreach($samp as $s){
+    $samples = explode(",", $samp);
+    
+	foreach($samples as $s){
 		$sampleQuery.= 'ngs_runlist.sample_id = '+ $s;
-		if($s != end($samp)){
+		if($s != end($samples)){
 			$sampleQuery.= ' OR ';
 		}
 	}
@@ -450,6 +451,15 @@ else if ($p == 'getWKey')
     SELECT wkey
     FROM ngs_runparams
     WHERE id = $run_id $time
+    ");
+}
+else if ($p == 'getFastQCBool')
+{
+    if (isset($_GET['id'])){$id = $_GET['id'];}
+    $data=$query->queryTable("
+    SELECT json_parameters
+    FROM ngs_runparams
+    WHERE id = $id
     ");
 }
 

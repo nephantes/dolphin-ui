@@ -13,6 +13,7 @@
 				<!-- Main content -->
 				<section class="content">
 					<?php echo $html->sendJScript("report", "", "", $selection, $uid, $gids); ?>
+					<?php echo $html->getBasePath(BASE_PATH); ?>
 					<div class="row">
 						<div class="col-md-12">
 						<div class="panel panel-default">
@@ -21,8 +22,11 @@
 				</div>
 				<div class="panel-body">
 					<?php echo $html->getExpandingAnalysisBox('Initial Mapping Results', "initial_mapping", true); ?>
-					<?php echo $html->getExpandingAnalysisBox('Summary', "summary", false); ?>
-					<?php echo $html->getExpandingAnalysisBox('Detailed Results', "details", false); ?>
+					<?php echo $html->getExpandingAnalysisBox('FastQC Summary', "summary", false); ?>
+					<?php echo $html->getExpandingAnalysisBox('Detailed FastQC Results', "details", false); ?>
+					<?php echo $html->getExpandingAnalysisBox('RSEM Results', "rsem", false); ?>
+					<?php echo $html->getExpandingAnalysisBox('DESeq Results', "deseq", false); ?>
+					<button id="back_to_status" class="btn btn-primary" onclick="sendToStatus()">Return to Status</button>
 				</div>
 			</div>
 						</div><!-- /.col (RIGHT) -->
