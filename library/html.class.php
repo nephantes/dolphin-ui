@@ -670,16 +670,9 @@ e range"><i class="fa fa-calendar"></i></button>
 	$html = '';
 	$html.= '<table id="jsontable_initial_mapping" class="table table-hover compact">
 			<thead>
-			<tr>
+			<tr id="tablerow">
 				<th>Libname</th>
 				<th>Total Reads</th>
-				<th>rRNA</th>
-				<th>miRNA</th>
-				<th>tRNA</th>
-				<th>snRNA</th>
-				<th>rmsk</th>
-				<th>Usable Reads</th>
-				<th>Selected</th>
 			</tr>
 			</thead>
 		</table>';

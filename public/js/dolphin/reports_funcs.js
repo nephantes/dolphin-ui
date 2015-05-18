@@ -9,52 +9,39 @@ var lib_checklist = [];
 var nameAndDirArray = [];
 var currentResultSelection = '--- Select a Result ---';
 
-function parseTSV(report, jsonName, nameAndDirArray){
-	var URL = nameAndDirArray[1][0] + 'counts/' + report + '.summary.tsv&fields=' + jsonName;
+function parseTSV(jsonName, url_path){
 	var parsed = [];
-	var parsePushed = [];
 	$.ajax({ type: "GET",
-			url: BASE_PATH + URL,
+			url: BASE_PATH + "/public/api/?source=" + BASE_PATH + "/public/pub/" + wkey + "/" + url_path,
 			async: false,
 			success : function(s)
 			{
-				jsonGrab = s.map(JSON.stringify);
-				for(var i = 0; i < jsonGrab.length - 1; i++){
-					//limit is length minus one, last element is empty
-					parsed = JSON.parse(jsonGrab[i]);
-					parsePushed.push(parsed[jsonName]);
+				for( var j = 0; j < s.length; j++){
+					parsed.push(s[j][jsonName]);
 				}
 			}
 	});
-	return parsePushed;
+	return parsed;
 }
 
-function parseMoreTSV(report, jsonNameArray, nameAndDirArray){
-	var basePath = 'http://galaxyweb.umassmed.edu/csv-to-api/?source=/project/umw_biocore/pub/ngstrack_pub';
-	var URL = nameAndDirArray[1][0] + 'counts/' + report + '.summary.tsv&fields=' + jsonNameArray;
+function parseMoreTSV(jsonNameArray, url_path){
 	var parsed = [];
-	var parsePushed = [];
-
 	$.ajax({ type: "GET",
-			url: basePath + URL,
+			url: BASE_PATH + "/public/api/?source=" + BASE_PATH + "/public/pub/" + wkey + "/" + url_path,
 			async: false,
 			success : function(s)
 			{
-				jsonGrab = s.map(JSON.stringify);
-				for(var i = 0; i < jsonGrab.length - 1; i++){
-					//limit is length minus one, last element is empty
-					parsed = JSON.parse(jsonGrab[i]);
+				for( var j = 0; j < s.length; j++){
 					for(var k = 0; k < jsonNameArray.length; k++){
-						parsePushed.push(parsed[jsonNameArray[k]]);
+						parsed.push(s[j][jsonNameArray[k]]);
 					}
 				}
 			}
 	});
-	return parsePushed;
+	return parsed;
 }
 
 function createSummary(nameAndDirArray) {
-	var basePath = 'http://galaxyweb.umassmed.edu/pub/ngstrack_pub' + nameAndDirArray[1][0] + 'fastqc/UNITED';
 	var linkRef = [ '/per_base_quality.html', '/per_base_sequence_content.html', '/per_sequence_quality.html'];
 	var linkRefName = ['Per Base Quality Summary', 'Per Base Sequence Content Summary', 'Per Sequence Quality Summary'];
 
@@ -69,9 +56,6 @@ function createSummary(nameAndDirArray) {
 }
 
 function createDetails(nameAndDirArray) {
-	var basePath = 'http://galaxyweb.umassmed.edu/pub/ngstrack_pub' + '/mousetest/fastqc/'; //+ checkFrontAndEndDir(wkey);
-	var URL = '';
-	
 	var masterDiv = document.getElementById('details_exp_body');
 	var hrefSplit = window.location.href.split("/");
 	var runId = hrefSplit[hrefSplit.length - 2];
@@ -265,30 +249,9 @@ function getWKey(run_id){
 	return wkey;
 }
 
-function readTextFile(file)
-{
-	var text = '';
-    var rawFile = new XMLHttpRequest();
-    rawFile.open("GET", file, false);
-    rawFile.onreadystatechange = function ()
-    {
-        if(rawFile.readyState === 4)
-        {
-            if(rawFile.status === 200 || rawFile.status == 0)
-            {
-                text = rawFile.responseText;
-            }
-        }
-		return text;
-    }
-	rawFile.send(null);
-	return text;
-}
-
 $(function() {
 	"use strict";
 	if (phpGrab.theSegment == 'report') {
-	var reports_table = $('#jsontable_initial_mapping').dataTable();
 
 	var hrefSplit = window.location.href.split("/");
 
@@ -296,54 +259,79 @@ $(function() {
 	wkey = getWKey(runId);
 	var samples = hrefSplit[hrefSplit.length - 1].substring(0, hrefSplit[hrefSplit.length - 1].length - 1).split(",");
 	
+	var summary_files = [];
+	var count_files = [];
+	var RSEM_files = [];
+	var DESeq_files = [];
+	
 	$.ajax({ type: "GET",
 			url: BASE_PATH + "/public/api/?source=" + BASE_PATH + "/public/pub/" + wkey + "/reports.tsv",
 			async: false,
 			success : function(s)
 			{
-			   alert(s);
+				for(var x = 0; x < s.length; x++){
+					if(s[x].type == 'rsem'){
+						RSEM_files.push(s[x]);
+					}else if (s[x].type == 'deseq'){
+						DESeq_files.push(s[x]);
+					}else if (s[x].type == 'summary') {
+						summary_files.push(s[x]);
+					}else{
+						count_files.push(s[x]);
+					}
+				}
 			}
 	});
 	
-	var raw_report_info = readTextFile(BASE_PATH + '/public/pub/' + wkey + '/reports.tsv');
-	var report_info = raw_report_info.split('\n');
-	for (var y = 0; y < report_info.length; y++){
-		report_info[y] = report_info[y].split('\t');
-		console.log(report_info[y]);
+	var summary_rna_type = [];
+	for (var z = 0; z < summary_files.length; z++) {
+		summary_rna_type.push(summary_files[z]['file'].split("/")[summary_files[z]['file'].split("/").length - 1].split(".")[0]);
 	}
-	
-	
-	
-	for(var x = 0; x < nameAndDirArray[1].length; x++){
-		nameAndDirArray[1][x] = checkFrontAndEndDir(nameAndDirArray[1][x]);
+	for (var z = 0; z < summary_files.length; z++) {
+		document.getElementById('tablerow').appendChild(createElement('th', ['id'], [summary_rna_type[z]]));
+		document.getElementById(summary_rna_type[z]).innerHTML = summary_rna_type[z];
 	}
-
-	createSummary(nameAndDirArray);
-	createDetails(nameAndDirArray);
-
-	var jsonGrab = parseMoreTSV('rRNA', ['File','Total Reads','Reads 1'], nameAndDirArray);
-	var miRNA = parseTSV('miRNA', 'Reads 1', nameAndDirArray);
-	var tRNA= parseTSV('tRNA', 'Reads 1', nameAndDirArray);
-	var snRNA = parseTSV('snRNA', 'Reads 1', nameAndDirArray);
-	var rmsk = parseMoreTSV('rmsk', ['Reads 1','Unmapped Reads'], nameAndDirArray);
-	var libnames = ['rRNA', 'miRNA', 'tRNA', 'snRNA', 'rmsk'];
+	document.getElementById('tablerow').appendChild(createElement('th', ['id'], ['unused']));
+	document.getElementById('unused').innerHTML = 'Reads Left';
+	document.getElementById('tablerow').appendChild(createElement('th', ['id'], ['selection']));
+	document.getElementById('selection').innerHTML = 'Selected';
+	
+	var table_array = [];
+	
+	for (var z = 0; z < summary_files.length; z++) {
+		if (z == 0){
+			table_array.push(parseMoreTSV(['File','Total Reads','Reads 1'], summary_files[z]['file']));
+		}else if (z == summary_files.length - 1) {
+			table_array.push(parseMoreTSV(['Reads 1', 'Unmapped Reads'], summary_files[z]['file']));
+		}else{
+			table_array.push(parseTSV('Reads 1', summary_files[z]['file']));
+		}
+	}
 
 	//Initial Mapping Results
+	var reports_table = $('#jsontable_initial_mapping').dataTable();
 	reports_table.fnClearTable();
-	for (var x = 0; x < miRNA.length; x++) {
-		reports_table.fnAddData([
-		jsonGrab[x * 3],
-		jsonGrab[(x * 3) + 1],
-		cleanReports(jsonGrab[(x * 3) + 2].split(" ")[0], jsonGrab[(x * 3) + 1]),
-		cleanReports(miRNA[x].split(" ")[0], jsonGrab[(x * 3) + 1]),
-		cleanReports(tRNA[x].split(" ")[0], jsonGrab[(x * 3) + 1]),
-		cleanReports(snRNA[x].split(" ")[0], jsonGrab[(x * 3) + 1]),
-		cleanReports(rmsk[x * 2].split(" ")[0], jsonGrab[(x * 3) + 1]),
-		cleanReports(rmsk[(x * 2) + 1].split(" ")[0], jsonGrab[(x * 3) + 1]),
-		"<input type=\"checkbox\" class=\"ngs_checkbox\" name=\"" + jsonGrab[x * 3] + "\" id=\"lib_checkbox_"+x+"\" onClick=\"storeLib(this.name)\">",
-		]);
+	for (var x = 0; x < ((table_array[0].length/3) - 1); x++) {
+		var row_array = [];
+		for (var y = 0; y < table_array.length; y++){
+			if (y == 0) {
+				row_array.push(table_array[y][(x*3)]);
+				row_array.push(table_array[y][(x*3) + 1]);
+				row_array.push(table_array[y][(x*3) + 2].split(" ")[0]);
+			}else if (y == (table_array.length - 1)) {
+				row_array.push(table_array[y][(x*2)].split(" ")[0]);
+				row_array.push(table_array[y][(x*2) + 1].split(" ")[0]);
+			}else{
+				row_array.push(table_array[y][x].split(" ")[0]);
+			}
+		}
+		row_array.push("<input type=\"checkbox\" class=\"ngs_checkbox\" name=\"" + row_array[0] + "\" id=\"lib_checkbox_"+x+"\" onClick=\"storeLib(this.name)\">");
+		reports_table.fnAddData(row_array);
 	}
-
+	reports_table.fnAdjustColumnSizing(true);
+	
+	createSummary();
+	createDetails();
 	createDropdown(libnames);
 
 	reports_table.fnSort( [ [0,'asc'] ] );
