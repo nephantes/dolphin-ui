@@ -188,7 +188,7 @@ $(function() {
 					runparams.fnAddData([
 						parsed[i].title,
 						parsed[i].duration,
-						'<span class="pull-right badge bg-'+colortype+'">'+parsed[i].percentComplete+'%</span>',
+						'<span class="pull-right badge bg-'+colortype+'">'+parsed[i].percentComplete.split(".")[0]+'%</span>',
 						'<div class="progress progress-xs"><div class="progress-bar progress-bar-'+bartype+'" style="width: '+parsed[i].percentComplete+'%"></div></div>',
 						parsed[i].start,
 						parsed[i].finish,

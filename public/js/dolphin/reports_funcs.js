@@ -143,9 +143,12 @@ function showSelectTable(){
 			var buttonDiv = createElement('div', ['id', 'class'], ['clear_button_div', 'input-group margin']);
 			var buttonDivInner = createElement('div', ['id', 'class'], ['clear_button_inner_div', 'input-group margin pull-left']);
 			var clearButton = createElement('input', ['id', 'type', 'value', 'class', 'onclick'], ['clear_button', 'button', 'Clear Selection', 'btn btn-primary', 'clearSelection()']);
+			var downloads_link_div = createElement('div', ['id', 'class'], ['downloads_link_div', 'input-group margin pull-right']);
 			buttonDivInner.appendChild(clearButton);
 			buttonDiv.appendChild(buttonDivInner);
 			buttonDiv.appendChild(createDownloadReportButtons());
+			downloads_link_div.appendChild(createElement('input', ['id', 'class', 'type'], ['downloadable', 'form-control', 'text']));
+			buttonDiv.appendChild(downloads_link_div);
 			masterDiv.appendChild(buttonDiv);
 			
 			var table = generateSelectionTable();
@@ -213,7 +216,7 @@ function getCountsTableData(currentResultSelection){
 }
 
 function createDownloadReportButtons(){
-	var downloadDiv = createElement('div', ['id', 'class'], ['downloads_div', 'btn-group margin pull-right']);
+	var downloadDiv = createElement('div', ['id', 'class'], ['downloads_div', 'btn-group margin']);
 	var buttonType = ['JSON','JSON2', 'XML', 'HTML'];
 	for (var x = 0; x < buttonType.length; x++){
 		var button = createElement('input', ['id', 'class', 'type', 'value', 'onclick'], [buttonType[x], 'btn btn-primary', 'button', buttonType[x], 'downloadReports("'+buttonType[x]+'")']);
@@ -224,16 +227,9 @@ function createDownloadReportButtons(){
 }
 
 function downloadReports(type){
-	var basePath = 'http://galaxyweb.umassmed.edu/csv-to-api/?source=/project/umw_biocore/pub/ngstrack_pub';
-	var countsType = document.getElementById('select_report').value;
-	var URL = checkFrontAndEndDir(wkey) + 'counts/' + countsType + '.counts.tsv&fields=id,' + lib_checklist + '&format=' + type;
+	var URL = BASE_PATH + "/public/api/?source=" + BASE_PATH + '/public/pub/' + wkey + '/counts/' + currentResultSelection + '.counts.tsv&fields=id,' + lib_checklist.toString() + '&format=' + type;
 	
-	if (type == 'JSON') {
-		//Download actual file in the future?
-		window.open(basePath + URL);
-	}else{
-		window.open(basePath + URL);
-	}
+	document.getElementById('downloadable').value = URL;
 }
 
 function getWKey(run_id){
@@ -334,10 +330,13 @@ $(function() {
 	reports_table.fnAdjustColumnSizing(true);
 	
 	//Create a check for FASTQC output????
-	createSummary(getFastQCBool(runId));
-	
-	createDetails(libraries);
-	
+	if (getFastQCBool(runId)) {
+		createSummary(true);
+		createDetails(libraries);
+	}else{
+		document.getElementById('summary_exp').remove();
+		document.getElementById('details_exp').remove();
+	}
 	createDropdown(summary_rna_type);
 	}
 });
