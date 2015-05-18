@@ -7,6 +7,7 @@
 var wkey = '';
 var lib_checklist = [];
 var libraries = [];
+var table_array = [];
 var currentResultSelection = '--- Select a Result ---';
 var currentResultRSEM = '--- Select a Result ---';
 
@@ -508,7 +509,6 @@ $(function() {
 			async: false,
 			success : function(s)
 			{
-				console.log(s);
 				for(var x = 0; x < s.length; x++){
 					if(s[x].type == 'rsem'){
 						RSEM_files.push(s[x]);
@@ -522,6 +522,7 @@ $(function() {
 				}
 			}
 	});
+	
 	var summary_rna_type = [];
 	for (var z = 0; z < summary_files.length; z++) {
 		summary_rna_type.push(summary_files[z]['file'].split("/")[summary_files[z]['file'].split("/").length - 1].split(".")[0]);
@@ -534,8 +535,6 @@ $(function() {
 	document.getElementById('unused').innerHTML = 'Reads Left';
 	document.getElementById('tablerow').appendChild(createElement('th', ['id'], ['selection']));
 	document.getElementById('selection').innerHTML = 'Selected';
-	
-	var table_array = [];
 	
 	for (var z = 0; z < summary_files.length; z++) {
 		if (z == 0){
