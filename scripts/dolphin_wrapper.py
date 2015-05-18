@@ -314,7 +314,7 @@ def write_input( input_fn, data_dir, content,genomebuild,spaired,barcodes,adapte
    else:
      print >>fp, '@TRIM=NONE'
 
-   if(split and trim.lower() != 'none'):
+   if(split and split.lower() != 'none'):
      print >>fp, '@PREVIOUSSPLIT=%s'%previous
      previous="SPLIT"
    else:
