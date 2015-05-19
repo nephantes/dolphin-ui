@@ -35,7 +35,7 @@
 				<!-- Main content -->
 				<section class="content">
 					<div class="row">
-						<div class="col-md-11">
+						<div class="col-md-12">
 						<?php echo $html->sendJScript('advstatus', "", "", "", $uid, $gids); ?>
 						<?php echo $html->getBasePath(BASE_PATH, API_PATH); ?>
 						<?php echo $html->getRespBoxTable_ng("Services", "services", "<th>Name</th><th>Duration</th><th style=\"width: 75px\">% Complete</th><th>Progress</th><th>Start</th><th>Finish</th><th>Select</th>"); ?>
@@ -43,7 +43,7 @@
 								<?php echo $html->getRespBoxTable_ng("Jobs", "jobs", "<th>Name</th><th>Duration</th><th>Job #</th><th>Submission Time</th><th>Start</th><th>Finish</th><th>Select</th>"); ?>
 							</div>
 						</div>
-						<div class="col-md-11">
+						<div class="col-md-12">
 							<button id="back_to_status" class="btn btn-primary" onclick="backToStatus('<?php echo BASE_PATH?>')">Back to General Status</button>
 						</div>
 					</div><!-- /.row -->

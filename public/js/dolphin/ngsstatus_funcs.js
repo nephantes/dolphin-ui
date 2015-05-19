@@ -48,6 +48,8 @@ function selectService(id){
 				document.getElementById('service_jobs').style.display = 'inline';
 			}
 		});
+	runparams.fnSort( [ [4,'asc'] ] );
+	runparams.fnAdjustColumnSizing(true);
 }
 
 function selectJob(id){
