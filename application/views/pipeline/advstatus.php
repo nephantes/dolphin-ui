@@ -37,7 +37,7 @@
 					<div class="row">
 						<div class="col-md-11">
 						<?php echo $html->sendJScript('advstatus', "", "", "", $uid, $gids); ?>
-						<?php echo $html->getBasePath(BASE_PATH); ?>
+						<?php echo $html->getBasePath(BASE_PATH, API_PATH); ?>
 						<?php echo $html->getRespBoxTable_ng("Services", "services", "<th>Name</th><th>Duration</th><th style=\"width: 75px\">% Complete</th><th>Progress</th><th>Start</th><th>Finish</th><th>Select</th>"); ?>
 							<div id="service_jobs" style="display:none">
 								<?php echo $html->getRespBoxTable_ng("Jobs", "jobs", "<th>Name</th><th>Duration</th><th>Job #</th><th>Submission Time</th><th>Start</th><th>Finish</th><th>Select</th>"); ?>

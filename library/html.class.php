@@ -720,10 +720,11 @@ e range"><i class="fa fa-calendar"></i></button>
 	}
 	return $html;
 	}
-	function getBasePath($BASE_PATH){
+	function getBasePath($BASE_PATH, $API_PATH){
 		$html = "";
 		$html.="<script type='text/javascript'>\n";
 		$html.="var BASE_PATH = '" . $BASE_PATH . "'\n";
+		$html.="var API_PATH = '" . $API_PATH . "'\n";
 		$html.="</script>\n";
 		return $html;
 	}

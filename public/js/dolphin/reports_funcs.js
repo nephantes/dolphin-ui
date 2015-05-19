@@ -14,7 +14,7 @@ var currentResultRSEM = '--- Select a Result ---';
 function parseTSV(jsonName, url_path){
 	var parsed = [];
 	$.ajax({ type: "GET",
-			url: BASE_PATH + "/public/api/?source=" + BASE_PATH + "/public/pub/" + wkey + "/" + url_path,
+			url: BASE_PATH + "/public/api/?source=" + API_PATH + "/public/pub/" + wkey + "/" + url_path,
 			async: false,
 			success : function(s)
 			{
@@ -29,7 +29,7 @@ function parseTSV(jsonName, url_path){
 function parseMoreTSV(jsonNameArray, url_path){
 	var parsed = [];
 	$.ajax({ type: "GET",
-			url: BASE_PATH + "/public/api/?source=" + BASE_PATH + "/public/pub/" + wkey + "/" + url_path,
+			url: BASE_PATH + "/public/api/?source=" + API_PATH + "/public/pub/" + wkey + "/" + url_path,
 			async: false,
 			success : function(s)
 			{
@@ -211,7 +211,7 @@ function generateSelectionTable(){
 function getCountsTableData(currentResultSelection){
 	var objList = [];
 	$.ajax({ type: "GET",
-			url: BASE_PATH + "/public/api/?source=" + BASE_PATH + '/public/pub/' + wkey + '/counts/' + currentResultSelection + '.counts.tsv&fields=id,' + lib_checklist.toString(),
+			url: BASE_PATH + "/public/api/?source=" + API_PATH + '/public/pub/' + wkey + '/counts/' + currentResultSelection + '.counts.tsv&fields=id,' + lib_checklist.toString(),
 			async: false,
 			success : function(s)
 			{
@@ -233,7 +233,7 @@ function createDownloadReportButtons(){
 }
 
 function downloadReports(type){
-	var URL = BASE_PATH + "/public/api/?source=" + BASE_PATH + '/public/pub/' + wkey + '/counts/' + currentResultSelection + '.counts.tsv&fields=id,' + lib_checklist.toString() + '&format=' + type;
+	var URL = BASE_PATH + "/public/api/?source=" + API_PATH + '/public/pub/' + wkey + '/counts/' + currentResultSelection + '.counts.tsv&fields=id,' + lib_checklist.toString() + '&format=' + type;
 	document.getElementById('downloadable').value = URL;
 }
 
@@ -325,7 +325,7 @@ function generateRSEMTable(){
 function getRSEMTableData(currentResultRSEM){
 	var objList = [];
 	$.ajax({ type: "GET",
-			url: BASE_PATH + "/public/api/?source=" + BASE_PATH + '/public/pub/' + wkey + '/' + currentResultRSEM,
+			url: BASE_PATH + "/public/api/?source=" + API_PATH + '/public/pub/' + wkey + '/' + currentResultRSEM,
 			async: false,
 			success : function(s)
 			{
@@ -349,7 +349,7 @@ function createDownloadRSEMReportButtons(){
 }
 
 function downloadRSEMReports(type){
-	var URL = BASE_PATH + "/public/api/?source=" + BASE_PATH + '/public/pub/' + wkey + '/' + currentResultRSEM + '&format=' + type;
+	var URL = BASE_PATH + "/public/api/?source=" + API_PATH + '/public/pub/' + wkey + '/' + currentResultRSEM + '&format=' + type;
 	document.getElementById('downloadable_rsem').value = URL;
 }
 
@@ -447,7 +447,7 @@ function generateDESEQTable(){
 function getDESEQTableData(currentResultDESEQ){
 	var objList = [];
 	$.ajax({ type: "GET",
-			url: BASE_PATH + "/public/api/?source=" + BASE_PATH + '/public/pub/' + wkey + '/' + currentResultDESEQ,
+			url: BASE_PATH + "/public/api/?source=" + API_PATH + '/public/pub/' + wkey + '/' + currentResultDESEQ,
 			async: false,
 			success : function(s)
 			{
@@ -471,7 +471,7 @@ function createDownloadDESEQReportButtons(){
 }
 
 function downloadDESEQReports(type){
-	var URL = BASE_PATH + "/public/api/?source=" + BASE_PATH + '/public/pub/' + wkey + '/' + currentResultDESEQ + '&format=' + type;
+	var URL = BASE_PATH + "/public/api/?source=" + API_PATH + '/public/pub/' + wkey + '/' + currentResultDESEQ + '&format=' + type;
 	document.getElementById('downloadable_deseq').value = URL;
 }
 
