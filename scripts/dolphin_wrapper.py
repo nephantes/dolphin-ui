@@ -522,7 +522,7 @@ def write_workflow( resume, gettotalreads, amazonupload, backupS3, runparamsid, 
             indexname='Chip'
             stepline=stepSeqMapping % locals()
             print >>fp, '%s'%stepline
-            if (split):
+            if (split and split.lower() != 'none'):
                 stepline=stepMergeChip % locals()
                 print >>fp, '%s'%stepline
             #Set running macs step
@@ -534,7 +534,7 @@ def write_workflow( resume, gettotalreads, amazonupload, backupS3, runparamsid, 
             igv=str(arr[6])
             if (igv.lower()=="yes"):
                 type="chip"
-                if (split):
+                if (split and split.lower() != 'none'):
                     type="mergechip"
                 stepline=stepIGVTDF % locals()
                 print >>fp, '%s'%stepline
@@ -542,7 +542,7 @@ def write_workflow( resume, gettotalreads, amazonupload, backupS3, runparamsid, 
             bam2bw=str(arr[7])
             if (bam2bw.lower()=="yes"):
                 type="chip"
-                if (split):
+                if (split and split.lower() != 'none'):
                     type="mergechip"
                 stepline=stepBam2BW % locals()
                 print >>fp, '%s'%stepline
@@ -587,7 +587,7 @@ def parse_content( content, ncols=8, base64=False, verbose=0 ) :
    content = content.replace( '__pd__', '' )
    content = content.replace( '__cr____cn__', ':' )
    content = re.sub('[\s\t,]+', ',', content)
-   content = re.sub('[\n:]+', ':', content)
+   content = re.sub('[\n\r:]+', ':', content)
    content = re.sub(':+', ':', content)
    content = re.sub(':$', '', content)
    #content = re.sub('[-]+', '_', content)
