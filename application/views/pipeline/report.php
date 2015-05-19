@@ -24,8 +24,8 @@
 					<?php echo $html->getExpandingAnalysisBox('Initial Mapping Results', "initial_mapping", true); ?>
 					<?php echo $html->getExpandingAnalysisBox('FastQC Summary', "summary", false); ?>
 					<?php echo $html->getExpandingAnalysisBox('Detailed FastQC Results', "details", false); ?>
-					<?php echo $html->getExpandingAnalysisBox('RSEM Results', "rsem", false); ?>
-					<?php echo $html->getExpandingAnalysisBox('DESeq Results', "deseq", false); ?>
+					<?php echo $html->getExpandingAnalysisBox('RSEM Results', "RSEM", false); ?>
+					<?php echo $html->getExpandingAnalysisBox('DESeq Results', "DESEQ", false); ?>
 					<button id="back_to_status" class="btn btn-primary" onclick="sendToStatus()">Return to Status</button>
 				</div>
 			</div>
