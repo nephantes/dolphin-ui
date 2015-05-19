@@ -128,7 +128,7 @@ function rerunLoad() {
 							additionalPipes();
 							document.getElementById('select_'+i).value = pipelineDict[2];
 							pipelineSelect(i);
-							document.getElementById('textarea_'+i).value = splt2[1].replace("__cr____cn__", "\n");
+							document.getElementById('textarea_'+i).value = splt2[1].replace(/__cr____cn__/g, "\n");
 							document.getElementById('text_1_'+i).value = splt2[2];
 							document.getElementById('text_2_'+i).value = splt2[3];
 							document.getElementById('select_1_'+i).value = splt2[4];
