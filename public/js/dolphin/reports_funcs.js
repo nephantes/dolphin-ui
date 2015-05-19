@@ -145,14 +145,10 @@ function showSelectTable(){
 	var masterDiv = document.getElementById('initial_mapping_exp_body');
 	
 	if (document.getElementById('jsontable_selected_results') == null) {
-		var buttonDiv = createElement('div', ['id', 'class'], ['clear_button_div', 'input-group margin']);
-		var buttonDivInner = createElement('div', ['id', 'class'], ['clear_button_inner_div', 'input-group margin pull-left']);
-		var clearButton = createElement('input', ['id', 'type', 'value', 'class', 'onclick'], ['clear_button', 'button', 'Clear Selection', 'btn btn-primary', 'clearSelection()']);
+		var buttonDiv = createElement('div', ['id', 'class'], ['clear_button_div', 'input-group margin col-md-12']);
 		var downloads_link_div = createElement('div', ['id', 'class'], ['downloads_link_div', 'input-group margin pull-right']);
-		buttonDivInner.appendChild(clearButton);
-		buttonDiv.appendChild(buttonDivInner);
 		buttonDiv.appendChild(createDownloadReportButtons());
-		downloads_link_div.appendChild(createElement('input', ['id', 'class', 'type'], ['downloadable', 'form-control', 'text']));
+		downloads_link_div.appendChild(createElement('input', ['id', 'class', 'type', 'size'], ['downloadable', 'form-control', 'text', '90']));
 		buttonDiv.appendChild(downloads_link_div);
 		masterDiv.appendChild(buttonDiv);
 		
@@ -223,11 +219,30 @@ function getCountsTableData(currentResultSelection){
 
 function createDownloadReportButtons(){
 	var downloadDiv = createElement('div', ['id', 'class'], ['downloads_div', 'btn-group margin']);
+	var ul = createElement('ul', ['class', 'role'], ['dropdown-menu', 'menu']);
+	var button = createElement('button', ['type', 'class', 'data-toggle', 'aria-expanded'], ['button', 'btn btn-primary dropdown-toggle', 'dropdown', 'true'])
+	button.innerHTML = 'Actions ';
+	var span = createElement('span', ['class'], ['fa fa-caret-down']);
+	button.appendChild(span);
+	
 	var buttonType = ['JSON','JSON2', 'XML', 'HTML'];
 	for (var x = 0; x < buttonType.length; x++){
-		var button = createElement('input', ['id', 'class', 'type', 'value', 'onclick'], [buttonType[x], 'btn btn-primary', 'button', buttonType[x], 'downloadReports("'+buttonType[x]+'")']);
-		downloadDiv.appendChild(button);
+		var li = createElement('li', [], []);
+		var a = createElement('a', ['onclick', 'style'], ['downloadReports("'+buttonType[x]+'")', 'cursor:pointer']);
+		a.innerHTML = buttonType[x];
+		li.appendChild(a);
+		ul.appendChild(li);
 	}
+	var divider = createElement('li', ['class'], ['divider']);
+	ul.appendChild(divider);
+	var clear = createElement('li', [], []);
+	var clear_a = createElement('a', ['value', 'onclick', 'style'], ['Clear Selection', 'clearSelection()', 'cursor:pointer']);
+	clear_a.innerHTML = 'Clear Selection';
+	clear.appendChild(clear_a);
+	ul.appendChild(clear);
+	
+	downloadDiv.appendChild(button);
+	downloadDiv.appendChild(ul);
 
 	return downloadDiv;
 }
@@ -259,15 +274,10 @@ function showRSEMTable(){
 	var masterDiv = document.getElementById('rsem_exp_body');
 	
 	if (document.getElementById('jsontable_rsem_results') == null) {
-		var buttonDiv = createElement('div', ['id', 'class'], ['clear_rsem_button_div', 'input-group margin']);
-		var buttonDivInner = createElement('div', ['id', 'class'], ['clear_rsem_button_inner_div', 'input-group margin pull-left']);
-		var clearButton = createElement('input', ['id', 'type', 'value', 'class', 'onclick'], ['clear_rsem_button', 'button', 'Clear Selection', 'btn btn-primary', 'clearRSEM()']);
+		var buttonDiv = createElement('div', ['id', 'class'], ['clear_rsem_button_div', 'input-group margin col-md-12']);
 		var downloads_link_div = createElement('div', ['id', 'class'], ['rsem_downloads_link_div', 'input-group margin pull-right']);
-		
-		buttonDivInner.appendChild(clearButton);
-		buttonDiv.appendChild(buttonDivInner);
 		buttonDiv.appendChild(createDownloadRSEMReportButtons());
-		downloads_link_div.appendChild(createElement('input', ['id', 'class', 'type'], ['downloadable_rsem', 'form-control', 'text']));
+		downloads_link_div.appendChild(createElement('input', ['id', 'class', 'type', 'size'], ['downloadable_rsem', 'form-control', 'text', '90']));
 		buttonDiv.appendChild(downloads_link_div);
 		masterDiv.appendChild(buttonDiv);
 		
@@ -332,18 +342,36 @@ function getRSEMTableData(currentResultRSEM){
 				objList = s;
 			}
 	});
-	console.log(objList);
 	return objList;
 }
 
 
 function createDownloadRSEMReportButtons(){
 	var downloadDiv = createElement('div', ['id', 'class'], ['downloads_div', 'btn-group margin']);
+	var ul = createElement('ul', ['class', 'role'], ['dropdown-menu', 'menu']);
+	var button = createElement('button', ['type', 'class', 'data-toggle', 'aria-expanded'], ['button', 'btn btn-primary dropdown-toggle', 'dropdown', 'true'])
+	button.innerHTML = 'Actions ';
+	var span = createElement('span', ['class'], ['fa fa-caret-down']);
+	button.appendChild(span);
+	
 	var buttonType = ['JSON','JSON2', 'XML', 'HTML'];
 	for (var x = 0; x < buttonType.length; x++){
-		var button = createElement('input', ['id', 'class', 'type', 'value', 'onclick'], [buttonType[x], 'btn btn-primary', 'button', buttonType[x], 'downloadRSEMReports("'+buttonType[x]+'")']);
-		downloadDiv.appendChild(button);
+		var li = createElement('li', [], []);
+		var a = createElement('a', ['onclick', 'style'], ['downloadRSEMReports("'+buttonType[x]+'")', 'cursor:pointer']);
+		a.innerHTML = buttonType[x];
+		li.appendChild(a);
+		ul.appendChild(li);
 	}
+	var divider = createElement('li', ['class'], ['divider']);
+	ul.appendChild(divider);
+	var clear = createElement('li', [], []);
+	var clear_a = createElement('a', ['value', 'onclick', 'style'], ['Clear Selection', 'clearRSEM()', 'cursor:pointer']);
+	clear_a.innerHTML = 'Clear Selection';
+	clear.appendChild(clear_a);
+	ul.appendChild(clear);
+	
+	downloadDiv.appendChild(button);
+	downloadDiv.appendChild(ul);
 
 	return downloadDiv;
 }
@@ -375,15 +403,10 @@ function showDESEQTable(){
 	var masterDiv = document.getElementById('deseq_exp_body');
 	
 	if (document.getElementById('jsontable_deseq_results') == null) {
-		var buttonDiv = createElement('div', ['id', 'class'], ['clear_deseq_button_div', 'input-group margin']);
-		var buttonDivInner = createElement('div', ['id', 'class'], ['clear_deseq_button_inner_div', 'input-group margin pull-left']);
-		var clearButton = createElement('input', ['id', 'type', 'value', 'class', 'onclick'], ['clear_deseq_button', 'button', 'Clear Selection', 'btn btn-primary', 'clearDESEQ()']);
+		var buttonDiv = createElement('div', ['id', 'class'], ['clear_deseq_button_div', 'input-group margin col-md-12']);
 		var downloads_link_div = createElement('div', ['id', 'class'], ['deseq_downloads_link_div', 'input-group margin pull-right']);
-		
-		buttonDivInner.appendChild(clearButton);
-		buttonDiv.appendChild(buttonDivInner);
 		buttonDiv.appendChild(createDownloadDESEQReportButtons());
-		downloads_link_div.appendChild(createElement('input', ['id', 'class', 'type', 'style'], ['downloadable_deseq', 'form-control', 'text', 'width:100%']));
+		downloads_link_div.appendChild(createElement('input', ['id', 'class', 'type', 'style', 'size'], ['downloadable_deseq', 'form-control', 'text', 'width:100%', '90']));
 		buttonDiv.appendChild(downloads_link_div);
 		masterDiv.appendChild(buttonDiv);
 		
@@ -454,18 +477,36 @@ function getDESEQTableData(currentResultDESEQ){
 				objList = s;
 			}
 	});
-	console.log(objList);
 	return objList;
 }
 
 
 function createDownloadDESEQReportButtons(){
 	var downloadDiv = createElement('div', ['id', 'class'], ['downloads_div', 'btn-group margin']);
+	var ul = createElement('ul', ['class', 'role'], ['dropdown-menu', 'menu']);
+	var button = createElement('button', ['type', 'class', 'data-toggle', 'aria-expanded'], ['button', 'btn btn-primary dropdown-toggle', 'dropdown', 'true'])
+	button.innerHTML = 'Actions ';
+	var span = createElement('span', ['class'], ['fa fa-caret-down']);
+	button.appendChild(span);
+	
 	var buttonType = ['JSON','JSON2', 'XML', 'HTML'];
 	for (var x = 0; x < buttonType.length; x++){
-		var button = createElement('input', ['id', 'class', 'type', 'value', 'onclick'], [buttonType[x], 'btn btn-primary', 'button', buttonType[x], 'downloadDESEQReports("'+buttonType[x]+'")']);
-		downloadDiv.appendChild(button);
+		var li = createElement('li', [], []);
+		var a = createElement('a', ['onclick', 'style'], ['downloadDESEQReports("'+buttonType[x]+'")', 'cursor:pointer']);
+		a.innerHTML = buttonType[x];
+		li.appendChild(a);
+		ul.appendChild(li);
 	}
+	var divider = createElement('li', ['class'], ['divider']);
+	ul.appendChild(divider);
+	var clear = createElement('li', [], []);
+	var clear_a = createElement('a', ['value', 'onclick', 'style'], ['Clear Selection', 'clearDESEQ()', 'cursor:pointer']);
+	clear_a.innerHTML = 'Clear Selection';
+	clear.appendChild(clear_a);
+	ul.appendChild(clear);
+	
+	downloadDiv.appendChild(button);
+	downloadDiv.appendChild(ul);
 
 	return downloadDiv;
 }

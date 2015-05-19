@@ -197,6 +197,8 @@ $(function() {
 				} // End For
 			}
 		});
+		runparams.fnSort( [ [4,'asc'] ] );
+		runparams.fnAdjustColumnSizing(true);
 	}
 
 
