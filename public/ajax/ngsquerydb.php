@@ -10,7 +10,7 @@ $query = new dbfuncs();
 
 $pDictionary = ['getSelectedSamples', 'submitPipeline', 'getStatus', 'getRunSamples', 'grabReload', 'getReportNames', 'lanesToSamples',
 				'checkMatePaired', 'getAllSampleIds', 'getLaneIdFromSample', 'getSingleSample', 'getSeriesIdFromLane', 'getAllLaneIds',
-                'getGIDs', 'getSampleNames', 'getWKey', 'getFastQCBool'];
+                'getGIDs', 'getSampleNames', 'getWKey', 'getFastQCBool', 'getReportList'];
 
 $q = "";
 $r = "";
@@ -460,6 +460,15 @@ else if ($p == 'getFastQCBool')
     SELECT json_parameters
     FROM ngs_runparams
     WHERE id = $id
+    ");
+}
+else if ($p == 'getReportList')
+{
+    if (isset($_GET['wkey'])){$wkey = $_GET['wkey'];}
+    $data=$query->queryTable("
+    SELECT version, type, file
+    FROM biocore.report_list
+    WHERE wkey = '$wkey'
     ");
 }
 

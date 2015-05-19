@@ -28,4 +28,4 @@ if (isset($_SESSION['user']))
 }
 
 define('BASE_PATH', $ini_array['BASE_PATH']);
-
+define('API_PATH', $ini_array['API_PATH']);

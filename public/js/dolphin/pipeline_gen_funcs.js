@@ -128,7 +128,7 @@ function rerunLoad() {
 							additionalPipes();
 							document.getElementById('select_'+i).value = pipelineDict[2];
 							pipelineSelect(i);
-							document.getElementById('textarea_'+i).value = splt2[1];
+							document.getElementById('textarea_'+i).value = splt2[1].replace("__cr____cn__", "\n");
 							document.getElementById('text_1_'+i).value = splt2[2];
 							document.getElementById('text_2_'+i).value = splt2[3];
 							document.getElementById('select_1_'+i).value = splt2[4];
@@ -827,7 +827,7 @@ function findPipelineValues(){
 						pipeJSON += ':' + conditions_array.toString() + ':' + conditions_type_array.toString();
 					}
 				}else{
-					pipeJSON += ':' + e.value;
+					pipeJSON += ':' + e.value.replace(/\r\n|\r|\n/g, "__cr____cn__");
 				}
 			}
 		}

@@ -7,13 +7,14 @@
 var wkey = '';
 var lib_checklist = [];
 var libraries = [];
+var table_array = [];
 var currentResultSelection = '--- Select a Result ---';
 var currentResultRSEM = '--- Select a Result ---';
 
 function parseTSV(jsonName, url_path){
 	var parsed = [];
 	$.ajax({ type: "GET",
-			url: BASE_PATH + "/public/api/?source=" + BASE_PATH + "/public/pub/" + wkey + "/" + url_path,
+			url: BASE_PATH + "/public/api/?source=" + API_PATH + "/public/pub/" + wkey + "/" + url_path,
 			async: false,
 			success : function(s)
 			{
@@ -28,7 +29,7 @@ function parseTSV(jsonName, url_path){
 function parseMoreTSV(jsonNameArray, url_path){
 	var parsed = [];
 	$.ajax({ type: "GET",
-			url: BASE_PATH + "/public/api/?source=" + BASE_PATH + "/public/pub/" + wkey + "/" + url_path,
+			url: BASE_PATH + "/public/api/?source=" + API_PATH + "/public/pub/" + wkey + "/" + url_path,
 			async: false,
 			success : function(s)
 			{
@@ -210,7 +211,7 @@ function generateSelectionTable(){
 function getCountsTableData(currentResultSelection){
 	var objList = [];
 	$.ajax({ type: "GET",
-			url: BASE_PATH + "/public/api/?source=" + BASE_PATH + '/public/pub/' + wkey + '/counts/' + currentResultSelection + '.counts.tsv&fields=id,' + lib_checklist.toString(),
+			url: BASE_PATH + "/public/api/?source=" + API_PATH + '/public/pub/' + wkey + '/counts/' + currentResultSelection + '.counts.tsv&fields=id,' + lib_checklist.toString(),
 			async: false,
 			success : function(s)
 			{
@@ -232,7 +233,7 @@ function createDownloadReportButtons(){
 }
 
 function downloadReports(type){
-	var URL = BASE_PATH + "/public/api/?source=" + BASE_PATH + '/public/pub/' + wkey + '/counts/' + currentResultSelection + '.counts.tsv&fields=id,' + lib_checklist.toString() + '&format=' + type;
+	var URL = BASE_PATH + "/public/api/?source=" + API_PATH + '/public/pub/' + wkey + '/counts/' + currentResultSelection + '.counts.tsv&fields=id,' + lib_checklist.toString() + '&format=' + type;
 	document.getElementById('downloadable').value = URL;
 }
 
@@ -324,7 +325,7 @@ function generateRSEMTable(){
 function getRSEMTableData(currentResultRSEM){
 	var objList = [];
 	$.ajax({ type: "GET",
-			url: BASE_PATH + "/public/api/?source=" + BASE_PATH + '/public/pub/' + wkey + '/' + currentResultRSEM,
+			url: BASE_PATH + "/public/api/?source=" + API_PATH + '/public/pub/' + wkey + '/' + currentResultRSEM,
 			async: false,
 			success : function(s)
 			{
@@ -348,7 +349,7 @@ function createDownloadRSEMReportButtons(){
 }
 
 function downloadRSEMReports(type){
-	var URL = BASE_PATH + "/public/api/?source=" + BASE_PATH + '/public/pub/' + wkey + '/' + currentResultRSEM + '&format=' + type;
+	var URL = BASE_PATH + "/public/api/?source=" + API_PATH + '/public/pub/' + wkey + '/' + currentResultRSEM + '&format=' + type;
 	document.getElementById('downloadable_rsem').value = URL;
 }
 
@@ -446,7 +447,7 @@ function generateDESEQTable(){
 function getDESEQTableData(currentResultDESEQ){
 	var objList = [];
 	$.ajax({ type: "GET",
-			url: BASE_PATH + "/public/api/?source=" + BASE_PATH + '/public/pub/' + wkey + '/' + currentResultDESEQ,
+			url: BASE_PATH + "/public/api/?source=" + API_PATH + '/public/pub/' + wkey + '/' + currentResultDESEQ,
 			async: false,
 			success : function(s)
 			{
@@ -470,7 +471,7 @@ function createDownloadDESEQReportButtons(){
 }
 
 function downloadDESEQReports(type){
-	var URL = BASE_PATH + "/public/api/?source=" + BASE_PATH + '/public/pub/' + wkey + '/' + currentResultDESEQ + '&format=' + type;
+	var URL = BASE_PATH + "/public/api/?source=" + API_PATH + '/public/pub/' + wkey + '/' + currentResultDESEQ + '&format=' + type;
 	document.getElementById('downloadable_deseq').value = URL;
 }
 
@@ -503,7 +504,8 @@ $(function() {
 	var DESEQ_files = [];
 	
 	$.ajax({ type: "GET",
-			url: BASE_PATH + "/public/api/?source=" + BASE_PATH + "/public/pub/" + wkey + "/reports.tsv",
+			url: "/dolphin/public/ajax/ngsquerydb.php",
+			data: { p: 'getReportList', wkey: wkey },
 			async: false,
 			success : function(s)
 			{
@@ -520,6 +522,7 @@ $(function() {
 				}
 			}
 	});
+	
 	var summary_rna_type = [];
 	for (var z = 0; z < summary_files.length; z++) {
 		summary_rna_type.push(summary_files[z]['file'].split("/")[summary_files[z]['file'].split("/").length - 1].split(".")[0]);
@@ -532,8 +535,6 @@ $(function() {
 	document.getElementById('unused').innerHTML = 'Reads Left';
 	document.getElementById('tablerow').appendChild(createElement('th', ['id'], ['selection']));
 	document.getElementById('selection').innerHTML = 'Selected';
-	
-	var table_array = [];
 	
 	for (var z = 0; z < summary_files.length; z++) {
 		if (z == 0){
