@@ -64,7 +64,7 @@
 										<tr>
 											<td> Color axis 2</td>
 											<td>
-												<select type="text" id="zi" class="form-control" disabled></select>
+												<select type="text" id="zi" class="form-control"></select>
 											</td>
 										</tr>
 										<tr style="display:none">
