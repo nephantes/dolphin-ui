@@ -10,7 +10,7 @@ $query = new dbfuncs();
 
 $pDictionary = ['getSelectedSamples', 'submitPipeline', 'getStatus', 'getRunSamples', 'grabReload', 'getReportNames', 'lanesToSamples',
 				'checkMatePaired', 'getAllSampleIds', 'getLaneIdFromSample', 'getSingleSample', 'getSeriesIdFromLane', 'getAllLaneIds',
-                'getGIDs', 'getSampleNames', 'getWKey', 'getFastQCBool', 'getReportList'];
+                'getGIDs', 'getSampleNames', 'getWKey', 'getFastQCBool', 'getReportList', 'getTSVFileList'];
 
 $q = "";
 $r = "";
@@ -469,6 +469,15 @@ else if ($p == 'getReportList')
     SELECT version, type, file
     FROM biocore.report_list
     WHERE wkey = '$wkey'
+    ");
+}
+else if ($p == 'getTSVFileList')
+{
+    if (isset($_GET['wkey'])){$wkey = $_GET['wkey'];}
+    $data=$query->queryTable("
+    SELECT file
+    FROM report_list
+    WHERE wkey = '$wkey' and file like '%.tsv'
     ");
 }
 

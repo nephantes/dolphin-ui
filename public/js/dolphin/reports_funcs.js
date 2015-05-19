@@ -331,6 +331,11 @@ function getWKey(run_id){
 	return wkey;
 }
 
+function sendToPlots(){
+	sendWKey(wkey);
+	window.location.href = BASE_PATH+ '/plot';
+}
+
 $(function() {
 	"use strict";
 	if (phpGrab.theSegment == 'report') {

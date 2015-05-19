@@ -47,6 +47,35 @@ function getBasketInfo() {
 	}
 }
 
+function sendWKey(wkey){
+	$.ajax({ type: "POST",
+		url: "/dolphin/public/ajax/sessionrequests.php",
+		data: { p:"sendWKey", wkey:wkey },
+		async: false,
+		success : function(s)
+		{
+		}
+	});
+}
+
+function getWKey() {
+	wkey = "";
+	$.ajax({ type: "GET",
+		url: "/dolphin/public/ajax/sessionrequests.php",
+		data: { p:"getWKey" },
+		async: false,
+		success : function(s)
+		{
+			wkey = s;
+		}
+	});
+	if (wkey == "") {
+		return undefined;
+	}else{
+		return wkey;
+	}
+}
+
 function removeBasketInfo(id){
 	$.ajax({ type: "POST",
 		url: "/dolphin/public/ajax/sessionrequests.php",
@@ -62,6 +91,17 @@ function flushBasketInfo() {
 	$.ajax({ type: "POST",
 		url: "/dolphin/public/ajax/sessionrequests.php",
 		data: { p:"flushBasketInfo"},
+		async: false,
+		success : function(s)
+		{
+		}
+	});
+}
+
+function flushWKey() {
+	$.ajax({ type: "POST",
+		url: "/dolphin/public/ajax/sessionrequests.php",
+		data: { p:"flushWKey"},
 		async: false,
 		success : function(s)
 		{

@@ -10,6 +10,10 @@ class PlotController extends VanillaController {
 		$this->set('field', "Plots");
 	}
 	
+	function double(){
+		$this->set('field', "Plots");
+	}
+	
 	function afterAction(){
 		
 	}
