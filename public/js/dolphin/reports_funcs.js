@@ -332,6 +332,7 @@ function getWKey(run_id){
 }
 
 function sendToPlots(){
+	sendWKey(wkey);
 	window.location.href = BASE_PATH+ '/plot';
 }
 

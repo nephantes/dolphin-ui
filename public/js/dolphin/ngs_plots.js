@@ -1,4 +1,25 @@
-  console.log($("#xi_scale").is(":checked"));
+
+var wkey;
+
+function populateFileList(){
+  var tsv_files = [];
+  wkey = getWKey();
+  $.ajax({ type: "GET",
+			url: BASE_PATH + "/public/ajax/ngsquerydb.php",
+            data: { p: "getTSVFileList", wkey:wkey },
+			async: false,
+			success : function(s)
+              {
+                for (var x = 0; x < s.length; x++){
+                  var opt = createElement('option', ['value'], [s[x].file]);
+                  opt.innerHTML = s[x].file;
+                  document.getElementById('source_1').appendChild(opt);
+                }
+              }
+		});
+}
+
+populateFileList();
     (function (S,$) {
         window.handle_sheet_index=function(data)
         {
@@ -26,19 +47,18 @@
       
        var getSrc=function()
        {
-       var src= document.getElementById("source").value || document.getElementById("source").placeholder;
-       console.log(src);
+       var src= document.getElementById("source_1").value || document.getElementById("source").placeholder;
+       src = API_PATH+'/public/pub/'+wkey+'/'+src;
        var re=/^http/;
        var OK=re.exec(src);
-       console.log(OK);
-       
        
        if(!OK)
        {
         S.gsheet.query("select *", src, "window.handle_sheet_index")   
        }
        else {
-        d3.json("http://galaxyweb.umassmed.edu/csv-to-api/?format=json2&source="+src,function(error,data){
+        d3.json(BASE_PATH+"/public/api/?format=json2&source="+src,function(error,data){
+          console.log(data);
             window.handle_sheet_index(data);
         })
        }
@@ -56,7 +76,7 @@
             d3.select("#zi_value_cutoff").attr("min",Math.min.apply(null,a) || 0);
             
         }
-        $("#source").on("change",function(d) {getSrc();view()});
+        $("#source_1").on("change",function(d) {getSrc();view()});
         $("#xi").on("change",function(d) {view()});
         $("#yi").on("change",function(d) {view()});
         $("#zi").on("change",function(d) {

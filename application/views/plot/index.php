@@ -1,4 +1,5 @@
 				<section class="content">
+					<?php echo $html->getBasePath(BASE_PATH, API_PATH); ?>
 					<div class="row">
 						<!-- left column -->
 						<div class="col-md-3">
@@ -14,20 +15,28 @@
 									<table id="controller" class="table table-striped">
 										<tbody>
 										<tr>
+											<td ><b>Source</b></td>
+											<td>
+												<select type="text" id="source_1" class="form-control">
+													<option disabled>Select a Source</option>
+												</select>
+											</td>
+										</tr>
+										<tr style="display:none">
 											<td id="source_input"><b>Source</b><br><span style="font-size:8px">URL or Google Sheet ID</span></td>
 											<td>
-												 <textarea id="source" class="form-control" rows="5" cols="20" placeholder="http://galaxyweb.umassmed.edu/galaxy/ak97w/dene/all.tsv">http://galaxyweb.umassmed.edu/galaxy/ak97w/dene/alldetected.tsv</textarea>
+												 <textarea id="source" class="form-control" rows="5" cols="20" placeholder="http://galaxyweb.umassmed.edu/galaxy/ak97w/dene/all.tsv"></textarea>
 											</td>
 										</tr>
 										<tr>
-											<td>X axis<br>(Log)<input type="checkbox" id="xi_scale" value="log scale" checked> </td>
+											<td>X axis<br>(Log)<input type="checkbox" id="xi_scale" value="log scale" disabled checked> </td>
 											<td>
 												<select type="text" id="xi" class="form-control"></select>
 											</td>
 										</tr>
 										<tr>
 											<td >Y axis<br> 
-											(Log)<input type="checkbox" id="yi_scale" value="log scale" checked> 
+											(Log)<input type="checkbox" id="yi_scale" value="log scale" disabled checked> 
 											</td>
 											<td>
 												<select type="text" id="yi" class="form-control"></select>
@@ -38,15 +47,30 @@
 											<td><input type="number" id="pseudocount" placeholder=1 class="form-control"></input></td>
 										</tr>
 										<tr>
-											<td> Color axis</td>
+											<td> Color axis 1</td>
 											<td>
 												<select type="text" id="zi" class="form-control"></select>
 											</td>
 										</tr>
-										<tr>
-											<td>Color axis type</td>
+										<tr style="display:none">
+											<td>Color axis type 1</td>
 											<td>
 												<select type="text" id="zi_type" class="form-control">
+													<option value="value">value</option>
+													<option value="category">category</option>
+												</select>
+											</td>
+										</tr>
+										<tr>
+											<td> Color axis 2</td>
+											<td>
+												<select type="text" id="zi" class="form-control" disabled></select>
+											</td>
+										</tr>
+										<tr style="display:none">
+											<td>Color axis type 2</td>
+											<td>
+												<select type="text" id="zi_type_2" class="form-control">
 													<option value="value">value</option>
 													<option value="category">category</option>
 												</select>

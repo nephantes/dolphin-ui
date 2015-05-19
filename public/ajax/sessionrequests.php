@@ -53,6 +53,23 @@ else if ($p == "flushBasketInfo")
 {
 	unset($_SESSION['basket']);
 }
+else if ($p == "sendWKey")
+{
+	if (isset($_POST['wkey'])){$wkey = $_POST['wkey'];}
+	$_SESSION['wkey'] = $wkey;
+}
+else if ($p == "getWKey")
+{
+	if (isset($_SESSION['wkey'])){
+		echo $_SESSION['wkey'];
+	}else{
+		echo "";
+	}
+}
+else if ($p == 'flushWKey')
+{
+	unset($_SESSION['wkey']);
+}
 
 exit;
 ?>

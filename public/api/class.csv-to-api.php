@@ -57,8 +57,8 @@ class CSV_To_API {
     }
 
     // Attempt to retrieve the data from cache
-    $key = 'csv_to_api_' . md5( $this->source );
-    $this->data = $this->get_cache( $key );
+    //$key = 'csv_to_api_' . md5( $this->source );
+    //$this->data = $this->get_cache( $key );
 
     if ( !$this->data ) {
 
