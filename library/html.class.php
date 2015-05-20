@@ -430,8 +430,7 @@ e range"><i class="fa fa-calendar"></i></button>
 				</tbody>
 				</table>
 			</div>
-		</div>
-		<input type="button" id="selected_report_btn" class="btn btn-primary" value="View Selected Reports" disabled="true" onclick=""></input>';
+		</div>';
 	return $html;
 	}
 	
