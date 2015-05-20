@@ -372,6 +372,7 @@ $("#zi_value_cutoff").on("change",function(d) {
             d3.select("#output_table_tbody")
 
                     .remove();
+                    console.log(data.table.cols);
                         d3.select("#output_table")
                                 .append("thead")
                                 .attr("id","output_table_thead")
