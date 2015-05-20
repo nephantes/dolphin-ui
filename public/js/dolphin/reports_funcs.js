@@ -151,9 +151,8 @@ function showTable(type){
 	
 	if (document.getElementById('jsontable_' + type + '_results') == null) {
 		var buttonDiv = createElement('div', ['id', 'class'], ['clear_' + type + '_button_div', 'input-group margin col-md-8']);
-		var downloads_link_div = createElement('div', ['id', 'class'], ['downloads_' + type + '_link_div', 'input-group margin col-md-8']);
+		var downloads_link_div = createElement('div', ['id', 'class'], ['downloads_' + type + '_link_div', 'input-group margin col-md-4']);
 		buttonDiv.appendChild(createDownloadReportButtons(type));
-		downloads_link_div.appendChild(createElement('input', ['id', 'class', 'type', 'size'], ['downloadable_' + type, 'form-control', 'text', '90']));
 		buttonDiv.appendChild(downloads_link_div);
 		masterDiv.appendChild(buttonDiv);
 		
@@ -325,7 +324,7 @@ function downloadReports(buttonType, type){
 		temp_currentResultSelection = currentResultSelection + '&fields=name,' + libraries.toString() + ',padj,log2FoldChange,foldChange';
 	}
 	var URL = BASE_PATH + "/public/api/?source=" + API_PATH + '/public/pub/' + wkey + '/' + temp_currentResultSelection + '&format=' + buttonType;
-	document.getElementById('downloadable_' + type).value = URL;
+	window.open(URL);
 }
 
 function downloadTSV(type){
@@ -436,7 +435,6 @@ $(function() {
 		row_array.push("<input type=\"checkbox\" class=\"ngs_checkbox\" name=\"" + row_array[0] + "\" id=\"lib_checkbox_"+x+"\" onClick=\"storeLib(this.name)\">");
 		reports_table.fnAddData(row_array);
 	}
-	reports_table.fnAdjustColumnSizing(true);
 	createDropdown(summary_rna_type, 'initial_mapping');
 	
 	//Create a check for FASTQC output????
@@ -467,6 +465,6 @@ $(function() {
 	}else{
 		document.getElementById('RSEM_exp').remove();
 	}
-	
+	reports_table.fnAdjustColumnSizing(true);
 	}
 });
