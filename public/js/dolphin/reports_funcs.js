@@ -9,7 +9,6 @@ var lib_checklist = [];
 var libraries = [];
 var table_array = [];
 var currentResultSelection = '--- Select a Result ---';
-var currentResultRSEM = '--- Select a Result ---';
 
 function parseTSV(jsonName, url_path){
 	var parsed = [];
@@ -135,8 +134,15 @@ function createDropdown(mapping_list, type){
 }
 
 function showTable(type){
-	var temp_libs = [];
-	if (lib_checklist.length < 1) {
+	var ordered_lib_checklist = [];
+	for (var x = 0; x < libraries.length; x++){
+		if (lib_checklist.indexOf(libraries[x]) != -1) {
+			ordered_lib_checklist.push(libraries[x]);
+		}
+	}
+	lib_checklist = ordered_lib_checklist;
+	temp_libs = [null];
+	if (lib_checklist.length <= 0) {
 		temp_libs = lib_checklist;
 		lib_checklist = libraries;
 	}
@@ -192,8 +198,8 @@ function showTable(type){
 	}
 	newTableData.fnAdjustColumnSizing(true);
 	
-	if (temp_libs.length < 1) {
-		lib_checklist = temp_libs;
+	if (temp_libs.length <= 0) {
+		lib_checklist = [];
 	}
 }
 
