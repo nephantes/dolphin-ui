@@ -289,7 +289,6 @@ function pipelineSelect(num){
 
 /*##### SUBMIT PIPELINE RUN #####*/
 function submitPipeline(type) {
-
 	//Static
 	var genome = document.getElementById("genomebuild").value;
 	var matepair = document.getElementById("spaired").value;
@@ -299,114 +298,132 @@ function submitPipeline(type) {
 	var run_name = document.getElementById("run_name").value;
 	var description = document.getElementById("description").value;
 
-	//Expanding
-	var doBarcode = findRadioChecked("barcodes");
-	var doAdapter = findRadioChecked("adapter");
-	var doQuality = findRadioChecked("quality");
-	var doTrimming = findRadioChecked("trim");
-	var doRNA = findRNAChecked(rnaList);
-	var doSplit = findRadioChecked("split");
-
-	var barcode = findAdditionalInfoValues(doBarcode, ["distance", "format"]);
-	var adapter = findAdditionalInfoValues(doAdapter, ["adapter"]);
-	var quality = findAdditionalInfoValues(doQuality, ["window size", "required quality", "leading", "trailing", "minlen"]);
-	var trimming = findAdditionalInfoValues(doTrimming, ["single or paired-end", "5 length 1", "3 length 1", "5 length 2", "3 length 2"]);
-	var rna = findAdditionalInfoValues(doRNA, rnaList);
-	var split = findAdditionalInfoValues(doSplit, ["number of reads per file"]);
-
-	//Pipeline
-	var pipelines = findPipelineValues();
-
-	//Grab sample ids
-	var ids = getSampleIDs(phpGrab.theSearch);
-	var previous = 'none';
-	//start json construction
-	//static
-	var json = '{"genomebuild":"' + genome + '"'
-	if (matepair == "yes") {
-		json = json + ',"spaired":"paired"'
-		previous = 'spaired';
+	var empty_values = []
+	if (run_name == "") {
+		empty_values.push('Run Name');
+	}
+	if (description == "") {
+		empty_values.push("Run Description");
+	}
+	if (outputdir == "") {
+		empty_values.push('Output Directory');
+	}
+	
+	if (empty_values.length > 0) {
+		$('#errorModal').modal({
+			show: true
+		});
+		document.getElementById('errorAreas').innerHTML = empty_values.join(", ");
 	}else{
-		json = json + ',"spaired":"no"';
-	}
-	if (freshrun != "yes") {
-		json = json + ',"resume":"no"'
-	}else{
-		json = json + ',"resume":"resume"'
-		previous = 'resume';
-	}
-	json = json + ',"fastqc":"' + fastqc + '"'
-
-	//expanding
-	//barcode
-	if (doBarcode == "yes") {
-		json = json + ',"barcodes":"distance,' + barcode[0] + ':format,' + barcode[1] + '"';
-		previous = 'barcodes';
-	}else{
-		json = json + ',"barcodes":"none"';
-	}
-	//adapter
-	if (doAdapter == "yes") {
-		previous = 'adapter';
-	}
-	json = json + ',"adapter":"' + adapter[0] + '"';
-	//quality
-	if (doQuality == "yes") {
-		json = json + ',"quality":"' + quality[0] + ':' + quality[1] + ':' + quality[2] + ':' + quality[3] + ':' + quality[4] + '"';
-		previous = 'quality';
-	}else{
-		json = json + ',"quality":"none"'
-	}
-	//trim
-	if (doTrimming == "yes") {
-		json = json + ',"trim":"' + trimming[1] + ':' + trimming[2];
-		previous = 'trim';
-	}else{
-		json = json + ',"trim":"none"';
-	}
-	if (trimming[0] == 'paired-end' && doTrimming == 'yes') {
-		json = json + ':' + trimming[3] + ':' + trimming[4] + '","trimpaired":"paired'
-	}
-	if (doTrimming == "yes") {
-		json = json + '"';
-	}
-	//split
-	if (doSplit == "yes") {
-		previous = 'split';
-	}
-	json = json + ',"split":"' + split[0] + '"';
-
-	//expanding multiple queries
-	if (doRNA == "yes"){
-		json = json + ',"commonind":"'
-		var rnacheck = true;
-		for (var i = 0; i < rna.length; i++) {
-			if (rnacheck) {
-				json = json + rna[i];
-				previous = rna[i];
-				rnacheck = false;
-			}else if (rna[i] != undefined && rnaList.indexOf(rna[i]) == -1){
-				json = json + '","advparams":"' + rna[i];
-			}else if (rna[i] != undefined) {
-				json = json + ',' + rna[i]
-				previous = rna[i];
-			}
+		//Expanding
+		var doBarcode = findRadioChecked("barcodes");
+		var doAdapter = findRadioChecked("adapter");
+		var doQuality = findRadioChecked("quality");
+		var doTrimming = findRadioChecked("trim");
+		var doRNA = findRNAChecked(rnaList);
+		var doSplit = findRadioChecked("split");
+	
+		var barcode = findAdditionalInfoValues(doBarcode, ["distance", "format"]);
+		var adapter = findAdditionalInfoValues(doAdapter, ["adapter"]);
+		var quality = findAdditionalInfoValues(doQuality, ["window size", "required quality", "leading", "trailing", "minlen"]);
+		var trimming = findAdditionalInfoValues(doTrimming, ["single or paired-end", "5 length 1", "3 length 1", "5 length 2", "3 length 2"]);
+		var rna = findAdditionalInfoValues(doRNA, rnaList);
+		var split = findAdditionalInfoValues(doSplit, ["number of reads per file"]);
+	
+		//Pipeline
+		var pipelines = findPipelineValues();
+	
+		//Grab sample ids
+		var ids = getSampleIDs(phpGrab.theSearch);
+		var previous = 'none';
+		//start json construction
+		//static
+		var json = '{"genomebuild":"' + genome + '"'
+		if (matepair == "yes") {
+			json = json + ',"spaired":"paired"'
+			previous = 'spaired';
+		}else{
+			json = json + ',"spaired":"no"';
 		}
-		json = json + '"'
-	}else{
-		json = json + ',"commonind":"none"'
-	}
-	var customSeqSet = findCustomSequenceSets(previous);
-	json = json + customSeqSet;
-	json = json + pipelines + '}'
-	//end json construction
-
-	//insert new values into ngs_runparams
-	var runparamsInsert = postInsertRunparams(json, outputdir, run_name, description);
-	//insert new values into ngs_runlist
-	var submitted = postInsertRunlist(runparamsInsert[0], ids, runparamsInsert[1]);
-	if (submitted) {
-		window.location.href = "/dolphin/pipeline/status";
+		if (freshrun != "yes") {
+			json = json + ',"resume":"no"'
+		}else{
+			json = json + ',"resume":"resume"'
+			previous = 'resume';
+		}
+		json = json + ',"fastqc":"' + fastqc + '"'
+	
+		//expanding
+		//barcode
+		if (doBarcode == "yes") {
+			json = json + ',"barcodes":"distance,' + barcode[0] + ':format,' + barcode[1] + '"';
+			previous = 'barcodes';
+		}else{
+			json = json + ',"barcodes":"none"';
+		}
+		//adapter
+		if (doAdapter == "yes") {
+			previous = 'adapter';
+		}
+		json = json + ',"adapter":"' + adapter[0] + '"';
+		//quality
+		if (doQuality == "yes") {
+			json = json + ',"quality":"' + quality[0] + ':' + quality[1] + ':' + quality[2] + ':' + quality[3] + ':' + quality[4] + '"';
+			previous = 'quality';
+		}else{
+			json = json + ',"quality":"none"'
+		}
+		//trim
+		if (doTrimming == "yes") {
+			json = json + ',"trim":"' + trimming[1] + ':' + trimming[2];
+			previous = 'trim';
+		}else{
+			json = json + ',"trim":"none"';
+		}
+		if (trimming[0] == 'paired-end' && doTrimming == 'yes') {
+			json = json + ':' + trimming[3] + ':' + trimming[4] + '","trimpaired":"paired'
+		}
+		if (doTrimming == "yes") {
+			json = json + '"';
+		}
+		//split
+		if (doSplit == "yes") {
+			previous = 'split';
+		}
+		json = json + ',"split":"' + split[0] + '"';
+	
+		//expanding multiple queries
+		if (doRNA == "yes"){
+			json = json + ',"commonind":"'
+			var rnacheck = true;
+			for (var i = 0; i < rna.length; i++) {
+				if (rnacheck) {
+					json = json + rna[i];
+					previous = rna[i];
+					rnacheck = false;
+				}else if (rna[i] != undefined && rnaList.indexOf(rna[i]) == -1){
+					json = json + '","advparams":"' + rna[i];
+				}else if (rna[i] != undefined) {
+					json = json + ',' + rna[i]
+					previous = rna[i];
+				}
+			}
+			json = json + '"'
+		}else{
+			json = json + ',"commonind":"none"'
+		}
+		var customSeqSet = findCustomSequenceSets(previous);
+		json = json + customSeqSet;
+		json = json + pipelines + '}'
+		//end json construction
+	
+		//insert new values into ngs_runparams
+		var runparamsInsert = postInsertRunparams(json, outputdir, run_name, description);
+		//insert new values into ngs_runlist
+		var submitted = postInsertRunlist(runparamsInsert[0], ids, runparamsInsert[1]);
+		if (submitted) {
+			window.location.href = "/dolphin/pipeline/status";
+		}
 	}
 }
 
