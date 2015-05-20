@@ -1,4 +1,28 @@
 <!-- Content Header (Page header) -->
+			<div class="modal fade" id="errorModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+				<div class="modal-dialog">
+				  <div class="modal-content">
+					<div class="modal-header">
+					  <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+					  <h4 class="modal-title" id="myModalLabel">Warning</h4>
+					</div>
+					<form name="editForm" role="form" method="post">
+						<div class="modal-body">
+							<fieldset>
+								<div class="form-group">
+									<label id="errorLabel"></label>
+									<br>
+									<p id="errorAreas"></p>
+								</div>
+							</fieldset>   
+						</div>
+						<div class="modal-footer">
+						  <button type="button" class="btn btn-default" data-dismiss="modal">OK</button>
+						</div>
+					</form>
+				  </div>
+				</div>
+			</div><!-- End Error modal -->	
 				<section class="content-header">
 					<h1>
 						NGS Pipeline

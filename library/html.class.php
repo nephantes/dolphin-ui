@@ -430,8 +430,7 @@ e range"><i class="fa fa-calendar"></i></button>
 				</tbody>
 				</table>
 			</div>
-		</div>
-		<input type="button" id="selected_report_btn" class="btn btn-primary" value="View Selected Reports" disabled="true" onclick=""></input>';
+		</div>';
 	return $html;
 	}
 	
@@ -473,8 +472,10 @@ e range"><i class="fa fa-calendar"></i></button>
 	{
 	$html = '';
 	$html.= '<div id="btn-group">';
-	$html.= '<input type="button" class="btn btn-primary" name="pipeline_button" value="Send to Pipeline" onClick="submitSelected();"/>
-		<input type="button" class="btn btn-primary" name="send_to_status_button" value="Pipeline Status" onClick="sendToStatus()"/>';
+	$html.= '	<input type="button" class="btn btn-primary" name="pipeline_button" value="Send to Pipeline" onClick="submitSelected();"/>
+				<input type="button" class="btn btn-primary" name="send_to_status_button" value="Pipeline Status" onClick="sendToStatus()"/>
+				<input type="button" class="btn btn-primary" name="send_to_NCBI_button" value="Send to NCBI" onClick="sendToStatus()" disabled/>
+				<input type="button" class="btn btn-primary" name="send_to_ENCODE_button" value="Send to ENCODE" onClick="sendToStatus()" disabled/>';
 	$html.= '</div>';
 	return $html;
 	}

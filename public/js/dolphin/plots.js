@@ -165,7 +165,7 @@ $("#zi_value").on("change",function(d) {
 	$("#zi_value_cutoff").val($("#zi_value").val());
 	view();
 })
-		var panels=[{"id":"svg","title":"Scatter plot"},{"id":"svg3","title":"Heatmap monitor"},{"id":"svg1","title":"Barplot monitor"}];
+		var panels=[{"id":"svg","title":"Scatter plot"},{"id":"svg3","title":"Barplot monitor"},{"id":"svg1","title":"Heatmap monitor"}];
         var panel_divs=d3.select("#canvas").selectAll("div").data(panels).enter().append("div").attr("class","panel panel-primary col-md-3")
         panel_divs.append("div").attr("class","panel-heading").append("h2").attr("class","panel-title").text(function(d) {return d.title});
         panel_divs.append("div").property("hidden",true).attr("class","loading").append("text").text("Loading Data ...");

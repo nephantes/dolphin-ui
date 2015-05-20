@@ -47,13 +47,13 @@
 				echo $html->getBrowserPanel($experiment_series, $experiment_series_fields, "Experiment Series", 'experiment_name');
 				}
 				else{
-					echo $html->getRespBoxTable_ng("Experiment Series", "experiment_series", "<th>id</th><th>Name</th><th>Summary</th><th>Design</th>");
+					echo $html->getRespBoxTable_ng("Experiment Series", "experiment_series", "<th>id</th><th>Series Name</th><th>Summary</th><th>Design</th>");
 				}
 				if ($table=="experiments" || $table=="samples"){
-								echo $html->getBrowserPanel($experiments, $experiment_fields, "Experiment", 'name');
+								echo $html->getBrowserPanel($experiments, $experiment_fields, "Import", 'name');
 				}
 				else{
-					echo $html->getRespBoxTable_ng("Experiments", "lanes", "<th>id</th><th>Experiment name</th><th>Facility</th><th>Total Reads</th><th>Total Samples</th><th>Selected</th>");
+					echo $html->getRespBoxTable_ng("Imports", "lanes", "<th>id</th><th>Import name</th><th>Facility</th><th>Total Reads</th><th>Total Samples</th><th>Selected</th>");
 				}
 				if ($table=="samples"){
 				echo $html->getBrowserPanel($samples, $sample_fields, "Sample",'name');

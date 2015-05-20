@@ -13,18 +13,7 @@ function postInsertRunparams(json, outputdir, name, description){
 
    var uid = phpGrab.uid;
    var gids = phpGrab.gids;
-
-   //check to make sure values are not empty
-   if (outputdir == "") {
-       outputdir = "/test/directory/change/me/";
-   }
-   if (name == "") {
-       name = "My Run";
-   }
-   if (description == "") {
-       description = "My Description";
-   }
-
+   
    //find the run group ID
    var hrefSplit = window.location.href.split("/");
    var rerunLoc = $.inArray('rerun', hrefSplit)

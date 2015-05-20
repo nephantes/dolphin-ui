@@ -9,7 +9,6 @@ var lib_checklist = [];
 var libraries = [];
 var table_array = [];
 var currentResultSelection = '--- Select a Result ---';
-var currentResultRSEM = '--- Select a Result ---';
 
 function parseTSV(jsonName, url_path){
 	var parsed = [];
@@ -135,8 +134,15 @@ function createDropdown(mapping_list, type){
 }
 
 function showTable(type){
-	var temp_libs = [];
-	if (lib_checklist.length < 1) {
+	var ordered_lib_checklist = [];
+	for (var x = 0; x < libraries.length; x++){
+		if (lib_checklist.indexOf(libraries[x]) != -1) {
+			ordered_lib_checklist.push(libraries[x]);
+		}
+	}
+	lib_checklist = ordered_lib_checklist;
+	temp_libs = [null];
+	if (lib_checklist.length <= 0) {
 		temp_libs = lib_checklist;
 		lib_checklist = libraries;
 	}
@@ -144,10 +150,9 @@ function showTable(type){
 	var masterDiv = document.getElementById(type+'_exp_body');
 	
 	if (document.getElementById('jsontable_' + type + '_results') == null) {
-		var buttonDiv = createElement('div', ['id', 'class'], ['clear_' + type + '_button_div', 'input-group margin col-md-12']);
-		var downloads_link_div = createElement('div', ['id', 'class'], ['downloads_' + type + '_link_div', 'input-group margin pull-right']);
+		var buttonDiv = createElement('div', ['id', 'class'], ['clear_' + type + '_button_div', 'input-group margin col-md-8']);
+		var downloads_link_div = createElement('div', ['id', 'class'], ['downloads_' + type + '_link_div', 'input-group margin col-md-4']);
 		buttonDiv.appendChild(createDownloadReportButtons(type));
-		downloads_link_div.appendChild(createElement('input', ['id', 'class', 'type', 'size'], ['downloadable_' + type, 'form-control', 'text', '90']));
 		buttonDiv.appendChild(downloads_link_div);
 		masterDiv.appendChild(buttonDiv);
 		
@@ -192,8 +197,8 @@ function showTable(type){
 	}
 	newTableData.fnAdjustColumnSizing(true);
 	
-	if (temp_libs.length < 1) {
-		lib_checklist = temp_libs;
+	if (temp_libs.length <= 0) {
+		lib_checklist = [];
 	}
 }
 
@@ -275,10 +280,10 @@ function getCountsTableData(currentResultSelection, type){
 }
 
 function createDownloadReportButtons(type){
-	var downloadDiv = createElement('div', ['id', 'class'], ['downloads_' + type + '_div', 'btn-group margin']);
+	var downloadDiv = createElement('div', ['id', 'class'], ['downloads_' + type + '_div', 'btn-group margin pull-left']);
 	var ul = createElement('ul', ['class', 'role'], ['dropdown-menu', 'menu']);
 	var button = createElement('button', ['type', 'class', 'data-toggle', 'aria-expanded'], ['button', 'btn btn-primary dropdown-toggle', 'dropdown', 'true'])
-	button.innerHTML = 'Actions ';
+	button.innerHTML = 'Select Data Options ';
 	var span = createElement('span', ['class'], ['fa fa-caret-down']);
 	button.appendChild(span);
 	
@@ -286,12 +291,17 @@ function createDownloadReportButtons(type){
 	for (var x = 0; x < buttonType.length; x++){
 		var li = createElement('li', [], []);
 		var a = createElement('a', ['onclick', 'style'], ['downloadReports("'+buttonType[x]+'", "'+type+'")', 'cursor:pointer']);
-		a.innerHTML = buttonType[x];
+		a.innerHTML = buttonType[x] + ' link';
 		li.appendChild(a);
 		ul.appendChild(li);
 	}
-	var divider = createElement('li', ['class'], ['divider']);
-	ul.appendChild(divider);
+	ul.appendChild(createElement('li', ['class'], ['divider']));
+	var TSV = createElement('li', [], []);
+	var TSV_a = createElement('a', ['value', 'onclick', 'style'], ['Download TSV', 'downloadTSV("'+type+'")', 'cursor:pointer']);
+	TSV_a.innerHTML = 'Download TSV';
+	TSV.appendChild(TSV_a);
+	ul.appendChild(TSV);
+	ul.appendChild(createElement('li', ['class'], ['divider']));
 	var clear = createElement('li', [], []);
 	var clear_a = createElement('a', ['value', 'onclick', 'style'], ['Clear Selection', 'clearSelection("'+type+'")', 'cursor:pointer']);
 	clear_a.innerHTML = 'Clear Selection';
@@ -314,7 +324,18 @@ function downloadReports(buttonType, type){
 		temp_currentResultSelection = currentResultSelection + '&fields=name,' + libraries.toString() + ',padj,log2FoldChange,foldChange';
 	}
 	var URL = BASE_PATH + "/public/api/?source=" + API_PATH + '/public/pub/' + wkey + '/' + temp_currentResultSelection + '&format=' + buttonType;
-	document.getElementById('downloadable_' + type).value = URL;
+	window.open(URL);
+}
+
+function downloadTSV(type){
+	var temp_currentResultSelection;
+	if (type == 'initial_mapping') {
+		temp_currentResultSelection = 'counts/' + currentResultSelection + '.counts.tsv';
+	}else{
+		temp_currentResultSelection = currentResultSelection;
+	}
+	var URL = BASE_PATH + '/public/pub/' + wkey + '/' + temp_currentResultSelection
+	window.open(URL, '_blank');
 }
 
 function getWKey(run_id){
@@ -414,7 +435,6 @@ $(function() {
 		row_array.push("<input type=\"checkbox\" class=\"ngs_checkbox\" name=\"" + row_array[0] + "\" id=\"lib_checkbox_"+x+"\" onClick=\"storeLib(this.name)\">");
 		reports_table.fnAddData(row_array);
 	}
-	reports_table.fnAdjustColumnSizing(true);
 	createDropdown(summary_rna_type, 'initial_mapping');
 	
 	//Create a check for FASTQC output????
@@ -445,6 +465,6 @@ $(function() {
 	}else{
 		document.getElementById('RSEM_exp').remove();
 	}
-	
+	reports_table.fnAdjustColumnSizing(true);
 	}
 });
