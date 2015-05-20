@@ -189,11 +189,23 @@ function pipelineSelect(num){
 	//Grab some useful variables
 	var pipeType = document.getElementById('select_'+num).value;
 	var divAdj = createElement('div', ['id', 'class', 'style'], ['select_child_'+num, 'input-group margin col-md-11', 'float:left']);
-	//Check for only one RSEM
+	//Check for only one RSEM/DESeq dependencies
 	if (pipeType == pipelineDict[0] && rsemSwitch)
 	{
-	alert("Warning: You cannot select more than one additional RSEM pipeline")
-	document.getElementById('select_'+num).value = currentPipelineVal[currentPipelineID.indexOf(num)];
+		$('#errorModal').modal({
+			show: true
+		});
+		document.getElementById('errorLabel').innerHTML ='You cannot select more than one additional RSEM pipeline';
+		document.getElementById('errorAreas').innerHTML = '';
+		document.getElementById('select_'+num).value = currentPipelineVal[currentPipelineID.indexOf(num)];
+	}
+	else if (pipeType == pipelineDict[3] && !rsemSwitch) {
+		$('#errorModal').modal({
+			show: true
+		});
+		document.getElementById('errorLabel').innerHTML ='You must first add a RSEM pipeline before running DESeq';
+		document.getElementById('errorAreas').innerHTML = '';
+		document.getElementById('select_'+num).value = currentPipelineVal[currentPipelineID.indexOf(num)];
 	}
 	else
 	{
@@ -313,6 +325,7 @@ function submitPipeline(type) {
 		$('#errorModal').modal({
 			show: true
 		});
+		document.getElementById('errorLabel').innerHTML ='The following fields may not be empty for submission:';
 		document.getElementById('errorAreas').innerHTML = empty_values.join(", ");
 	}else{
 		//Expanding

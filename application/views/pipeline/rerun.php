@@ -10,7 +10,7 @@
 						<div class="modal-body">
 							<fieldset>
 								<div class="form-group">
-									<label>The following fields may not be empty for submission:</label>
+									<label id="errorLabel"></label>
 									<br>
 									<p id="errorAreas"></p>
 								</div>
