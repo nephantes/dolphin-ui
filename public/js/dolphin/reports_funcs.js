@@ -203,11 +203,19 @@ function showTable(type){
 		}
 	}else{
 		var masterDiv = document.getElementById(type+'_exp_body');
-		var buttonDiv = createElement('div', ['id', 'class'], ['clear_' + type + '_button_div', 'input-group margin col-md-8']);
-		var downloads_link_div = createElement('div', ['id', 'class'], ['downloads_' + type + '_link_div', 'input-group margin col-md-4']);
-		buttonDiv.appendChild(createDownloadReportButtons(currentResultSelection, type));
-		buttonDiv.appendChild(downloads_link_div);
-		masterDiv.appendChild(buttonDiv);
+		if (document.getElementById('clear_' + type + '_button_div') == null) {
+			var buttonDiv = createElement('div', ['id', 'class'], ['clear_' + type + '_button_div', 'input-group margin col-md-8']);
+			var downloads_link_div = createElement('div', ['id', 'class'], ['downloads_' + type + '_link_div', 'input-group margin col-md-4']);
+			buttonDiv.appendChild(createDownloadReportButtons(currentResultSelection, type));
+			buttonDiv.appendChild(downloads_link_div);
+			masterDiv.appendChild(buttonDiv);
+		}else{
+			var buttonDiv = createElement('div', ['id', 'class'], ['clear_' + type + '_button_div', 'input-group margin col-md-8']);
+			var downloads_link_div = createElement('div', ['id', 'class'], ['downloads_' + type + '_link_div', 'input-group margin col-md-4']);
+			buttonDiv.appendChild(createDownloadReportButtons(currentResultSelection, type));
+			buttonDiv.appendChild(downloads_link_div);
+			$('#clear_' + type + '_button_div').replaceWith(buttonDiv);
+		}
 	}
 	
 }
