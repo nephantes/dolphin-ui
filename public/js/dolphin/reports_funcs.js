@@ -133,6 +133,16 @@ function createDropdown(mapping_list, type){
 	}
 }
 
+function obtainObjectKeys(obj){
+	var keys = [];
+	for (var key in obj) {
+		if (obj.hasOwnProperty(key)) {
+			keys.push(key)
+		}
+	}
+	return keys;
+}
+
 function showTable(type){
 	var ordered_lib_checklist = [];
 	for (var x = 0; x < libraries.length; x++){
@@ -146,10 +156,12 @@ function showTable(type){
 		temp_libs = lib_checklist;
 		lib_checklist = libraries;
 	}
+	
 	currentResultSelection = document.getElementById('select_' + type + '_report').value
+	var objList = getCountsTableData(currentResultSelection, type);
+	var keys = obtainObjectKeys(objList[0]);
 	if(currentResultSelection.split(".")[currentResultSelection.split(".").length - 1] == "tsv" || currentResultSelection.substring(currentResultSelection.length - 3, currentResultSelection.length) == "RNA"){
 		var masterDiv = document.getElementById(type+'_exp_body');
-	
 		if (document.getElementById('jsontable_' + type + '_results') == null) {
 			var previous_button = false;
 			if (document.getElementById('clear_' + type + '_button_div') != null) {
@@ -164,40 +176,30 @@ function showTable(type){
 			}else{
 				masterDiv.appendChild(buttonDiv);
 			}
-			var table = generateSelectionTable(type);
+			var table = generateSelectionTable(keys, type);
 			masterDiv.appendChild(table);
 		}else{
 			var table = document.getElementById('jsontable_' + type + '_results');
-			var newTable = generateSelectionTable(type);
+			var newTable = generateSelectionTable(keys, type);
 			$('#jsontable_' + type + '_results_wrapper').replaceWith(newTable);
 		}
-	
+		
 		var newTableData = $('#jsontable_' + type + '_results').dataTable();
-		var objList = getCountsTableData(currentResultSelection, type);
 		newTableData.fnClearTable();
 		var selection_array = [];
-		
 		for (var x = 0; x < objList.length; x++){
-			if (type == 'initial_mapping') {
-				var objList_row = [objList[x].id];
-				for (var y = 0; y < lib_checklist.length; y++){
-					objList_row.push(objList[x][lib_checklist[y]]);
+			var objList_row = [];
+			for (var y = 0; y < keys.length; y++){
+				if (type == 'initial_mapping') {
+					if (keys[y].indexOf(lib_checklist)) {
+						objList_row.push(objList[x][keys[y]]);
+					}else if (keys[y] == "id" || keys[y] == "name" || keys[y] == "len") {
+						objList_row.push(objList[x][keys[y]]);
+					}
+				}else{
+					objList_row.push(objList[x][keys[y]]);
 				}
-			}else if (type == 'RSEM') {
-				var objList_row = [objList[x]['gene'], objList[x]['transcript']];
-				for (var y = 0; y < libraries.length; y++){
-					objList_row.push(objList[x][libraries[y]]);
-				}
-			}else if (type == 'DESEQ') {
-				var objList_row = [objList[x]['name']];
-				for (var y = 0; y < libraries.length; y++){
-					objList_row.push(objList[x][libraries[y]]);
-				}
-				objList_row.push(objList[x]['padj']);
-				objList_row.push(objList[x]['log2FoldChange']);
-				objList_row.push(objList[x]['foldChange']);
 			}
-			
 			selection_array.push(objList_row);
 		}
 		for(var x = 0; x < selection_array.length - 1; x++){
@@ -241,49 +243,29 @@ function clearSelection(type){
 	document.getElementById('select_' + type + '_report').value = '--- Select a Result ---';
 }
 
-function generateSelectionTable(type){
+function generateSelectionTable(keys, type){
 	var newTable = createElement('table', ['id', 'class'], ['jsontable_' + type + '_results', 'table table-hover compact']);
 	var thead = createElement('thead', [], []);
 	var header = createElement('tr', ['id'], [type + '_header']);
 	if (type == 'initial_mapping') {
-		var thID = createElement('th', [], []);
-		thID.innerHTML = 'id';
-		header.appendChild(thID);
-	for(var x = 0; x < lib_checklist.length; x++){
-		var th = createElement('th', [], []);
-			th.innerHTML = lib_checklist[x];
-			header.appendChild(th);
-	}
-	}else if (type == 'RSEM') {
-		var gene = createElement('th', [], []);
-			gene.innerHTML = 'Gene';
-			header.appendChild(gene);
-		var trans = createElement('th', [], []);
-			trans.innerHTML = 'Transcript'
-			header.appendChild(trans);
-		for(var x = 0; x < libraries.length; x++){
+		for(var x = 0; x < keys.length; x++){
+			if (keys[x].indexOf(lib_checklist)) {
+				var th = createElement('th', [], []);
+				th.innerHTML = keys[x];
+				header.appendChild(th);
+			}else if (keys[x] == "id" || keys[x] == "name" || keys[x] == "len") {
+				var th = createElement('th', [], []);
+				th.innerHTML = keys[x];
+				header.appendChild(th);
+			}
+			
+		}
+	}else{
+		for(var x = 0; x < keys.length; x++){
 			var th = createElement('th', [], []);
-			th.innerHTML = libraries[x];
+			th.innerHTML = keys[x];
 			header.appendChild(th);
 		}
-	}else if (type == 'DESEQ') {
-		var name = createElement('th', [], []);
-			name.innerHTML = 'name';
-			header.appendChild(name);
-		for(var x = 0; x < libraries.length; x++){
-			var th = createElement('th', [], []);
-			th.innerHTML = libraries[x];
-			header.appendChild(th);
-		}
-		var padj = createElement('th', [], []);
-			padj.innerHTML = 'padj';
-			header.appendChild(padj);
-		var l2fc = createElement('th', [], []);
-			l2fc.innerHTML = 'log2FoldChange';
-			header.appendChild(l2fc);
-		var fc = createElement('th', [], []);
-			fc.innerHTML = 'foldChange';
-			header.appendChild(fc);
 	}
 	
 	thead.appendChild(header);
@@ -297,9 +279,9 @@ function getCountsTableData(currentResultSelection, type){
 	if (type == 'initial_mapping') {
 		temp_currentResultSelection = 'counts/' + currentResultSelection + '.counts.tsv&fields=id,' + lib_checklist.toString();
 	}else if (type == 'RSEM'){
-		temp_currentResultSelection = currentResultSelection + '&fields=gene,transcript,' + libraries.toString();
+		temp_currentResultSelection = currentResultSelection;
 	}else if (type == 'DESEQ') {
-		temp_currentResultSelection = currentResultSelection + '&fields=name,' + libraries.toString() + ',padj,log2FoldChange,foldChange';
+		temp_currentResultSelection = currentResultSelection;
 	}
 	$.ajax({ type: "GET",
 			url: BASE_PATH + "/public/api/?source=" + API_PATH + '/public/pub/' + wkey + '/' + temp_currentResultSelection,
