@@ -76,7 +76,7 @@ function createDetails(libraries) {
 			masterDiv.appendChild(createElement('div', [],[]));
 		}else{
 			var link = createElement('a', ['href'], [BASE_PATH + '/public/pub/' + wkey + '/fastqc/' + libraries[x] + '/' + libraries[x] + '.fastqc/fastqc_report.html']);
-			link.appendChild(document.createTextNode(nameAndDirArray[0][x]));
+			link.appendChild(document.createTextNode(libraries[x]));
 			masterDiv.appendChild(link);
 			masterDiv.appendChild(createElement('div', [],[]));
 		}
@@ -401,12 +401,17 @@ $(function() {
 						DESEQ_files.push(s[x]);
 					}else if (s[x].type == 'summary') {
 						summary_files.push(s[x]);
-					}else{
+					}else if (s[x].type == 'counts'){
 						count_files.push(s[x]);
 					}
 				}
 			}
 	});
+	
+	console.log(RSEM_files);
+	console.log(DESEQ_files);
+	console.log(count_files);
+	console.log(summary_files);
 	
 	var summary_rna_type = [];
 	for (var z = 0; z < summary_files.length; z++) {
@@ -421,38 +426,53 @@ $(function() {
 	document.getElementById('tablerow').appendChild(createElement('th', ['id'], ['selection']));
 	document.getElementById('selection').innerHTML = 'Selected';
 	
-	for (var z = 0; z < summary_files.length; z++) {
-		if (z == 0){
-			table_array.push(parseMoreTSV(['File','Total Reads','Reads 1'], summary_files[z]['file']));
-		}else if (z == summary_files.length - 1) {
-			table_array.push(parseMoreTSV(['Reads 1', 'Unmapped Reads'], summary_files[z]['file']));
-		}else{
-			table_array.push(parseTSV('Reads 1', summary_files[z]['file']));
-		}
-	}
+	$.ajax({ type: "GET",
+			url: "/dolphin/public/ajax/ngsquerydb.php",
+			data: { p: 'getSampleNames', samples: samples.toString() },
+			async: false,
+			success : function(s)
+			{
+				for(var x  = 0; x < s.length; x++){
+					libraries.push(s[x].name);
+				}
+			}
+	});
 
-	//Initial Mapping Results
-	var reports_table = $('#jsontable_initial_mapping').dataTable();
-	reports_table.fnClearTable();
-	for (var x = 0; x < ((table_array[0].length/3) - 1); x++) {
-		var row_array = [];
-		for (var y = 0; y < table_array.length; y++){
-			if (y == 0) {
-				libraries.push(table_array[y][(x*3)]);
-				row_array.push(table_array[y][(x*3)]);
-				row_array.push(table_array[y][(x*3) + 1]);
-				row_array.push(table_array[y][(x*3) + 2].split(" ")[0]);
-			}else if (y == (table_array.length - 1)) {
-				row_array.push(table_array[y][(x*2)].split(" ")[0]);
-				row_array.push(table_array[y][(x*2) + 1].split(" ")[0]);
+	if (summary_files.length > 0) {
+		for (var z = 0; z < summary_files.length; z++) {
+			if (z == 0){
+				table_array.push(parseMoreTSV(['File','Total Reads','Reads 1'], summary_files[z]['file']));
+			}else if (z == summary_files.length - 1) {
+				table_array.push(parseMoreTSV(['Reads 1', 'Unmapped Reads'], summary_files[z]['file']));
 			}else{
-				row_array.push(table_array[y][x].split(" ")[0]);
+				table_array.push(parseTSV('Reads 1', summary_files[z]['file']));
 			}
 		}
-		row_array.push("<input type=\"checkbox\" class=\"ngs_checkbox\" name=\"" + row_array[0] + "\" id=\"lib_checkbox_"+x+"\" onClick=\"storeLib(this.name)\">");
-		reports_table.fnAddData(row_array);
+		
+		//Initial Mapping Results
+		var reports_table = $('#jsontable_initial_mapping').dataTable();
+		reports_table.fnClearTable();
+		for (var x = 0; x < ((table_array[0].length/3) - 1); x++) {
+			var row_array = [];
+			for (var y = 0; y < table_array.length; y++){
+				if (y == 0) {
+					row_array.push(table_array[y][(x*3)]);
+					row_array.push(table_array[y][(x*3) + 1]);
+					row_array.push(table_array[y][(x*3) + 2].split(" ")[0]);
+				}else if (y == (table_array.length - 1)) {
+					row_array.push(table_array[y][(x*2)].split(" ")[0]);
+					row_array.push(table_array[y][(x*2) + 1].split(" ")[0]);
+				}else{
+					row_array.push(table_array[y][x].split(" ")[0]);
+				}
+			}
+			row_array.push("<input type=\"checkbox\" class=\"ngs_checkbox\" name=\"" + row_array[0] + "\" id=\"lib_checkbox_"+x+"\" onClick=\"storeLib(this.name)\">");
+			reports_table.fnAddData(row_array);
+		}
+		createDropdown(summary_rna_type, 'initial_mapping');
+	}else{
+		document.getElementById('initial_mapping_exp').remove();
 	}
-	createDropdown(summary_rna_type, 'initial_mapping');
 	
 	//Create a check for FASTQC output????
 	if (getFastQCBool(runId)) {
