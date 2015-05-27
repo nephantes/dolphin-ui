@@ -74,6 +74,22 @@ else if ($p == 'deleteRunparams')
     WHERE id = $run_id
     ");
 }
+else if ($p == 'noAddedParamsRerun')
+{
+    if (isset($_POST['run_id'])){$run_id = $_POST['run_id'];}
+    $data=$query->runSQL("
+	UPDATE ngs_runparams
+    SET run_status=0
+    WHERE id = $run_id
+    ");
+    $wkey = $query->queryAVal("
+    SELECT wkey
+    FROM ngs_runparams
+    WHERE id = $run_id limit 1
+    ");
+    $cmd = "cd ../../scripts && python dolphin_wrapper.py -r $idKey -w $wkey 2>&1 >> ../tmp/run.log &";
+    pclose(popen( $cmd, "r"));
+}
 
 //footer
 header('Cache-Control: no-cache, must-revalidate');
