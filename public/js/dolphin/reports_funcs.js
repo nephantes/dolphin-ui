@@ -75,7 +75,7 @@ function createDetails(libraries) {
 			masterDiv.appendChild(link2);
 			masterDiv.appendChild(createElement('div', [],[]));
 		}else{
-			var link = createElement('a', ['href'], [BASE_PATH + '/public/pub/' + wkey + '/fastqc/' + libraries[x] + '/' + libraries[x] + '.fastqc/fastqc_report.html']);
+			var link = createElement('a', ['href'], [BASE_PATH + '/public/pub/' + wkey + '/fastqc/' + libraries[x] + '/' + libraries[x] + '_fastqc/fastqc_report.html']);
 			link.appendChild(document.createTextNode(libraries[x]));
 			masterDiv.appendChild(link);
 			masterDiv.appendChild(createElement('div', [],[]));
@@ -374,6 +374,10 @@ function sendToPlots(){
 	window.location.href = BASE_PATH+ '/plot';
 }
 
+function numberWithCommas(x) {
+    return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+}
+
 $(function() {
 	"use strict";
 	if (phpGrab.theSegment == 'report') {
@@ -408,11 +412,6 @@ $(function() {
 			}
 	});
 	
-	console.log(RSEM_files);
-	console.log(DESEQ_files);
-	console.log(count_files);
-	console.log(summary_files);
-	
 	var summary_rna_type = [];
 	for (var z = 0; z < summary_files.length; z++) {
 		summary_rna_type.push(summary_files[z]['file'].split("/")[summary_files[z]['file'].split("/").length - 1].split(".")[0]);
@@ -443,7 +442,8 @@ $(function() {
 			if (z == 0){
 				table_array.push(parseMoreTSV(['File','Total Reads','Reads 1'], summary_files[z]['file']));
 			}else if (z == summary_files.length - 1) {
-				table_array.push(parseMoreTSV(['Reads 1', 'Unmapped Reads'], summary_files[z]['file']));
+				table_array.push(parseTSV('Reads 1', summary_files[z]['file']));
+				table_array.push(parseTSV('Unmapped Reads', summary_files[z]['file']));
 			}else{
 				table_array.push(parseTSV('Reads 1', summary_files[z]['file']));
 			}
@@ -454,16 +454,17 @@ $(function() {
 		reports_table.fnClearTable();
 		for (var x = 0; x < ((table_array[0].length/3) - 1); x++) {
 			var row_array = [];
+			var reads_total;
 			for (var y = 0; y < table_array.length; y++){
 				if (y == 0) {
 					row_array.push(table_array[y][(x*3)]);
-					row_array.push(table_array[y][(x*3) + 1]);
-					row_array.push(table_array[y][(x*3) + 2].split(" ")[0]);
-				}else if (y == (table_array.length - 1)) {
-					row_array.push(table_array[y][(x*2)].split(" ")[0]);
-					row_array.push(table_array[y][(x*2) + 1].split(" ")[0]);
+					row_array.push(numberWithCommas(table_array[y][(x*3) + 1]));
+					reads_total = table_array[y][(x*3) + 1]
+					row_array.push(numberWithCommas(table_array[y][(x*3) + 2].split(" ")[0]) + " (" + ((table_array[y][(x*3) + 2].split(" ")[0])/(reads_total)).toFixed(2) + " %)");
 				}else{
-					row_array.push(table_array[y][x].split(" ")[0]);
+					if (table_array[y][x] != undefined) {
+						row_array.push(numberWithCommas(table_array[y][x].split(" ")[0]) + " (" + ((table_array[y][x].split(" ")[0]/reads_total)*100).toFixed(2) + " %)");
+					}
 				}
 			}
 			row_array.push("<input type=\"checkbox\" class=\"ngs_checkbox\" name=\"" + row_array[0] + "\" id=\"lib_checkbox_"+x+"\" onClick=\"storeLib(this.name)\">");
