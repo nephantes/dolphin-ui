@@ -4,10 +4,17 @@ class Search extends VanillaModel {
 
 /** Get menuitems for this user **/
 	function getAccItems($fieldname, $tablename, $uid, $gids) {
-		$result = $this->query("select $fieldname name, count($fieldname) count from $tablename where $fieldname!='' AND (((group_id in ($gids)) AND (perms >= 15)) OR (owner_id = $uid)) group by $fieldname");
+        
+        if($gids == ''){
+            $gids = -1;
+        }
+		$result = $this->query("select $fieldname name, count($fieldname) count from $tablename where $fieldname !='' AND (((group_id in ($gids)) AND (perms >= 15)) OR (owner_id = $uid)) group by $fieldname");
 		return json_decode($result, true);
 	}
 	function getAccItemsCont($fieldname, $tablename, $search, $uid, $gids){
+        if($gids == ''){
+            $gids = -1;
+        }
 		if($search != ""){
 			$advQuery = "";
 			foreach(explode('$', $search) as $s){
@@ -15,10 +22,10 @@ class Search extends VanillaModel {
 				$split = explode('=', $s);
 				$advQuery.= " AND " . $split[0]. " = " . '"'. $split[1] . '"';
 			}
-			$result = $this->query("select $fieldname name, count($fieldname) count from $tablename where $fieldname!='' $advQuery AND (((group_id in ($gids)) AND (perms >= 15)) OR (owner_id = $uid)) group by $fieldname");
+			$result = $this->query("select $fieldname name, count($fieldname) count from $tablename where $fieldname !='' $advQuery AND (((group_id in ($gids)) AND (perms >= 15)) OR (owner_id = $uid)) group by $fieldname");
 		}
 		else{
-			$result = $this->query("select $fieldname name, count($fieldname) count from $tablename where $fieldname!='' AND (((group_id in ($gids)) AND (perms >= 15)) OR (owner_id = $uid)) group by $fieldname" );
+			$result = $this->query("select $fieldname name, count($fieldname) count from $tablename where $fieldname !='' AND (((group_id in ($gids)) AND (perms >= 15)) OR (owner_id = $uid)) group by $fieldname" );
 		}
 		return json_decode($result, true);
 	}
