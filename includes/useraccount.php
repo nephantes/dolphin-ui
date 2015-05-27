@@ -5,7 +5,7 @@
   $name=$line[1]." ".$line[0];
   $role=$query->getRole($_SESSION['user']);
   $membersince="June 2012";
-  $avatar=BASE_PATH."/img/avatar5.png";
+  $avatar=BASE_PATH.$query->getPhotoLoc($_SESSION['user']);
   
 ?>
 
