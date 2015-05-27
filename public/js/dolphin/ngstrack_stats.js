@@ -30,14 +30,19 @@ $(function() {
 		gids = phpGrab.gids;
 	}
 
+	//gids
+	if (gids == '') {
+		gids = -1;
+	}
+	
 	//Details values
 	if (segment == "details") {
-	if (phpGrab.theField == "experiment_series") {
-		qvar = phpGrab.theValue;
-	}
-	else if (phpGrab.theField == "experiments") {
-		rvar = phpGrab.theValue;
-	}
+		if (phpGrab.theField == "experiment_series") {
+			qvar = phpGrab.theValue;
+		}
+		else if (phpGrab.theField == "experiments") {
+			rvar = phpGrab.theValue;
+		}
 	}
 
 	//Browse values

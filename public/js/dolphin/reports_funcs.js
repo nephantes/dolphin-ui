@@ -192,12 +192,12 @@ function showTable(type){
 			for (var y = 0; y < keys.length; y++){
 				if (type == 'initial_mapping') {
 					if (keys[y].indexOf(lib_checklist)) {
-						objList_row.push(objList[x][keys[y]]);
+						objList_row.push(numberWithCommas(objList[x][keys[y]]));
 					}else if (keys[y] == "id" || keys[y] == "name" || keys[y] == "len") {
 						objList_row.push(objList[x][keys[y]]);
 					}
 				}else{
-					objList_row.push(objList[x][keys[y]]);
+					objList_row.push(numberWithCommas(objList[x][keys[y]]));
 				}
 			}
 			selection_array.push(objList_row);
