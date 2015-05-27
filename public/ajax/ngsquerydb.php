@@ -12,6 +12,8 @@ $pDictionary = ['getSelectedSamples', 'submitPipeline', 'getStatus', 'getRunSamp
 				'checkMatePaired', 'getAllSampleIds', 'getLaneIdFromSample', 'getSingleSample', 'getSeriesIdFromLane', 'getAllLaneIds',
                 'getGIDs', 'getSampleNames', 'getWKey', 'getFastQCBool', 'getReportList', 'getTSVFileList'];
 
+$data = "";
+                
 $q = "";
 $r = "";
 $seg = "";
@@ -47,12 +49,14 @@ if($search != "" && !in_array($p, $pDictionary)){
 	$splt = explode("$", $search);
 	foreach ($splt as $s){
 		$queryArray = explode("=", $s);
-		$spltTable = $queryArray[0];
-		$spltValue = $queryArray[1];
-		$searchQuery .= "biocore.ngs_samples.$spltTable = \"$spltValue\"";
-		if($s != end($splt)){
-			$searchQuery .= " AND ";
-		}
+        if(sizeof($queryArray) == 2){
+            $spltTable = $queryArray[0];
+            $spltValue = $queryArray[1];
+            $searchQuery .= "biocore.ngs_samples.$spltTable = \"$spltValue\"";
+            if($s != end($splt)){
+                $searchQuery .= " AND ";
+            }
+        }
 	}
 	//browse (search incnluded)
 	if($seg == "browse")
