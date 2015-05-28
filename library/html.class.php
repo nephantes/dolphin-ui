@@ -651,8 +651,8 @@ e range"><i class="fa fa-calendar"></i></button>
 							<label value="'.$fieldTitles[$y].'">'.$fieldTitles[$y].'</label>
 							<div class="text-center">
 								yes
-								<input id="'.$fieldTitles[$y].'_yes" name="'.$fieldTitles[$y].'_val" type="radio" value="yes"/>
-								<input id="'.$fieldTitles[$y].'_no" name="'.$fieldTitles[$y].'_val" type="radio" value="no" checked/>
+								<input id="'.$fieldTitles[$y].'_yes" name="common_'.$fieldTitles[$y].'" type="radio" value="yes" />
+								<input id="'.$fieldTitles[$y].'_no" name="common_'.$fieldTitles[$y].'" type="radio" value="no" checked/>
 								no
 							</div>
 						</div>';

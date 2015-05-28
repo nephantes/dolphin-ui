@@ -20,6 +20,7 @@ var trimmingDict = ["single or paired-end", "5 length 1", "3 length 1", "5 lengt
 var currentPipelineID = [];
 var currentPipelineVal =[];
 var rsemSwitch = false;
+var deseqList = ['RSEM'];
 
 /*##### FILL A RERUN PIPELINE WITH PREVIOUS SELECTIONS #####*/
 function rerunLoad() {
@@ -81,6 +82,7 @@ function rerunLoad() {
 							}else if (jsonTypeList[x] == 'commonind'){
 								for(var y = 0; y < splt2.length; y++){
 									$( '#'+splt2[y]+'_yes' ).iCheck('check');
+									deseqList.push(splt2[y]);
 								}
 							}else{
 								document.getElementById( splt2[0]+'_val' ).value = splt2[1];
@@ -170,6 +172,7 @@ function rerunLoad() {
 							document.getElementById('select_4_'+i).value = splt2[4];
 							document.getElementById('text_1_'+i).value = splt2[5];
 							document.getElementById('text_2_'+i).value = splt2[6];
+							document.getElementById('select_5_'+i).value = splt2[7];
 						}
 					}
 					document.getElementById(jsonTypeList[x]+'_exp_body').setAttribute('style', 'display: block');
@@ -269,9 +272,19 @@ function pipelineSelect(num){
 				createElement('input', ['id', 'class', 'type', 'value'], ['text_1_'+num, 'form-control', 'text', '0.01'])],
 				[createElement('label', ['class','TEXTNODE'], ['box-title', 'Fold Change cutoff']),
 				createElement('input', ['id', 'class', 'type', 'value'], ['text_2_'+num, 'form-control', 'text', '2'])] ]);
+		divAdj = mergeTidy(divAdj, 12,
+				[ [createElement('label', ['class','TEXTNODE'], ['box-title', 'Select Sequence']),
+				createElement('select', ['id', 'class'], ['select_5_'+num, 'form-control'])] ]);
 	}
 	//replace div
 	$('#select_child_'+num).replaceWith(divAdj);
+	if (pipeType == pipelineDict[3]) {
+		for (var x = 0; x < deseqList.length; x++) {
+			var opt = createElement('option', ['id', 'value'], [deseqList[x], deseqList[x]]);
+			opt.innerHTML = deseqList[x];
+			document.getElementById('select_5_'+num).appendChild(opt);
+		}
+	}
 	
 	//if DESEQ
 	if (document.getElementById('multi_select_1_'+num) != null) {
@@ -283,7 +296,7 @@ function pipelineSelect(num){
 				document.getElementById(num+'_2_'+sample_names[x]).innerHTML = sample_names[x]
 		}
 	}
-
+	
 	//adjust global pipeline counter
 	if (currentPipelineID.indexOf(num) == -1) {
 		currentPipelineID.push(num);
@@ -438,6 +451,10 @@ function submitPipeline(type) {
 			window.location.href = "/dolphin/pipeline/status";
 		}
 	}
+}
+
+function commonRNACheck(id){
+	console.log(id);
 }
 
 function sendToFastlane(){

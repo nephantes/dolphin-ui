@@ -13,6 +13,19 @@ $(function() {
 
 	//The Calender
 	$("#calendar").datepicker();
+	
+	$('input').on('ifChanged', function(event){
+		if (event.target.name.substring(0,6) == "common") {
+			var array = event.target.id.split("_");
+			
+			if (array[1] == 'yes' && deseqList.indexOf(array[0]) == -1) {
+				deseqList.push(array[0]);
+			}else if (array[1] == 'no' && deseqList.indexOf(array[0]) > -1 ){
+				deseqList.splice(deseqList.indexOf(array[0]), 1);
+			}
+			console.log(deseqList);
+		}
+	});
 
 	/*##### PAGE DETERMINER #####*/
 
