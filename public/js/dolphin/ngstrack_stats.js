@@ -93,7 +93,8 @@ $(function() {
 						'</button>' +
 						'<ul class="dropdown-menu" role="menu">' +
 							disabled +
-							'<li><a href="#" id="'+s[i].id+'" name="'+s[i].run_group_id+'" onclick="rerunSelected(this.id, this.name)">Re-run this Run</a></li>' +
+							'<li><a href="#" id="'+s[i].id+'" name="'+s[i].run_group_id+'" onclick="rerunSelected(this.id, this.name)">Re-run with changes</a></li>' +
+							'<li><a href="#" id="'+s[i].id+'" name="'+s[i].run_group_id+'" onclick="resumeSelected(this.id, this.name)">Re-run without changes</a></li>' +
 							'<li class="divider"></li>' +
 							'<li><a href="#" id="'+s[i].id+'" name="'+s[i].run_group_id+'" onClick="deleteRunparams(\''+s[i].id+'\')">Delete this Run</a></li>' +
 						'</ul>' +
@@ -153,7 +154,8 @@ $(function() {
 						'</button>' +
 						'<ul class="dropdown-menu" role="menu">' +
 							disabled +
-							'<li><a href="#" id="'+s[i].id+'" name="'+s[i].run_group_id+'" onclick="rerunSelected(this.id, this.name)">Re-run this Run</a></li>' +
+							'<li><a href="#" id="'+s[i].id+'" name="'+s[i].run_group_id+'" onclick="rerunSelected(this.id, this.name)">Re-run with changes</a></li>' +
+							'<li><a href="#" id="'+s[i].id+'" name="'+s[i].run_group_id+'" onclick="resumeSelected(this.id, this.name)">Re-run without changes</a></li>' +
 							'<li class="divider"></li>' +
 							'<li><a href="#" id="'+s[i].id+'" name="'+s[i].run_group_id+'" onClick="deleteRunparams(\''+s[i].id+'\')">Delete this Run</a></li>' +
 						'</ul>' +
