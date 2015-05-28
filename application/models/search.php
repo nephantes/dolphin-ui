@@ -49,5 +49,15 @@ class Search extends VanillaModel {
         endforeach;
         return rtrim($group_str, ",");
     }
-	
+    function getSampleFileLocation($value){
+        $result = $this->query("select file_name from ngs_fastq_files where sample_id = $value");
+        if($result == null or $result == []){
+            $result = $this->query("select file_name from ngs_temp_sample_files where sample_id = $value");
+        }
+		return json_decode($result, true);
+    }
+	function getLaneFileLocation($value){
+        $result = $this->query("select file_name from ngs_temp_lane_files where lane_id = $value");
+		return json_decode($result, true);
+    }
 }
