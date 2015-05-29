@@ -5,7 +5,7 @@
   $name=$line[1]." ".$line[0];
   $role=$query->getRole($_SESSION['user']);
   $membersince="June 2012";
-  $avatar=BASE_PATH."/img/avatar5.png";
+  $avatar=BASE_PATH.$query->getPhotoLoc($_SESSION['user']);
   
 ?>
 
@@ -39,7 +39,7 @@
                                 <!-- Menu Footer-->
                                 <li class="user-footer">
                                     <div class="pull-left">
-                                        <a href="#" class="btn btn-default btn-flat">Profile</a>
+                                        <a href="<?php echo BASE_PATH?>/profile" class="btn btn-default btn-flat">Profile</a>
                                     </div>
                                     <div class="pull-right">
                                         <a href="<?php echo BASE_PATH?>/index.php?p=logout" class="btn btn-default btn-flat">Sign out</a>

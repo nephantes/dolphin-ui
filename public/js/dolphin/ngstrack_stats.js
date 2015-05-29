@@ -13,6 +13,38 @@ $(function() {
 
 	//The Calender
 	$("#calendar").datepicker();
+	
+	$('input').on('ifChanged', function(event){
+		if (event.target.name.substring(0,6) == "common") {
+			var array = event.target.id.split("_");
+			
+			if (array[1] == 'yes' && deseqList.indexOf(array[0]) == -1 && (array[0] == 'miRNA' || array[0] == 'tRNA')) {
+				var selects = document.getElementsByTagName("select");
+				for(var i = 0; i < selects.length; i++) {
+					if(selects[i].id.indexOf('select_5_') == 0) {
+						var opt = createElement('option', ['id', 'value'], [array[0], array[0]]);
+						opt.innerHTML = array[0];
+						selects[i].appendChild(opt);
+					}
+				}
+				deseqList.push(array[0]);
+			}else if (array[1] == 'no' && deseqList.indexOf(array[0]) > -1 ){
+				deseqList.splice(deseqList.indexOf(array[0]), 1);
+				var selects = document.getElementsByTagName("select");
+				for(var i = 0; i < selects.length; i++) {
+					if(selects[i].id.indexOf('select_5_') == 0) {
+						var children = selects[i].childNodes;
+						for (var y = 0; y < children.length; y++) {
+							if (children[y].id.split("_")[0] == array[0]) {
+								children[y].remove();
+							}
+						}
+					}
+				}
+			}
+			console.log(event.target);
+		}
+	});
 
 	/*##### PAGE DETERMINER #####*/
 
@@ -30,14 +62,19 @@ $(function() {
 		gids = phpGrab.gids;
 	}
 
+	//gids
+	if (gids == '') {
+		gids = -1;
+	}
+	
 	//Details values
 	if (segment == "details") {
-	if (phpGrab.theField == "experiment_series") {
-		qvar = phpGrab.theValue;
-	}
-	else if (phpGrab.theField == "experiments") {
-		rvar = phpGrab.theValue;
-	}
+		if (phpGrab.theField == "experiment_series") {
+			qvar = phpGrab.theValue;
+		}
+		else if (phpGrab.theField == "experiments") {
+			rvar = phpGrab.theValue;
+		}
 	}
 
 	//Browse values
@@ -88,7 +125,8 @@ $(function() {
 						'</button>' +
 						'<ul class="dropdown-menu" role="menu">' +
 							disabled +
-							'<li><a href="#" id="'+s[i].id+'" name="'+s[i].run_group_id+'" onclick="rerunSelected(this.id, this.name)">Re-run this Run</a></li>' +
+							'<li><a href="#" id="'+s[i].id+'" name="'+s[i].run_group_id+'" onclick="rerunSelected(this.id, this.name)">Re-run with changes</a></li>' +
+							'<li><a href="#" id="'+s[i].id+'" name="'+s[i].run_group_id+'" onclick="resumeSelected(this.id, this.name)">Re-run without changes</a></li>' +
 							'<li class="divider"></li>' +
 							'<li><a href="#" id="'+s[i].id+'" name="'+s[i].run_group_id+'" onClick="deleteRunparams(\''+s[i].id+'\')">Delete this Run</a></li>' +
 						'</ul>' +
@@ -148,7 +186,8 @@ $(function() {
 						'</button>' +
 						'<ul class="dropdown-menu" role="menu">' +
 							disabled +
-							'<li><a href="#" id="'+s[i].id+'" name="'+s[i].run_group_id+'" onclick="rerunSelected(this.id, this.name)">Re-run this Run</a></li>' +
+							'<li><a href="#" id="'+s[i].id+'" name="'+s[i].run_group_id+'" onclick="rerunSelected(this.id, this.name)">Re-run with changes</a></li>' +
+							'<li><a href="#" id="'+s[i].id+'" name="'+s[i].run_group_id+'" onclick="resumeSelected(this.id, this.name)">Re-run without changes</a></li>' +
 							'<li class="divider"></li>' +
 							'<li><a href="#" id="'+s[i].id+'" name="'+s[i].run_group_id+'" onClick="deleteRunparams(\''+s[i].id+'\')">Delete this Run</a></li>' +
 						'</ul>' +

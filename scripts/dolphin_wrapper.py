@@ -21,7 +21,7 @@ warnings.filterwarnings('ignore', '.*the sets module is deprecated.*',
 from workflowdefs import *
 
 bin_dir = dirname(argv[0])
-cmd = 'python %(dolphin_tools_dir)s/runWorkflow.py -i %(input_fn)s -d %(galaxyhost)s -w %(workflow)s -p %(dolphin_default_params)s/Dolphin_v1.3_default.txt -u %(username)s -o %(outdir)s'
+cmd = 'python %(dolphin_tools_dir)s/runWorkflow.py -i %(input_fn)s -d %(galaxyhost)s -w %(workflow)s -p %(dolphin_default_params)s/Dolphin_v1.3_default.txt -u %(username)s -o %(outdir)s %(wkeystr)s'
 Config = ConfigParser.ConfigParser()
 params_section = 'Default'
 
@@ -154,11 +154,13 @@ def main():
         parser = OptionParser()
         parser.add_option("-r", "--rungroupid", dest="rpid")
         parser.add_option("-b", "--backup", dest="backup")
+        parser.add_option("-w", "--wkey", dest="wkey")
         # parse
         options, args = parser.parse_args()
         # retrieve options
         rpid    = options.rpid
         BACKUP    = options.backup
+	WKEY     = options.wkey
         if (not rpid):
            rpid=-1
 
@@ -245,7 +247,9 @@ def main():
            galaxyhost=Config.get(params_section, "galaxyhost")
            dolphin_tools_dir=Config.get(params_section, "dolphin_tools_src_path") 
            dolphin_default_params=Config.get(params_section, "dolphin_default_params_path")
-
+           wkeystr=''
+           if (WKEY):
+               wkeystr=' -k '+str(WKEY)
            print cmd % locals()
            print "\n\n\n"
            p = subprocess.Popen(cmd % locals(), shell=True, stdout=subprocess.PIPE)

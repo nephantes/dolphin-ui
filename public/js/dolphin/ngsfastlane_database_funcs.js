@@ -219,8 +219,8 @@ function checkFastlaneInput(info_array){
 				if (input_array[g].length == 2) {
 					insertTempSampleFiles(input_array[g][1], sample_ids[g], input_directory_id);
 				}else{
-					insertTempSampleFiles(input_array[g][1], sample_ids[g], input_directory_id);
-					insertTempSampleFiles(input_array[g][2], sample_ids[g], input_directory_id);
+					var combined_files = input_array[g][1] + "," + input_array[g][2];
+					insertTempSampleFiles(combined_files, sample_ids[g], input_directory_id);
 				}
 			}
 		}

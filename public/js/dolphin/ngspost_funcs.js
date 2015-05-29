@@ -81,6 +81,21 @@ function deleteRunparams(run_id) {
    document.getElementById('confirm_del_btn').value = run_id;
 }
 
+function resumeSelected(run_id, groupID){
+    $.ajax({ type: "POST",
+		url: "/dolphin/public/ajax/ngsalterdb.php",
+		data: { p: "noAddedParamsRerun", run_id: run_id },
+		async: false,
+		success : function(s)
+		{
+		}
+	});
+    
+    //   UPDATE THE PAGE
+    location.reload();
+}
+
+
 function confirmDeleteRunparams(run_id){
    $.ajax({
             type: 	'POST',

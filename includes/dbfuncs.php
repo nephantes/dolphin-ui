@@ -113,7 +113,11 @@ class dbfuncs {
      $sql="SELECT id FROM biocore.users where username='$username';";
      return $this->queryAVal($sql);
    }
-   
+   function getPhotoLoc($username)
+   {
+      $sql="SELECT photo_loc FROM biocore.users where username='$username';";
+      return $this->queryAVal($sql);
+   }
    function getRole($username)
    {
      
