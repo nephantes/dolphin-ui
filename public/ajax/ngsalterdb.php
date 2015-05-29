@@ -90,6 +90,15 @@ else if ($p == 'noAddedParamsRerun')
     $cmd = "cd ../../scripts && python dolphin_wrapper.py -r $idKey -w $wkey 2>&1 >> ../tmp/run.log &";
     pclose(popen( $cmd, "r"));
 }
+else if($p == 'updateProfile')
+{
+    if (isset($_POST['img'])){$img = $_POST['img'];}
+    $data=$query->runSQL("
+	UPDATE users
+    SET photo_loc = '".$img."'
+    WHERE username = '".$_SESSION['user']."'
+    ");
+}
 
 //footer
 header('Cache-Control: no-cache, must-revalidate');

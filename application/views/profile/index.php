@@ -16,24 +16,37 @@
 							<!-- general form elements -->
 							<div class="box box-primary">
 								<div class="box-header">
-									<h3 class="box-title">Choose your Avatar</h3>
-								</div><!-- /.box-header -->
-								<div class="box-body">
-									<div>				
+									
+								</div><!-- /.box-header -->			
 				<!-- form start -->
-								<form role="form" enctype="multipart/form-data" action="ngsimport/process" method="post">
-									<div class="box-body">
-										<div class="form-group">
-											<div class="col-md-3" id="av1"><img src="<?=BASE_PATH.'/img/avatar'?>" class="img-circle" alt="av1" onclick="selectAvatar(this.src)"/></div>
-											<div class="col-md-3" id="av2"><img src="<?=BASE_PATH.'/img/avatar2'?>" class="img-circle" alt="av2" onclick="selectAvatar(this.src)" /></div>
-											<div class="col-md-3" id="av3"><img src="<?=BASE_PATH.'/img/avatar3'?>" class="img-circle" alt="av3" onclick="selectAvatar(this.src)"/></div>
-											<div class="col-md-3" id="av4"><img src="<?=BASE_PATH.'/img/avatar5'?>" class="img-circle" alt="av4" onclick="selectAvatar(this.src)"/></div>
-											</ul>
+								<?php echo $html->getBasePath(BASE_PATH, API_PATH); ?>
+								<form role="form" enctype="multipart/form-data" action="profile" method="post">
+									<div class="box-body margin">
+										<div class="form-group" ">
+											<div class="margin">
+												<label><h3>Update your profile picture</h3></label>
+											</div>
+											<div class="margin">
+												<img src="<?=BASE_PATH.'/public/img/avatar.png'?>" height="100px" width="100px" name="avatar_sel" class="img-circle" alt="av1" onclick="selectAvatar(this.alt)"/>
+												<input id="av1" type="radio" name="avatar_select" value="/public/img/avatar.png">
+												<img src="<?=BASE_PATH.'/public/img/avatar2.png'?>" height="100px" width="100px" name="avatar_sel" class="img-circle" alt="av2" onclick="selectAvatar(this.alt)" />
+												<input id="av2" type="radio" name="avatar_select" value="/public/img/avatar2.png">
+												<img src="<?=BASE_PATH.'/public/img/avatar3.png'?>" height="100px" width="100px" name="avatar_sel" class="img-circle" alt="av3" onclick="selectAvatar(this.alt)"/>
+												<input id="av3" type="radio" name="avatar_select" value="/public/img/avatar3.png">
+												<img src="<?=BASE_PATH.'/public/img/avatar5.png'?>" height="100px" width="100px" name="avatar_sel" class="img-circle" alt="av4" onclick="selectAvatar(this.alt)"/>
+												<input id="av4" type="radio" name="avatar_select" value="/public/img/avatar5.png">
+											</div>
+											<br></br>
+											<div class="margin">
+												<label><h3>Update your Amazon Buckets</h3></label>
+											</div>
+											<div id="amazon_keys" class="margin">
+												<?php echo $html->getRespBoxTable_ng("", "amazon", "<th>Bucket</th><th>Access Key</th><th>Secret Key</th>"); ?>
+											</div>
 										</div>
 									</div><!-- /.box-body -->
-									<div class="box-footer">
-										<button type="button" id="changeAv" class="btn btn-primary" onclick="changeAvatar()">Change</button>
+									<div class="box-footer margin">
+										<button type="button" id="changeAv" class="btn btn-primary" onclick="updateProfile()">Update</button>
 									</div>
 								</form>
-
 

@@ -10,7 +10,8 @@ $query = new dbfuncs();
 
 $pDictionary = ['getSelectedSamples', 'submitPipeline', 'getStatus', 'getRunSamples', 'grabReload', 'getReportNames', 'lanesToSamples',
 				'checkMatePaired', 'getAllSampleIds', 'getLaneIdFromSample', 'getSingleSample', 'getSeriesIdFromLane', 'getAllLaneIds',
-                'getGIDs', 'getSampleNames', 'getWKey', 'getFastQCBool', 'getReportList', 'getTSVFileList'];
+                'getGIDs', 'getSampleNames', 'getWKey', 'getFastQCBool', 'getReportList', 'getTSVFileList', 'profileLoad',
+                'obtainAmazonKeys'];
 
 $data = "";
                 
@@ -482,6 +483,23 @@ else if ($p == 'getTSVFileList')
     SELECT file
     FROM report_list
     WHERE wkey = '$wkey' and file like '%.tsv'
+    ");
+}
+else if ($p == 'profileLoad')
+{
+    $data=$query->queryTable("
+    SELECT photo_loc
+    FROM users
+    WHERE username = '".$_SESSION['user']."'"
+    );
+}
+else if ($p == 'obtainAmazonKeys')
+{
+    $group=$query->queryTable("
+    SELECT * FROM biocore.amazon_credentials WHERE id in(
+        SELECT amazon_id FROM biocore.group_amazon WHERE id IN(
+            SELECT id FROM biocore.groups WHERE id in(
+                SELECT g_id FROM user_group WHERE u_id = ".$_SESSION['uid'].")))
     ");
 }
 
