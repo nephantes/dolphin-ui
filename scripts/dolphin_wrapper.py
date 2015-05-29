@@ -21,7 +21,7 @@ warnings.filterwarnings('ignore', '.*the sets module is deprecated.*',
 from workflowdefs import *
 
 bin_dir = dirname(argv[0])
-cmd = 'python %(dolphin_tools_dir)s/runWorkflow.py -i %(input_fn)s -d %(galaxyhost)s -w %(workflow)s -p %(dolphin_default_params)s/Dolphin_v1.3_default.txt -u %(username)s -o %(outdir)s %(wkeystr)s'
+cmd = 'python %(dolphin_tools_dir)s/runWorkflow.py -i %(input_fn)s -d %(galaxyhost)s -w %(workflow)s -p %(dolphin_default_params)s -u %(username)s -o %(outdir)s %(wkeystr)s'
 Config = ConfigParser.ConfigParser()
 params_section = 'Default'
 
