@@ -76,8 +76,7 @@ function grabReload(groupID){
 		async: false,
 		success : function(s)
 		{
-			var jsonObj = JSON.parse(s[0].json_parameters);
-            jsonArray.push(jsonObj);
+            jsonArray.push(s[0].json_parameters);
 			jsonArray.push(s[0].outdir);
 			jsonArray.push(s[0].run_name);
 			jsonArray.push(s[0].run_description);

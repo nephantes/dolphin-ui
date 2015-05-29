@@ -27,12 +27,14 @@ function rerunLoad() {
 	var hrefSplit = window.location.href.split("/");
 	var rerunLoc = $.inArray('rerun', hrefSplit)
 	var infoArray = [];
+	var json_primer = '';
 	var jsonObj;
 
 	//make sure this is a rerun
 	if (rerunLoc != -1) {
 	infoArray = grabReload(hrefSplit[rerunLoc + 1]);
-	jsonObj = infoArray[0];
+	json_primer = infoArray[0];
+	jsonObj = JSON.parse(json_primer);
 	//repopulate page
 	for (var x = 0; x < (jsonTypeList.length); x++) {
 		if (jsonObj.hasOwnProperty(jsonTypeList[x]) && jsonObj[jsonTypeList[x]] != 'none') {
@@ -64,7 +66,7 @@ function rerunLoad() {
 						if (jsonTypeList[x] == 'split') {
 							document.getElementById('number of reads per file_val').value = jsonObj[jsonTypeList[x]];
 						}else{
-							document.getElementById(jsonTypeList[x]+'_val').value = jsonObj[jsonTypeList[x]];
+							document.getElementById(jsonTypeList[x]+'_val').value = jsonObj[jsonTypeList[x]].replace(/__cr____cn__/g, "\n");;
 						}
 					}else{
 						for (var z = 0; z < splt1.length; z++) {
@@ -391,7 +393,7 @@ function submitPipeline(type) {
 		if (doAdapter == "yes") {
 			previous = 'adapter';
 		}
-		json = json + ',"adapter":"' + adapter[0] + '"';
+		json = json + ',"adapter":"' + adapter[0].replace(/\r\n|\r|\n/g, "__cr____cn__") + '"';
 		//quality
 		if (doQuality == "yes") {
 			json = json + ',"quality":"' + quality[0] + ':' + quality[1] + ':' + quality[2] + ':' + quality[3] + ':' + quality[4] + '"';
