@@ -32,9 +32,32 @@ function updateProfile(){
 	}
 }
 
+function obtainKeys(){
+	//	FIRST OBTAIN GROUPS
+	var groups = [];
+	var bucket_list = $('#jsontable_amazon').dataTable();
+	$.ajax({ type: "GET",
+			url: "/dolphin/public/ajax/ngsquerydb.php",
+			data: { p: 'obtainAmazonKeys' },
+			async: false,
+			success : function(s)
+			{
+				bucket_list.fnClearTable();
+				for(var i = 0; i < s.length; i++) {
+					bucket_list.fnAddData([
+						s[i].bucket,
+						s[i].aws_access_key_id,
+						s[i].aws_secret_access_key,
+						]);
+				}
+			}
+	});
+}
+
 $(function() {
 	"use strict";
 	
+	//	PROFILE AVATAR
 	$.ajax({ type: "GET",
 			url: "/dolphin/public/ajax/ngsquerydb.php",
 			data: { p: 'profileLoad' },
@@ -50,4 +73,7 @@ $(function() {
 				}
 			}
 	});
+	
+	//	AMAZON KEYS
+	obtainKeys();
 });
