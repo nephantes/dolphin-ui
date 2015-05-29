@@ -383,6 +383,7 @@ def write_input( input_fn, data_dir, content,genomebuild,spaired,barcodes,adapte
            print >>fp, '@HEATMAP%s=%s'%(str(deseq_count), arr[4]);
            print >>fp, '@PADJ%s=%s'%(str(deseq_count), arr[5]);
            print >>fp, '@FOLDCHANGE%s=%s'%(str(deseq_count), arr[6]);
+           print >>fp, '@DATASET%s=%s'%(str(deseq_count), arr[7]);
            deseq_count+=1
 
          if (pipename=="ChipSeq"):
@@ -461,6 +462,10 @@ def write_workflow( resume, gettotalreads, amazonupload, backupS3, runparamsid, 
          indexname=arr[1]
          stepline=stepSeqMapping % locals()
          print >>fp, '%s'%stepline
+
+   if (countstep):
+      stepline=stepCounts % locals()
+      print >>fp, '%s'%stepline
 
    if (split and split.lower() != 'none'):
       thenumberofreads=str(split)
@@ -551,9 +556,6 @@ def write_workflow( resume, gettotalreads, amazonupload, backupS3, runparamsid, 
                 stepline=stepBam2BW % locals()
                 print >>fp, '%s'%stepline
 
-   if (countstep):
-      stepline=stepCounts % locals()
-      print >>fp, '%s'%stepline
    
    level=0
    if (clean):
