@@ -20,6 +20,6 @@ stepIGVTDF='stepIGVTDF%(type)s%(sep)s@RUNIGVTDF -o @OUTDIR -g @GENOMEFASTA -pa @
 stepBam2BW='stepBam2BW%(type)s%(sep)s@RUNBAM2BW -o @OUTDIR -g @GENOMESIZE -p @PUBDIR -wk @WKEY -c @RUNCOVERAGE -t %(type)s -wi @WIGTOBIGWIG -s stepBam2BW%(type)s -j @JGEN%(sep)s0'
 stepPicard='stepPicard%(sep)s@PERL @RUNPICARD -o @OUTDIR -r @REFFLAT -p @PICARDCMD -s stepPicard -j @JGEN%(sep)s0'
 stepCounts = 'stepCounts%(sep)s@RUNCOUNTS -m @MAPNAMES -o @OUTDIR -g @GCOMMONDB -p @PUBDIR -w @WKEY -b @MAKEBED -c @BEDTOOLSCMD -s stepCounts -j @JGEN%(sep)s1'
-stepDESeq2 = 'stepDESeq2p%(deseq_count)s%(sep)s@RUNDESEQ2 -c @COLS%(deseq_count)s -pu @PUBDIR -w @WKEY -d @CONDS%(deseq_count)s -r @RSCRIPT -o @OUTDIR -n %(deseq_count)s -e @HEATMAP%(deseq_count)s -t @FITTYPE%(deseq_count)s -pa @PADJ%(deseq_count)s -f @FOLDCHANGE%(deseq_count)s -s stepDESeq2p%(deseq_count)s -j @JGEN%(sep)s0'
+stepDESeq2 = 'stepDESeq2p%(deseq_count)s%(sep)s@RUNDESEQ2 -c @COLS%(deseq_count)s -pu @PUBDIR -da @DATASET%(deseq_count)s -w @WKEY -dc @CONDS%(deseq_count)s -r @RSCRIPT -o @OUTDIR -n %(deseq_count)s -e @HEATMAP%(deseq_count)s -t @FITTYPE%(deseq_count)s -pa @PADJ%(deseq_count)s -f @FOLDCHANGE%(deseq_count)s -s stepDESeq2p%(deseq_count)s -j @JGEN%(sep)s0'
 stepClean      = 'stepClean%(sep)s@RUNCLEAN -l %(level)s -p @PUBDIR -w @WKEY -d @DBCOMMCMD  -o @OUTDIR%(sep)s1'
 
