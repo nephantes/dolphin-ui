@@ -10,7 +10,7 @@ $query = new dbfuncs();
 
 $pDictionary = ['getSelectedSamples', 'submitPipeline', 'getStatus', 'getRunSamples', 'grabReload', 'getReportNames', 'lanesToSamples',
 				'checkMatePaired', 'getAllSampleIds', 'getLaneIdFromSample', 'getSingleSample', 'getSeriesIdFromLane', 'getAllLaneIds',
-                'getGIDs', 'getSampleNames', 'getWKey', 'getFastQCBool', 'getReportList', 'getTSVFileList'];
+                'getGIDs', 'getSampleNames', 'getWKey', 'getFastQCBool', 'getReportList', 'getTSVFileList', 'profileLoad'];
 
 $data = "";
                 
@@ -483,6 +483,14 @@ else if ($p == 'getTSVFileList')
     FROM report_list
     WHERE wkey = '$wkey' and file like '%.tsv'
     ");
+}
+else if ($p == 'profileLoad')
+{
+    $data=$query->queryTable("
+    SELECT photo_loc
+    FROM users
+    WHERE username = '".$_SESSION['user']."'"
+    );
 }
 
 header('Cache-Control: no-cache, must-revalidate');
