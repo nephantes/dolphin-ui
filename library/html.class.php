@@ -405,7 +405,43 @@ e range"><i class="fa fa-calendar"></i></button>
 			 $html.='<dd>'.$obj[$field['fieldname']].'</dd>';
 		}
 		endforeach;
+	$html.=	'</dl>
+		</div> 
+		</div>';
+	endforeach;
+	return $html;
+	}
 	
+	function getBrowserPanelMore($objects, $fields, $header ,$name, $files)
+	{
+	foreach ($objects as $obj):
+	$html='<div class="panel panel-default">
+		<div class="panel-heading">
+			<h3 class="panel-title">'.$header.'</h3>
+			<div class="panel-tools pull-right">
+				<button class="btn btn-panel-tool" onclick="backFromDetails(\''.$header.'\')">
+					<i class="fa fa-arrow-left"></i>
+				</button>
+			</div>
+		</div>
+		<div class="panel-body">
+		<h4>
+			'.$obj[$name].'
+		</h4>
+		</div>
+		<div class="box-body">
+		<dl class="dl-horizontal">
+		';
+		foreach ($fields as $field):
+		if ($field['fieldname']!=$name && $obj[$field['fieldname']]!=""){
+					 $html.='	<dt>'.$field['title'].'</dt>';
+			 $html.='<dd>'.$obj[$field['fieldname']].'</dd>';
+		}
+		endforeach;
+		if($files != null){
+				$html.='<dt>File(s)</dt>';
+				$html.='<dd>'.$files[0]['file_name'].'</dd>';
+		}
 	$html.=	'</dl>
 		</div> 
 		</div>';
@@ -615,8 +651,8 @@ e range"><i class="fa fa-calendar"></i></button>
 							<label value="'.$fieldTitles[$y].'">'.$fieldTitles[$y].'</label>
 							<div class="text-center">
 								yes
-								<input id="'.$fieldTitles[$y].'_yes" name="'.$fieldTitles[$y].'_val" type="radio" value="yes"/>
-								<input id="'.$fieldTitles[$y].'_no" name="'.$fieldTitles[$y].'_val" type="radio" value="no" checked/>
+								<input id="'.$fieldTitles[$y].'_yes" name="common_'.$fieldTitles[$y].'" type="radio" value="yes" />
+								<input id="'.$fieldTitles[$y].'_no" name="common_'.$fieldTitles[$y].'" type="radio" value="no" checked/>
 								no
 							</div>
 						</div>';

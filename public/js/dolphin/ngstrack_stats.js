@@ -13,6 +13,38 @@ $(function() {
 
 	//The Calender
 	$("#calendar").datepicker();
+	
+	$('input').on('ifChanged', function(event){
+		if (event.target.name.substring(0,6) == "common") {
+			var array = event.target.id.split("_");
+			
+			if (array[1] == 'yes' && deseqList.indexOf(array[0]) == -1 && (array[0] == 'miRNA' || array[0] == 'tRNA')) {
+				var selects = document.getElementsByTagName("select");
+				for(var i = 0; i < selects.length; i++) {
+					if(selects[i].id.indexOf('select_5_') == 0) {
+						var opt = createElement('option', ['id', 'value'], [array[0], array[0]]);
+						opt.innerHTML = array[0];
+						selects[i].appendChild(opt);
+					}
+				}
+				deseqList.push(array[0]);
+			}else if (array[1] == 'no' && deseqList.indexOf(array[0]) > -1 ){
+				deseqList.splice(deseqList.indexOf(array[0]), 1);
+				var selects = document.getElementsByTagName("select");
+				for(var i = 0; i < selects.length; i++) {
+					if(selects[i].id.indexOf('select_5_') == 0) {
+						var children = selects[i].childNodes;
+						for (var y = 0; y < children.length; y++) {
+							if (children[y].id.split("_")[0] == array[0]) {
+								children[y].remove();
+							}
+						}
+					}
+				}
+			}
+			console.log(event.target);
+		}
+	});
 
 	/*##### PAGE DETERMINER #####*/
 

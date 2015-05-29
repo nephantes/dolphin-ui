@@ -160,7 +160,7 @@ function showTable(type){
 	currentResultSelection = document.getElementById('select_' + type + '_report').value
 	var objList = getCountsTableData(currentResultSelection, type);
 	var keys = obtainObjectKeys(objList[0]);
-	if(currentResultSelection.split(".")[currentResultSelection.split(".").length - 1] == "tsv" || currentResultSelection.substring(currentResultSelection.length - 3, currentResultSelection.length) == "RNA"){
+	if(currentResultSelection.split(".")[currentResultSelection.split(".").length - 1] == "tsv" || currentResultSelection.substring(currentResultSelection.length - 3, currentResultSelection.length) == "RNA" || currentResultSelection == 'ercc'){
 		var masterDiv = document.getElementById(type+'_exp_body');
 		if (document.getElementById('jsontable_' + type + '_results') == null) {
 			var previous_button = false;
@@ -192,12 +192,12 @@ function showTable(type){
 			for (var y = 0; y < keys.length; y++){
 				if (type == 'initial_mapping') {
 					if (keys[y].indexOf(lib_checklist)) {
-						objList_row.push(numberWithCommas(objList[x][keys[y]]));
+						objList_row.push(objList[x][keys[y]]);
 					}else if (keys[y] == "id" || keys[y] == "name" || keys[y] == "len") {
 						objList_row.push(objList[x][keys[y]]);
 					}
 				}else{
-					objList_row.push(numberWithCommas(objList[x][keys[y]]));
+					objList_row.push(objList[x][keys[y]]);
 				}
 			}
 			selection_array.push(objList_row);
@@ -302,7 +302,7 @@ function createDownloadReportButtons(currentSelection, type){
 	var span = createElement('span', ['class'], ['fa fa-caret-down']);
 	button.appendChild(span);
 	
-	if(currentResultSelection.split(".")[currentResultSelection.split(".").length - 1] == "tsv" || currentResultSelection.substring(currentResultSelection.length - 3, currentResultSelection.length) == "RNA"){
+	if(currentResultSelection.split(".")[currentResultSelection.split(".").length - 1] == "tsv" || currentResultSelection.substring(currentResultSelection.length - 3, currentResultSelection.length) == "RNA" || currentResultSelection == 'ercc'){
 		var buttonType = ['JSON','JSON2', 'XML', 'HTML'];
 		for (var x = 0; x < buttonType.length; x++){
 			var li = createElement('li', [], []);

@@ -67,6 +67,7 @@ class SearchController extends VanillaController {
 
 			$this->set('experiment_series', $this->Search->getValues($this->Search->getId($value, 'series_id', 'ngs_lanes'), 'ngs_experiment_series'));
 			$this->set('experiments', $this->Search->getValues($value, 'ngs_lanes'));
+            $this->set('lane_file', $this->Search->getLaneFileLocation($value));
 		}
 		if ($table=='samples')
 		{
@@ -76,7 +77,9 @@ class SearchController extends VanillaController {
 
 			$this->set('experiment_series', $this->Search->getValues($this->Search->getId($value, 'series_id', 'ngs_samples'), 'ngs_experiment_series'));
 			$this->set('experiments', $this->Search->getValues($this->Search->getId($value, 'lane_id', 'ngs_samples'), 'ngs_lanes'));
+            $this->set('lane_file', $this->Search->getLaneFileLocation($this->Search->getId($value, 'lane_id', 'ngs_samples')));
 			$this->set('samples', $this->Search->getValues($value, 'ngs_samples'));
+            $this->set('sample_file', $this->Search->getSampleFileLocation($value));
 		}
 	}
 

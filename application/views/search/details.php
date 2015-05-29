@@ -50,13 +50,13 @@
 					echo $html->getRespBoxTable_ng("Experiment Series", "experiment_series", "<th>id</th><th>Series Name</th><th>Summary</th><th>Design</th>");
 				}
 				if ($table=="experiments" || $table=="samples"){
-								echo $html->getBrowserPanel($experiments, $experiment_fields, "Import", 'name');
+								echo $html->getBrowserPanelMore($experiments, $experiment_fields, "Import", 'name', $lane_file);
 				}
 				else{
 					echo $html->getRespBoxTable_ng("Imports", "lanes", "<th>id</th><th>Import name</th><th>Facility</th><th>Total Reads</th><th>Total Samples</th><th>Selected</th>");
 				}
 				if ($table=="samples"){
-				echo $html->getBrowserPanel($samples, $sample_fields, "Sample",'name');
+				echo $html->getBrowserPanelMore($samples, $sample_fields, "Sample",'name', $sample_file);
 				//echo $html->getQCPanel();
 				//echo $html->getRSEMPanel();
 				//echo $html->getDESeqPanel();
