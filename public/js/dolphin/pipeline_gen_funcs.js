@@ -639,7 +639,9 @@ function addToDolphinBasket(sampleID){
 	tblcol3.appendChild(remove_button);
 	tblrow.appendChild(tblcol3);
 
-	tblBody.appendChild(tblrow);
+	if (tblBody != null) {
+		tblBody.appendChild(tblrow);
+	}
 }
 
 function removeFromDolphinBasket(sampleID){

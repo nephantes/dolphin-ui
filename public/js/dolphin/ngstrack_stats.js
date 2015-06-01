@@ -42,7 +42,6 @@ $(function() {
 					}
 				}
 			}
-			console.log(event.target);
 		}
 	});
 
@@ -201,7 +200,7 @@ $(function() {
 	});
 
 	runparams.fnSort( [ [0,'des'] ] );
-	runparams.fnAdjustColumnSizing(true);
+	//runparams.fnAdjustColumnSizing(true);
 	
 	}else if (segment == 'advstatus') {
 	
@@ -237,7 +236,7 @@ $(function() {
 			}
 		});
 		runparams.fnSort( [ [4,'asc'] ] );
-		runparams.fnAdjustColumnSizing(true);
+		//runparams.fnAdjustColumnSizing(true);
 	}
 
 
@@ -384,7 +383,7 @@ $(function() {
 	});
 
 	samplesTable.fnSort( [ [0,'asc'] ] );
-	samplesTable.fnAdjustColumnSizing(true);
+	//samplesTable.fnAdjustColumnSizing(true);
 
 	if (phpGrab.theField == "experiments") {
 	checkOffAllSamples();
@@ -453,7 +452,7 @@ $(function() {
 	});
 
 	lanesTable.fnSort( [ [0,'asc'] ] );
-	lanesTable.fnAdjustColumnSizing(true);
+	//lanesTable.fnAdjustColumnSizing(true);
 
 	if (phpGrab.theField == "experiment_series") {
 	checkOffAllSamples();
@@ -520,9 +519,11 @@ $(function() {
 	experiment_seriesTable.fnSort( [ [0,'asc'] ] );
 	//experiment_seriesTable.fnAdjustColumnSizing(true);
 
-	checkOffAllSamples();
-	checkOffAllLanes();
-	reloadBasket();
+	if (segment == 'index' || segment == 'browse' || segment == 'details') {
+		checkOffAllSamples();
+		checkOffAllLanes();
+		reloadBasket();
+	}
 });
 
 
