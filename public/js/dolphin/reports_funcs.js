@@ -466,8 +466,8 @@ $(function() {
 						row_array.push(table_array[y][(x*4)]);
 						row_array.push(numberWithCommas(table_array[y][(x*4) + 1]));
 						reads_total = table_array[y][(x*4) + 1]
-						row_array.push(numberWithCommas(table_array[y][(x*4) + 2].split(" ")[0]) + " (" + ((table_array[y][(x*4) + 2].split(" ")[0])/(reads_total)).toFixed(2) + " %)");
-						row_array.push(numberWithCommas(table_array[y][(x*4) + 3]));
+						row_array.push(numberWithCommas(table_array[y][(x*4) + 2].split(" ")[0]) + " (" + ((table_array[y][(x*4) + 2].split(" ")[0])/(reads_total)*100).toFixed(2) + " %)");
+						row_array.push(numberWithCommas(table_array[y][(x*4) + 3].split(" ")[0]) + " (" + ((table_array[y][(x*4) + 3].split(" ")[0])/(reads_total)*100).toFixed(2) + " %)");
 					}else{
 						row_array.push(table_array[y][(x*3)]);
 						row_array.push(numberWithCommas(table_array[y][(x*3) + 1]));
