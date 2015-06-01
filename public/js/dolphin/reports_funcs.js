@@ -37,6 +37,7 @@ function parseMoreTSV(jsonNameArray, url_path){
 						parsed.push(s[j][jsonNameArray[k]]);
 					}
 				}
+				console.log(parsed);
 			}
 	});
 	return parsed;
@@ -440,7 +441,11 @@ $(function() {
 	if (summary_files.length > 0) {
 		for (var z = 0; z < summary_files.length; z++) {
 			if (z == 0){
-				table_array.push(parseMoreTSV(['File','Total Reads','Reads 1'], summary_files[z]['file']));
+				if (summary_files.length == 1) {
+					table_array.push(parseMoreTSV(['File','Total Reads','Reads 1','Unmapped Reads'], summary_files[z]['file']));
+				}else{
+					table_array.push(parseMoreTSV(['File','Total Reads','Reads 1'], summary_files[z]['file']));
+				}
 			}else if (z == summary_files.length - 1) {
 				table_array.push(parseTSV('Reads 1', summary_files[z]['file']));
 				table_array.push(parseTSV('Unmapped Reads', summary_files[z]['file']));
@@ -457,10 +462,18 @@ $(function() {
 			var reads_total;
 			for (var y = 0; y < table_array.length; y++){
 				if (y == 0) {
-					row_array.push(table_array[y][(x*3)]);
-					row_array.push(numberWithCommas(table_array[y][(x*3) + 1]));
-					reads_total = table_array[y][(x*3) + 1]
-					row_array.push(numberWithCommas(table_array[y][(x*3) + 2].split(" ")[0]) + " (" + ((table_array[y][(x*3) + 2].split(" ")[0])/(reads_total)).toFixed(2) + " %)");
+					if (table_array.length == 1) {
+						row_array.push(table_array[y][(x*4)]);
+						row_array.push(numberWithCommas(table_array[y][(x*4) + 1]));
+						reads_total = table_array[y][(x*4) + 1]
+						row_array.push(numberWithCommas(table_array[y][(x*4) + 2].split(" ")[0]) + " (" + ((table_array[y][(x*4) + 2].split(" ")[0])/(reads_total)).toFixed(2) + " %)");
+						row_array.push(numberWithCommas(table_array[y][(x*4) + 3]));
+					}else{
+						row_array.push(table_array[y][(x*3)]);
+						row_array.push(numberWithCommas(table_array[y][(x*3) + 1]));
+						reads_total = table_array[y][(x*3) + 1]
+						row_array.push(numberWithCommas(table_array[y][(x*3) + 2].split(" ")[0]) + " (" + ((table_array[y][(x*3) + 2].split(" ")[0])/(reads_total)).toFixed(2) + " %)");
+					}
 				}else{
 					if (table_array[y][x] != undefined) {
 						row_array.push(numberWithCommas(table_array[y][x].split(" ")[0]) + " (" + ((table_array[y][x].split(" ")[0]/reads_total)*100).toFixed(2) + " %)");
