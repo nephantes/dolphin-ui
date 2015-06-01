@@ -11,7 +11,7 @@ $query = new dbfuncs();
 $pDictionary = ['getSelectedSamples', 'submitPipeline', 'getStatus', 'getRunSamples', 'grabReload', 'getReportNames', 'lanesToSamples',
 				'checkMatePaired', 'getAllSampleIds', 'getLaneIdFromSample', 'getSingleSample', 'getSeriesIdFromLane', 'getAllLaneIds',
                 'getGIDs', 'getSampleNames', 'getWKey', 'getFastQCBool', 'getReportList', 'getTSVFileList', 'profileLoad',
-                'obtainAmazonKeys'];
+                'obtainAmazonKeys', 'checkAmazonPermissions'];
 
 $data = "";
                 
@@ -495,11 +495,20 @@ else if ($p == 'profileLoad')
 }
 else if ($p == 'obtainAmazonKeys')
 {
-    $group=$query->queryTable("
-    SELECT * FROM biocore.amazon_credentials WHERE id in(
-        SELECT amazon_id FROM biocore.group_amazon WHERE id IN(
-            SELECT id FROM biocore.groups WHERE id in(
+    $data=$query->queryTable("
+    SELECT * FROM amazon_credentials WHERE id IN(
+        SELECT amazon_id FROM group_amazon WHERE id IN(
+            SELECT id FROM groups WHERE id IN(
                 SELECT g_id FROM user_group WHERE u_id = ".$_SESSION['uid'].")))
+    ");
+}
+else if ($p = 'checkAmazonPermissions')
+{
+    if (isset($_GET['a_id'])){$a_id = $_GET['a_id'];}
+    $data=$query->queryTable("
+    SELECT id FROM groups WHERE owner_id = ".$_SESSION['uid']." AND id IN(
+    SELECT group_id FROM group_amazon WHERE amazon_id = (
+    SELECT DISTINCT id FROM biocore.amazon_credentials where id = $a_id));
     ");
 }
 
