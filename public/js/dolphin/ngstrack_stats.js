@@ -463,62 +463,62 @@ $(function() {
 
 	/*##### SERIES TABLE #####*/
 
-	 var experiment_seriesTable = $('#jsontable_experiment_series').dataTable();
-	 $.ajax({ type: "GET",
-					 url: "/dolphin/public/ajax/ngsquerydb.php",
-					 data: { p: "getExperimentSeries", q: qvar, r: rvar, seg: segment, search: theSearch, uid: uid, gids: gids },
-					 async: false,
-					 success : function(s)
-					 {
-						experiment_seriesTable.fnClearTable();
-						for(var i = 0; i < s.length; i++) {
-						experiment_seriesTable.fnAddData([
-			s[i].id,
-			"<a href=\"/dolphin/search/details/experiment_series/"+s[i].id+'/'+theSearch+"\">"+s[i].experiment_name+"</a>",
-						s[i].summary,
-						s[i].design,
-						]);
-						} // End For
-					 }
-			});
+	var experiment_seriesTable = $('#jsontable_experiment_series').dataTable({responsive: true});
+	$.ajax({ type: "GET",
+					url: "/dolphin/public/ajax/ngsquerydb.php",
+					data: { p: "getExperimentSeries", q: qvar, r: rvar, seg: segment, search: theSearch, uid: uid, gids: gids },
+					async: false,
+					success : function(s)
+					{
+					   experiment_seriesTable.fnClearTable();
+					   for(var i = 0; i < s.length; i++) {
+					   experiment_seriesTable.fnAddData([
+		   s[i].id,
+		   "<a href=\"/dolphin/search/details/experiment_series/"+s[i].id+'/'+theSearch+"\">"+s[i].experiment_name+"</a>",
+					   s[i].summary,
+					   s[i].design,
+					   ]);
+					   } // End For
+					}
+		   });
 
-	 $('.daterange_experiment_series').daterangepicker(
-			{
-				ranges: {
-					'Today': [moment().subtract('days', 1), moment()],
-					'Yesterday': [moment().subtract('days', 2), moment().subtract('days', 1)],
-					'Last 7 Days': [moment().subtract('days', 6), moment()],
-					'Last 30 Days': [moment().subtract('days', 29), moment()],
-					'This Month': [moment().startOf('month'), moment().endOf('month')],
-					'Last Month': [moment().subtract('month', 1).startOf('month'), moment().subtract('month', 1).endOf('month')],
-					'This Year': [moment().startOf('year'), moment().endOf('year')],
-				},
-				startDate: moment().subtract('days', 29),
-				endDate: moment()
-			},
-	function(start, end) {
-			$.ajax({ type: "GET",
-					 url: "/dolphin/public/ajax/ngsquerydb.php",
-					 data: { p: "getExperimentSeries", q: qvar, r: rvar, seg: segment, search: theSearch, uid: uid, gids: gids, start:start.format('YYYY-MM-DD'), end:end.format('YYYY-MM-DD') },
-					 async: false,
-					 success : function(s)
-					 {
-						experiment_seriesTable.fnClearTable();
-						for(var i = 0; i < s.length; i++) {
-						experiment_seriesTable.fnAddData([
-			s[i].id,
-			"<a href=\"/dolphin/search/details/experiment_series/"+s[i].id+'/'+theSearch+"\">"+s[i].experiment_name+"</a>",
-						s[i].summary,
-						s[i].design,
-						]);
-						} // End For
-					 }
+	$('.daterange_experiment_series').daterangepicker(
+		   {
+			   ranges: {
+				   'Today': [moment().subtract('days', 1), moment()],
+				   'Yesterday': [moment().subtract('days', 2), moment().subtract('days', 1)],
+				   'Last 7 Days': [moment().subtract('days', 6), moment()],
+				   'Last 30 Days': [moment().subtract('days', 29), moment()],
+				   'This Month': [moment().startOf('month'), moment().endOf('month')],
+				   'Last Month': [moment().subtract('month', 1).startOf('month'), moment().subtract('month', 1).endOf('month')],
+				   'This Year': [moment().startOf('year'), moment().endOf('year')],
+			   },
+			   startDate: moment().subtract('days', 29),
+			   endDate: moment()
+		   },
+   function(start, end) {
+		   $.ajax({ type: "GET",
+					url: "/dolphin/public/ajax/ngsquerydb.php",
+					data: { p: "getExperimentSeries", q: qvar, r: rvar, seg: segment, search: theSearch, uid: uid, gids: gids, start:start.format('YYYY-MM-DD'), end:end.format('YYYY-MM-DD') },
+					async: false,
+					success : function(s)
+					{
+					   experiment_seriesTable.fnClearTable();
+					   for(var i = 0; i < s.length; i++) {
+					   experiment_seriesTable.fnAddData([
+		   s[i].id,
+		   "<a href=\"/dolphin/search/details/experiment_series/"+s[i].id+'/'+theSearch+"\">"+s[i].experiment_name+"</a>",
+					   s[i].summary,
+					   s[i].design,
+					   ]);
+					   } // End For
+					}
 			});
 
 	});
 
 	experiment_seriesTable.fnSort( [ [0,'asc'] ] );
-	experiment_seriesTable.fnAdjustColumnSizing(true);
+	//experiment_seriesTable.fnAdjustColumnSizing(true);
 
 	checkOffAllSamples();
 	checkOffAllLanes();
