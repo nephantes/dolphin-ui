@@ -207,13 +207,14 @@ class CSV_To_API {
       foreach ( $line as $key => $field ) {
         $row[ $this->sanitize_key( $headers[ $key ] ) ] = $field;
       }
-	  if ($this->fields)
-	      $row = $this->removeKeys($row, $this->fields);
+      if ($this->fields)
+          $row = $this->removeKeys($row, $this->fields);
+      if (!is_null($row[key($row)]))
+      {
+        $row = $this->array_to_object( $row );
 
-      $row = $this->array_to_object( $row );
-
-      $data[] = $row;
-
+        $data[] = $row;
+      }
     }
 
     return $data;
@@ -312,7 +313,7 @@ class CSV_To_API {
       $cput = $this->commatrim($cput); 
       $cput .= "\n       ]";
       $cput .= "\n      },\n      {\n";
-      if ($value !=null) {
+      if ($value != 'null') {
          $output.=$cput;
       }
     
