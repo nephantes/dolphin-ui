@@ -375,7 +375,7 @@ function sendToPlots(){
 }
 
 function numberWithCommas(x) {
-    return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+	return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
 }
 
 $(function() {
@@ -453,15 +453,21 @@ $(function() {
 			}
 		}
 		
+		var separator = 3;
+		if (table_array.length == 1) {
+			separator = 4;
+		}
 		//Initial Mapping Results
 		var reports_table = $('#jsontable_initial_mapping').dataTable();
 		reports_table.fnClearTable();
-		for (var x = 0; x < ((table_array[0].length/3) - 1); x++) {
+		console.log(table_array.length);
+		for (var x = 0; x < ((table_array[0].length/separator)); x++) {
 			var row_array = [];
 			var reads_total;
 			for (var y = 0; y < table_array.length; y++){
 				if (y == 0) {
 					if (table_array.length == 1) {
+						console.log(table_array[y][(x*4) + 1]);
 						row_array.push(table_array[y][(x*4)]);
 						row_array.push(numberWithCommas(table_array[y][(x*4) + 1]));
 						reads_total = table_array[y][(x*4) + 1];
