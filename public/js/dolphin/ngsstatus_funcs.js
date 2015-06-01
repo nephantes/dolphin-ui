@@ -49,7 +49,7 @@ function selectService(id){
 			}
 		});
 	runparams.fnSort( [ [4,'asc'] ] );
-	runparams.fnAdjustColumnSizing(true);
+	//runparams.fnAdjustColumnSizing(true);
 }
 
 function selectJob(id){

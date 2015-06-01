@@ -47,7 +47,7 @@
 				echo $html->getBrowserPanel($experiment_series, $experiment_series_fields, "Experiment Series", 'experiment_name');
 				}
 				else{
-					echo $html->getRespBoxTable_ng("Experiment Series", "experiment_series", "<th>id</th><th>Series Name</th><th>Summary</th><th>Design</th>");
+					echo $html->getRespBoxTable_ng("Experiment Series", "experiment_series", "<th style=\"width:50px\" >id</th><th style=\"width:100px\">Series Name</th><th>Summary</th><th>Design</th>");
 				}
 				if ($table=="experiments" || $table=="samples"){
 								echo $html->getBrowserPanelMore($experiments, $experiment_fields, "Import", 'name', $lane_file);

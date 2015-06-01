@@ -42,7 +42,7 @@
 		<!-- END ACCORDION & CAROUSEL-->
 			</div><!-- /.col (LEFT) -->
 						<div class="col-md-9">
-				<?php echo $html->getRespBoxTable_ng("Experiment Series", "experiment_series", "<th>id</th><th>Series Name</th><th>Summary</th><th>Design</th>"); ?>
+				<?php echo $html->getRespBoxTable_ng("Experiment Series", "experiment_series", "<th style=\"width:50px\" >id</th><th style=\"width:100px\">Series Name</th><th>Summary</th><th>Design</th>"); ?>
 
 				<?php echo $html->getRespBoxTable_ng("Imports", "lanes", "<th>id</th><th>Import Name</th><th>Facility</th><th>Total Reads</th><th>Total Samples</th><th>Selected</th>"); ?>
 							<?php echo $html->getRespBoxTable_ng("Samples", "samples", "<th>id</th><th>Sample Name</th><th>Title</th><th>Source</th><th>Organism</th><th>Molecule</th><th>Selected</th>"); ?>
