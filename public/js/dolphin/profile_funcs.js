@@ -1,5 +1,7 @@
 
 var current_avatar;
+var access_key_change = [];
+var secret_key_change = [];
 
 function selectAvatar(id){
 	$( '#'+id ).iCheck('check');
@@ -18,7 +20,32 @@ function updateProfile(){
 			change_value = document.getElementById(imgs[x].alt).value;
 		}
 	}
-	console.log(change_value);
+
+	if (access_key_change.length > 0) {
+		for(var x = 0; x < access_key_change.length; x++){
+			$.ajax({ type: "POST",
+				url: "/dolphin/public/ajax/ngsalterdb.php",
+				data: { p: 'alterAccessKey', id: access_key_change[x].split("_")[0], a_key: document.getElementById(access_key_change).value},
+				async: false,
+				success : function(s)
+				{
+				}
+			});
+		}
+	}
+	if (secret_key_change.length > 0) {
+		for(var x = 0; x < secret_key_change.length; x++){
+			$.ajax({ type: "POST",
+				url: "/dolphin/public/ajax/ngsalterdb.php",
+				data: { p: 'alterSecretKey', id: secret_key_change[x].split("_")[0], s_key: document.getElementById(secret_key_change).value},
+				async: false,
+				success : function(s)
+				{
+				}
+			});
+		}
+	}
+	
 	if (change_check) {
 		$.ajax({ type: "POST",
 			url: "/dolphin/public/ajax/ngsalterdb.php",
@@ -26,9 +53,33 @@ function updateProfile(){
 			async: false,
 			success : function(s)
 			{
-				location.reload();
 			}
 		});
+	}
+	location.reload();
+}
+
+function obtainPermissions(id){
+	var verdict = false;
+	$.ajax({ type: "GET",
+			url: "/dolphin/public/ajax/ngsquerydb.php",
+			data: { p: 'checkAmazonPermissions', a_id: id},
+			async: false,
+			success : function(s)
+			{
+				if (s.length > 0) {
+					verdict = true;
+				}
+			}
+	});
+	return verdict;
+}
+
+function credentials_change(id){
+	if (id.split("_")[1] == 'access' && access_key_change.indexOf(id) == -1) {
+		access_key_change.push(id);
+	}else if (id.split("_")[1] == 'secret' && secret_key_change.indexOf(id) == -1){
+		secret_key_change.push(id);
 	}
 }
 
@@ -36,6 +87,7 @@ function obtainKeys(){
 	//	FIRST OBTAIN GROUPS
 	var groups = [];
 	var bucket_list = $('#jsontable_amazon').dataTable();
+
 	$.ajax({ type: "GET",
 			url: "/dolphin/public/ajax/ngsquerydb.php",
 			data: { p: 'obtainAmazonKeys' },
@@ -44,11 +96,20 @@ function obtainKeys(){
 			{
 				bucket_list.fnClearTable();
 				for(var i = 0; i < s.length; i++) {
-					bucket_list.fnAddData([
+					if (obtainPermissions(s[i].id)) {
+						bucket_list.fnAddData([
 						s[i].bucket,
-						s[i].aws_access_key_id,
-						s[i].aws_secret_access_key,
+						'<input id="'+s[i].id+'_access" type="textbox" class="input-group col-md-12" value="'+s[i].aws_access_key_id+'" onchange="credentials_change(this.id)">',
+						'<input id="'+s[i].id+'_secret" type="textbox" class="input-group col-md-12" value="'+s[i].aws_secret_access_key+'" onchange="credentials_change(this.id)">'
 						]);
+					}else{
+						bucket_list.fnAddData([
+						s[i].bucket,
+						'<input type="textbox" class="input-group col-md-12" value="'+Array(17).join('*') + s[i].aws_access_key_id.substring(16, 20)+'" disabled>',
+						'<input type="textbox" class="input-group col-md-12" value="'+Array(37).join('*') + s[i].aws_secret_access_key.substring(36,40)+'" disabled>'
+						]);
+					}
+					
 				}
 			}
 	});

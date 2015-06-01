@@ -99,6 +99,26 @@ else if($p == 'updateProfile')
     WHERE username = '".$_SESSION['user']."'
     ");
 }
+else if ($p == 'alterAccessKey')
+{
+    if (isset($_POST['id'])){$id = $_POST['id'];}
+    if (isset($_POST['a_key'])){$a_key = $_POST['a_key'];}
+    $data=$query->runSQL("
+	UPDATE amazon_credentials
+    SET aws_access_key_id = '".$a_key."'
+    WHERE id = $id
+    ");
+}
+else if ($p == 'alterSecretKey')
+{
+    if (isset($_POST['id'])){$id = $_POST['id'];}
+    if (isset($_POST['s_key'])){$s_key = $_POST['s_key'];}
+    $data=$query->runSQL("
+	UPDATE amazon_credentials
+    SET aws_secret_access_key = '".$s_key."'
+    WHERE id = $id
+    ");
+}
 
 //footer
 header('Cache-Control: no-cache, must-revalidate');
