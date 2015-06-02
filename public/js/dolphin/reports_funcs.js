@@ -339,11 +339,11 @@ function createDownloadReportButtons(currentSelection, type){
 function downloadReports(buttonType, type){
 	var temp_currentResultSelection;
 	if (type == 'initial_mapping') {
-		temp_currentResultSelection = 'counts/' + currentResultSelection + '.counts.tsv&fields=id,' + lib_checklist.toString();
+		temp_currentResultSelection = 'counts/' + currentResultSelection + '.counts.tsv';
 	}else if (type == 'RSEM'){
-		temp_currentResultSelection = currentResultSelection + '&fields=gene,transcript,' + libraries.toString();
+		temp_currentResultSelection = currentResultSelection;
 	}else if (type == 'DESEQ') {
-		temp_currentResultSelection = currentResultSelection + '&fields=name,' + libraries.toString() + ',padj,log2FoldChange,foldChange';
+		temp_currentResultSelection = currentResultSelection;
 	}
 	var URL = BASE_PATH + "/public/api/?source=" + API_PATH + '/public/pub/' + wkey + '/' + temp_currentResultSelection + '&format=' + buttonType;
 	window.open(URL);
@@ -443,38 +443,36 @@ $(function() {
 	});
 	
 	if (summary_files.length > 0) {
-		console.log(table_array);
 		for (var z = 0; z < summary_files.length; z++) {
 			if (z == 0){
 				if (summary_files.length == 1) {
-					var table_array_raw = (parseMoreTSV(['File','Total Reads','Reads 1','Reads >1','Unmapped Reads'], summary_files[z]['file']));
+					var table_array_raw = (parseMoreTSV(['File','Total Reads','Total align','Unmapped Reads'], summary_files[z]['file']));
 					for(var x = 0; x < table_array_raw.length; x++){
-						var table_array_push = [table_array_raw[x][0], table_array_raw[x][1], parseInt(table_array_raw[x][2].split(" ")[0] + table_array_raw[x][3].split(" ")[0]).toString(), table_array_raw[x][4].split(" ")[0]];
+						var table_array_push = [table_array_raw[x][0], table_array_raw[x][1], table_array_raw[x][2].split(" ")[0], table_array_raw[x][4].split(" ")[0]];
 						table_array.push(table_array_push);
 					}
 				}else{
-					var table_array_raw = (parseMoreTSV(['File','Total Reads','Reads 1','Reads >1'], summary_files[z]['file']));
+					var table_array_raw = (parseMoreTSV(['File','Total Reads','Total align'], summary_files[z]['file']));
 					for(var x = 0; x < table_array_raw.length; x++){
-						var table_array_push = [table_array_raw[x][0], table_array_raw[x][1], parseInt(table_array_raw[x][2].split(" ")[0] + table_array_raw[x][3].split(" ")[0]).toString()];
-						console.log(table_array_push);
+						var table_array_push = [table_array_raw[x][0], table_array_raw[x][1], table_array_raw[x][2].split(" ")[0]];
 						table_array.push(table_array_push);
 					}
 				}
 			}else if (z == summary_files.length - 1) {
-				var parsed_add = parseMoreTSV(['Reads 1','Reads >1','Unmapped Reads'], summary_files[z]['file']);
+				var parsed_add = parseMoreTSV(['Total align','Unmapped Reads'], summary_files[z]['file']);
 				for(var x = 0; x < table_array.length; x ++){
 					var concat_array = table_array[x];
-					table_array[x] = concat_array.concat([parseInt(parsed_add[x][0].split(" ")[0] + parsed_add[x][1].split(" ")[0]).toString(), parsed_add[x][2].split(" ")[0]]);
+					table_array[x] = concat_array.concat([parsed_add[x][0].split(" ")[0], parsed_add[x][1].split(" ")[0]]);
 				}
 			}else{
-				var parsed_add = parseMoreTSV(['Reads 1','Reads >1'], summary_files[z]['file']);
+				var parsed_add = parseMoreTSV(['Total align'], summary_files[z]['file']);
 				for(var x = 0; x < table_array.length; x ++){
 					var concat_array = table_array[x];
-					table_array[x] = concat_array.concat([parseInt(parsed_add[x][0].split(" ")[0] + parsed_add[x][1].split(" ")[0]).toString()]);
+					table_array[x] = concat_array.concat([parsed_add[x][0].split(" ")[0]]);
 				}
 			}
 		}
-		console.log(table_array);
+		
 		var separator = 3;
 		if (table_array.length == 1) {
 			separator = 4;
@@ -485,8 +483,9 @@ $(function() {
 		for (var x = 0; x < (table_array.length); x++) {
 			var row_array = table_array[x];
 			var reads_total = row_array[1];
+			row_array[1] = numberWithCommas(row_array[1]);
 			for(var y = 2; y < row_array.length; y++){
-				row_array[y] = row_array[y] + " (" + (row_array[y]/reads_total)*100 + " %)";
+				row_array[y] = numberWithCommas(row_array[y] + " (" + ((row_array[y]/reads_total)*100).toFixed(2) + " %)");
 			}
 			row_array.push("<input type=\"checkbox\" class=\"ngs_checkbox\" name=\"" + row_array[0] + "\" id=\"lib_checkbox_"+x+"\" onClick=\"storeLib(this.name)\">");
 			reports_table.fnAddData(row_array);
