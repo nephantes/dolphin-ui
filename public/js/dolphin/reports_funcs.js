@@ -339,11 +339,11 @@ function createDownloadReportButtons(currentSelection, type){
 function downloadReports(buttonType, type){
 	var temp_currentResultSelection;
 	if (type == 'initial_mapping') {
-		temp_currentResultSelection = 'counts/' + currentResultSelection + '.counts.tsv&fields=id,' + lib_checklist.toString();
+		temp_currentResultSelection = 'counts/' + currentResultSelection + '.counts.tsv';
 	}else if (type == 'RSEM'){
-		temp_currentResultSelection = currentResultSelection + '&fields=gene,transcript,' + libraries.toString();
+		temp_currentResultSelection = currentResultSelection;
 	}else if (type == 'DESEQ') {
-		temp_currentResultSelection = currentResultSelection + '&fields=name,' + libraries.toString() + ',padj,log2FoldChange,foldChange';
+		temp_currentResultSelection = currentResultSelection;
 	}
 	var URL = BASE_PATH + "/public/api/?source=" + API_PATH + '/public/pub/' + wkey + '/' + temp_currentResultSelection + '&format=' + buttonType;
 	window.open(URL);
