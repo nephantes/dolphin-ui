@@ -485,8 +485,9 @@ $(function() {
 		for (var x = 0; x < (table_array.length); x++) {
 			var row_array = table_array[x];
 			var reads_total = row_array[1];
+			row_array[1] = numberWithCommas(row_array[1]);
 			for(var y = 2; y < row_array.length; y++){
-				row_array[y] = row_array[y] + " (" + (row_array[y]/reads_total)*100 + " %)";
+				row_array[y] = numberWithCommas(row_array[y] + " (" + ((row_array[y]/reads_total)*100).toFixed(2) + " %)");
 			}
 			row_array.push("<input type=\"checkbox\" class=\"ngs_checkbox\" name=\"" + row_array[0] + "\" id=\"lib_checkbox_"+x+"\" onClick=\"storeLib(this.name)\">");
 			reports_table.fnAddData(row_array);
