@@ -37,7 +37,6 @@ function parseMoreTSV(jsonNameArray, url_path){
 						parsed.push(s[j][jsonNameArray[k]]);
 					}
 				}
-				console.log(parsed);
 			}
 	});
 	return parsed;
@@ -206,7 +205,7 @@ function showTable(type){
 		for(var x = 0; x < selection_array.length - 1; x++){
 			newTableData.fnAddData(selection_array[x]);
 		}
-		newTableData.fnAdjustColumnSizing(true);
+		//newTableData.fnAdjustColumnSizing(true);
 		
 		if (temp_libs.length <= 0) {
 			lib_checklist = [];
@@ -376,7 +375,7 @@ function sendToPlots(){
 }
 
 function numberWithCommas(x) {
-    return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+	return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
 }
 
 $(function() {
@@ -454,10 +453,14 @@ $(function() {
 			}
 		}
 		
+		var separator = 3;
+		if (table_array.length == 1) {
+			separator = 4;
+		}
 		//Initial Mapping Results
 		var reports_table = $('#jsontable_initial_mapping').dataTable();
 		reports_table.fnClearTable();
-		for (var x = 0; x < ((table_array[0].length/3) - 1); x++) {
+		for (var x = 0; x < ((table_array[0].length/separator)); x++) {
 			var row_array = [];
 			var reads_total;
 			for (var y = 0; y < table_array.length; y++){
@@ -465,14 +468,14 @@ $(function() {
 					if (table_array.length == 1) {
 						row_array.push(table_array[y][(x*4)]);
 						row_array.push(numberWithCommas(table_array[y][(x*4) + 1]));
-						reads_total = table_array[y][(x*4) + 1]
+						reads_total = table_array[y][(x*4) + 1];
 						row_array.push(numberWithCommas(table_array[y][(x*4) + 2].split(" ")[0]) + " (" + ((table_array[y][(x*4) + 2].split(" ")[0])/(reads_total)*100).toFixed(2) + " %)");
 						row_array.push(numberWithCommas(table_array[y][(x*4) + 3].split(" ")[0]) + " (" + ((table_array[y][(x*4) + 3].split(" ")[0])/(reads_total)*100).toFixed(2) + " %)");
 					}else{
 						row_array.push(table_array[y][(x*3)]);
 						row_array.push(numberWithCommas(table_array[y][(x*3) + 1]));
-						reads_total = table_array[y][(x*3) + 1]
-						row_array.push(numberWithCommas(table_array[y][(x*3) + 2].split(" ")[0]) + " (" + ((table_array[y][(x*3) + 2].split(" ")[0])/(reads_total)).toFixed(2) + " %)");
+						reads_total = table_array[y][(x*3) + 1];
+						row_array.push(numberWithCommas(table_array[y][(x*3) + 2].split(" ")[0]) + " (" + ((table_array[y][(x*3) + 2].split(" ")[0])/(reads_total)*100).toFixed(2) + " %)");
 					}
 				}else{
 					if (table_array[y][x] != undefined) {
@@ -516,6 +519,6 @@ $(function() {
 	}else{
 		document.getElementById('RSEM_exp').remove();
 	}
-	reports_table.fnAdjustColumnSizing(true);
+	//reports_table.fnAdjustColumnSizing(true);
 	}
 });

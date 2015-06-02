@@ -10,6 +10,7 @@ if (!empty(getenv('DOLPHIN_PARAMS_SECTION'))){
 }
  
 $ini = parse_ini_file("config.ini", true);
+
 $ini_array = $ini[$param_section];
 
 define ('DEVELOPMENT_ENVIRONMENT',true);
