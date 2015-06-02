@@ -11,35 +11,40 @@ var table_array = [];
 var currentResultSelection = '--- Select a Result ---';
 
 function parseTSV(jsonName, url_path){
-	var parsed = [];
+	var parsedArray = [];
 	$.ajax({ type: "GET",
 			url: BASE_PATH + "/public/api/?source=" + API_PATH + "/public/pub/" + wkey + "/" + url_path,
 			async: false,
 			success : function(s)
 			{
+				console.log(s);
 				for( var j = 0; j < s.length; j++){
+					var parsed = [];
 					parsed.push(s[j][jsonName]);
+					parsedArray.push(parsed);
 				}
 			}
 	});
-	return parsed;
+	return parsedArray;
 }
 
 function parseMoreTSV(jsonNameArray, url_path){
-	var parsed = [];
+	var parsedArray = [];
 	$.ajax({ type: "GET",
 			url: BASE_PATH + "/public/api/?source=" + API_PATH + "/public/pub/" + wkey + "/" + url_path,
 			async: false,
 			success : function(s)
 			{
 				for( var j = 0; j < s.length; j++){
+					var parsed = [];
 					for(var k = 0; k < jsonNameArray.length; k++){
 						parsed.push(s[j][jsonNameArray[k]]);
 					}
+					parsedArray.push(parsed);
 				}
 			}
 	});
-	return parsed;
+	return parsedArray;
 }
 
 function createSummary(fastqc_summary) {
@@ -436,23 +441,40 @@ $(function() {
 				}
 			}
 	});
-
+	
 	if (summary_files.length > 0) {
+		console.log(table_array);
 		for (var z = 0; z < summary_files.length; z++) {
 			if (z == 0){
 				if (summary_files.length == 1) {
-					table_array.push(parseMoreTSV(['File','Total Reads','Reads 1','Unmapped Reads'], summary_files[z]['file']));
+					var table_array_raw = (parseMoreTSV(['File','Total Reads','Reads 1','Reads >1','Unmapped Reads'], summary_files[z]['file']));
+					for(var x = 0; x < table_array_raw.length; x++){
+						var table_array_push = [table_array_raw[x][0], table_array_raw[x][1], parseInt(table_array_raw[x][2].split(" ")[0] + table_array_raw[x][3].split(" ")[0]).toString(), table_array_raw[x][4].split(" ")[0]];
+						table_array.push(table_array_push);
+					}
 				}else{
-					table_array.push(parseMoreTSV(['File','Total Reads','Reads 1'], summary_files[z]['file']));
+					var table_array_raw = (parseMoreTSV(['File','Total Reads','Reads 1','Reads >1'], summary_files[z]['file']));
+					for(var x = 0; x < table_array_raw.length; x++){
+						var table_array_push = [table_array_raw[x][0], table_array_raw[x][1], parseInt(table_array_raw[x][2].split(" ")[0] + table_array_raw[x][3].split(" ")[0]).toString()];
+						console.log(table_array_push);
+						table_array.push(table_array_push);
+					}
 				}
 			}else if (z == summary_files.length - 1) {
-				table_array.push(parseTSV('Reads 1', summary_files[z]['file']));
-				table_array.push(parseTSV('Unmapped Reads', summary_files[z]['file']));
+				var parsed_add = parseMoreTSV(['Reads 1','Reads >1','Unmapped Reads'], summary_files[z]['file']);
+				for(var x = 0; x < table_array.length; x ++){
+					var concat_array = table_array[x];
+					table_array[x] = concat_array.concat([parseInt(parsed_add[x][0].split(" ")[0] + parsed_add[x][1].split(" ")[0]).toString(), parsed_add[x][2].split(" ")[0]]);
+				}
 			}else{
-				table_array.push(parseTSV('Reads 1', summary_files[z]['file']));
+				var parsed_add = parseMoreTSV(['Reads 1','Reads >1'], summary_files[z]['file']);
+				for(var x = 0; x < table_array.length; x ++){
+					var concat_array = table_array[x];
+					table_array[x] = concat_array.concat([parseInt(parsed_add[x][0].split(" ")[0] + parsed_add[x][1].split(" ")[0]).toString()]);
+				}
 			}
 		}
-		
+		console.log(table_array);
 		var separator = 3;
 		if (table_array.length == 1) {
 			separator = 4;
@@ -460,28 +482,11 @@ $(function() {
 		//Initial Mapping Results
 		var reports_table = $('#jsontable_initial_mapping').dataTable();
 		reports_table.fnClearTable();
-		for (var x = 0; x < ((table_array[0].length/separator)); x++) {
-			var row_array = [];
-			var reads_total;
-			for (var y = 0; y < table_array.length; y++){
-				if (y == 0) {
-					if (table_array.length == 1) {
-						row_array.push(table_array[y][(x*4)]);
-						row_array.push(numberWithCommas(table_array[y][(x*4) + 1]));
-						reads_total = table_array[y][(x*4) + 1];
-						row_array.push(numberWithCommas(table_array[y][(x*4) + 2].split(" ")[0]) + " (" + ((table_array[y][(x*4) + 2].split(" ")[0])/(reads_total)*100).toFixed(2) + " %)");
-						row_array.push(numberWithCommas(table_array[y][(x*4) + 3].split(" ")[0]) + " (" + ((table_array[y][(x*4) + 3].split(" ")[0])/(reads_total)*100).toFixed(2) + " %)");
-					}else{
-						row_array.push(table_array[y][(x*3)]);
-						row_array.push(numberWithCommas(table_array[y][(x*3) + 1]));
-						reads_total = table_array[y][(x*3) + 1];
-						row_array.push(numberWithCommas(table_array[y][(x*3) + 2].split(" ")[0]) + " (" + ((table_array[y][(x*3) + 2].split(" ")[0])/(reads_total)*100).toFixed(2) + " %)");
-					}
-				}else{
-					if (table_array[y][x] != undefined) {
-						row_array.push(numberWithCommas(table_array[y][x].split(" ")[0]) + " (" + ((table_array[y][x].split(" ")[0]/reads_total)*100).toFixed(2) + " %)");
-					}
-				}
+		for (var x = 0; x < (table_array.length); x++) {
+			var row_array = table_array[x];
+			var reads_total = row_array[1];
+			for(var y = 2; y < row_array.length; y++){
+				row_array[y] = row_array[y] + " (" + (row_array[y]/reads_total)*100 + " %)";
 			}
 			row_array.push("<input type=\"checkbox\" class=\"ngs_checkbox\" name=\"" + row_array[0] + "\" id=\"lib_checkbox_"+x+"\" onClick=\"storeLib(this.name)\">");
 			reports_table.fnAddData(row_array);
