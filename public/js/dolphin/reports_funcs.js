@@ -179,15 +179,14 @@ function showTable(type){
 			async: false,
 			success : function(s)
 			{
-				console.log(BASE_PATH + "/public/api/?source=" + API_PATH + '/public/pub/' + wkey + '/' + temp_currentResultSelection);
 				objList = s;
 			}
 	});
-	console.log(objList[0]);
 	var keys = obtainObjectKeys(objList[0]);
 	
 	if(currentResultSelection.split(".")[currentResultSelection.split(".").length - 1] == "tsv" || currentResultSelection.substring(currentResultSelection.length - 3, currentResultSelection.length) == "RNA" || currentResultSelection == 'ercc'){
 		var masterDiv = document.getElementById(type+'_exp_body');
+		var tableDiv = createElement('div', ['id'], [type+'_table_div']);
 		if (document.getElementById('jsontable_' + type + '_results') == null) {
 			var previous_button = false;
 			if (document.getElementById('clear_' + type + '_button_div') != null) {
@@ -203,15 +202,16 @@ function showTable(type){
 				masterDiv.appendChild(buttonDiv);
 			}
 			var table = generateSelectionTable(keys, type);
-			masterDiv.appendChild(table);
+			tableDiv.appendChild(table)
+			masterDiv.appendChild(tableDiv);
 		}else{
-			document.getElementById('st_search').remove();
-			document.getElementById('st_num_search').remove();
-			document.getElementById('st_pagination').remove();
+			document.getElementById(type+'_table_div').remove();
 			document.getElementById('template_'+type).remove();
-			var table = document.getElementById('jsontable_' + type + '_results');
-			var newTable = generateSelectionTable(keys, type);
-			$('#jsontable_' + type + '_results').replaceWith(newTable);
+			
+			tableDiv = createElement('div', ['id'], [type+'_table_div']);
+			var table = generateSelectionTable(keys, type);
+			tableDiv.appendChild(table)
+			masterDiv.appendChild(tableDiv);
 		}
 		
 		createStreamScript(keys, type)
@@ -221,8 +221,8 @@ function showTable(type){
 		};
 		
 		var callbacks = {
-			after_add: function(){	
-			  //Only for example: Stop ajax streaming beacause from localfile data size never going to empty.
+			after_add: function(){
+				//Only for example: Stop ajax streaming beacause from localfile data size never going to empty.
 				if (this.data.length == objList.length){
 					this.stopStreaming();
 				}
@@ -234,15 +234,16 @@ function showTable(type){
 		  { view: view, 
 			per_page: 10, 
 			data_url: BASE_PATH + "/public/api/?source=" + API_PATH + '/public/pub/' + wkey + '/' + temp_currentResultSelection,
-			stream_after: 0.5,
+			stream_after: 0.2,
 			fetch_data_limit: 100,
 			callbacks: callbacks,
 			pagination: {span: 5, next_text: 'Next &rarr;', prev_text: '&larr; Previous'}
 		  },
 		 data);
 		
-		//$('#jsontable_' + type + '_results').stream_table(options, objList);
-		
+		document.getElementById('st_search').id = 'st_search_' + type;
+		document.getElementById('st_num_search').id = 'st_num_search_' + type;
+		document.getElementById('st_pagination').id = 'st_pagination_' + type;
  		
 		/*
 		var newTableData = $('#jsontable_' + type + '_results').dataTable();
