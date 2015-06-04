@@ -179,6 +179,7 @@ function showTable(type){
 			async: false,
 			success : function(s)
 			{
+				console.log(BASE_PATH + "/public/api/?source=" + API_PATH + '/public/pub/' + wkey + '/' + temp_currentResultSelection);
 				objList = s;
 			}
 	});
