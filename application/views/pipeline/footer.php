@@ -32,6 +32,8 @@
 		<script src="<?php echo BASE_PATH?>/js/dolphin/ngstrack_stats.js" type="text/javascript"></script>
 		<script src="<?php echo BASE_PATH?>/js/dolphin/sessionget_funcs.js" type="text/javascript"></script>
         <script src="<?php echo BASE_PATH?>/js/dolphin/ngsstatus_funcs.js" type="text/javascript"></script>
+        <script src="<?php echo BASE_PATH?>/js/streamTable/stream_table.js" type="text/javascript"></script>
+        <script src="<?php echo BASE_PATH?>/js/streamTable/vendors/mustache.js" type="text/javascript"></script>
 	</body>
 
 </html>
