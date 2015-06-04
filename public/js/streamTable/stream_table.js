@@ -93,7 +93,6 @@
       per_page_opts: [10,25,50]
     }, opts);
 
-    console.log(this.type);
     var p_classes = ['st_pagination_' + this.type];
     
 

@@ -228,7 +228,6 @@ function showTable(type){
 		
 			}
 		}
-		console.log(type);
 		st = StreamTable('#jsontable_' + type + '_results',
 		  { view: view, 
 			per_page: 10, 
