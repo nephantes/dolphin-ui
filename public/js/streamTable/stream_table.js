@@ -15,8 +15,8 @@
 
   'use strict';
 
-  var StreamTable = function(container, opts, data) {
-    return new _StreamTable(container, opts, data);
+  var StreamTable = function(container, opts, data, type) {
+    return new _StreamTable(container, opts, data, type);
   };
 
   StreamTable.VERSION = '1.1.0';
@@ -29,7 +29,7 @@
 
   window.StreamTable = StreamTable;
 
-  var _StreamTable = function(container, opts, data) {
+  var _StreamTable = function(container, opts, data, type) {
     this.data = [];
     this.main_container = container;
     this.$container = $(container);
@@ -43,6 +43,7 @@
     this.stream_after = (this.opts.stream_after || 2)*1000;
     this.timer = null;
     this.opts.callbacks = this.opts.callbacks || {};
+    this.type = type;
 
     if (!this.view) $.error('Add view function in options.');
 
@@ -92,7 +93,9 @@
       per_page_opts: [10,25,50]
     }, opts);
 
-    var p_classes = ['st_pagination'];
+    console.log(this.type);
+    var p_classes = ['st_pagination_' + this.type];
+    
 
     if (opts.container_class){
       p_classes = [].concat.apply(p_classes, [opts.container_class])
@@ -100,7 +103,7 @@
 
     this.paging_opts.per_page = this.paging_opts.per_page_opts[0] || 10;
     this.paging_opts.container_class = p_classes.join(' ');
-    this.paging_opts.ul_class = ['pagination', opts.ul_class].join(' ');
+    this.paging_opts.ul_class = [this.type+' pagination', opts.ul_class].join(' ');
     this.paging_opts.per_page_class = ['st_per_page', opts.per_page_class].join(' ');
     this.opts.pagination = this.paging_opts;
 
@@ -135,18 +138,16 @@
 
     _self.$pagination.on('click', 'a', function(e){
       var $this = $(this), page = parseInt($this.text()), current_page;
-
       if (page.toString() == 'NaN'){
         if ($this.hasClass('prev')) page = 'prev';
         else if ($this.hasClass('next')) page = 'next';
         else if ($this.hasClass('first')) page = 1;
         else if ($this.hasClass('last')) page = _self.pageCount();
       }
-
       current_page = _self.paginate(page);
       if (current_page >= 0) {
-        $('.st_pagination .active').removeClass('active');
-        $('.st_pagination li[data-page='+ current_page +']').addClass('active');
+        $('.st_pagination_'+_self.type+' .active').removeClass('active');
+        $('.st_pagination_'+_self.type+' li[data-page='+ current_page +']').addClass('active');
       }
 
       return false;
@@ -392,7 +393,7 @@
     }
 
     links.push('<li><a href="#" class="prev">'+ this.paging_opts.prev_text +'</a></li>');
-
+    
     for(i; i < l; i++){
       if(current_page == i){
         links.push('<li class="active" data-page="'+ i +'"><a href="#" class="active" >'+ (i + 1) +'</a></li>');

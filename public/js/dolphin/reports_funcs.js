@@ -9,7 +9,6 @@ var lib_checklist = [];
 var libraries = [];
 var table_array = [];
 var currentResultSelection = '--- Select a Result ---';
-var st;
 
 function parseTSV(jsonName, url_path){
 	var parsedArray = [];
@@ -229,7 +228,7 @@ function showTable(type){
 		
 			}
 		}
-		
+		console.log(type);
 		st = StreamTable('#jsontable_' + type + '_results',
 		  { view: view, 
 			per_page: 10, 
@@ -237,13 +236,19 @@ function showTable(type){
 			stream_after: 0.2,
 			fetch_data_limit: 100,
 			callbacks: callbacks,
-			pagination: {span: 5, next_text: 'Next &rarr;', prev_text: '&larr; Previous'}
+			pagination:{
+				span: 5,                              
+				next_text: 'Next &rarr;',              
+				prev_text: '&larr; Previous',
+				ul_class: type,
+			},
 		  },
-		 data);
+		 data, type);
 		
 		document.getElementById('st_search').id = 'st_search_' + type;
 		document.getElementById('st_num_search').id = 'st_num_search_' + type;
 		document.getElementById('st_pagination').id = 'st_pagination_' + type;
+		
  		
 		/*
 		var newTableData = $('#jsontable_' + type + '_results').dataTable();
