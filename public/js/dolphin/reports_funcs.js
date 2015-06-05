@@ -17,7 +17,6 @@ function parseTSV(jsonName, url_path){
 			async: false,
 			success : function(s)
 			{
-				console.log(s);
 				for( var j = 0; j < s.length; j++){
 					var parsed = [];
 					parsed.push(s[j][jsonName]);
@@ -162,11 +161,31 @@ function showTable(type){
 		lib_checklist = libraries;
 	}
 	
-	currentResultSelection = document.getElementById('select_' + type + '_report').value
-	var objList = getCountsTableData(currentResultSelection, type);
+	currentResultSelection = document.getElementById('select_' + type + '_report').value;
+	var temp_currentResultSelection;
+	var objList;
+	
+	if (type == 'initial_mapping') {
+		temp_currentResultSelection = 'counts/' + currentResultSelection + '.counts.tsv&fields=id,' + lib_checklist.toString();
+	}else if (type == 'RSEM'){
+		temp_currentResultSelection = currentResultSelection;
+	}else if (type == 'DESEQ') {
+		temp_currentResultSelection = currentResultSelection;
+	}
+	
+	$.ajax({ type: "GET",
+			url: BASE_PATH + "/public/api/?source=" + API_PATH + '/public/pub/' + wkey + '/' + temp_currentResultSelection,
+			async: false,
+			success : function(s)
+			{
+				objList = s;
+			}
+	});
 	var keys = obtainObjectKeys(objList[0]);
+	
 	if(currentResultSelection.split(".")[currentResultSelection.split(".").length - 1] == "tsv" || currentResultSelection.substring(currentResultSelection.length - 3, currentResultSelection.length) == "RNA" || currentResultSelection == 'ercc'){
 		var masterDiv = document.getElementById(type+'_exp_body');
+		var tableDiv = createElement('div', ['id'], [type+'_table_div']);
 		if (document.getElementById('jsontable_' + type + '_results') == null) {
 			var previous_button = false;
 			if (document.getElementById('clear_' + type + '_button_div') != null) {
@@ -182,13 +201,55 @@ function showTable(type){
 				masterDiv.appendChild(buttonDiv);
 			}
 			var table = generateSelectionTable(keys, type);
-			masterDiv.appendChild(table);
+			tableDiv.appendChild(table)
+			masterDiv.appendChild(tableDiv);
 		}else{
-			var table = document.getElementById('jsontable_' + type + '_results');
-			var newTable = generateSelectionTable(keys, type);
-			$('#jsontable_' + type + '_results_wrapper').replaceWith(newTable);
+			document.getElementById(type+'_table_div').remove();
+			document.getElementById('template_'+type).remove();
+			
+			tableDiv = createElement('div', ['id'], [type+'_table_div']);
+			var table = generateSelectionTable(keys, type);
+			tableDiv.appendChild(table)
+			masterDiv.appendChild(tableDiv);
 		}
 		
+		createStreamScript(keys, type)
+		var data = objList, html = $.trim($("#template_"+type).html()), template = Mustache.compile(html);
+		var view = function(record, index){
+			return template({record: record, index: index});
+		};
+		
+		var callbacks = {
+			after_add: function(){
+				//Only for example: Stop ajax streaming beacause from localfile data size never going to empty.
+				if (this.data.length == objList.length){
+					this.stopStreaming();
+				}
+		
+			}
+		}
+		st = StreamTable('#jsontable_' + type + '_results',
+		  { view: view, 
+			per_page: 10, 
+			data_url: BASE_PATH + "/public/api/?source=" + API_PATH + '/public/pub/' + wkey + '/' + temp_currentResultSelection,
+			stream_after: 0.2,
+			fetch_data_limit: 100,
+			callbacks: callbacks,
+			pagination:{
+				span: 5,                              
+				next_text: 'Next &rarr;',              
+				prev_text: '&larr; Previous',
+				ul_class: type,
+			},
+		  },
+		 data, type);
+		
+		document.getElementById('st_search').id = 'st_search_' + type;
+		document.getElementById('st_num_search').id = 'st_num_search_' + type;
+		document.getElementById('st_pagination').id = 'st_pagination_' + type;
+		
+ 		
+		/*
 		var newTableData = $('#jsontable_' + type + '_results').dataTable();
 		newTableData.fnClearTable();
 		var selection_array = [];
@@ -211,7 +272,7 @@ function showTable(type){
 			newTableData.fnAddData(selection_array[x]);
 		}
 		//newTableData.fnAdjustColumnSizing(true);
-		
+		*/
 		if (temp_libs.length <= 0) {
 			lib_checklist = [];
 		}
@@ -240,6 +301,19 @@ function showTable(type){
 	
 }
 
+function createStreamScript(keys, type){
+	var masterScript = createElement('script', ['id', 'type'], ['template_'+type, 'text/html']);
+	var tr = createElement('tr', [], []);
+	
+	for(var x = 0; x < keys.length; x++){
+		var td = createElement('td', [], []);
+		td.innerHTML = "{{record."+keys[x]+"}}";
+		tr.appendChild(td);
+	}
+	masterScript.appendChild(tr);
+	document.getElementsByTagName('body')[0].appendChild(masterScript);
+}
+
 function clearSelection(type){
 	if (document.getElementById('jsontable_' + type + '_results_wrapper') != null) {
 		document.getElementById('jsontable_' + type + '_results_wrapper').remove();
@@ -251,6 +325,7 @@ function clearSelection(type){
 function generateSelectionTable(keys, type){
 	var newTable = createElement('table', ['id', 'class'], ['jsontable_' + type + '_results', 'table table-hover compact']);
 	var thead = createElement('thead', [], []);
+	var tbody = createElement('tbody', [], []);
 	var header = createElement('tr', ['id'], [type + '_header']);
 	if (type == 'initial_mapping') {
 		for(var x = 0; x < keys.length; x++){
@@ -275,28 +350,8 @@ function generateSelectionTable(keys, type){
 	
 	thead.appendChild(header);
 	newTable.appendChild(thead);
+	newTable.appendChild(tbody);
 	return newTable;
-}
-
-function getCountsTableData(currentResultSelection, type){
-	var objList = [];
-	var temp_currentResultSelection;
-	if (type == 'initial_mapping') {
-		temp_currentResultSelection = 'counts/' + currentResultSelection + '.counts.tsv&fields=id,' + lib_checklist.toString();
-	}else if (type == 'RSEM'){
-		temp_currentResultSelection = currentResultSelection;
-	}else if (type == 'DESEQ') {
-		temp_currentResultSelection = currentResultSelection;
-	}
-	$.ajax({ type: "GET",
-			url: BASE_PATH + "/public/api/?source=" + API_PATH + '/public/pub/' + wkey + '/' + temp_currentResultSelection,
-			async: false,
-			success : function(s)
-			{
-				objList = s;
-			}
-	});
-	return objList;
 }
 
 function createDownloadReportButtons(currentSelection, type){
@@ -432,7 +487,7 @@ $(function() {
 	
 	$.ajax({ type: "GET",
 			url: "/dolphin/public/ajax/ngsquerydb.php",
-			data: { p: 'getSampleNames', samples: samples.toString() },
+			data: { p: 'getSampleNames', samples: samples.toString().substring(0,samples.toString().length - 1) },
 			async: false,
 			success : function(s)
 			{
@@ -446,7 +501,7 @@ $(function() {
 		for (var z = 0; z < summary_files.length; z++) {
 			if (z == 0){
 				if (summary_files.length == 1) {
-					var table_array_raw = (parseMoreTSV(['File','Total Reads','Reads 1', 'Reads >1','Unmapped Reads'], summary_files[z]['file']));
+					var table_array_raw = (parseMoreTSV(['File','Total Reads','Reads 1','Reads >1','Unmapped Reads'], summary_files[z]['file']));
 					for(var x = 0; x < table_array_raw.length; x++){
 						var table_array_push = [table_array_raw[x][0], table_array_raw[x][1], parseInt(table_array_raw[x][2].split(" ")[0]) + parseInt(table_array_raw[x][3].split(" ")[0]), table_array_raw[x][4].split(" ")[0]];
 						table_array.push(table_array_push);
@@ -455,18 +510,17 @@ $(function() {
 					var table_array_raw = (parseMoreTSV(['File','Total Reads','Reads 1','Reads >1'], summary_files[z]['file']));
 					for(var x = 0; x < table_array_raw.length; x++){
 						var table_array_push = [table_array_raw[x][0], table_array_raw[x][1], parseInt(table_array_raw[x][2].split(" ")[0]) + parseInt(table_array_raw[x][3].split(" ")[0])];
-						console.log(table_array_push)
 						table_array.push(table_array_push);
 					}
 				}
 			}else if (z == summary_files.length - 1) {
-				var parsed_add = parseMoreTSV(['Reads 1', 'Reads >1','Unmapped Reads'], summary_files[z]['file']);
+				var parsed_add = parseMoreTSV(['Reads 1','Reads >1','Unmapped Reads'], summary_files[z]['file']);
 				for(var x = 0; x < table_array.length; x ++){
 					var concat_array = table_array[x];
 					table_array[x] = concat_array.concat([parseInt(parsed_add[x][0].split(" ")[0]) + parseInt(parsed_add[x][1].split(" ")[0]), parsed_add[x][2].split(" ")[0]]);
 				}
 			}else{
-				var parsed_add = parseMoreTSV(['Reads 1', 'Reads >1'], summary_files[z]['file']);
+				var parsed_add = parseMoreTSV(['Reads 1','Reads >1'], summary_files[z]['file']);
 				for(var x = 0; x < table_array.length; x ++){
 					var concat_array = table_array[x];
 					table_array[x] = concat_array.concat([ parseInt(parsed_add[x][0].split(" ")[0]) + parseInt(parsed_add[x][1].split(" ")[0]) ]);

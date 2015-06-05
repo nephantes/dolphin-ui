@@ -1,5 +1,7 @@
 <?php
 
+ini_set('memory_limit', '-1');
+
 class CSV_To_API {
 
   public $ttl = 3600;
@@ -11,7 +13,7 @@ class CSV_To_API {
   public $sort_dir = null;
   public $data;
   public $fields = null;
-
+  
   /**
    * Use the query (often the requested URL) to define some settings.
    */
@@ -201,7 +203,6 @@ class CSV_To_API {
     
     $data = array();
     foreach ( $lines as $line ) {
-       
       $row = array();
 
       foreach ( $line as $key => $field ) {

@@ -34,7 +34,4 @@
 			</div>
 						</div><!-- /.col (RIGHT) -->
 					</div><!-- /.row -->
-					<div class="row">
-
-					</div><!-- /.row -->
 				</section><!-- /.content -->
