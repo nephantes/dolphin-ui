@@ -331,12 +331,12 @@ function generateSelectionTable(keys, type){
 	if (type == 'initial_mapping') {
 		for(var x = 0; x < keys.length; x++){
 			if (keys[x].indexOf(lib_checklist)) {
-				var th = createElement('th', ['data-sort', 'onclick'], [keys[x]+':', 'shiftColumns(this)']);
+				var th = createElement('th', ['data-sort', 'onclick'], [keys[x]+'::number', 'shiftColumns(this)']);
 				th.innerHTML = keys[x];
 				th.appendChild(createElement('i', ['id', 'class'], [keys[x], 'pull-right fa']));
 				header.appendChild(th);
 			}else if (keys[x] == "id" || keys[x] == "name" || keys[x] == "len") {
-				var th = createElement('th', ['data-sort', 'onclick'], [keys[x]+':', 'shiftColumns(this)']);
+				var th = createElement('th', ['data-sort', 'onclick'], [keys[x]+'::string', 'shiftColumns(this)']);
 				th.innerHTML = keys[x];
 				th.appendChild(createElement('i', ['id', 'class'], [keys[x], 'pull-right fa']));
 				header.appendChild(th);
@@ -345,7 +345,12 @@ function generateSelectionTable(keys, type){
 		}
 	}else{
 		for(var x = 0; x < keys.length; x++){
-			var th = createElement('th', ['data-sort', 'onclick'], [keys[x]+':', 'shiftColumns(this)']);
+			if (keys[x].indexOf(libraries || keys[x] == 'padj' || keys[x] == 'log2FoldChange' || keys[x] == 'foldChange')) {
+				var th = createElement('th', ['data-sort', 'onclick'], [keys[x]+'::number', 'shiftColumns(this)']);
+			}else{
+				var th = createElement('th', ['data-sort', 'onclick'], [keys[x]+'::string', 'shiftColumns(this)']);
+			}
+			
 			th.innerHTML = keys[x];
 			th.appendChild(createElement('i', ['id', 'class'], [keys[x], 'pull-right fa']));
 			header.appendChild(th);
