@@ -328,31 +328,36 @@ function generateSelectionTable(keys, type){
 	var thead = createElement('thead', [], []);
 	var tbody = createElement('tbody', [], []);
 	var header = createElement('tr', ['id'], [type + '_header']);
+	var temp_lib_checklist;
+	if (lib_checklist.length == 0) {
+		temp_lib_checklist = libraries;
+	}else{
+		temp_lib_checklist = lib_checklist;
+	}
+	
 	if (type == 'initial_mapping') {
 		for(var x = 0; x < keys.length; x++){
-			if (keys[x].indexOf(lib_checklist)) {
+			if (temp_lib_checklist.indexOf(keys[x]) > -1) {
 				var th = createElement('th', ['data-sort', 'onclick'], [keys[x]+'::number', 'shiftColumns(this)']);
 				th.innerHTML = keys[x];
-				th.appendChild(createElement('i', ['id', 'class'], [keys[x], 'pull-right fa']));
+				th.appendChild(createElement('i', ['id', 'class'], [keys[x], 'pull-right fa fa-unsorted']));
 				header.appendChild(th);
-			}else if (keys[x] == "id" || keys[x] == "name" || keys[x] == "len") {
+			}else if (keys[x] == "id" || keys[x] == "name" || keys[x] == "len" || keys[x] == "gene" || keys[x] == "transcript") {
 				var th = createElement('th', ['data-sort', 'onclick'], [keys[x]+'::string', 'shiftColumns(this)']);
 				th.innerHTML = keys[x];
-				th.appendChild(createElement('i', ['id', 'class'], [keys[x], 'pull-right fa']));
+				th.appendChild(createElement('i', ['id', 'class'], [keys[x], 'pull-right fa fa-unsorted']));
 				header.appendChild(th);
 			}
-			
 		}
 	}else{
 		for(var x = 0; x < keys.length; x++){
-			if (keys[x].indexOf(libraries || keys[x] == 'padj' || keys[x] == 'log2FoldChange' || keys[x] == 'foldChange')) {
+			if (libraries.indexOf(keys[x]) > -1 || keys[x] == 'padj' || keys[x] == 'log2FoldChange' || keys[x] == 'foldChange') {
 				var th = createElement('th', ['data-sort', 'onclick'], [keys[x]+'::number', 'shiftColumns(this)']);
 			}else{
 				var th = createElement('th', ['data-sort', 'onclick'], [keys[x]+'::string', 'shiftColumns(this)']);
 			}
-			
 			th.innerHTML = keys[x];
-			th.appendChild(createElement('i', ['id', 'class'], [keys[x], 'pull-right fa']));
+			th.appendChild(createElement('i', ['id', 'class'], [keys[x], 'pull-right fa fa-unsorted']));
 			header.appendChild(th);
 		}
 	}
@@ -364,7 +369,6 @@ function generateSelectionTable(keys, type){
 }
 
 function shiftColumns(id){
-	console.log(id);
 	if (id.childNodes[1].getAttribute('class') == 'pull-right fa') {
 		id.childNodes[1].setAttribute('class', 'pull-right fa fa-sort-asc');
 	}else if (id.childNodes[1].getAttribute('class') == 'pull-right fa fa-sort-asc') {
