@@ -9,6 +9,7 @@ var lib_checklist = [];
 var libraries = [];
 var table_array = [];
 var currentResultSelection = '--- Select a Result ---';
+var tableDirectionNum = 0;
 
 function parseTSV(jsonName, url_path){
 	var parsedArray = [];
@@ -330,20 +331,28 @@ function generateSelectionTable(keys, type){
 	if (type == 'initial_mapping') {
 		for(var x = 0; x < keys.length; x++){
 			if (keys[x].indexOf(lib_checklist)) {
-				var th = createElement('th', [], []);
+				var th = createElement('th', ['data-sort', 'onclick'], [keys[x]+'::number', 'shiftColumns(this)']);
 				th.innerHTML = keys[x];
+				th.appendChild(createElement('i', ['id', 'class'], [keys[x], 'pull-right fa']));
 				header.appendChild(th);
 			}else if (keys[x] == "id" || keys[x] == "name" || keys[x] == "len") {
-				var th = createElement('th', [], []);
+				var th = createElement('th', ['data-sort', 'onclick'], [keys[x]+'::string', 'shiftColumns(this)']);
 				th.innerHTML = keys[x];
+				th.appendChild(createElement('i', ['id', 'class'], [keys[x], 'pull-right fa']));
 				header.appendChild(th);
 			}
 			
 		}
 	}else{
 		for(var x = 0; x < keys.length; x++){
-			var th = createElement('th', [], []);
+			if (keys[x].indexOf(libraries || keys[x] == 'padj' || keys[x] == 'log2FoldChange' || keys[x] == 'foldChange')) {
+				var th = createElement('th', ['data-sort', 'onclick'], [keys[x]+'::number', 'shiftColumns(this)']);
+			}else{
+				var th = createElement('th', ['data-sort', 'onclick'], [keys[x]+'::string', 'shiftColumns(this)']);
+			}
+			
 			th.innerHTML = keys[x];
+			th.appendChild(createElement('i', ['id', 'class'], [keys[x], 'pull-right fa']));
 			header.appendChild(th);
 		}
 	}
@@ -352,6 +361,18 @@ function generateSelectionTable(keys, type){
 	newTable.appendChild(thead);
 	newTable.appendChild(tbody);
 	return newTable;
+}
+
+function shiftColumns(id){
+	console.log(id);
+	if (id.childNodes[1].getAttribute('class') == 'pull-right fa') {
+		id.childNodes[1].setAttribute('class', 'pull-right fa fa-sort-asc');
+	}else if (id.childNodes[1].getAttribute('class') == 'pull-right fa fa-sort-asc') {
+		id.childNodes[1].setAttribute('class','pull-right fa fa-sort-desc');
+	}else{
+		id.childNodes[1].setAttribute('class','pull-right fa fa-sort-asc');
+	}
+	
 }
 
 function createDownloadReportButtons(currentSelection, type){
