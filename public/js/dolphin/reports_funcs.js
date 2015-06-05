@@ -330,11 +330,11 @@ function generateSelectionTable(keys, type){
 	if (type == 'initial_mapping') {
 		for(var x = 0; x < keys.length; x++){
 			if (keys[x].indexOf(lib_checklist)) {
-				var th = createElement('th', [], []);
+				var th = createElement('th', ['data-sort'], [keys[x]+':asc']);
 				th.innerHTML = keys[x];
 				header.appendChild(th);
 			}else if (keys[x] == "id" || keys[x] == "name" || keys[x] == "len") {
-				var th = createElement('th', [], []);
+				var th = createElement('th', ['data-sort'], [keys[x]+':asc']);
 				th.innerHTML = keys[x];
 				header.appendChild(th);
 			}
@@ -342,7 +342,7 @@ function generateSelectionTable(keys, type){
 		}
 	}else{
 		for(var x = 0; x < keys.length; x++){
-			var th = createElement('th', [], []);
+			var th = createElement('th', ['data-sort'], [keys[x]+':asc']);
 			th.innerHTML = keys[x];
 			header.appendChild(th);
 		}
