@@ -186,7 +186,7 @@ function showTable(type){
 	
 	if(currentResultSelection.split(".")[currentResultSelection.split(".").length - 1] == "tsv" || currentResultSelection.substring(currentResultSelection.length - 3, currentResultSelection.length) == "RNA" || currentResultSelection == 'ercc'){
 		var masterDiv = document.getElementById(type+'_exp_body');
-		var tableDiv = createElement('div', ['id'], [type+'_table_div']);
+		var tableDiv = createElement('div', ['id', 'class'], [type+'_table_div', 'panel panel-default margin']);
 		var selectDiv = document.getElementById('select_'+type+'_div');
 		if (document.getElementById('jsontable_' + type + '_results') == null) {
 			var previous_button = false;
@@ -207,7 +207,7 @@ function showTable(type){
 			document.getElementById(type+'_table_div').remove();
 			document.getElementById('template_'+type).remove();
 			
-			tableDiv = createElement('div', ['id'], [type+'_table_div']);
+			tableDiv = createElement('div', ['id', 'class'], [type+'_table_div', 'panel panel-default margin']);
 			var table = generateSelectionTable(keys, type);
 			tableDiv.appendChild(table)
 			masterDiv.appendChild(tableDiv);
@@ -244,10 +244,24 @@ function showTable(type){
 		  },
 		 data, type);
 		
-		document.getElementById('st_search').id = 'st_search_' + type;
-		document.getElementById('st_num_search').id = 'st_num_search_' + type;
+		var search = document.getElementById('st_search');
+		search.id = 'st_search_' + type;
+		search.setAttribute('class',"st_search margin pull-right");
+		
+		var num_search = document.getElementById('st_num_search');
+		num_search.id = 'st_num_search_' + type;
+		
+		var newlabel = createElement('label', ['class'], ['margin']);
+		newlabel.setAttribute("for",'st_num_search_'+type);
+		newlabel.innerHTML = " entries per page";
+		document.getElementById(type+'_table_div').insertBefore(newlabel, num_search);
+		
+		num_search.setAttribute('class',"st_per_page margin pull-left");
+		
 		document.getElementById('st_pagination').id = 'st_pagination_' + type;
-
+		document.getElementById('st_pagination_'+type).setAttribute('class',"st_pagination_"+type+" margin");
+		document.getElementById('st_pagination_'+type).setAttribute('style',"text-align:right");
+		
 		if (temp_libs.length <= 0) {
 			lib_checklist = [];
 		}
