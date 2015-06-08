@@ -123,8 +123,8 @@ function storeLib(name){
 
 function createDropdown(mapping_list, type){
 	var masterDiv = document.getElementById(type+'_exp_body');
-	var childDiv = createElement('div', ['id', 'class'], ['select_'+ type + '_div', 'input-group margin col-md-4']);
-	var selectDiv = createElement('div', ['id', 'class'], ['inner_select_' + type + '_div', 'input-group-btn margin']);
+	var childDiv = createElement('div', ['id', 'class'], ['select_'+ type + '_div', 'input-group margin col-md-12']);
+	var selectDiv = createElement('div', ['id', 'class'], ['inner_select_' + type + '_div', 'margin col-md-4']);
 
 	selectDiv.appendChild( createElement('select',
 					['id', 'class', 'onchange', 'OPTION_DIS_SEL'],
@@ -187,19 +187,18 @@ function showTable(type){
 	if(currentResultSelection.split(".")[currentResultSelection.split(".").length - 1] == "tsv" || currentResultSelection.substring(currentResultSelection.length - 3, currentResultSelection.length) == "RNA" || currentResultSelection == 'ercc'){
 		var masterDiv = document.getElementById(type+'_exp_body');
 		var tableDiv = createElement('div', ['id'], [type+'_table_div']);
+		var selectDiv = document.getElementById('select_'+type+'_div');
 		if (document.getElementById('jsontable_' + type + '_results') == null) {
 			var previous_button = false;
 			if (document.getElementById('clear_' + type + '_button_div') != null) {
 				previous_button = true;
 			}
-			var buttonDiv = createElement('div', ['id', 'class'], ['clear_' + type + '_button_div', 'input-group margin col-md-8']);
-			var downloads_link_div = createElement('div', ['id', 'class'], ['downloads_' + type + '_link_div', 'input-group margin col-md-4']);
+			var buttonDiv = createElement('div', ['id', 'class'], ['clear_' + type + '_button_div', 'margin col-md-4']);
 			buttonDiv.appendChild(createDownloadReportButtons(currentResultSelection, type));
-			buttonDiv.appendChild(downloads_link_div);
 			if (previous_button) {
 				$('#clear_' + type + '_button_div').replaceWith(buttonDiv);
 			}else{
-				masterDiv.appendChild(buttonDiv);
+				selectDiv.appendChild(buttonDiv);
 			}
 			var table = generateSelectionTable(keys, type);
 			tableDiv.appendChild(table)
@@ -248,51 +247,22 @@ function showTable(type){
 		document.getElementById('st_search').id = 'st_search_' + type;
 		document.getElementById('st_num_search').id = 'st_num_search_' + type;
 		document.getElementById('st_pagination').id = 'st_pagination_' + type;
-		
- 		
-		/*
-		var newTableData = $('#jsontable_' + type + '_results').dataTable();
-		newTableData.fnClearTable();
-		var selection_array = [];
-		for (var x = 0; x < objList.length; x++){
-			var objList_row = [];
-			for (var y = 0; y < keys.length; y++){
-				if (type == 'initial_mapping') {
-					if (keys[y].indexOf(lib_checklist)) {
-						objList_row.push(objList[x][keys[y]]);
-					}else if (keys[y] == "id" || keys[y] == "name" || keys[y] == "len") {
-						objList_row.push(objList[x][keys[y]]);
-					}
-				}else{
-					objList_row.push(objList[x][keys[y]]);
-				}
-			}
-			selection_array.push(objList_row);
-		}
-		for(var x = 0; x < selection_array.length - 1; x++){
-			newTableData.fnAddData(selection_array[x]);
-		}
-		//newTableData.fnAdjustColumnSizing(true);
-		*/
+
 		if (temp_libs.length <= 0) {
 			lib_checklist = [];
 		}
 	}else{
-		var masterDiv = document.getElementById(type+'_exp_body');
+		var masterDiv = document.getElementById('select_'+type+'_div');
 		if (document.getElementById('clear_' + type + '_button_div') == null) {
-			var buttonDiv = createElement('div', ['id', 'class'], ['clear_' + type + '_button_div', 'input-group margin col-md-8']);
-			var downloads_link_div = createElement('div', ['id', 'class'], ['downloads_' + type + '_link_div', 'input-group margin col-md-4']);
+			var buttonDiv = createElement('div', ['id', 'class'], ['clear_' + type + '_button_div', 'margin col-md-4']);
 			buttonDiv.appendChild(createDownloadReportButtons(currentResultSelection, type));
-			buttonDiv.appendChild(downloads_link_div);
 			masterDiv.appendChild(buttonDiv);
 			if (document.getElementById('jsontable_' + type + '_results_wrapper') != null) {
 				document.getElementById('jsontable_' + type + '_results_wrapper').remove();
 			}
 		}else{
-			var buttonDiv = createElement('div', ['id', 'class'], ['clear_' + type + '_button_div', 'input-group margin col-md-8']);
-			var downloads_link_div = createElement('div', ['id', 'class'], ['downloads_' + type + '_link_div', 'input-group margin col-md-4']);
+			var buttonDiv = createElement('div', ['id', 'class'], ['clear_' + type + '_button_div', 'margin col-md-4']);
 			buttonDiv.appendChild(createDownloadReportButtons(currentResultSelection, type));
-			buttonDiv.appendChild(downloads_link_div);
 			$('#clear_' + type + '_button_div').replaceWith(buttonDiv);
 			if (document.getElementById('jsontable_' + type + '_results_wrapper') != null) {
 				document.getElementById('jsontable_' + type + '_results_wrapper').remove();
@@ -320,6 +290,7 @@ function clearSelection(type){
 		document.getElementById('jsontable_' + type + '_results_wrapper').remove();
 	}
 	document.getElementById('clear_' + type + '_button_div').remove();
+	document.getElementById(type+'_table_div').remove();
 	document.getElementById('select_' + type + '_report').value = '--- Select a Result ---';
 }
 
@@ -380,7 +351,7 @@ function shiftColumns(id){
 }
 
 function createDownloadReportButtons(currentSelection, type){
-	var downloadDiv = createElement('div', ['id', 'class'], ['downloads_' + type + '_div', 'btn-group margin pull-left']);
+	var downloadDiv = createElement('div', ['id', 'class'], ['downloads_' + type + '_div', 'btn-group']);
 	var ul = createElement('ul', ['class', 'role'], ['dropdown-menu', 'menu']);
 	var button = createElement('button', ['type', 'class', 'data-toggle', 'aria-expanded'], ['button', 'btn btn-primary dropdown-toggle', 'dropdown', 'true'])
 	button.innerHTML = 'Select Data Options ';
