@@ -47,7 +47,7 @@ function rerunLoad() {
 					element.value = 'no';
 				}
 				}else if (element.id == "resume"){
-					element.value = 'no';
+					element.value = 'Resume';
 				}else{
 					element.value = jsonObj[jsonTypeList[x]];
 				}
@@ -379,7 +379,7 @@ function submitPipeline(type) {
 		}else{
 			json = json + ',"spaired":"no"';
 		}
-		if (freshrun != "yes") {
+		if (freshrun == "Fresh") {
 			json = json + ',"resume":"no"'
 		}else{
 			json = json + ',"resume":"resume"'

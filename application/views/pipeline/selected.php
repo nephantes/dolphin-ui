@@ -57,8 +57,8 @@
 																				<option>d_melanogaster,dm3</option>", 4)?>
 						<?php echo $html->getStaticSelectionBox("Mate-paired", "spaired", "<option>yes</option>
 																				<option>no</option>", 4)?>
-						<?php echo $html->getStaticSelectionBox("Fresh Run", "resume", "<option>yes</option>
-																				<option>no</option>", 4)?>
+						<?php echo $html->getStaticSelectionBox("Resume Run", "resume", "<option>Fresh</option>
+																				<option>Resume</option>", 4)?>
 						<?php echo $html->getStaticSelectionBox("Output Directory", "outdir", "TEXT", 8)?>
 						<?php echo $html->getStaticSelectionBox("FastQC", "fastqc", "<option>yes</option>
 																			<option>no</option>", 4)?>
