@@ -393,7 +393,7 @@ function submitPipeline(type) {
 		if (doAdapter == "yes") {
 			previous = 'adapter';
 		}
-		json = json + ',"adapter":"' + adapter[0].replace(/\r\n|\r|\n/g, "__cr____cn__") + '"';
+		json = json + ',"adapter":"' + adapter[0].toUpperCase().replace(/\r\n|\r|\n/g, "__cr____cn__").replace(/U/g, 'T') + '"';
 		//quality
 		if (doQuality == "yes") {
 			json = json + ',"quality":"' + quality[0] + ':' + quality[1] + ':' + quality[2] + ':' + quality[3] + ':' + quality[4] + '"';
