@@ -524,8 +524,8 @@ def write_workflow( resume, gettotalreads, amazonupload, backupS3, runparamsid, 
             if (bam2bw.lower()=="yes"):
                stepline=stepBam2BW % locals()
                print >>fp, '%s'%stepline
-            stepline=stepPicard % locals()
-            print >>fp, '%s'%stepline
+            #stepline=stepPicard % locals()
+            #print >>fp, '%s'%stepline
 
          if (pipename == "Tophat"):
             stepline=stepTophat % locals()
