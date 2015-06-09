@@ -47,7 +47,7 @@ function rerunLoad() {
 					element.value = 'no';
 				}
 				}else if (element.id == "resume"){
-					element.value = 'no';
+					element.value = 'Resume';
 				}else{
 					element.value = jsonObj[jsonTypeList[x]];
 				}
@@ -353,6 +353,12 @@ function submitPipeline(type) {
 	
 		var barcode = findAdditionalInfoValues(doBarcode, ["distance", "format"]);
 		var adapter = findAdditionalInfoValues(doAdapter, ["adapter"]);
+
+		var adapterCheck = false;
+		if (adapter[0].match(/[bd-fh-sv-zBD-FH-SV-Z0-9\!\@\#\$\%\^\&\*\(\)\_\+\-\=\\\|\[\]\{\}\;\'\:\"\,\.\/\<\>\?\`\~]+/g)) {
+			adapterCheck = true;
+		}
+			
 		var quality = findAdditionalInfoValues(doQuality, ["window size", "required quality", "leading", "trailing", "minlen"]);
 		var trimming = findAdditionalInfoValues(doTrimming, ["single or paired-end", "5 length 1", "3 length 1", "5 length 2", "3 length 2"]);
 		var rna = findAdditionalInfoValues(doRNA, rnaList);
@@ -373,7 +379,7 @@ function submitPipeline(type) {
 		}else{
 			json = json + ',"spaired":"no"';
 		}
-		if (freshrun != "yes") {
+		if (freshrun == "Fresh") {
 			json = json + ',"resume":"no"'
 		}else{
 			json = json + ',"resume":"resume"'
@@ -393,7 +399,7 @@ function submitPipeline(type) {
 		if (doAdapter == "yes") {
 			previous = 'adapter';
 		}
-		json = json + ',"adapter":"' + adapter[0].replace(/\r\n|\r|\n/g, "__cr____cn__") + '"';
+		json = json + ',"adapter":"' + adapter[0].toUpperCase().replace(/\r\n|\r|\n/g, "__cr____cn__").replace(/U/g, 'T') + '"';
 		//quality
 		if (doQuality == "yes") {
 			json = json + ',"quality":"' + quality[0] + ':' + quality[1] + ':' + quality[2] + ':' + quality[3] + ':' + quality[4] + '"';
@@ -445,12 +451,20 @@ function submitPipeline(type) {
 		json = json + pipelines + '}'
 		//end json construction
 	
-		//insert new values into ngs_runparams
-		var runparamsInsert = postInsertRunparams(json, outputdir, run_name, description);
-		//insert new values into ngs_runlist
-		var submitted = postInsertRunlist(runparamsInsert[0], ids, runparamsInsert[1]);
-		if (submitted) {
-			window.location.href = "/dolphin/pipeline/status";
+		if (adapterCheck) {
+			$('#errorModal').modal({
+				show: true
+			});
+			document.getElementById('errorLabel').innerHTML ='Please use A,T,C,G only in the adapter';
+			document.getElementById('errorAreas').innerHTML = '';
+		}else{
+			//insert new values into ngs_runparams
+			var runparamsInsert = postInsertRunparams(json, outputdir, run_name, description);
+			//insert new values into ngs_runlist
+			var submitted = postInsertRunlist(runparamsInsert[0], ids, runparamsInsert[1]);
+			if (submitted) {
+				window.location.href = "/dolphin/pipeline/status";
+			}
 		}
 	}
 }

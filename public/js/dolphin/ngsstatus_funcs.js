@@ -3,7 +3,9 @@ function backToStatus(basepath){
 	window.location.href = basepath + '/pipeline/status';
 }
 
-function sendToPlot(){
+function sendToPlot(id){
+	var wkey = getWKey(id);
+	sendWKey(wkey);
 	window.location.href = '/dolphin/plot';
 }
 
