@@ -3,6 +3,7 @@
     usage: dophin_wrapper.py [options]
 """
 # imports
+import logging
 import warnings
 import MySQLdb
 import os, re, string, sys, commands
@@ -148,8 +149,12 @@ def stop_err( msg ):
 def main():
    try:
         tmpdir = '../tmp/files'
+        logdir = '../tmp/logs'
+
         if not os.path.exists(tmpdir):
            os.makedirs(tmpdir)
+        if not os.path.exists(logdir):
+           os.makedirs(logdir)
          #define options
         parser = OptionParser()
         parser.add_option("-r", "--rungroupid", dest="rpid")
@@ -161,6 +166,8 @@ def main():
         rpid    = options.rpid
         BACKUP    = options.backup
 	WKEY     = options.wkey
+        logging.basicConfig(filename=logdir+'/'+rpid+'.log', filemode='w',format='%(asctime)s %(message)s', datefmt='%m/%d/%Y %I:%M:%S %p', level=logging.DEBUG)
+
         if (not rpid):
            rpid=-1
 
@@ -169,12 +176,14 @@ def main():
         if (os.environ.has_key('DOLPHIN_PARAMS_SECTION')):
             params_section=os.environ['DOLPHIN_PARAMS_SECTION']
         print params_section
+        logging.info(params_section)
         runparamsids=getRunParamsID(rpid)
         for runparams_arr in runparamsids:
            runparamsid=runparams_arr[0]
            username=runparams_arr[1]
            isbarcode=runparams_arr[2]
            print runparams_arr
+           logging.info(runparams_arr)
 
            amazon = getAmazonCredentials(username)
            backupS3="Yes"
@@ -190,6 +199,7 @@ def main():
               gettotalreads = "Yes"
 
            print "%s %s %s %s %s %s"%(inputdir, backup_dir, amazon_bucket, outdir, organism, library_type )
+           logging.info("%s %s %s %s %s %s"%(inputdir, backup_dir, amazon_bucket, outdir, organism, library_type ))
 
            if (isbarcode):
                spaired, inputparams, barcodes=getLaneList(runparamsid)
@@ -198,6 +208,7 @@ def main():
                barcodes    = None
 
            runparams = getRunParams(runparamsid)
+           logging.info(runparams)
 
            input_fn      = "../tmp/files/input.txt"
 
@@ -215,13 +226,18 @@ def main():
            pipeline    = runparams.get('pipeline')
            genomebuild = runparams.get('genomebuild')
 
-           #print inputparams
-           #print barcodes
-           #print spaired
-           #print "adapter:"+adapter
-           #print "quality:"+quality
-           #print "trim:"+trim
-           #print "fastqc:"+fastqc
+           logging.info("######## INPUTS #########")
+           logging.info("inputparams:"+inputparams)
+           logging.info("barcodes:%s"%barcodes)
+           logging.info("paired:%s"%spaired)
+           logging.info("adapter:%s"%adapter)
+           logging.info("quality:%s"%quality)
+           logging.info("trim:%s"%trim)
+           logging.info("resume:%s"%resume)
+           logging.info("pipeline:%s"%pipeline)
+           logging.info("customind:%s"%customind)
+           logging.info("genomebuild:%s"%genomebuild)
+           logging.info("######## INPUTS END #########")
 
            if customind:
               customind    = [i for i in customind]
@@ -250,15 +266,18 @@ def main():
            wkeystr=''
            if (WKEY):
                wkeystr=' -k '+str(WKEY)
+           logging.info("CMD:%s"%(cmd % locals()))
            print cmd % locals()
            print "\n\n\n"
            p = subprocess.Popen(cmd % locals(), shell=True, stdout=subprocess.PIPE)
 
            for line in p.stdout:
               print(str(line.rstrip()))
+              logging.info(str(line.rstrip()))
               p.stdout.flush()
               if (re.search('failed\n', line) or re.search('Err\n', line) ):
-                stop_err("failed")
+                 logging.info("failed")
+                 stop_err("failed")
    except Exception, ex:
         stop_err('Error running dolphin_wrapper.py\n' + str(ex))
 
