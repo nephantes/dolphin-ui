@@ -48,12 +48,12 @@
 						<?php echo $html->getStaticSelectionBox("Genome Build", "genomebuild", "<option>human,hg19</option>
 																				<option>hamster,cho-k1</option>
 																				<option>rat,rn5</option>
-																				<option>zebrafish,danrer7</option>
+																				<option>zebrafish,danRer7</option>
 																				<option>mouse,mm10</option>
 																				<option>mousetest,mm10</option>
-																				<option>s_cerevisiae,saccer3</option>
+																				<option>s_cerevisiae,sacCer3</option>
 																				<option>c_elegans,ce10</option>
-																				<option>cow,bostau7</option>
+																				<option>cow,bosTau7</option>
 																				<option>d_melanogaster,dm3</option>", 4)?>
 						<?php echo $html->getStaticSelectionBox("Mate-paired", "spaired", "<option>yes</option>
 																				<option>no</option>", 4)?>
