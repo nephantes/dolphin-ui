@@ -29,6 +29,7 @@
 		<script src='<?php echo BASE_PATH?>/js/dolphin/ngspost_funcs.js' type="text/javascript"></script>
 		<script src="<?php echo BASE_PATH?>/js/dolphin/sessionget_funcs.js" type="text/javascript"></script>
 		<script src='<?php echo BASE_PATH?>/js/dolphin/plots.js' type="text/javascript"></script>
+		<script src='<?php echo BASE_PATH?>/js/dolphin/ngs_help.js' type="text/javascript"></script>
 		<!-- External Sources -->
 	</body>
 

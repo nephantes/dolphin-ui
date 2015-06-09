@@ -7,6 +7,7 @@
 							<div class="box box-primary">
 								<div class="box-header">
 									<h3 class="box-title">Control Panel</h3>
+									<?php echo $html->getInfoBox('plot_control_panel');?>
 								</div><!-- /.box-header -->
 								<div class="box-body">
 								<!-- form start -->
