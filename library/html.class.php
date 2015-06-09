@@ -775,7 +775,7 @@ e range"><i class="fa fa-calendar"></i></button>
 		$html = '';
 		$html.= '<div class="navbar-right margin">
 						<div class="box-tools nav">
-						<li class="dropdown user-menu" id="'.$id.'" onclick="getInfoBoxData(this.id)">
+						<li class="dropdown user-menu" id="'.$id.'-head" onclick="getInfoBoxData(this.id)">
                             <a href="#" class="dropdown-toggle" data-toggle="dropdown">
                                 <i class="fa fa-info-circle"></i>
                             </a>

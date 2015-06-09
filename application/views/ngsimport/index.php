@@ -46,3 +46,5 @@
 										<button type="submit" class="btn btn-primary">Submit</button>
 									</div>
 								</form>
+								<script src="<?php echo BASE_PATH?>/js/dolphin/ngs_help.js" type="text/javascript"></script>
+								<script src='<?php echo BASE_PATH?>/js/dolphin/js_to_html_funcs.js' type="text/javascript"></script>

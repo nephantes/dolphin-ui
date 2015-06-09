@@ -24,8 +24,11 @@
 																				<option>c_elegans,ce10</option>
 																				<option>cow,bostau7</option>
 																				<option>d_melanogaster,dm3</option>", 3)?>
-							<?php echo $html->getStaticSelectionBox("Barcode Seperation", "barcode_sep\" onchange=\"expandBarcodeSep()", "<option>no</option>
+							<?php echo $html->getStaticSelectionBox("Barcode Seperation", "barcode_sep", "<option>no</option>
 																				<option>yes</option>", 3)?>
+							<script>
+								document.getElementById('barcode_sep').setAttribute('onchange', 'expandBarcodeSep()');
+							</script>
 							<?php echo $html->getStaticSelectionBox("Mate-paired", "spaired", "<option>yes</option>
 																				<option>no</option>", 3)?>
 						</div>
