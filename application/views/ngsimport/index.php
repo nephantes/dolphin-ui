@@ -6,6 +6,7 @@
 							<div class="box box-primary">
 								<div class="box-header">
 									<h3 class="box-title">Excel Import</h3>
+									<?php echo $html->getInfoBox("excel_import");?>
 								</div><!-- /.box-header -->
 								<div class="box-body">
 									<div>				

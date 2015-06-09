@@ -203,8 +203,9 @@ class HTML {
 	{
 	$html='				<div class="box">
 				<div class="box-header">
-					<h3 class="box-title">'.$title.'</h3>
-				</div><!-- /.box-header -->
+					<h3 class="box-title">'.$title.'</h3>';
+		$html.= $this->getInfoBox($table);
+		$html.= '</div>
 				<div class="box-body table-responsive">
 				<table id="jsontable_'.$table.'" class="table table-hover table-striped table-condensed table-scrollable">
 		<thead>
@@ -557,8 +558,9 @@ e range"><i class="fa fa-calendar"></i></button>
 	$html = '<div class="col-md-'.$width.'">
 			<div class="box box-default">
 				<div class="box-header with-border">
-				<h3 class="box-title">'.$title.'</h3>
-				</div><!-- /.box-header -->
+				<h3 class="box-title">'.$title.'</h3>';
+		$html.= $this->getInfoBox($id);
+		$html.= '</div><!-- /.box-header -->
 				<div class="box-body">
 					<div class="input-group margin col-md-11">
 						<form role="form">';
@@ -601,10 +603,11 @@ e range"><i class="fa fa-calendar"></i></button>
 			<div id="'.$id.'_exp" class="box box-default collapsed-box">
 				<div class="box-header with-border">
 					<h3 class="box-title">'.$title.'</h3>
-					<div class="box-tools pull-right">
+					<div class="box-tools margin pull-right">
 					<button class="btn btn-box-tool btn-primary" data-widget="collapse"><i id="'.$id.'_exp_btn" class="fa fa-plus"></i></button>
-					</div><!-- /.box-tools -->
-				</div><!-- /.box-header -->';
+					</div><!-- /.box-tools -->';
+		$html.= $this->getInfoBox($id);
+		$html.= '</div><!-- /.box-header -->';
 	if ($fieldTitles[0] == "Add a Pipeline")
 	{
 		$html.= $this->getPipelinesButton();
@@ -638,10 +641,11 @@ e range"><i class="fa fa-calendar"></i></button>
 			<div id="'.$id.'_exp" class="box box-default collapsed-box">
 				<div class="box-header with-border">
 					<h3 class="box-title">'.$title.'</h3>
-					<div class="box-tools pull-right">
+					<div class="box-tools pull-right margin">
 					<button class="btn btn-box-tool btn-primary" data-widget="collapse"><i id="'.$id.'_exp_btn" class="fa fa-plus"></i></button>
-					</div><!-- /.box-tools -->
-				</div><!-- /.box-header -->
+					</div><!-- /.box-tools -->';
+		$html.= $this->getInfoBox($id);
+		$html.= '</div><!-- /.box-header -->
 				<div id="'.$id.'_exp_body" class="box-body compact" style="display: none;" onchange="">';
 	
 	$html.= 			'<div class="input-group col-md-12">
@@ -687,8 +691,9 @@ e range"><i class="fa fa-calendar"></i></button>
 				<div class="box-header with-border">
 					<h3 class="box-title">'.$title.'</h3>
 					<div class="box-tools pull-right">
-						<button class="btn btn-box-tool btn-primary" data-widget="collapse"><i id="'.$id.'_exp_btn" class="'.$exp_btn.'"></i></button>
-					</div><!-- /.box-tools -->
+						<button class="btn btn-box-tool btn-primary margin pull-right" data-widget="collapse"><i id="'.$id.'_exp_btn" class="'.$exp_btn.'"></i></button>';
+		$html.= $this->getInfoBox($id);
+		$html.= '	</div><!-- /.box-tools -->
 				</div><!-- /.box-header -->
 				<div id="'.$id.'_exp_body" class="box-solid box-body" style="'.$exp_body.'">';
 				
@@ -763,6 +768,31 @@ e range"><i class="fa fa-calendar"></i></button>
 		$html.="var BASE_PATH = '" . $BASE_PATH . "'\n";
 		$html.="var API_PATH = '" . $API_PATH . "'\n";
 		$html.="</script>\n";
+		return $html;
+	}
+	
+	function getInfoBox($id){
+		$html = '';
+		$html.= '<div class="navbar-right margin">
+						<div class="box-tools nav">
+						<li class="dropdown user-menu" id="'.$id.'" onclick="getInfoBoxData(this.id)">
+                            <a href="#" class="dropdown-toggle" data-toggle="dropdown">
+                                <i class="fa fa-info-circle"></i>
+                            </a>
+                            <ul class="dropdown-menu">
+                                <li class="header">
+										<h4 style="text-align: center" class="margin">Info</h3>
+								</li>
+                                <li>
+										<div id="'.$id.'_info" class="slimScrollDiv margin" style="position: relative; overflow: hidden; width: auto; height: auto;">
+										</div>
+                                </li>
+                                <li class="footer">
+                                </li>
+                            </ul>
+                        </li>
+					</div>
+				</div>';
 		return $html;
 	}
 }
