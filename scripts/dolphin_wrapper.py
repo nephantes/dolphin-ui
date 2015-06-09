@@ -496,30 +496,32 @@ def write_workflow( resume, gettotalreads, amazonupload, backupS3, runparamsid, 
             t_e = "expected_count"
             stepline=stepRSEMCount % locals()
             print >>fp, '%s'%stepline
+            type="RSEM"
             igv=arr[2]
             if (igv.lower()=="yes"):
-               type="RSEM"
                stepline=stepIGVTDF % locals()
                print >>fp, '%s'%stepline
             bam2bw=arr[3]
             if (bam2bw.lower()=="yes"):
-               type="RSEM"
                stepline=stepBam2BW % locals()
                print >>fp, '%s'%stepline
+            stepline=stepPicard % locals()
+            print >>fp, '%s'%stepline
 
          if (pipename == "Tophat"):
             stepline=stepTophat % locals()
             print >>fp, '%s'%stepline
             igv=arr[2]
+            type="Tophat"
             if (igv.lower()=="yes"):
-               type="Tophat"
                stepline=stepIGVTDF % locals()
                print >>fp, '%s'%stepline
             bam2bw=arr[3]
             if (bam2bw.lower()=="yes"):
-               type="Tophat"
                stepline=stepBam2BW % locals()
                print >>fp, '%s'%stepline
+            stepline=stepPicard % locals()
+            print >>fp, '%s'%stepline
 
          if (pipename == "DESeq"):
             stepline=stepDESeq2 % locals()
@@ -540,21 +542,20 @@ def write_workflow( resume, gettotalreads, amazonupload, backupS3, runparamsid, 
             stepline=stepAggregation % locals()
             print >>fp, '%s'%stepline
 
+            type="chip"
+            if (split and split.lower() != 'none'):
+                type="mergechip"
             igv=str(arr[6])
             if (igv.lower()=="yes"):
-                type="chip"
-                if (split and split.lower() != 'none'):
-                    type="mergechip"
                 stepline=stepIGVTDF % locals()
                 print >>fp, '%s'%stepline
 
             bam2bw=str(arr[7])
             if (bam2bw.lower()=="yes"):
-                type="chip"
-                if (split and split.lower() != 'none'):
-                    type="mergechip"
                 stepline=stepBam2BW % locals()
                 print >>fp, '%s'%stepline
+            stepline=stepPicard % locals()
+            print >>fp, '%s'%stepline
 
    
    level=0
