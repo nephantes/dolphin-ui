@@ -39,4 +39,5 @@ INSERT INTO `biocore`.`ngs_help` (`id`, `field_name`, `help_text`) VALUES ('32',
 INSERT INTO `biocore`.`ngs_help` (`id`, `field_name`, `help_text`) VALUES ('33', 'RSEM', 'RSEM');
 INSERT INTO `biocore`.`ngs_help` (`id`, `field_name`, `help_text`) VALUES ('34', 'DESEQ', 'DESEQ');
 INSERT INTO `biocore`.`ngs_help` (`id`, `field_name`, `help_text`) VALUES ('35', 'excel_import', 'excel import');
+INSERT INTO `biocore`.`ngs_help` (`id`, `field_name`, `help_text`) VALUES ('36', 'plot_control_panel', 'plot control panel');
 
