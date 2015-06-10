@@ -495,9 +495,10 @@ $(function() {
 	document.getElementById('tablerow').appendChild(createElement('th', ['id'], ['selection']));
 	document.getElementById('selection').innerHTML = 'Selected';
 	
+	console.log(samples.toString());
 	$.ajax({ type: "GET",
 			url: "/dolphin/public/ajax/ngsquerydb.php",
-			data: { p: 'getSampleNames', samples: samples.toString().substring(0,samples.toString().length - 1) },
+			data: { p: 'getSampleNames', samples: samples.toString() },
 			async: false,
 			success : function(s)
 			{
