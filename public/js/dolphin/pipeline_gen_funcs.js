@@ -451,7 +451,7 @@ function submitPipeline(type) {
 		json = json + pipelines + '}'
 		//end json construction
 	
-		if (adapterCheck) {
+		if (adapterCheck && doAdapter == 'yes') {
 			$('#errorModal').modal({
 				show: true
 			});
