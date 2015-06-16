@@ -53,7 +53,8 @@ function fastlaneToPipeline(sample_ids){
 }
 
 $(function() {
-	if (document.getElementById('barcode_sep' != null)) {
+	if (document.getElementById('barcode_sep') != null) {
+		console.log('test');
 		if(document.getElementById('barcode_sep').value == 'yes'){
 			var barcodeDiv = document.getElementById('barcode_div');
 			barcodeDiv.style.display = 'inline';
