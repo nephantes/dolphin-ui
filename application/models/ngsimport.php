@@ -12,6 +12,12 @@ class Ngsimport extends VanillaModel {
 	public $amazon_bucket;
 	public $samples=[];
 	
+	public $organismCheck;
+	public $pairedEndCheck;
+	public $barcode;
+	public $namesList;
+	public $initialSubmission = [];
+	
 	//	Variable Classes
 	//	METADATA
 	public $experiment_name;
@@ -34,6 +40,15 @@ class Ngsimport extends VanillaModel {
 	
 	//	Sheet Check bools
 	public $final_check;
+	
+	function getGroup($username) {
+        $groups = json_decode($this->query("select g.id from user_group ug, users u, groups g where ug.u_id=u.id and ug.g_id=g.id and username='$username'"), true);
+        $group_str='';
+        foreach ($groups as $group):
+            $group_str.=$group['id'].",";
+        endforeach;
+        return rtrim($group_str, ",");
+    }
 	
 	function parseExcel($gid, $sid, $worksheet, $sheetData, $passed_final_check) {
 		$this->worksheet=$worksheet;
@@ -77,7 +92,9 @@ class Ngsimport extends VanillaModel {
 	function finalizeExcel($worksheet, $sheetData){
 		$this->worksheet=$worksheet;
 		$this->sheetData=$sheetData;
+		
 		$text = "";
+		
 		$text='<li>'.$this->worksheet['worksheetName'].'<br />';
 		if ( $this->worksheet['worksheetName']=="METADATA"){
 			$text.=$this->processMeta();
@@ -91,6 +108,13 @@ class Ngsimport extends VanillaModel {
 			$text.=$this->processFiles();
 			$text.=$this->successText("<BR><BR>Excel import successful!<BR>");
 		}
+		array_push($this->initialSubmission, $this->barcode);
+		
+		$text.="<script type='text/javascript'>";
+		$text.="var initialSubmission = '" . implode(",", $this->initialSubmission) . "';";
+		$text.="var initialNameList = '" . $this->namesList . "';";
+		$text.="</script>";
+		
 		return $text;
 	}
 	
@@ -126,6 +150,13 @@ class Ngsimport extends VanillaModel {
 			if($this->sheetData[$i]["A"]=="fastq directory"){$this->fastq_dir=$this->esc($this->sheetData[$i]["B"]);}
 			if($this->sheetData[$i]["A"]=="backup directory"){$this->backup_dir=$this->esc($this->sheetData[$i]["B"]);}
 			if($this->sheetData[$i]["A"]=="amazon bucket"){$this->amazon_bucket=$this->esc($this->sheetData[$i]["B"]);}
+			
+			if($this->sheetData[$i]["A"]=="title"){
+				array_push($this->initialSubmission, $this->esc($this->sheetData[$i]["B"]));
+			}
+			if($this->sheetData[$i]["A"]=="backup directory"){
+					array_push($this->initialSubmission, $this->esc($this->sheetData[$i]["B"]));
+			}
 		}
 		
 		/*
@@ -384,6 +415,25 @@ class Ngsimport extends VanillaModel {
 				if($this->sheetData[3][$j]=="Notebook reference"){$samp->notebook_ref=$this->esc($this->sheetData[$i][$j]);}
 				if($this->sheetData[3][$j]=="Notes"){$samp->notes=$this->esc($this->sheetData[$i][$j]);}
 	
+				if($this->sheetData[3][$j]=="Sample name"){
+					if($this->namesList == null){
+						$this->namesList = $samp->name;
+					}else{
+						$this->namesList .= "," . $samp->name;
+					}
+				}
+				if($this->sheetData[3][$j]=="barcode"){
+					if($this->barcode == null){
+						$this->barcode = $this->esc($this->sheetData[$i][$j]);
+					}else{
+						$this->barcode .= "__cr____cn__". $this->esc($this->sheetData[$i][$j]);	
+					}
+				}
+				if($this->sheetData[3][$j]=="organism" && $this->organismCheck == null){
+					array_push($this->initialSubmission, $this->esc($this->sheetData[$i][$j]));
+					$this->organismCheck = 'check';
+				}
+	
 				$valid = "/^characteristics:\s+?(.*)/";
 	
 				if(preg_match( $valid, $this->sheetData[3][$j], $matches) == 1)
@@ -485,6 +535,13 @@ class Ngsimport extends VanillaModel {
 				if($this->sheetData[3][$j]=="Sample or Lane Name (Enter same name for multiple files)"){$file->name=$this->esc($this->sheetData[$i][$j]);}
 				if($this->sheetData[3][$j]=="file name(comma separated for paired ends)"){$file->file_name=$this->esc($this->sheetData[$i][$j]);$file->file_name=preg_replace('/\s/', '', $file->file_name);}
 				if($this->sheetData[3][$j]=="file checksum"){$file->checksum=$this->esc($this->sheetData[$i][$j]);}
+				
+				if($this->sheetData[3][$j]=="file name(comma separated for paired ends)" && $this->pairedEndCheck == null){
+					if (strpos($file->file_name, '.') !== FALSE){
+						array_push($this->initialSubmission, 'yes');
+						$this->pairedEndCheck = 'yes';
+					}
+				}
 			}
 			
 			/*

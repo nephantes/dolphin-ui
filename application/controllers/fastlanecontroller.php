@@ -42,7 +42,6 @@ class FastlaneController extends VanillaController {
 			$text.= "Don't forget to add more information about your samples!<br><br>";
 			$text.="<script type='text/javascript'>";
 			$text.="var initialSubmission = '" . $fastlane_values . "';";
-			echo $fastlane_values;
 			if(isset($_SESSION['barcode_array'])){$text.="var barcode_array = '" . $barcode_array . "';";}
 			$text.="</script>";
 		}

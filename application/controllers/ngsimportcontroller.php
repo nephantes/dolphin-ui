@@ -10,8 +10,16 @@ class NgsimportController extends VanillaController {
 		$this->username=$_SESSION['user'];
 		$this->set('title','NGS Excel Import');
 		$this->set('groups',$this->Ngsimport->getGroups($this->username));
+        
+        $this->set('uid', $_SESSION['uid']);
+        $gids = $this->Ngsimport->getGroup($_SESSION['user']);
+        $this->set('gids', $gids);
 	}
 	function process() {
+            $this->set('uid', $_SESSION['uid']);
+            $gids = $this->Ngsimport->getGroup($_SESSION['user']);
+            $this->set('gids', $gids);
+            
 			$filename=$_FILES["excelFile"]["tmp_name"];
 			$text = "Files size: ".$_FILES["excelFile"]["size"]."</br>";
 
@@ -63,10 +71,6 @@ class NgsimportController extends VanillaController {
                         $text.=$ngs->finalizeExcel($worksheet, $sheetData);
                     }
                     $text.='</ol>';
-                    
-                    $text.="<script type='text/javascript'>";
-                    $text.="var initialSubmission = '" . $fastlane_values . "'";
-                    $text.="</script>";
                 }else{
                     $text.=$ngs->errorText("<BR><BR>Excel import aborted due to errors, see above<BR>");
                 }

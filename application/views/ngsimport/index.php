@@ -11,6 +11,8 @@
 								<div class="box-body">
 									<div>				
 				<!-- form start -->
+							<?php echo $html->sendJScript("excel import", "", "", "", $uid, $gids); ?>
+			<?php echo $html->getBasePath(BASE_PATH, API_PATH); ?>
 								<form role="form" enctype="multipart/form-data" action="ngsimport/process" method="post">
 									<div class="box-body">
 										<div class="form-group">

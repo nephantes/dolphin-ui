@@ -4,6 +4,31 @@
  * Ascription:
  **/
 
+function organismSelect(org){
+	if (org == 'human') {
+		org = org + ',hg19';
+	}else if (org == 'hamster') {
+		org = org + ',cho-k1';
+	}else if (org == 'rat') {
+		org = org + ',rn5';
+	}else if (org == 'zebrafish') {
+		org = org + ',danRer7';
+	}else if (org == 'mouse') {
+		org = org + ',mm10';
+	}else if (org == 'mousetest') {
+		org = org + ',mm10';
+	}else if (org == 's_cerevisiae') {
+		org = org + ',sacCer3';
+	}else if (org == 'c_elegans') {
+		org = org + ',ce10';
+	}else if (org == 'cow') {
+		org = org + ',bosTau7';
+	}else if (org == 'd_melanogaster') {
+		org = org + ',dm3';
+	}
+	return org;
+}
+
 $(function() {
 	
 	if (typeof(initialSubmission) != undefined && window.location.href.split("/")[window.location.href.split("/").length -1] == 'process') {
@@ -52,16 +77,21 @@ $(function() {
 			
 		}else{
 			runname = 'Import Initial Run';
-			rundesc = 'Import Initial Run within import: ' + initial_split[5];
+			rundesc = 'Import Initial Run within import: ' + initial_split[0];
+			outdir = initial_split[1] + '/initial_run';
 			
-			json = '{"genomebuild":"' + initial_split[0] + ',' + initial_split[1] + '"';
+			json = '{"genomebuild":"' + organismSelect(initial_split[2]) + '"';
 			if (initial_split[3] == 'yes') {
 				json = json + ',"spaired":"paired"';
 			}else{
 				json = json + ',"spaired":"no"';
 			}
-			json = json + ',"resume":"no","fastqc":"yes","barcodes":"none","adapters":"none","quality":"none","quality":"none",';
+			json = json + ',"resume":"no","fastqc":"yes","barcodes":"distance,1:format,5 end read 1",';
+			json = json + '"adapters":"' + initial_split[4] + '"';
+			json = json + ',"quality":"none","quality":"none",';
 			json = json + '"trim":"none","split":"none","commonind":"none"}'
+			
+			var names_list = initialNameList.split(",");
 		}
 		
 		if (json != undefined & outdir != undefined && runname != undefined && rundesc != undefined) {
