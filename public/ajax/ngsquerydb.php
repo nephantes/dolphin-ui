@@ -11,7 +11,7 @@ $query = new dbfuncs();
 $pDictionary = ['getSelectedSamples', 'submitPipeline', 'getStatus', 'getRunSamples', 'grabReload', 'getReportNames', 'lanesToSamples',
 				'checkMatePaired', 'getAllSampleIds', 'getLaneIdFromSample', 'getSingleSample', 'getSeriesIdFromLane', 'getAllLaneIds',
                 'getGIDs', 'getSampleNames', 'getWKey', 'getFastQCBool', 'getReportList', 'getTSVFileList', 'profileLoad',
-                'obtainAmazonKeys', 'checkAmazonPermissions', 'getInfoBoxData'];
+                'obtainAmazonKeys', 'checkAmazonPermissions', 'getInfoBoxData', 'getSamplesFromName'];
 
 $data = "";
                 
@@ -502,7 +502,7 @@ else if ($p == 'obtainAmazonKeys')
                 SELECT g_id FROM user_group WHERE u_id = ".$_SESSION['uid'].")))
     ");
 }
-else if ($p = 'getInfoBoxData')
+else if ($p == 'getInfoBoxData')
 {
     if (isset($_GET['fieldname'])){$fieldname = $_GET['fieldname'];}
     $data=$query->queryTable("
@@ -511,13 +511,31 @@ else if ($p = 'getInfoBoxData')
     WHERE field_name = '$fieldname';
     ");
 }
-else if ($p = 'checkAmazonPermissions')
+else if ($p == 'checkAmazonPermissions')
 {
     if (isset($_GET['a_id'])){$a_id = $_GET['a_id'];}
     $data=$query->queryTable("
     SELECT id FROM groups WHERE owner_id = ".$_SESSION['uid']." AND id IN(
     SELECT group_id FROM group_amazon WHERE amazon_id = (
     SELECT DISTINCT id FROM biocore.amazon_credentials where id = $a_id));
+    ");
+}
+else if($p == 'getSamplesFromName')
+{
+    if (isset($_GET['names'])){$names = $_GET['names'];}
+    $names = explode(",", $names);
+    $sqlnames = "";
+    foreach($names as $n){
+        if($n != end($names)){
+            $sqlnames.= "'".$n."',";
+        }else{
+            $sqlnames.= "'".$n."'";    
+        }
+    }
+    $data=$query->queryTable("
+    SELECT id
+    FROM ngs_samples
+    WHERE name in (".$sqlnames.") ;
     ");
 }
 

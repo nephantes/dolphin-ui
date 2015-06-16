@@ -11,12 +11,21 @@ class FastlaneController extends VanillaController {
 		$this->set('field', "Fastlane");
 		$this->username=$_SESSION['user'];
 		$this->set('title','NGS Fastlane');
+		
+		$this->set('uid', $_SESSION['uid']);
+        $gids = $this->Fastlane->getGroup($_SESSION['user']);
+        $this->set('gids', $gids);
 	}
 	
 	function process() {
+		$this->set('uid', $_SESSION['uid']);
+        $gids = $this->Fastlane->getGroup($_SESSION['user']);
+        $this->set('gids', $gids);
+		
 		$text = '';
 		$bad_samples = '';
 		if(isset($_SESSION['fastlane_values'])){$fastlane_values = $_SESSION['fastlane_values'];}
+		if(isset($_SESSION['barcode_array'])){$barcode_array = $_SESSION['barcode_array'];}
 		if(isset($_SESSION['pass_fail_values'])){$pass_fail_values = $_SESSION['pass_fail_values'];}
 		if(isset($_SESSION['bad_samples'])){$bad_samples = $_SESSION['bad_samples'];}
 		
@@ -24,15 +33,18 @@ class FastlaneController extends VanillaController {
 		$pass_fail_array = explode(",",$pass_fail_values);
 		$bad_samples_array = explode(",",$bad_samples);
 		
-		unset($_SESSION['fastlane_values']);
-		unset($_SESSION['pass_fail_values']);
-		unset($_SESSION['bad_samples']);
+		$fastlane_values = str_replace("\n", ":", $fastlane_values);
 		
 		if($pass_fail_array[0] == "true" || $pass_fail_array == "false"){
 			$text.= "<h4>Errors found during submission:</h4><br>";
 		}else{
 			$text.= "<h4>Successful Fastlane submission!</h4><br>";
 			$text.= "Don't forget to add more information about your samples!<br><br>";
+			$text.="<script type='text/javascript'>";
+			$text.="var initialSubmission = '" . $fastlane_values . "';";
+			echo $fastlane_values;
+			if(isset($_SESSION['barcode_array'])){$text.="var barcode_array = '" . $barcode_array . "';";}
+			$text.="</script>";
 		}
 		$database_sample_bool = false;
 		foreach($pass_fail_array as $key=>$index){
@@ -79,7 +91,9 @@ class FastlaneController extends VanillaController {
 		
 		$this->set('mytext', $text);
 		unset($_SESSION['fastlane_values']);
+		unset($_SESSION['bar_distance']);
 		unset($_SESSION['pass_fail_values']);
+		unset($_SESSION['bad_samples']);
 	}
 	
 	function afterAction(){

@@ -106,7 +106,7 @@ function checkFastlaneInput(info_array){
 	if (experiment_series_id > 0) {
 		var lane_id = laneCheck(experiment_series_id, info_array[4]);
 	}
-	
+
 	//	Samples
 	if (experiment_series_id > 0 && lane_id > 0) {
 		if (input_array[1] == 'yes') {
@@ -232,7 +232,7 @@ function insertExperimentSeries(experiment_name){
 	$.ajax({
 			type: 	'POST',
 			url: 	'/dolphin/public/ajax/ngsfastlanedb.php',
-			data:  	{ p: 'insertExperimentSeries', name: experiment_name },
+			data:  	{ p: 'insertExperimentSeries', name: experiment_name, gids: phpGrab.gids },
 			async:	false,
 			success: function(s)
 			{
@@ -244,7 +244,7 @@ function insertLane(experiment_id, lane_name){
 	$.ajax({
 			type: 	'POST',
 			url: 	'/dolphin/public/ajax/ngsfastlanedb.php',
-			data:  	{ p: 'insertLane', experiment: experiment_id, lane: lane_name },
+			data:  	{ p: 'insertLane', experiment: experiment_id, lane: lane_name, gids: phpGrab.gids },
 			async:	false,
 			success: function(s)
 			{
@@ -258,13 +258,13 @@ function insertSample(experiment_id, lane_id, sample_name, organism, barcode){
 			type: 	'POST',
 			url: 	'/dolphin/public/ajax/ngsfastlanedb.php',
 			data:  	{ p: 'insertSample', experiment: experiment_id, lane: lane_id, sample: sample_name,
-					organism: organism, barcode: barcode },
+					organism: organism, barcode: barcode, gids: phpGrab.gids },
 			async:	false,
 			success: function(s)
 			{
 			}
 	});
-	id = sampleCheck(experiment_id, lane_id, sample_name)
+	id = sampleCheck(experiment_id, lane_id, sample_name);
 	return id;
 }
 
@@ -272,7 +272,7 @@ function insertDirectories(input, backup, amazon){
 	$.ajax({
 			type: 	'POST',
 			url: 	'/dolphin/public/ajax/ngsfastlanedb.php',
-			data:  	{ p: 'insertDirectories', input: input, backup: backup, amazon: amazon },
+			data:  	{ p: 'insertDirectories', input: input, backup: backup, amazon: amazon, gids: phpGrab.gids },
 			async:	false,
 			success: function(s)
 			{
@@ -284,7 +284,7 @@ function insertTempSampleFiles(filename, sample_id, input_directory_id){
 	$.ajax({
 			type: 	'POST',
 			url: 	'/dolphin/public/ajax/ngsfastlanedb.php',
-			data:  	{ p: 'insertTempSample', filename: filename, sample_id: sample_id, input: input_directory_id },
+			data:  	{ p: 'insertTempSample', filename: filename, sample_id: sample_id, input: input_directory_id, gids: phpGrab.gids },
 			async:	false,
 			success: function(s)
 			{
@@ -296,7 +296,7 @@ function insertTempLaneFiles(file_name, lane_id, dir_id){
 	$.ajax({
 			type: 	'POST',
 			url: 	'/dolphin/public/ajax/ngsfastlanedb.php',
-			data:  	{ p: 'insertTempLane', file_name: file_name, lane_id: lane_id, dir_id: dir_id },
+			data:  	{ p: 'insertTempLane', file_name: file_name, lane_id: lane_id, dir_id: dir_id, gids: phpGrab.gids },
 			async:	false,
 			success: function(s)
 			{

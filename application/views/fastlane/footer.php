@@ -29,6 +29,8 @@
         <script src="<?php echo BASE_PATH?>/js/dolphin/ngsfastlane_funcs.js" type="text/javascript"></script>
         <script src="<?php echo BASE_PATH?>/js/dolphin/ngsfastlane_database_funcs.js" type="text/javascript"></script>
 		<script src="<?php echo BASE_PATH?>/js/dolphin/ngs_help.js" type="text/javascript"></script>
+		<script src="<?php echo BASE_PATH?>/js/dolphin/ngspost_funcs.js" type="text/javascript"></script>
+		<script src="<?php echo BASE_PATH?>/js/dolphin/initialrun_funcs.js" type="text/javascript"></script>
 	</body>
 
 </html>

@@ -14,13 +14,16 @@ function expandBarcodeSep(){
 	//	Obtain information
 	var expandType = document.getElementById('barcode_sep').value;
 	var barcodeDiv = document.getElementById('barcode_div');
+	var barcodeOptDiv = document.getElementById('barcode_opt_div');
 	
 	//	Check the expand type
 	if (expandType == 'yes') {
 		barcodeDiv.style.display = 'inline';
+		barcodeOptDiv.style.display = 'inline';
 		document.getElementById('input_files').placeholder = "Paired End Example:\nlane_001_R1.fastq.gz lane_001_R2.fastq\nSingle End Example:\nlane_001.fastq.gz";
 	}else{
 		barcodeDiv.style.display = 'none';
+		barcodeOptDiv.style.display = 'none';
 		document.getElementById('input_files').placeholder = "Paired End Example:\nlibrary_name_rep1 lib_rep1_R1.fastq.gz lib_rep1_R2.fastq.gz\nSingle End Example:\nlibrary_name_rep1 lib_rep1.fastq.gz";
 	}
 }
@@ -32,8 +35,13 @@ function submitFastlaneButton() {
 			value_array.push((document.getElementById(id_array[x]).value).trim());
 		}
 	}
-	
 	sendProcessData(value_array, 'fastlane_values');
+	
+	var barcode_array = [];
+	barcode_array.push(document.getElementById('bar_distance').value);
+	barcode_array.push(document.getElementById('bar_format').value);
+	sendProcessData(barcode_array, 'barcode_array');
+	
 	var checked_values = checkFastlaneInput(value_array);
 	sendProcessData(checked_values, 'pass_fail_values');
 	var bad_samples = getBadSamples();
@@ -54,10 +62,11 @@ function fastlaneToPipeline(sample_ids){
 
 $(function() {
 	if (document.getElementById('barcode_sep') != null) {
-		console.log('test');
 		if(document.getElementById('barcode_sep').value == 'yes'){
 			var barcodeDiv = document.getElementById('barcode_div');
 			barcodeDiv.style.display = 'inline';
+			var barcodeOptDiv = document.getElementById('barcode_opt_div');
+			barcodeOptDiv.style.display = 'inline';
 		}
 	}
 });
