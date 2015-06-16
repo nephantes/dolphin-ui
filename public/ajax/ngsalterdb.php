@@ -87,7 +87,7 @@ else if ($p == 'noAddedParamsRerun')
     FROM ngs_runparams
     WHERE id = $run_id limit 1
     ");
-    $cmd = "echo 'cd ../../scripts && echo 'Re-run started($idKey)' >> ../tmp/run.log && python dolphin_wrapper.py -r $idKey -w $wkey >> ../tmp/run.log 2>&1 & echo $! &";
+    $cmd = "cd ../../scripts && echo 'Re-run started($run_id)' >> ../tmp/run.log && python dolphin_wrapper.py -r $run_id -w $wkey >> ../tmp/run.log 2>&1 & echo $! &";
     pclose(popen( $cmd, "r"));
 }
 else if($p == 'updateProfile')
