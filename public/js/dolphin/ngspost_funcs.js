@@ -25,7 +25,7 @@ function postInsertRunparams(json, outputdir, name, description){
        runGroupID = 'new';
    }
 
-   if (json.indexOf("\"barcodes\":\"none\"") != -1) {
+   if (json.indexOf('"barcodes":"none"') != -1) {
       barcode = 0;
    }
    

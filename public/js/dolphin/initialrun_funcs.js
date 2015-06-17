@@ -77,17 +77,17 @@ $(function() {
 			
 		}else{
 			runname = 'Import Initial Run';
-			rundesc = 'Import Initial Run within import: ' + initial_split[0];
+			rundesc = 'Import Initial Run within series: ' + initial_split[0];
 			outdir = initial_split[1] + '/initial_run';
-			
+			console.log(initial_split);
 			json = '{"genomebuild":"' + organismSelect(initial_split[2]) + '"';
-			if (initial_split[4] == 'yes') {
+			if (initial_split[4] == 'paired') {
 				json = json + ',"spaired":"paired"';
 			}else{
 				json = json + ',"spaired":"no"';
 			}
 			json = json + ',"resume":"no","fastqc":"yes",';
-			if (initial_split[3] != null) {
+			if (initial_split[3] == 'lane') {
 				json = json + '"barcodes":"distance,1:format,5 end read 1",';
 			}else{
 				json = json + '"barcodes":"none",';

@@ -422,16 +422,25 @@ $(function() {
 					 {
 						lanesTable.fnClearTable();
 						for(var i = 0; i < s.length; i++) {
+							$.ajax({ type: "GET",
+							url: "/dolphin/public/ajax/initialmappingdb.php",
+							data: { p: 'sampleChecking', sample_id: s[i].id},
+							async: false,
+							success : function(r)
+							{
+								
+							}
+						});
 						lanesTable.fnAddData([
 						s[i].id,
-			"<a href=\"/dolphin/search/details/experiments/"+s[i].id+'/'+theSearch+"\">"+s[i].name+"</a>",
-			s[i].facility,
-			s[i].total_reads,
-			s[i].total_samples,
-			"<input type=\"checkbox\" class=\"ngs_checkbox\" name=\""+s[i].id+"\" id=\"lane_checkbox_"+s[i].id+"\" onClick=\"manageChecklists(this.name, 'lane_checkbox');\">",
+						"<a href=\"/dolphin/search/details/experiments/"+s[i].id+'/'+theSearch+"\">"+s[i].name+"</a>",
+						s[i].facility,
+						s[i].total_reads,
+						s[i].total_samples,
+						"<input type=\"checkbox\" class=\"ngs_checkbox\" name=\""+s[i].id+"\" id=\"lane_checkbox_"+s[i].id+"\" onClick=\"manageChecklists(this.name, 'lane_checkbox');\">",
 						]);
-						} // End For
-					}
+					} // End For
+				}
 			});
 
 	$('.daterange_lanes').daterangepicker(

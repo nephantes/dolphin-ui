@@ -537,17 +537,19 @@ class Ngsimport extends VanillaModel {
 				if($this->sheetData[3][$j]=="file name(comma separated for paired ends)"){$file->file_name=$this->esc($this->sheetData[$i][$j]);$file->file_name=preg_replace('/\s/', '', $file->file_name);}
 				if($this->sheetData[3][$j]=="file checksum"){$file->checksum=$this->esc($this->sheetData[$i][$j]);}
 				
-				
 				if($this->sheetData[3][$j]=="Sample or Lane Name (Enter same name for multiple files)"){
-					if(in_array($file->name, $this->lane_arr) && $this->pairedEndCheck == null){
-						array_push($this->initialSubmission, 'yes');
-						$this->laneArrayCheck = 'yes';
+					if(isset($this->lane_arr[$file->name]) && $this->laneArrayCheck == null){
+						array_push($this->initialSubmission, 'lane');
+						$this->laneArrayCheck = 'lane';
+					}else if(isset($this->sample_arr[$file->name]) && $this->laneArrayCheck == null){
+						array_push($this->initialSubmission, 'sample');
+						$this->laneArrayCheck = 'sample';
 					}
 				}
 				if($this->sheetData[3][$j]=="file name(comma separated for paired ends)" && $this->pairedEndCheck == null){
-					if (strpos($file->file_name, '.') !== FALSE){
-						array_push($this->initialSubmission, 'yes');
-						$this->pairedEndCheck = 'yes';
+					if (strpos($file->file_name, ',') !== false){
+						array_push($this->initialSubmission, 'paired');
+						$this->pairedEndCheck = 'paired';
 					}
 				}
 			}
