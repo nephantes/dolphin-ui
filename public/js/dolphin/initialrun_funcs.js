@@ -81,13 +81,18 @@ $(function() {
 			outdir = initial_split[1] + '/initial_run';
 			
 			json = '{"genomebuild":"' + organismSelect(initial_split[2]) + '"';
-			if (initial_split[3] == 'yes') {
+			if (initial_split[4] == 'yes') {
 				json = json + ',"spaired":"paired"';
 			}else{
 				json = json + ',"spaired":"no"';
 			}
-			json = json + ',"resume":"no","fastqc":"yes","barcodes":"distance,1:format,5 end read 1",';
-			json = json + '"adapters":"' + initial_split[4] + '"';
+			json = json + ',"resume":"no","fastqc":"yes",';
+			if (initial_split[3] != null) {
+				json = json + '"barcodes":"distance,1:format,5 end read 1",';
+			}else{
+				json = json + '"barcodes":"none",';
+			}
+			json = json + '"adapters":"none"';
 			json = json + ',"quality":"none","quality":"none",';
 			json = json + '"trim":"none","split":"none","commonind":"none"}'
 			

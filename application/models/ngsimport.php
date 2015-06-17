@@ -14,6 +14,7 @@ class Ngsimport extends VanillaModel {
 	
 	public $organismCheck;
 	public $pairedEndCheck;
+	public $laneArrayCheck;
 	public $barcode;
 	public $namesList;
 	public $initialSubmission = [];
@@ -536,6 +537,13 @@ class Ngsimport extends VanillaModel {
 				if($this->sheetData[3][$j]=="file name(comma separated for paired ends)"){$file->file_name=$this->esc($this->sheetData[$i][$j]);$file->file_name=preg_replace('/\s/', '', $file->file_name);}
 				if($this->sheetData[3][$j]=="file checksum"){$file->checksum=$this->esc($this->sheetData[$i][$j]);}
 				
+				
+				if($this->sheetData[3][$j]=="Sample or Lane Name (Enter same name for multiple files)"){
+					if(in_array($file->name, $this->lane_arr) && $this->pairedEndCheck == null){
+						array_push($this->initialSubmission, 'yes');
+						$this->laneArrayCheck = 'yes';
+					}
+				}
 				if($this->sheetData[3][$j]=="file name(comma separated for paired ends)" && $this->pairedEndCheck == null){
 					if (strpos($file->file_name, '.') !== FALSE){
 						array_push($this->initialSubmission, 'yes');
@@ -583,7 +591,7 @@ class Ngsimport extends VanillaModel {
 	
 	function processFiles(){
 		$text = "";
-		//echo json_encode($file_arr);
+		//echo json_encode($this->file_arr);
 		$new_files = new files($this, $this->file_arr, $this->samples);
 		$text.="FILES:".$new_files->getStat();
 		//var_dump($sheetData);
@@ -1042,16 +1050,15 @@ class files extends main{
 		return $this->model->query($sql,1);
 	}
 	function getLaneIdFromSample($name){
+		echo $name;
 		$lane_name=$this->sample_arr[$name]->lane_name;
 		$sql="SELECT id FROM biocore.ngs_lanes where name='$lane_name' and `series_id`='".$this->model->series_id."'";
-
 		return $this->model->query($sql,1);
 	}
 	function getSampleId($name)
 	{
 		$lane_id=$this->getLaneIdFromSample($name);
 		$sql="select id from biocore.ngs_samples where `name`='$name' and `lane_id`='$lane_id' and `series_id`='".$this->model->series_id."'";
-
 		return $this->model->query($sql,1);
 	}
 	function getDirId($model)
@@ -1062,7 +1069,9 @@ class files extends main{
 
 	function getId($file)
 	{
-		$this->sample_id = $this->getSampleId($file->name);
+		if(in_array($file->name, $this->sample_arr)){
+			$this->sample_id = $this->getSampleId($file->name);
+		}
 		$this->lane_id = ($this->sample_id==0 ? $this->getLaneId($file->name) : $this->getLaneIdFromSample($file->name));
 	$this->dir_id = $this->getDirId($this->model);
 		if ($this->sample_id>0)
@@ -1083,7 +1092,6 @@ class files extends main{
 
 	function insert($file)
 	{
-
 		$sql="INSERT INTO `biocore`.`$this->tablename`
 			(`file_name`,
 			`$this->fieldname`, `dir_id`,
@@ -1100,7 +1108,6 @@ class files extends main{
 
 	function update($file)
 	{
-
 		$sql="update `biocore`.`$this->tablename` set
 			`fieldname`='$this->value', `dir_id`='$this->dir_id',
 			`group_id`='".$this->model->gid."', `perms`='".$this->model->sid."',
