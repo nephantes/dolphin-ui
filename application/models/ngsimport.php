@@ -1082,15 +1082,20 @@ class files extends main{
 			$this->tablename="ngs_temp_sample_files";
 			$this->fieldname="sample_id";
 		$this->value=$this->sample_id;
+		
+		$sql="select id from `biocore`.`$this->tablename` where `file_name`='$file->file_name' and `sample_id`='$this->sample_id'";
+		return $this->model->query($sql,1);
 		}
 	else
 	{
 			$this->tablename="ngs_temp_lane_files";
 			$this->fieldname="lane_id";
 		$this->value=$this->lane_id;
-	}
-		$sql="select id from `biocore`.`$this->tablename` where `file_name`='$file->file_name' and `sample_id`='$this->sample_id'";
+		
+		$sql="select id from `biocore`.`$this->tablename` where `file_name`='$file->file_name' and `lane_id`='$this->lane_id'";
 		return $this->model->query($sql,1);
+	}
+		
 	}
 
 	function insert($file)
