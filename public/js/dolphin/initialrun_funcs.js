@@ -101,7 +101,7 @@ $(function() {
 			json = json + '"trim":"none","split":"none","commonind":"none"}'
 			
 			var names_list = initialNameList.split(",");
-			sample_lane = initial_split[5].substring(1, initial_split[5].length).split(' ').toString();
+			sample_lane = initial_split[5];
 			
 		}
 		

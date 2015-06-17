@@ -43,6 +43,20 @@ class Ngsimport extends VanillaModel {
 	//	Sheet Check bools
 	public $final_check;
 	
+	function num2alpha($n){
+		for($r = ""; $n >= 0; $n = intval($n / 26) - 1){
+			$r = chr($n%26 + 0x41) . $r;
+		}
+		return $r;
+	}
+	
+	function columnNumber($col){
+		$col = str_pad($col,2,'0',STR_PAD_LEFT);
+		$i = ($col{0} == '0') ? 0 : (ord($col{0}) - 64) * 26;
+		$i += ord($col{1}) - 64;
+		return $i;
+	}
+	
 	function getGroup($username) {
         $groups = json_decode($this->query("select g.id from user_group ug, users u, groups g where ug.u_id=u.id and ug.g_id=g.id and username='$username'"), true);
         $group_str='';
@@ -263,7 +277,6 @@ class Ngsimport extends VanillaModel {
 				if($this->sheetData[3][$j]=="Cost"){$lane->cost=$this->esc($this->sheetData[$i][$j]);}
 				if($this->sheetData[3][$j]=="Date submitted"){$lane->date_submitted=$this->esc($this->sheetData[$i][$j]);}
 				if($this->sheetData[3][$j]=="Date received"){$lane->date_received=$this->esc($this->sheetData[$i][$j]);}
-				if($this->sheetData[3][$j]=="Total reads"){$lane->total_reads=$this->esc($this->sheetData[$i][$j]);}
 				if($this->sheetData[3][$j]=="% PhiX requested"){$lane->phix_requested=$this->esc($this->sheetData[$i][$j]);}
 				if($this->sheetData[3][$j]=="% PhiX in lane"){$lane->phix_in_lane=$this->esc($this->sheetData[$i][$j]);}
 				if($this->sheetData[3][$j]=="# of Samples"){$lane->total_samples=$this->esc($this->sheetData[$i][$j]);}
@@ -342,7 +355,6 @@ class Ngsimport extends VanillaModel {
 			{
 				if($this->sheetData[3][$j]=="protocol name"){$prot->name= $this->esc($this->sheetData[$i][$j]);}
 				if($this->sheetData[3][$j]=="growth protocol"){$prot->growth= $this->esc($this->sheetData[$i][$j]);}
-				if($this->sheetData[3][$j]=="treatment protocol"){$prot->treatment= $this->esc($this->sheetData[$i][$j]);}
 				if($this->sheetData[3][$j]=="extract protocol"){$prot->extraction= $this->esc($this->sheetData[$i][$j]);}
 				if($this->sheetData[3][$j]=="library construction protocol"){$prot->library_construction= $this->esc($this->sheetData[$i][$j]);}
 				if($this->sheetData[3][$j]=="library strategy"){$prot->library_strategy= $this->esc($this->sheetData[$i][$j]);}
@@ -361,7 +373,7 @@ class Ngsimport extends VanillaModel {
 			}
 			
 			//	Other Values
-			if($prot->growth == null || !isset($prot->treatment) || $prot->extraction == null || $prot->library_construction == null || $prot->library_strategy == null){
+			if($prot->growth == null || $prot->extraction == null || $prot->library_construction == null || $prot->library_strategy == null){
 				$prot_warning_check = true;
 			}
 		}
@@ -397,8 +409,9 @@ class Ngsimport extends VanillaModel {
 			 */
 			$samp = new sample();
 			$tag = new tag();
-			for ($j='A';$j<=$this->worksheet['lastColumnLetter'];$j++)
+			for ($k=0;$k!=$this->columnNumber($this->worksheet['lastColumnLetter']);$k++)
 			{
+				$j = $this->num2alpha($k);
 				if($this->sheetData[3][$j]=="Sample name"){$samp->name=$this->esc($this->sheetData[$i][$j]);}
 				if($this->sheetData[3][$j]=="Lane name"){$samp->lane_name=$this->esc($this->sheetData[$i][$j]);}
 				if($this->sheetData[3][$j]=="Protocol name"){$samp->protocol_name=$this->esc($this->sheetData[$i][$j]);}
@@ -413,7 +426,6 @@ class Ngsimport extends VanillaModel {
 				if($this->sheetData[3][$j]=="read length"){$samp->read_length=$this->esc($this->sheetData[$i][$j]);}
 				if($this->sheetData[3][$j]=="Genotype"){$samp->genotype=$this->esc($this->sheetData[$i][$j]);}
 				if($this->sheetData[3][$j]=="Condition"){$samp->condition=$this->esc($this->sheetData[$i][$j]);}
-				if($this->sheetData[3][$j]=="Library type"){$samp->library_type=$this->esc($this->sheetData[$i][$j]);}
 				if($this->sheetData[3][$j]=="3' Adapter sequence"){$samp->adapter=$this->esc($this->sheetData[$i][$j]);}
 				if($this->sheetData[3][$j]=="Notebook reference"){$samp->notebook_ref=$this->esc($this->sheetData[$i][$j]);}
 				if($this->sheetData[3][$j]=="Notes"){$samp->notes=$this->esc($this->sheetData[$i][$j]);}
@@ -426,8 +438,8 @@ class Ngsimport extends VanillaModel {
 					}
 				}
 				if($this->sheetData[3][$j]=="Lane name"){
-					if (!strpos($this->laneList, $samp->lane_name) !== false){
-						$this->laneList .= " " . $samp->lane_name;
+					if ($this->laneList == null){
+						$this->laneList = $samp->lane_name;
 					}
 				}
 				if($this->sheetData[3][$j]=="organism" && $this->organismCheck == null){
@@ -756,13 +768,13 @@ class lanes extends main{
 	function insert($lane)
 	{
 		$sql="insert into `biocore`.`ngs_lanes`(`series_id`, `name`, `lane_id`, `facility`, `cost`,
-					`date_submitted`, `date_received`, `total_reads`, `phix_requested`,
+					`date_submitted`, `date_received`, `phix_requested`,
 					`phix_in_lane`, `total_samples`, `resequenced`, `notes`,
 			`owner_id`, `group_id`, `perms`, `date_created`,
 					`date_modified`, `last_modified_user`)
 			values('".$this->model->series_id."','$lane->name','$lane->lane_id', '$lane->facility','$lane->cost',
 					".$this->correct_date($lane->date_submitted).",".$this->correct_date($lane->date_received).",
-			'$lane->total_reads','$lane->phix_requested',
+			'$lane->phix_requested',
 					'$lane->phix_in_lane','$lane->total_samples',
 			".$this->correct_bool($lane->resequenced).",'$lane->notes',
 			'".$this->model->uid."', '".$this->model->gid."', '".$this->model->sid."',
@@ -783,7 +795,6 @@ class lanes extends main{
 				`cost` = '$lane->cost',
 				`date_submitted` = ".$this->correct_date($lane->date_submitted).",
 				`date_received` = ".$this->correct_date($lane->date_received).",
-				`total_reads` = '$lane->total_reads',
 				`phix_requested` = '$lane->phix_requested',
 				`phix_in_lane` = '$lane->phix_in_lane',
 				`total_samples` = '$lane->total_samples',
@@ -827,11 +838,11 @@ class protocols extends main{
 	}
 	function insert($prot)
 	{
-		$sql="insert into biocore.ngs_protocols(`name`, `growth`, `treatment`,
+		$sql="insert into biocore.ngs_protocols(`name`, `growth`,
 				`extraction`, `library_construction`, `library_strategy`,
 		`owner_id`, `group_id`, `perms`,
 				`date_created`, `date_modified`, `last_modified_user`)
-			values('$prot->name', '$prot->growth', '$prot->treatment',
+			values('$prot->name', '$prot->growth',
 				'$prot->extraction', '$prot->library_construction', '$prot->library_strategy',
 		'".$this->model->uid."', '".$this->model->gid."', '".$this->model->sid."',
 				now(), now(), '".$this->model->uid."');";
@@ -841,7 +852,7 @@ class protocols extends main{
 
 	function update($prot)
 	{
-		$sql="update biocore.ngs_protocols set `growth`='$prot->growth',`treatment`='$prot->treatment',
+		$sql="update biocore.ngs_protocols set `growth`='$prot->growth',
 			`extraction`='$prot->extraction', `library_construction`='$prot->library_construction',
 			`library_strategy`='$prot->library_strategy',
 		`owner_id`='".$this->model->uid."', `group_id`='".$this->model->gid."', `perms`='".$this->model->sid."',
@@ -906,7 +917,7 @@ class samples extends main{
 			`name`, `barcode`, `title`, `source`, `organism`,
 			`molecule`, `description`, `instrument_model`,
 			`avg_insert_size`, `read_length`, `genotype`,
-			`condition`, `library_type`, `adapter`,
+			`condition`, `adapter`,
 			`notebook_ref`, `notes`,
 		`owner_id`, `group_id`, `perms`, `date_created`,
 			`date_modified`, `last_modified_user`)
@@ -916,7 +927,7 @@ class samples extends main{
 			'$sample->name', '$sample->barcode', '$sample->title', '$sample->source', '$sample->organism',
 			'$sample->molecule', '$sample->description', '$sample->instrument_model',
 			'$sample->avg_insert_size', '$sample->read_length', '$sample->genotype',
-			'$sample->condition', '$sample->library_type', '$sample->adapter',
+			'$sample->condition', '$sample->adapter',
 			'$sample->notebook_ref', '$sample->notes',
 		'".$this->model->uid."', '".$this->model->gid."', '".$this->model->sid."',
 		 now(), now(), '".$this->model->uid."');";
@@ -946,7 +957,6 @@ class samples extends main{
 			`read_length` = '$sample->read_length',
 			`genotype` = '$sample->genotype',
 			`condition` = '$sample->condition',
-			`library_type` = '$sample->library_type',
 			`adapter` = '$sample->adapter',
 			`notebook_ref` = '$sample->notebook_ref',
 			`notes` = '$sample->notes',
