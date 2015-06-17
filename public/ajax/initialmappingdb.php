@@ -20,6 +20,15 @@ if ($p == 'sampleChecking')
 	WHERE sample_id = $sample_id
 	");
 }
+else if ($p == 'getCounts')
+{
+	if (isset($_GET['samples'])){$samples = $_GET['samples'];}
+	$data=$query->queryTable("
+	SELECT total_reads
+	FROM ngs_fastq_files
+	WHERE sample_id in ( $samples )
+	");
+}
 
 header('Cache-Control: no-cache, must-revalidate');
 header('Expires: Mon, 26 Jul 1997 05:00:00 GMT');
