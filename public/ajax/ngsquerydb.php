@@ -523,6 +523,8 @@ else if ($p == 'checkAmazonPermissions')
 else if($p == 'getSamplesFromName')
 {
     if (isset($_GET['names'])){$names = $_GET['names'];}
+    if (isset($_GET['lane'])){$lane = $_GET['lane'];}
+    if (isset($_GET['experiment'])){$experiment = $_GET['experiment'];}
     $names = explode(",", $names);
     $sqlnames = "";
     foreach($names as $n){
@@ -535,7 +537,9 @@ else if($p == 'getSamplesFromName')
     $data=$query->queryTable("
     SELECT id
     FROM ngs_samples
-    WHERE name in (".$sqlnames.") ;
+    WHERE name in (".$sqlnames.")
+    AND lane_id IN (SELECT id FROM ngs_lanes WHERE name = '.$lane.')
+    AND series_id IN (SELECT id FROM ngs_experiment_series WHERE name = '.$experiment.';
     ");
 }
 

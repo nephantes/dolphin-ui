@@ -17,6 +17,7 @@ class Ngsimport extends VanillaModel {
 	public $laneArrayCheck;
 	public $barcode;
 	public $namesList;
+	public $laneList;
 	public $initialSubmission = [];
 	
 	//	Variable Classes
@@ -109,8 +110,9 @@ class Ngsimport extends VanillaModel {
 			$text.=$this->processFiles();
 			$text.=$this->successText("<BR><BR>Excel import successful!<BR>");
 		}
-		array_push($this->initialSubmission, $this->barcode);
-		
+		if(!isset($this->initialSubmission[5])){
+			array_push($this->initialSubmission, $this->laneList);
+		}
 		$text.="<script type='text/javascript'>";
 		$text.="var initialSubmission = '" . implode(",", $this->initialSubmission) . "';";
 		$text.="var initialNameList = '" . $this->namesList . "';";
@@ -256,7 +258,7 @@ class Ngsimport extends VanillaModel {
 			for ($j='A';$j<=$this->worksheet['lastColumnLetter'];$j++)
 			{
 				if($this->sheetData[3][$j]=="Lane name"){$lane->name=$this->esc($this->sheetData[$i][$j]);}
-				if($this->sheetData[3][$j]=="Lane id"){$lane->lane_id=$this->esc($this->sheetData[$i][$j]);}
+				if($this->sheetData[3][$j]=="Sequencing id"){$lane->lane_id=$this->esc($this->sheetData[$i][$j]);}
 				if($this->sheetData[3][$j]=="Sequencing facility"){$lane->facility=$this->esc($this->sheetData[$i][$j]);}
 				if($this->sheetData[3][$j]=="Cost"){$lane->cost=$this->esc($this->sheetData[$i][$j]);}
 				if($this->sheetData[3][$j]=="Date submitted"){$lane->date_submitted=$this->esc($this->sheetData[$i][$j]);}
@@ -359,7 +361,7 @@ class Ngsimport extends VanillaModel {
 			}
 			
 			//	Other Values
-			if($prot->growth == null || $prot->treatment == null || $prot->extraction == null || $prot->library_construction == null || $prot->library_strategy == null){
+			if($prot->growth == null || !isset($prot->treatment) || $prot->extraction == null || $prot->library_construction == null || $prot->library_strategy == null){
 				$prot_warning_check = true;
 			}
 		}
@@ -423,11 +425,9 @@ class Ngsimport extends VanillaModel {
 						$this->namesList .= "," . $samp->name;
 					}
 				}
-				if($this->sheetData[3][$j]=="barcode"){
-					if($this->barcode == null){
-						$this->barcode = $this->esc($this->sheetData[$i][$j]);
-					}else{
-						$this->barcode .= "__cr____cn__". $this->esc($this->sheetData[$i][$j]);	
+				if($this->sheetData[3][$j]=="Lane name"){
+					if (!strpos($this->laneList, $samp->lane_name) !== false){
+						$this->laneList .= " " . $samp->lane_name;
 					}
 				}
 				if($this->sheetData[3][$j]=="organism" && $this->organismCheck == null){
@@ -493,7 +493,7 @@ class Ngsimport extends VanillaModel {
 			//	Barcode
 			
 			//	Other Values
-			if($samp->title == null || $samp->source == null || $samp->organism == null || $samp->molecule == null || $samp->description == null || $samp->instrument_model == null
+			if(!isset($samp->title) || $samp->source == null || $samp->organism == null || $samp->molecule == null || $samp->description == null || $samp->instrument_model == null
 				|| $samp->avg_insert_size == null || $samp->read_length == null || $samp->genotype == null || $samp->condition == null || $samp->adapter == null || $samp->notebook_ref == null
 				|| $samp->notes == null){
 				$samp_warning_check = true;

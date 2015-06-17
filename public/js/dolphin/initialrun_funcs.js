@@ -37,6 +37,8 @@ $(function() {
 		var outdir;
 		var runname;
 		var rundesc;
+		var sample_lane;
+		var experiment_series;
 		
 		//	Create the Json object
 		if (window.location.href.split("/")[window.location.href.split("/").length - 2] == 'fastlane') {
@@ -73,13 +75,15 @@ $(function() {
 				}
 			}
 			
-			
+			sample_lane = initial_split[5];
+			experiment_series = initial_split[4];
 			
 		}else{
 			runname = 'Import Initial Run';
 			rundesc = 'Import Initial Run within series: ' + initial_split[0];
 			outdir = initial_split[1] + '/initial_run';
-			console.log(initial_split);
+			experiment_series = initial_split[0];
+			
 			json = '{"genomebuild":"' + organismSelect(initial_split[2]) + '"';
 			if (initial_split[4] == 'paired') {
 				json = json + ',"spaired":"paired"';
@@ -97,6 +101,8 @@ $(function() {
 			json = json + '"trim":"none","split":"none","commonind":"none"}'
 			
 			var names_list = initialNameList.split(",");
+			sample_lane = initial_split[5].substring(1, initial_split[5].length).split(' ').toString();
+			
 		}
 		
 		if (json != undefined & outdir != undefined && runname != undefined && rundesc != undefined) {
@@ -104,10 +110,12 @@ $(function() {
 			var runparamsInsert = postInsertRunparams(json, outdir, runname, rundesc);
 			
 			names_to_ids = [];
+			console.log(sample_lane);
+			console.log(experiment_series);
 			$.ajax({
 				type: 	'GET',
 				url: 	'/dolphin/public/ajax/ngsquerydb.php',
-				data:  	{ p: 'getSamplesFromName', names: names_list.toString() },
+				data:  	{ p: 'getSamplesFromName', names: names_list.toString(), lane: sample_lane, experiment: experiment_series },
 				async:	false,
 				success: function(s)
 				{
