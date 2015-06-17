@@ -1050,16 +1050,21 @@ class files extends main{
 		return $this->model->query($sql,1);
 	}
 	function getLaneIdFromSample($name){
-		echo $name;
 		$lane_name=$this->sample_arr[$name]->lane_name;
 		$sql="SELECT id FROM biocore.ngs_lanes where name='$lane_name' and `series_id`='".$this->model->series_id."'";
 		return $this->model->query($sql,1);
 	}
 	function getSampleId($name)
 	{
-		$lane_id=$this->getLaneIdFromSample($name);
-		$sql="select id from biocore.ngs_samples where `name`='$name' and `lane_id`='$lane_id' and `series_id`='".$this->model->series_id."'";
-		return $this->model->query($sql,1);
+		$testsql="select id from biocore.ngs_lanes where `name`='$name' and `series_id`='".$this->model->series_id."'";
+		$laneresult = $this->model->query($testsql,1);
+		if($laneresult == '[]'){
+			$lane_id=$this->getLaneIdFromSample($name);
+			$sql="select id from biocore.ngs_samples where `name`='$name' and `lane_id`='$lane_id' and `series_id`='".$this->model->series_id."'";
+			return $this->model->query($sql,1);
+		}else{
+			return 0;
+		}
 	}
 	function getDirId($model)
 	{
@@ -1069,11 +1074,9 @@ class files extends main{
 
 	function getId($file)
 	{
-		if(in_array($file->name, $this->sample_arr)){
-			$this->sample_id = $this->getSampleId($file->name);
-		}
+		$this->sample_id = $this->getSampleId($file->name);
 		$this->lane_id = ($this->sample_id==0 ? $this->getLaneId($file->name) : $this->getLaneIdFromSample($file->name));
-	$this->dir_id = $this->getDirId($this->model);
+		$this->dir_id = $this->getDirId($this->model);
 		if ($this->sample_id>0)
 		{
 			$this->tablename="ngs_temp_sample_files";
