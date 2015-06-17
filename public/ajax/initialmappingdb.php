@@ -18,6 +18,17 @@ if ($p == 'sampleChecking')
 	SELECT id
 	FROM ngs_fastq_files
 	WHERE sample_id = $sample_id
+	AND total_reads > 0
+	");
+}
+else if ($p == 'laneChecking')
+{
+	if (isset($_GET['lane_id'])){$lane_id = $_GET['lane_id'];}
+	$data=$query->queryTable("
+	SELECT id
+	FROM ngs_fastq_files
+	WHERE lane_id = $lane_id
+	AND total_reads > 0
 	");
 }
 else if ($p == 'getCounts')

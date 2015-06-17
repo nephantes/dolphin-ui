@@ -64,9 +64,9 @@ class FastlaneController extends VanillaController {
 					$database_sample_bool = true;
 				}
 			}else if($index != 'true' && $index != 'false'){
-				$text.= "Sample created with id #".$index."<br>";
-				$text.='<h4>We are currently processing your samples to obtain read counts and additional information.<br>
-                            You can check the status of these initial runs on your NGS Status page.</h4>';
+				$text.= "Sample created with id #".$index."<br><br>";
+				$text.='<div class="callout callout-info lead"><h4>We are currently processing your samples to obtain read counts and additional information.<br><br>
+                            You can check the status of these initial runs on your NGS Status page.</h4></div>';
 			}
 		}
 		if($database_sample_bool == true){
@@ -81,12 +81,12 @@ class FastlaneController extends VanillaController {
 		if($pass_fail_array[0] == "true" || $pass_fail_array == "false"){
 			$text.= '<div>
 				<input type="button" class="btn btn-primary" value="Return to Fastlane" onclick="backToFastlane()">
-				<input type="button" class="btn btn-primary" value="Send to Status" disabled="true" onclick="">
+				<input type="button" class="btn btn-primary" value="Go to Status" disabled="true" onclick="">
 				</div>';
 		}else{
 			$text.= '<div>
 				<input type="button" class="btn btn-primary" value="Return to Fastlane" onclick="sentToNewFastlane()">
-				<input type="button" class="btn btn-primary" value="Send to Status" onclick="sendToStatus()">
+				<input type="button" class="btn btn-primary" value="Go to Status" onclick="sendToStatus()">
 				</div>';
 		}
 		

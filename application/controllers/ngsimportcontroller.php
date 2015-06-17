@@ -72,10 +72,10 @@ class NgsimportController extends VanillaController {
                     }
                     $text.='</ol>';
                     
-                    $text.='<h4>We are currently processing your samples to obtain read counts and additional information.<br>
-                            You can check the status of these initial runs on your NGS Status page.</h4><br>';
+                    $text.='<div class="callout callout-info lead"><h4>We are currently processing your samples to obtain read counts and additional information.<br><br>
+                            You can check the status of these initial runs on your NGS Status page.</h4></div>';
                     $text.= '<div>
-                            <input type="button" class="btn btn-primary" value="Send to Status" onclick="sendToStatus()">
+                            <input type="button" class="btn btn-primary" value="Go to Status" onclick="sendToStatus()">
                             </div>';
                 }else{
                     $text.=$ngs->errorText("<BR><BR>Excel import aborted due to errors, see above<BR>");
