@@ -605,16 +605,28 @@ function manageChecklists(name, type){
 	{
 		//add
 		checklist_lanes.push(name);
+		var sampleBoolCheck = false;
 		var lane_samples = getLanesToSamples(name);
 		for (var x = 0; x < lane_samples.length; x++) {
-		if ( checklist_samples.indexOf( lane_samples[x] ) == -1 ){
-			checklist_samples.push(lane_samples[x]);
-			addToDolphinBasket(lane_samples[x]);
-			sendBasketInfo(lane_samples[x]);
+			$.ajax({ type: "GET",
+				url: "/dolphin/public/ajax/initialmappingdb.php",
+				data: { p: 'sampleChecking', sample_id: lane_samples[x]},
+				async: false,
+				success : function(r)
+				{
+					if (r[0] != undefined) {
+						sampleBoolCheck = true;
+						if ( checklist_samples.indexOf( lane_samples[x] ) == -1 ){
+							checklist_samples.push(lane_samples[x]);
+							addToDolphinBasket(lane_samples[x]);
+							sendBasketInfo(lane_samples[x]);
+						}
+					}
+				}
+			});
 		}
-		}
-		if (document.getElementById('clear_basket').disabled) {
-		document.getElementById('clear_basket').disabled = false;
+		if (document.getElementById('clear_basket').disabled && sampleBoolCheck) {
+			document.getElementById('clear_basket').disabled = false;
 		}
 		for(var y = 0; y < checklist_samples.length; y++){
 		if ( document.getElementById('sample_checkbox_' + checklist_samples[y]) != null) {
