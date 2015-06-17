@@ -110,6 +110,7 @@ $(function() {
 			var runparamsInsert = postInsertRunparams(json, outdir, runname, rundesc);
 			
 			names_to_ids = [];
+			console.log(names_list.toString());
 			console.log(sample_lane);
 			console.log(experiment_series);
 			$.ajax({

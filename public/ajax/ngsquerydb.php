@@ -535,11 +535,11 @@ else if($p == 'getSamplesFromName')
         }
     }
     $data=$query->queryTable("
-    SELECT id
-    FROM ngs_samples
-    WHERE name in (".$sqlnames.")
-    AND lane_id IN (SELECT id FROM ngs_lanes WHERE name = '.$lane.')
-    AND series_id IN (SELECT id FROM ngs_experiment_series WHERE name = '.$experiment.';
+    SELECT ns.id
+    FROM ngs_samples ns, ngs_lanes nl, ngs_experiment_series ne 
+    WHERE ns.name in ($sqlnames)
+    AND ns.lane_id = nl.id and nl.name = '$lane'
+    AND ns.series_id = ne.id and ne.experiment_name = '$experiment';
     ");
 }
 
