@@ -80,9 +80,7 @@ if($search != "" && !in_array($p, $pDictionary)){
 			$data=$query->queryTable("
 			SELECT id, name, title, source, organism, molecule
 			FROM biocore.ngs_samples
-			WHERE $searchQuery
-            and WHERE biocore.ngs_samples.id in (select sample_id from biocore.ngs_fastq_files where total_reads >= 1)
-            $andPerms $time
+			WHERE $searchQuery $andPerms $time
 			");
 		}
 		else if($p == "getExperimentSeries")
@@ -120,9 +118,7 @@ if($search != "" && !in_array($p, $pDictionary)){
 			SELECT id, name, title, source, organism, molecule
 			FROM biocore.ngs_samples
 			WHERE $searchQuery
-			AND biocore.ngs_samples.lane_id = $r
-            AND WHERE biocore.ngs_samples.id in (select sample_id from biocore.ngs_fastq_files where total_reads >= 1)
-            $andPerms $time
+			AND biocore.ngs_samples.lane_id = $r $andPerms $time
 			");
 		}
 		else if($p == "getSamples" && $q != "")
@@ -133,7 +129,6 @@ if($search != "" && !in_array($p, $pDictionary)){
 			SELECT id, name, title, source, organism, molecule
 			FROM biocore.ngs_samples
 			WHERE $searchQuery
-            and WHERE biocore.ngs_samples.id in (select sample_id from biocore.ngs_fastq_files where total_reads >= 1)
 			AND biocore.ngs_samples.series_id = $q $andPerms $time
 			");
 		}
@@ -184,9 +179,7 @@ else if (!in_array($p, $pDictionary))
 			$data=$query->queryTable("
 			SELECT id, name, title, source, organism, molecule
 			FROM biocore.ngs_samples
-			WHERE biocore.ngs_samples.$q = \"$r\"
-            AND WHERE biocore.ngs_samples.id in (select sample_id from biocore.ngs_fastq_files where total_reads >= 1)
-            $andPerms $time
+			WHERE biocore.ngs_samples.$q = \"$r\" $andPerms $time
 			");
 		}
 		else if($p == "getProtocols")
@@ -220,9 +213,7 @@ else if (!in_array($p, $pDictionary))
 			$data=$query->queryTable("
 			SELECT id, name, title, source, organism, molecule
 			FROM biocore.ngs_samples
-			WHERE biocore.ngs_samples.lane_id = $r
-            AND WHERE biocore.ngs_samples.id in (select sample_id from biocore.ngs_fastq_files where total_reads >= 1)
-            $andPerms $time
+			WHERE biocore.ngs_samples.lane_id = $r $andPerms $time
 			");
 		}
 		else if($p == "getSamples" && $q != "")
@@ -232,9 +223,7 @@ else if (!in_array($p, $pDictionary))
 			$data=$query->queryTable("
 			SELECT id, name, title, source, organism, molecule
 			FROM biocore.ngs_samples
-			WHERE biocore.ngs_samples.series_id = $q
-            AND WHERE biocore.ngs_samples.id in (select sample_id from biocore.ngs_fastq_files where total_reads >= 1)
-            $andPerms $time
+			WHERE biocore.ngs_samples.series_id = $q $andPerms $time
 			");
 		}
 		//index
@@ -272,9 +261,7 @@ else if (!in_array($p, $pDictionary))
 			if (isset($start)){$time="and `date_created`>='$start' and `date_created`<='$end'";}
 			$data=$query->queryTable("
 			SELECT id, name, title, source, organism, molecule
-			FROM biocore.ngs_samples
-            WHERE biocore.ngs_samples.id in (select sample_id from biocore.ngs_fastq_files where total_reads >= 1)
-            $andPerms $time
+			FROM biocore.ngs_samples $perms $time
 			");
 		}
 	}
