@@ -52,10 +52,6 @@ function backToFastlane(){
 	window.history.back();
 }
 
-function sentToNewFastlane() {
-	window.location.href = "/dolphin/fastlane";
-}
-
 function fastlaneToPipeline(sample_ids){
 	window.location.href = "/dolphin/pipeline/selected/" + sample_ids + "$";
 }

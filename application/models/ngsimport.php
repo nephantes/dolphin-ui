@@ -163,6 +163,9 @@ class Ngsimport extends VanillaModel {
 			if($this->sheetData[$i]["A"]=="title"){$this->experiment_name=$this->esc($this->sheetData[$i]["B"]);}
 			if($this->sheetData[$i]["A"]=="summary"){$this->summary=$this->esc($this->sheetData[$i]["B"]);}
 			if($this->sheetData[$i]["A"]=="overall design"){$this->design=$this->esc($this->sheetData[$i]["B"]);}
+			if($this->sheetData[$i]["A"]=="organization"){$this->organization=$this->esc($this->sheetData[$i]["B"]);}
+			if($this->sheetData[$i]["A"]=="lab"){$this->lab=$this->esc($this->sheetData[$i]["B"]);}
+			if($this->sheetData[$i]["A"]=="grant"){$this->grant=$this->esc($this->sheetData[$i]["B"]);}
 			if($this->sheetData[$i]["A"]=="contributor"){array_push($this->conts, $this->esc($this->sheetData[$i]["B"]));}
 			if($this->sheetData[$i]["A"]=="fastq directory"){$this->fastq_dir=$this->esc($this->sheetData[$i]["B"]);}
 			if($this->sheetData[$i]["A"]=="backup directory"){$this->backup_dir=$this->esc($this->sheetData[$i]["B"]);}
@@ -206,6 +209,20 @@ class Ngsimport extends VanillaModel {
 			$meta_check = false;
 		}
 		
+		//	Organization
+		if(!isset($this->organization)){
+			$text.= $this->errorText("organization is required for submission");
+			$this->final_check = false;
+			$meta_check = false;
+		}
+		
+		//	Lab
+		if(!isset($this->lab)){
+			$text.= $this->errorText("lab is required for submission");
+			$this->final_check = false;
+			$meta_check = false;
+		}
+		
 		//	Contributors
 		if($this->conts == []){
 			$text.= $this->warningText("No contributors specified, please make sure to add them later if desired");
@@ -244,7 +261,8 @@ class Ngsimport extends VanillaModel {
 	
 	function processMeta(){
 		$text = "";
-		$new_series = new series($this, $this->experiment_name,$this->summary,$this->design);
+		$new_series = new series($this, $this->experiment_name,$this->summary,$this->design,
+								$this->organization, $this->lab, $this->grant);
 		$this->series_id=$new_series->getId();
 		$text.="SERIES:".$new_series->getStat()."<BR>";
 		$new_conts = new contributors($this, $this->conts);
@@ -315,8 +333,11 @@ class Ngsimport extends VanillaModel {
 			}
 			
 			//	Other Values
-			if($lane->facility == null || $lane->cost == null || $lane->date_submitted ==  null || $lane->date_received == null || $lane->total_reads == null || $lane->phix_requested == null
-				|| $lane->phix_in_lane == null || $lane->total_samples == null || $lane->resequenced == null || $lane->notes == null){
+			if($lane->facility == null || $lane->cost == null ||
+				$lane->date_submitted ==  null || $lane->date_received == null ||
+				$lane->total_reads == null || $lane->phix_requested == null ||
+				$lane->phix_in_lane == null || $lane->total_samples == null ||
+				$lane->resequenced == null || $lane->notes == null){
 				$lane_warning_check = true;
 			}
 		}
@@ -357,6 +378,9 @@ class Ngsimport extends VanillaModel {
 				if($this->sheetData[3][$j]=="growth protocol"){$prot->growth= $this->esc($this->sheetData[$i][$j]);}
 				if($this->sheetData[3][$j]=="extract protocol"){$prot->extraction= $this->esc($this->sheetData[$i][$j]);}
 				if($this->sheetData[3][$j]=="library construction protocol"){$prot->library_construction= $this->esc($this->sheetData[$i][$j]);}
+				if($this->sheetData[3][$j]=="crosslinking method"){$prot->crosslinking_method=$this->esc($this->sheetData[$i][$j]);}
+				if($this->sheetData[3][$j]=="fragmentation method"){$prot->fragmentation_method=$this->esc($this->sheetData[$i][$j]);}
+				if($this->sheetData[3][$j]=="strand-specific"){$prot->strand_specific=$this->esc($this->sheetData[$i][$j]);}
 				if($this->sheetData[3][$j]=="library strategy"){$prot->library_strategy= $this->esc($this->sheetData[$i][$j]);}
 			}
 			
@@ -373,7 +397,9 @@ class Ngsimport extends VanillaModel {
 			}
 			
 			//	Other Values
-			if($prot->growth == null || $prot->extraction == null || $prot->library_construction == null || $prot->library_strategy == null){
+			if($prot->growth == null || $prot->extraction == null || $prot->library_construction == null ||
+				$prot->library_strategy == null || $prot->crosslinking_method == null ||
+				$prot->fragmentation_method == null || $prot->strand_specific == null){
 				$prot_warning_check = true;
 			}
 		}
@@ -417,15 +443,26 @@ class Ngsimport extends VanillaModel {
 				if($this->sheetData[3][$j]=="Protocol name"){$samp->protocol_name=$this->esc($this->sheetData[$i][$j]);}
 				if($this->sheetData[3][$j]=="barcode"){$samp->barcode=$this->esc($this->sheetData[$i][$j]);}
 				if($this->sheetData[3][$j]=="title"){$samp->title=$this->esc($this->sheetData[$i][$j]);}
+				if($this->sheetData[3][$j]=="batch id"){$samp->batch=$this->esc($this->sheetData[$i][$j]);}
+				if($this->sheetData[3][$j]=="source symbol"){$samp->source_symbol=$this->esc($this->sheetData[$i][$j]);}
 				if($this->sheetData[3][$j]=="source name"){$samp->source=$this->esc($this->sheetData[$i][$j]);}
 				if($this->sheetData[3][$j]=="organism"){$samp->organism=$this->esc($this->sheetData[$i][$j]);}
+				if($this->sheetData[3][$j]=="biosample type"){$samp->biosample_type=$this->esc($this->sheetData[$i][$j]);}
 				if($this->sheetData[3][$j]=="molecule"){$samp->molecule=$this->esc($this->sheetData[$i][$j]);}
 				if($this->sheetData[3][$j]=="description"){$samp->description=$this->esc($this->sheetData[$i][$j]);}
 				if($this->sheetData[3][$j]=="instrument model"){$samp->instrument_model=$this->esc($this->sheetData[$i][$j]);}
 				if($this->sheetData[3][$j]=="average insert size"){$samp->avg_insert_size=$this->esc($this->sheetData[$i][$j]);}
 				if($this->sheetData[3][$j]=="read length"){$samp->read_length=$this->esc($this->sheetData[$i][$j]);}
 				if($this->sheetData[3][$j]=="Genotype"){$samp->genotype=$this->esc($this->sheetData[$i][$j]);}
+				if($this->sheetData[3][$j]=="Condition Symbol"){$samp->condition_symbol=$this->esc($this->sheetData[$i][$j]);}
 				if($this->sheetData[3][$j]=="Condition"){$samp->condition=$this->esc($this->sheetData[$i][$j]);}
+				if($this->sheetData[3][$j]=="concentration"){$samp->concentration=$this->esc($this->sheetData[$i][$j]);}
+				if($this->sheetData[3][$j]=="treatment manufacturer"){$samp->treatment_manufacturer=$this->esc($this->sheetData[$i][$j]);}
+				if($this->sheetData[3][$j]=="Donor"){$samp->donor=$this->esc($this->sheetData[$i][$j]);}
+				if($this->sheetData[3][$j]=="Time"){$samp->time=$this->esc($this->sheetData[$i][$j]);}
+				if($this->sheetData[3][$j]=="Biological Replica"){$samp->biological_replica=$this->esc($this->sheetData[$i][$j]);}
+				if($this->sheetData[3][$j]=="Technical Replica"){$samp->technical_replica=$this->esc($this->sheetData[$i][$j]);}
+				if($this->sheetData[3][$j]=="spikeIns"){$samp->spikeins=$this->esc($this->sheetData[$i][$j]);}
 				if($this->sheetData[3][$j]=="3' Adapter sequence"){$samp->adapter=$this->esc($this->sheetData[$i][$j]);}
 				if($this->sheetData[3][$j]=="Notebook reference"){$samp->notebook_ref=$this->esc($this->sheetData[$i][$j]);}
 				if($this->sheetData[3][$j]=="Notes"){$samp->notes=$this->esc($this->sheetData[$i][$j]);}
@@ -501,13 +538,23 @@ class Ngsimport extends VanillaModel {
 			}
 			
 			//	Protocol Name
-			
+			if(!isset($this->prot_arr[$samp->protocol_name])){
+				$text.= $this->errorText("Protocol name does not match any protocol given in the excel file (row " . $i . ")");
+					$this->final_check = false;
+					$samp_check = false;
+			}
 			//	Barcode
 			
 			//	Other Values
-			if(!isset($samp->title) || $samp->source == null || $samp->organism == null || $samp->molecule == null || $samp->description == null || $samp->instrument_model == null
-				|| $samp->avg_insert_size == null || $samp->read_length == null || $samp->genotype == null || $samp->condition == null || $samp->adapter == null || $samp->notebook_ref == null
-				|| $samp->notes == null){
+			if(!isset($samp->title) ||
+				$samp->source == null || $samp->organism == null || $samp->condition_symbol == null ||
+				$samp->batch == null || $samp->source_symbol == null || $samp->biosample_type == null ||
+				$samp->molecule == null || $samp->description == null || $samp->instrument_model == null ||
+				$samp->avg_insert_size == null || $samp->read_length == null || $samp->genotype == null ||
+				$samp->condition == null || $samp->adapter == null || $samp->notebook_ref == null ||
+				$samp->notes == null || $samp->concentration == null || $samp->treatment_manufacturer == null ||
+				$samp->donor == null || $samp->time == null || $samp->biological_replica == null ||
+				$samp->technical_replica == null || $samp->spikeins == null){
 				$samp_warning_check = true;
 			}
 		}
@@ -648,13 +695,18 @@ class series extends main{
 	private $experiment_name;
 	private $summary;
 	private $design;
+	private $organization;
+	private $lab;
+	private $grant;
 
-
-	function __construct($model, $experiment_name, $summary, $design)
+	function __construct($model, $experiment_name, $summary, $design, $organization, $lab, $grant)
 	{
 		$this->experiment_name=$experiment_name;
 		$this->summary=$summary;
 		$this->design=$design;
+		$this->organization=$organization;
+		$this->lab=$lab;
+		$this->grant=$grant;
 		$this->model = $model;
 		$this->process($this);
 	}
@@ -672,10 +724,12 @@ class series extends main{
 	{
 
 		$sql="insert into biocore.ngs_experiment_series(`experiment_name`, `summary`, `design`,
-		`owner_id`, `group_id`, `perms`, `date_created`, `date_modified`, `last_modified_user`)
+			`organization`, `lab`, `grant`, `owner_id`, `group_id`, `perms`, `date_created`,
+			`date_modified`, `last_modified_user`)
 			values('$this->experiment_name', '$this->summary', '$this->design',
-		'".$this->model->uid."', '".$this->model->gid."', '".$this->model->sid."',
-		now(), now(), '".$this->model->uid."');";
+			'$this->organization', '$this->lab', '$this->grant',
+			'".$this->model->uid."', '".$this->model->gid."', '".$this->model->sid."',
+			now(), now(), '".$this->model->uid."');";
 
 		$this->insert++;
 		return $this->model->query($sql);
@@ -683,9 +737,16 @@ class series extends main{
 
 	function update()
 	{
-		$sql="update biocore.ngs_experiment_series set `summary`='$this->summary', `design`='$this->design',
-	`group_id`='".$this->model->gid."', `perms`='".$this->model->sid."',
-	`date_modified`=now(), `last_modified_user`='".$this->model->uid."' where `id` = ".$this->getId();
+		$sql="update biocore.ngs_experiment_series set
+			`summary`='$this->summary',
+			`design`='$this->design',
+			`organization`='$this->organization',
+			`lab`='$this->lab',
+			`grant`='$this->grant',
+			`group_id`='".$this->model->gid."',
+			`perms`='".$this->model->sid."',
+			`date_modified`=now(),
+			`last_modified_user`='".$this->model->uid."' where `id` = ".$this->getId();
 		$this->update++;
 		//return $sql;
 		return $this->model->query($sql);
@@ -838,26 +899,40 @@ class protocols extends main{
 	}
 	function insert($prot)
 	{
-		$sql="insert into biocore.ngs_protocols(`name`, `growth`,
-				`extraction`, `library_construction`, `library_strategy`,
-		`owner_id`, `group_id`, `perms`,
+		$sql="insert into biocore.ngs_protocols(
+				`name`, `growth`,
+				`extraction`, `library_construction`, `crosslinking_method`,
+				`fragmentation_method`, `strand_specific`, `library_strategy`,
+				`owner_id`, `group_id`, `perms`,
 				`date_created`, `date_modified`, `last_modified_user`)
-			values('$prot->name', '$prot->growth',
-				'$prot->extraction', '$prot->library_construction', '$prot->library_strategy',
-		'".$this->model->uid."', '".$this->model->gid."', '".$this->model->sid."',
+				values
+				('$prot->name', '$prot->growth',
+				'$prot->extraction', '$prot->library_construction', '$prot->crosslinking_method',
+				'$prot->fragmentation_method', '$prot->strand_specific', '$prot->library_strategy',
+				'".$this->model->uid."', '".$this->model->gid."', '".$this->model->sid."',
 				now(), now(), '".$this->model->uid."');";
+				echo $sql . ' <br>';
 		$this->insert++;
 		return $this->model->query($sql);
 	}
 
 	function update($prot)
 	{
-		$sql="update biocore.ngs_protocols set `growth`='$prot->growth',
-			`extraction`='$prot->extraction', `library_construction`='$prot->library_construction',
+		$sql="update biocore.ngs_protocols set
+			`growth`='$prot->growth',
+			`extraction`='$prot->extraction',
+			`library_construction`='$prot->library_construction',
+			`crosslinking_method`='$prot->crosslinking_method',
+			`fragmentation_method`='$prot->fragmentation_method',
+			`strand_specific`='$prot->strand_specific',
 			`library_strategy`='$prot->library_strategy',
-		`owner_id`='".$this->model->uid."', `group_id`='".$this->model->gid."', `perms`='".$this->model->sid."',
-		`group_id`='".$this->model->gid."', `perms`='".$this->model->sid."',
-		`date_modified`=now(), `last_modified_user`='".$this->model->uid."'
+			`owner_id`='".$this->model->uid."',
+			`group_id`='".$this->model->gid."',
+			`perms`='".$this->model->sid."',
+			`group_id`='".$this->model->gid."',
+			`perms`='".$this->model->sid."',
+			`date_modified`=now(),
+			`last_modified_user`='".$this->model->uid."'
 			where `id` = ".$this->getId($prot);
 		$this->update++;
 
@@ -914,23 +989,31 @@ class samples extends main{
 
 		$sql="INSERT INTO `biocore`.`ngs_samples`
 			(`series_id`, `protocol_id`, `lane_id`,
-			`name`, `barcode`, `title`, `source`, `organism`,
+			`name`, `barcode`, `title`, `batch_id`,
+			`source_symbol`, `source`, `organism`,
+			`biosample_type`, `condition_symbol`, `concentration`,
 			`molecule`, `description`, `instrument_model`,
 			`avg_insert_size`, `read_length`, `genotype`,
-			`condition`, `adapter`,
-			`notebook_ref`, `notes`,
-		`owner_id`, `group_id`, `perms`, `date_created`,
+			`condition`, `adapter`, `treatment_manufacturer`,
+			`donor`, `time`, `biological_replica`,
+			`spike_ins`,
+			`technical_replica`, `notebook_ref`, `notes`,
+			`owner_id`, `group_id`, `perms`, `date_created`,
 			`date_modified`, `last_modified_user`)
 			VALUES
 			(
 			'".$this->model->series_id."', '$protocol_id', '$lane_id',
-			'$sample->name', '$sample->barcode', '$sample->title', '$sample->source', '$sample->organism',
+			'$sample->name', '$sample->barcode', '$sample->title',
+			'$sample->batch', '$sample->source_symbol', '$sample->source', '$sample->organism',
+			'$sample->biosample_type', '$sample->condition_symbol', '$sample->concentration',
 			'$sample->molecule', '$sample->description', '$sample->instrument_model',
 			'$sample->avg_insert_size', '$sample->read_length', '$sample->genotype',
-			'$sample->condition', '$sample->adapter',
-			'$sample->notebook_ref', '$sample->notes',
-		'".$this->model->uid."', '".$this->model->gid."', '".$this->model->sid."',
-		 now(), now(), '".$this->model->uid."');";
+			'$sample->condition', '$sample->adapter', '$sample->treatment_manufacturer',
+			'$sample->donor', '$sample->time', '$sample->biological_replica',
+			'$sample->spikeins',
+			'$sample->technical_replica', '$sample->notebook_ref', '$sample->notes',
+			'".$this->model->uid."', '".$this->model->gid."', '".$this->model->sid."',
+			now(), now(), '".$this->model->uid."');";
 		$this->insert++;
 		
 		return $this->model->query($sql);
@@ -948,8 +1031,13 @@ class samples extends main{
 			`name` = '$sample->name',
 			`barcode` = '$sample->barcode',
 			`title` = '$sample->title',
+			`batch_id` = '$sample->batch',
+			`source_symbol` = '$sample->source_symbol',
 			`source` = '$sample->source',
 			`organism` = '$sample->organism',
+			`biosample_type` = '$sample->biosample_type',
+			`condition_symbol` = '$sample->condition_symbol',
+			`concentration` = '$sample->concentration',
 			`molecule` = '$sample->molecule',
 			`description` = '$sample->description',
 			`instrument_model` = '$sample->instrument_model',
@@ -958,12 +1046,18 @@ class samples extends main{
 			`genotype` = '$sample->genotype',
 			`condition` = '$sample->condition',
 			`adapter` = '$sample->adapter',
+			`treatment_manufacturer` = '$sample->treatment_manufacturer',
+			`donor` = '$sample->donor',
+			`time` = '$sample->time',
+			`biological_replica` = '$sample->biological_replica',
+			`spike_ins` = '$sample->spikeins',
+			`technical_replica` = '$sample->technical_replica',
 			`notebook_ref` = '$sample->notebook_ref',
 			`notes` = '$sample->notes',
-		`group_id`='".$this->model->gid."',
-		`perms`='".$this->model->sid."',
-		`date_modified`=now(),
-		`last_modified_user`='".$this->model->uid."'
+			`group_id`='".$this->model->gid."',
+			`perms`='".$this->model->sid."',
+			`date_modified`=now(),
+			`last_modified_user`='".$this->model->uid."'
 			where `id` = ".$this->getId($sample);
 		$this->update++;
 
