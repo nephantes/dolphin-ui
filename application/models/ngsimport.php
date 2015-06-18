@@ -210,17 +210,19 @@ class Ngsimport extends VanillaModel {
 		}
 		
 		//	Organization
+		
 		if(!isset($this->organization)){
-			$text.= $this->errorText("organization is required for submission");
-			$this->final_check = false;
-			$meta_check = false;
+			$this->organization = NULL;
 		}
 		
 		//	Lab
 		if(!isset($this->lab)){
-			$text.= $this->errorText("lab is required for submission");
-			$this->final_check = false;
-			$meta_check = false;
+			$this->lab = NULL;
+		}
+		
+		//	Grant
+		if(!isset($this->grant)){
+			$this->grant = NULL;
 		}
 		
 		//	Contributors
@@ -290,7 +292,11 @@ class Ngsimport extends VanillaModel {
 			for ($j='A';$j<=$this->worksheet['lastColumnLetter'];$j++)
 			{
 				if($this->sheetData[3][$j]=="Lane name"){$lane->name=$this->esc($this->sheetData[$i][$j]);}
-				if($this->sheetData[3][$j]=="Sequencing id"){$lane->lane_id=$this->esc($this->sheetData[$i][$j]);}
+				if($this->sheetData[3][$j]=="Sequencing id"){
+					$lane->lane_id=$this->esc($this->sheetData[$i][$j]);
+				}elseif($this->sheetData[3][$j]=="Lane id"){
+					$lane->lane_id=$this->esc($this->sheetData[$i][$j]);
+				}
 				if($this->sheetData[3][$j]=="Sequencing facility"){$lane->facility=$this->esc($this->sheetData[$i][$j]);}
 				if($this->sheetData[3][$j]=="Cost"){$lane->cost=$this->esc($this->sheetData[$i][$j]);}
 				if($this->sheetData[3][$j]=="Date submitted"){$lane->date_submitted=$this->esc($this->sheetData[$i][$j]);}
@@ -396,9 +402,24 @@ class Ngsimport extends VanillaModel {
 				$prot_check = false;
 			}
 			
+			//	Crosslinking Method
+			if(!isset($prot->crosslinking_method)){
+				$prot->crosslinking_method = NULL;
+			}
+			
+			//	Fragmentation Method
+			if(!isset($prot->fragmentation_method)){
+				$prot->fragmentation_method = NULL;
+			}
+			
+			//	Strand Specific
+			if(!isset($prot->strand_specific)){
+				$prot->strand_specific = NULL;
+			}
+			
 			//	Other Values
 			if($prot->growth == null || $prot->extraction == null || $prot->library_construction == null ||
-				$prot->library_strategy == null || $prot->crosslinking_method == null ||
+				$prot->library_strategy == null || !isset($prot->crosslinking_method) ||
 				$prot->fragmentation_method == null || $prot->strand_specific == null){
 				$prot_warning_check = true;
 			}
@@ -543,11 +564,65 @@ class Ngsimport extends VanillaModel {
 					$this->final_check = false;
 					$samp_check = false;
 			}
-			//	Barcode
+			
+			//	Batch ID
+			if(!isset($samp->batch)){
+				$samp->batch = NULL;
+			}
+			
+			//	Source Symbol
+			if(!isset($samp->source_symbol)){
+				$samp->source_symbol = NULL;
+			}
+			
+			//	Condition Symbol
+			if(!isset($samp->condition_symbol)){
+				$samp->condition_symbol = NULL;
+			}
+			
+			//	Concentration
+			if(!isset($samp->concentration)){
+				$samp->concentration = NULL;
+			}
+			
+			//	Treatment Manufacturer
+			if(!isset($samp->treatment_manufacturer)){
+				$samp->treatment_manufacturer = NULL;
+			}
+			
+			//	Biosample Type
+			if(!isset($samp->biosample_type)){
+				$samp->biosample_type = NULL;
+			}
+			
+			//	Donor
+			if(!isset($samp->donor)){
+				$samp->donor = NULL;
+			}
+			
+			//	Time
+			if(!isset($samp->time)){
+				$samp->time = NULL;
+			}
+			
+			//	Biological Replica
+			if(!isset($samp->biological_replica)){
+				$samp->biological_replica = NULL;
+			}
+			
+			//	Technical Replica
+			if(!isset($samp->technical_replica)){
+				$samp->technical_replica = NULL;
+			}
+			
+			//	Spikeins
+			if(!isset($samp->spikeins)){
+				$samp->spikeins = NULL;
+			}
 			
 			//	Other Values
 			if(!isset($samp->title) ||
-				$samp->source == null || $samp->organism == null || $samp->condition_symbol == null ||
+				$samp->source == null || $samp->organism == null || !isset($samp->condition_symbol) ||
 				$samp->batch == null || $samp->source_symbol == null || $samp->biosample_type == null ||
 				$samp->molecule == null || $samp->description == null || $samp->instrument_model == null ||
 				$samp->avg_insert_size == null || $samp->read_length == null || $samp->genotype == null ||
