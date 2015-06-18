@@ -344,14 +344,12 @@ function submitPipeline(type) {
 		document.getElementById('errorAreas').innerHTML = empty_values.join(", ");
 	}else{
 		//Expanding
-		var doBarcode = findRadioChecked("barcodes");
 		var doAdapter = findRadioChecked("adapter");
 		var doQuality = findRadioChecked("quality");
 		var doTrimming = findRadioChecked("trim");
 		var doRNA = findRNAChecked(rnaList);
 		var doSplit = findRadioChecked("split");
 	
-		var barcode = findAdditionalInfoValues(doBarcode, ["distance", "format"]);
 		var adapter = findAdditionalInfoValues(doAdapter, ["adapter"]);
 
 		var adapterCheck = false;
@@ -389,17 +387,21 @@ function submitPipeline(type) {
 	
 		//expanding
 		//barcode
+		/*
 		if (doBarcode == "yes") {
 			json = json + ',"barcodes":"distance,' + barcode[0] + ':format,' + barcode[1] + '"';
 			previous = 'barcodes';
 		}else{
-			json = json + ',"barcodes":"none"';
-		}
+		*/
+		json = json + ',"barcodes":"none"';
+
 		//adapter
 		if (doAdapter == "yes") {
 			previous = 'adapter';
+			json = json + ',"adapter":"' + adapter[0].toUpperCase().replace(/\r\n|\r|\n/g, "__cr____cn__").replace(/U/g, 'T') + '"';
+		}else{
+			json = json + ',"adapter":"none"';	
 		}
-		json = json + ',"adapter":"' + adapter[0].toUpperCase().replace(/\r\n|\r|\n/g, "__cr____cn__").replace(/U/g, 'T') + '"';
 		//quality
 		if (doQuality == "yes") {
 			json = json + ',"quality":"' + quality[0] + ':' + quality[1] + ':' + quality[2] + ':' + quality[3] + ':' + quality[4] + '"';
@@ -603,16 +605,28 @@ function manageChecklists(name, type){
 	{
 		//add
 		checklist_lanes.push(name);
+		var sampleBoolCheck = false;
 		var lane_samples = getLanesToSamples(name);
 		for (var x = 0; x < lane_samples.length; x++) {
-		if ( checklist_samples.indexOf( lane_samples[x] ) == -1 ){
-			checklist_samples.push(lane_samples[x]);
-			addToDolphinBasket(lane_samples[x]);
-			sendBasketInfo(lane_samples[x]);
+			$.ajax({ type: "GET",
+				url: "/dolphin/public/ajax/initialmappingdb.php",
+				data: { p: 'sampleChecking', sample_id: lane_samples[x]},
+				async: false,
+				success : function(r)
+				{
+					if (r[0] != undefined) {
+						sampleBoolCheck = true;
+						if ( checklist_samples.indexOf( lane_samples[x] ) == -1 ){
+							checklist_samples.push(lane_samples[x]);
+							addToDolphinBasket(lane_samples[x]);
+							sendBasketInfo(lane_samples[x]);
+						}
+					}
+				}
+			});
 		}
-		}
-		if (document.getElementById('clear_basket').disabled) {
-		document.getElementById('clear_basket').disabled = false;
+		if (document.getElementById('clear_basket').disabled && sampleBoolCheck) {
+			document.getElementById('clear_basket').disabled = false;
 		}
 		for(var y = 0; y < checklist_samples.length; y++){
 		if ( document.getElementById('sample_checkbox_' + checklist_samples[y]) != null) {

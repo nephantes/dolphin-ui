@@ -1,4 +1,6 @@
 		<section class="content">
+			<?php echo $html->sendJScript("excel import", "", "", "", $uid, $gids); ?>
+			<?php echo $html->getBasePath(BASE_PATH, API_PATH); ?>
 					<div class="row">
 						<!-- left column -->
 						<div class="col-md-6">

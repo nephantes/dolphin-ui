@@ -490,10 +490,6 @@ $(function() {
 		document.getElementById('tablerow').appendChild(createElement('th', ['id'], [summary_rna_type[z]]));
 		document.getElementById(summary_rna_type[z]).innerHTML = summary_rna_type[z];
 	}
-	document.getElementById('tablerow').appendChild(createElement('th', ['id'], ['unused']));
-	document.getElementById('unused').innerHTML = 'Reads Left';
-	document.getElementById('tablerow').appendChild(createElement('th', ['id'], ['selection']));
-	document.getElementById('selection').innerHTML = 'Selected';
 	
 	console.log(samples.toString());
 	$.ajax({ type: "GET",
@@ -508,7 +504,27 @@ $(function() {
 			}
 	});
 	
+	var read_counts = [];
+	
+	$.ajax({ type: "GET",
+			url: "/dolphin/public/ajax/initialmappingdb.php",
+			data: { p: 'getCounts', samples: samples.toString() },
+			async: false,
+			success : function(s)
+			{
+				for(var x  = 0; x < s.length; x++){
+					read_counts.push(s[x].total_reads);
+				}
+			}
+	});
+	
+	console.log(read_counts);
+	
 	if (summary_files.length > 0) {
+		document.getElementById('tablerow').appendChild(createElement('th', ['id'], ['unused']));
+		document.getElementById('unused').innerHTML = 'Reads Left';
+		document.getElementById('tablerow').appendChild(createElement('th', ['id'], ['selection']));
+		document.getElementById('selection').innerHTML = 'Selected';
 		for (var z = 0; z < summary_files.length; z++) {
 			if (z == 0){
 				if (summary_files.length == 1) {
@@ -557,6 +573,13 @@ $(function() {
 			reports_table.fnAddData(row_array);
 		}
 		createDropdown(summary_rna_type, 'initial_mapping');
+	}else if (read_counts.length > 0) {
+		var reports_table = $('#jsontable_initial_mapping').dataTable();
+		reports_table.fnClearTable();
+		for(var y = 0; y < read_counts.length; y++){
+			reports_table.fnAddData([libraries[y], numberWithCommas(read_counts[y])]);
+		}
+		document.getElementById('send_to_plots').disabled = true;
 	}else{
 		document.getElementById('initial_mapping_exp').remove();
 	}

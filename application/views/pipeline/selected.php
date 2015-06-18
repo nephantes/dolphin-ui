@@ -64,18 +64,13 @@
 																			<option>no</option>", 4)?>
 
 			<?php echo $html->startExpandingSelectionBox(6)?>
-						<?php echo $html->getExpandingSelectionBox("Barcode Separation", "barcodes", 2, 12, ["distance","format"], [[1,2,3,4,5],[
-																	"5 end read 1","3 end read 2 (or 3 end on single end)","barcode is in header (illumina casava)",
-																	"no barcode on read 1 of a pair (read 2 must have on 5 end)",
-																	"paired end both reads 5 end"]])?>
 						<?php echo $html->getExpandingSelectionBox("Adapter Removal", "adapter", 1, 12, ["adapter"], [["TEXTBOX"]])?>
-
+			<?php echo $html->getExpandingSelectionBox("Split FastQ", "split", 1, 12, ["number of reads per file"], [["TEXT","5000000"]])?>
 			<?php echo $html->getExpandingSelectionBox("Custom Sequence Set", "custom", 1, 12, ["Add new Custom Sequence Set"], [["BUTTON"]])?>
 			<?php echo $html->getExpandingSelectionBox("Additional Pipelines", "pipeline", 1, 12, ["Add a Pipeline"], [["BUTTON"]])?>
 			<?php echo $html->endExpandingSelectionBox()?>
 
 			<?php echo $html->startExpandingSelectionBox(6)?>
-						<?php echo $html->getExpandingSelectionBox("Split FastQ", "split", 1, 12, ["number of reads per file"], [["TEXT","5000000"]])?>
 						<?php echo $html->getExpandingSelectionBox("Quality Filtering", "quality", 5, 12, ["window size","required quality","leading","trailing","minlen"],
 																	[["TEXT","10"],["TEXT","15"],["TEXT","5"],["TEXT","5"],["TEXT","36"]])?>
 						<?php echo $html->getExpandingSelectionBox("Trimming", "trim", 3, 12, ["single or paired-end", "5 length 1", "3 length 1"],

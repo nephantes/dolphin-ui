@@ -12,6 +12,14 @@ class Ngsimport extends VanillaModel {
 	public $amazon_bucket;
 	public $samples=[];
 	
+	public $organismCheck;
+	public $pairedEndCheck;
+	public $laneArrayCheck;
+	public $barcode;
+	public $namesList;
+	public $laneList;
+	public $initialSubmission = [];
+	
 	//	Variable Classes
 	//	METADATA
 	public $experiment_name;
@@ -34,6 +42,29 @@ class Ngsimport extends VanillaModel {
 	
 	//	Sheet Check bools
 	public $final_check;
+	
+	function num2alpha($n){
+		for($r = ""; $n >= 0; $n = intval($n / 26) - 1){
+			$r = chr($n%26 + 0x41) . $r;
+		}
+		return $r;
+	}
+	
+	function columnNumber($col){
+		$col = str_pad($col,2,'0',STR_PAD_LEFT);
+		$i = ($col{0} == '0') ? 0 : (ord($col{0}) - 64) * 26;
+		$i += ord($col{1}) - 64;
+		return $i;
+	}
+	
+	function getGroup($username) {
+        $groups = json_decode($this->query("select g.id from user_group ug, users u, groups g where ug.u_id=u.id and ug.g_id=g.id and username='$username'"), true);
+        $group_str='';
+        foreach ($groups as $group):
+            $group_str.=$group['id'].",";
+        endforeach;
+        return rtrim($group_str, ",");
+    }
 	
 	function parseExcel($gid, $sid, $worksheet, $sheetData, $passed_final_check) {
 		$this->worksheet=$worksheet;
@@ -77,7 +108,9 @@ class Ngsimport extends VanillaModel {
 	function finalizeExcel($worksheet, $sheetData){
 		$this->worksheet=$worksheet;
 		$this->sheetData=$sheetData;
+		
 		$text = "";
+		
 		$text='<li>'.$this->worksheet['worksheetName'].'<br />';
 		if ( $this->worksheet['worksheetName']=="METADATA"){
 			$text.=$this->processMeta();
@@ -91,6 +124,14 @@ class Ngsimport extends VanillaModel {
 			$text.=$this->processFiles();
 			$text.=$this->successText("<BR><BR>Excel import successful!<BR>");
 		}
+		if(!isset($this->initialSubmission[5])){
+			array_push($this->initialSubmission, $this->laneList);
+		}
+		$text.="<script type='text/javascript'>";
+		$text.="var initialSubmission = '" . implode(",", $this->initialSubmission) . "';";
+		$text.="var initialNameList = '" . $this->namesList . "';";
+		$text.="</script>";
+		
 		return $text;
 	}
 	
@@ -126,6 +167,13 @@ class Ngsimport extends VanillaModel {
 			if($this->sheetData[$i]["A"]=="fastq directory"){$this->fastq_dir=$this->esc($this->sheetData[$i]["B"]);}
 			if($this->sheetData[$i]["A"]=="backup directory"){$this->backup_dir=$this->esc($this->sheetData[$i]["B"]);}
 			if($this->sheetData[$i]["A"]=="amazon bucket"){$this->amazon_bucket=$this->esc($this->sheetData[$i]["B"]);}
+			
+			if($this->sheetData[$i]["A"]=="title"){
+				array_push($this->initialSubmission, $this->esc($this->sheetData[$i]["B"]));
+			}
+			if($this->sheetData[$i]["A"]=="backup directory"){
+					array_push($this->initialSubmission, $this->esc($this->sheetData[$i]["B"]));
+			}
 		}
 		
 		/*
@@ -224,12 +272,11 @@ class Ngsimport extends VanillaModel {
 			for ($j='A';$j<=$this->worksheet['lastColumnLetter'];$j++)
 			{
 				if($this->sheetData[3][$j]=="Lane name"){$lane->name=$this->esc($this->sheetData[$i][$j]);}
-				if($this->sheetData[3][$j]=="Lane id"){$lane->lane_id=$this->esc($this->sheetData[$i][$j]);}
+				if($this->sheetData[3][$j]=="Sequencing id"){$lane->lane_id=$this->esc($this->sheetData[$i][$j]);}
 				if($this->sheetData[3][$j]=="Sequencing facility"){$lane->facility=$this->esc($this->sheetData[$i][$j]);}
 				if($this->sheetData[3][$j]=="Cost"){$lane->cost=$this->esc($this->sheetData[$i][$j]);}
 				if($this->sheetData[3][$j]=="Date submitted"){$lane->date_submitted=$this->esc($this->sheetData[$i][$j]);}
 				if($this->sheetData[3][$j]=="Date received"){$lane->date_received=$this->esc($this->sheetData[$i][$j]);}
-				if($this->sheetData[3][$j]=="Total reads"){$lane->total_reads=$this->esc($this->sheetData[$i][$j]);}
 				if($this->sheetData[3][$j]=="% PhiX requested"){$lane->phix_requested=$this->esc($this->sheetData[$i][$j]);}
 				if($this->sheetData[3][$j]=="% PhiX in lane"){$lane->phix_in_lane=$this->esc($this->sheetData[$i][$j]);}
 				if($this->sheetData[3][$j]=="# of Samples"){$lane->total_samples=$this->esc($this->sheetData[$i][$j]);}
@@ -308,7 +355,6 @@ class Ngsimport extends VanillaModel {
 			{
 				if($this->sheetData[3][$j]=="protocol name"){$prot->name= $this->esc($this->sheetData[$i][$j]);}
 				if($this->sheetData[3][$j]=="growth protocol"){$prot->growth= $this->esc($this->sheetData[$i][$j]);}
-				if($this->sheetData[3][$j]=="treatment protocol"){$prot->treatment= $this->esc($this->sheetData[$i][$j]);}
 				if($this->sheetData[3][$j]=="extract protocol"){$prot->extraction= $this->esc($this->sheetData[$i][$j]);}
 				if($this->sheetData[3][$j]=="library construction protocol"){$prot->library_construction= $this->esc($this->sheetData[$i][$j]);}
 				if($this->sheetData[3][$j]=="library strategy"){$prot->library_strategy= $this->esc($this->sheetData[$i][$j]);}
@@ -327,7 +373,7 @@ class Ngsimport extends VanillaModel {
 			}
 			
 			//	Other Values
-			if($prot->growth == null || $prot->treatment == null || $prot->extraction == null || $prot->library_construction == null || $prot->library_strategy == null){
+			if($prot->growth == null || $prot->extraction == null || $prot->library_construction == null || $prot->library_strategy == null){
 				$prot_warning_check = true;
 			}
 		}
@@ -363,8 +409,9 @@ class Ngsimport extends VanillaModel {
 			 */
 			$samp = new sample();
 			$tag = new tag();
-			for ($j='A';$j<=$this->worksheet['lastColumnLetter'];$j++)
+			for ($k=0;$k!=$this->columnNumber($this->worksheet['lastColumnLetter']);$k++)
 			{
+				$j = $this->num2alpha($k);
 				if($this->sheetData[3][$j]=="Sample name"){$samp->name=$this->esc($this->sheetData[$i][$j]);}
 				if($this->sheetData[3][$j]=="Lane name"){$samp->lane_name=$this->esc($this->sheetData[$i][$j]);}
 				if($this->sheetData[3][$j]=="Protocol name"){$samp->protocol_name=$this->esc($this->sheetData[$i][$j]);}
@@ -379,10 +426,26 @@ class Ngsimport extends VanillaModel {
 				if($this->sheetData[3][$j]=="read length"){$samp->read_length=$this->esc($this->sheetData[$i][$j]);}
 				if($this->sheetData[3][$j]=="Genotype"){$samp->genotype=$this->esc($this->sheetData[$i][$j]);}
 				if($this->sheetData[3][$j]=="Condition"){$samp->condition=$this->esc($this->sheetData[$i][$j]);}
-				if($this->sheetData[3][$j]=="Library type"){$samp->library_type=$this->esc($this->sheetData[$i][$j]);}
 				if($this->sheetData[3][$j]=="3' Adapter sequence"){$samp->adapter=$this->esc($this->sheetData[$i][$j]);}
 				if($this->sheetData[3][$j]=="Notebook reference"){$samp->notebook_ref=$this->esc($this->sheetData[$i][$j]);}
 				if($this->sheetData[3][$j]=="Notes"){$samp->notes=$this->esc($this->sheetData[$i][$j]);}
+	
+				if($this->sheetData[3][$j]=="Sample name"){
+					if($this->namesList == null){
+						$this->namesList = $samp->name;
+					}else{
+						$this->namesList .= "," . $samp->name;
+					}
+				}
+				if($this->sheetData[3][$j]=="Lane name"){
+					if ($this->laneList == null){
+						$this->laneList = $samp->lane_name;
+					}
+				}
+				if($this->sheetData[3][$j]=="organism" && $this->organismCheck == null){
+					array_push($this->initialSubmission, $this->esc($this->sheetData[$i][$j]));
+					$this->organismCheck = 'check';
+				}
 	
 				$valid = "/^characteristics:\s+?(.*)/";
 	
@@ -442,7 +505,7 @@ class Ngsimport extends VanillaModel {
 			//	Barcode
 			
 			//	Other Values
-			if($samp->title == null || $samp->source == null || $samp->organism == null || $samp->molecule == null || $samp->description == null || $samp->instrument_model == null
+			if(!isset($samp->title) || $samp->source == null || $samp->organism == null || $samp->molecule == null || $samp->description == null || $samp->instrument_model == null
 				|| $samp->avg_insert_size == null || $samp->read_length == null || $samp->genotype == null || $samp->condition == null || $samp->adapter == null || $samp->notebook_ref == null
 				|| $samp->notes == null){
 				$samp_warning_check = true;
@@ -485,6 +548,22 @@ class Ngsimport extends VanillaModel {
 				if($this->sheetData[3][$j]=="Sample or Lane Name (Enter same name for multiple files)"){$file->name=$this->esc($this->sheetData[$i][$j]);}
 				if($this->sheetData[3][$j]=="file name(comma separated for paired ends)"){$file->file_name=$this->esc($this->sheetData[$i][$j]);$file->file_name=preg_replace('/\s/', '', $file->file_name);}
 				if($this->sheetData[3][$j]=="file checksum"){$file->checksum=$this->esc($this->sheetData[$i][$j]);}
+				
+				if($this->sheetData[3][$j]=="Sample or Lane Name (Enter same name for multiple files)"){
+					if(isset($this->lane_arr[$file->name]) && $this->laneArrayCheck == null){
+						array_push($this->initialSubmission, 'lane');
+						$this->laneArrayCheck = 'lane';
+					}else if(isset($this->sample_arr[$file->name]) && $this->laneArrayCheck == null){
+						array_push($this->initialSubmission, 'sample');
+						$this->laneArrayCheck = 'sample';
+					}
+				}
+				if($this->sheetData[3][$j]=="file name(comma separated for paired ends)" && $this->pairedEndCheck == null){
+					if (strpos($file->file_name, ',') !== false){
+						array_push($this->initialSubmission, 'paired');
+						$this->pairedEndCheck = 'paired';
+					}
+				}
 			}
 			
 			/*
@@ -526,7 +605,7 @@ class Ngsimport extends VanillaModel {
 	
 	function processFiles(){
 		$text = "";
-		//echo json_encode($file_arr);
+		//echo json_encode($this->file_arr);
 		$new_files = new files($this, $this->file_arr, $this->samples);
 		$text.="FILES:".$new_files->getStat();
 		//var_dump($sheetData);
@@ -689,13 +768,13 @@ class lanes extends main{
 	function insert($lane)
 	{
 		$sql="insert into `biocore`.`ngs_lanes`(`series_id`, `name`, `lane_id`, `facility`, `cost`,
-					`date_submitted`, `date_received`, `total_reads`, `phix_requested`,
+					`date_submitted`, `date_received`, `phix_requested`,
 					`phix_in_lane`, `total_samples`, `resequenced`, `notes`,
 			`owner_id`, `group_id`, `perms`, `date_created`,
 					`date_modified`, `last_modified_user`)
 			values('".$this->model->series_id."','$lane->name','$lane->lane_id', '$lane->facility','$lane->cost',
 					".$this->correct_date($lane->date_submitted).",".$this->correct_date($lane->date_received).",
-			'$lane->total_reads','$lane->phix_requested',
+			'$lane->phix_requested',
 					'$lane->phix_in_lane','$lane->total_samples',
 			".$this->correct_bool($lane->resequenced).",'$lane->notes',
 			'".$this->model->uid."', '".$this->model->gid."', '".$this->model->sid."',
@@ -716,7 +795,6 @@ class lanes extends main{
 				`cost` = '$lane->cost',
 				`date_submitted` = ".$this->correct_date($lane->date_submitted).",
 				`date_received` = ".$this->correct_date($lane->date_received).",
-				`total_reads` = '$lane->total_reads',
 				`phix_requested` = '$lane->phix_requested',
 				`phix_in_lane` = '$lane->phix_in_lane',
 				`total_samples` = '$lane->total_samples',
@@ -760,11 +838,11 @@ class protocols extends main{
 	}
 	function insert($prot)
 	{
-		$sql="insert into biocore.ngs_protocols(`name`, `growth`, `treatment`,
+		$sql="insert into biocore.ngs_protocols(`name`, `growth`,
 				`extraction`, `library_construction`, `library_strategy`,
 		`owner_id`, `group_id`, `perms`,
 				`date_created`, `date_modified`, `last_modified_user`)
-			values('$prot->name', '$prot->growth', '$prot->treatment',
+			values('$prot->name', '$prot->growth',
 				'$prot->extraction', '$prot->library_construction', '$prot->library_strategy',
 		'".$this->model->uid."', '".$this->model->gid."', '".$this->model->sid."',
 				now(), now(), '".$this->model->uid."');";
@@ -774,7 +852,7 @@ class protocols extends main{
 
 	function update($prot)
 	{
-		$sql="update biocore.ngs_protocols set `growth`='$prot->growth',`treatment`='$prot->treatment',
+		$sql="update biocore.ngs_protocols set `growth`='$prot->growth',
 			`extraction`='$prot->extraction', `library_construction`='$prot->library_construction',
 			`library_strategy`='$prot->library_strategy',
 		`owner_id`='".$this->model->uid."', `group_id`='".$this->model->gid."', `perms`='".$this->model->sid."',
@@ -839,7 +917,7 @@ class samples extends main{
 			`name`, `barcode`, `title`, `source`, `organism`,
 			`molecule`, `description`, `instrument_model`,
 			`avg_insert_size`, `read_length`, `genotype`,
-			`condition`, `library_type`, `adapter`,
+			`condition`, `adapter`,
 			`notebook_ref`, `notes`,
 		`owner_id`, `group_id`, `perms`, `date_created`,
 			`date_modified`, `last_modified_user`)
@@ -849,7 +927,7 @@ class samples extends main{
 			'$sample->name', '$sample->barcode', '$sample->title', '$sample->source', '$sample->organism',
 			'$sample->molecule', '$sample->description', '$sample->instrument_model',
 			'$sample->avg_insert_size', '$sample->read_length', '$sample->genotype',
-			'$sample->condition', '$sample->library_type', '$sample->adapter',
+			'$sample->condition', '$sample->adapter',
 			'$sample->notebook_ref', '$sample->notes',
 		'".$this->model->uid."', '".$this->model->gid."', '".$this->model->sid."',
 		 now(), now(), '".$this->model->uid."');";
@@ -879,7 +957,6 @@ class samples extends main{
 			`read_length` = '$sample->read_length',
 			`genotype` = '$sample->genotype',
 			`condition` = '$sample->condition',
-			`library_type` = '$sample->library_type',
 			`adapter` = '$sample->adapter',
 			`notebook_ref` = '$sample->notebook_ref',
 			`notes` = '$sample->notes',
@@ -987,15 +1064,19 @@ class files extends main{
 	function getLaneIdFromSample($name){
 		$lane_name=$this->sample_arr[$name]->lane_name;
 		$sql="SELECT id FROM biocore.ngs_lanes where name='$lane_name' and `series_id`='".$this->model->series_id."'";
-
 		return $this->model->query($sql,1);
 	}
 	function getSampleId($name)
 	{
-		$lane_id=$this->getLaneIdFromSample($name);
-		$sql="select id from biocore.ngs_samples where `name`='$name' and `lane_id`='$lane_id' and `series_id`='".$this->model->series_id."'";
-
-		return $this->model->query($sql,1);
+		$testsql="select id from biocore.ngs_lanes where `name`='$name' and `series_id`='".$this->model->series_id."'";
+		$laneresult = $this->model->query($testsql,1);
+		if($laneresult == '[]'){
+			$lane_id=$this->getLaneIdFromSample($name);
+			$sql="select id from biocore.ngs_samples where `name`='$name' and `lane_id`='$lane_id' and `series_id`='".$this->model->series_id."'";
+			return $this->model->query($sql,1);
+		}else{
+			return 0;
+		}
 	}
 	function getDirId($model)
 	{
@@ -1007,26 +1088,30 @@ class files extends main{
 	{
 		$this->sample_id = $this->getSampleId($file->name);
 		$this->lane_id = ($this->sample_id==0 ? $this->getLaneId($file->name) : $this->getLaneIdFromSample($file->name));
-	$this->dir_id = $this->getDirId($this->model);
+		$this->dir_id = $this->getDirId($this->model);
 		if ($this->sample_id>0)
 		{
 			$this->tablename="ngs_temp_sample_files";
 			$this->fieldname="sample_id";
 		$this->value=$this->sample_id;
+		
+		$sql="select id from `biocore`.`$this->tablename` where `file_name`='$file->file_name' and `sample_id`='$this->sample_id'";
+		return $this->model->query($sql,1);
 		}
 	else
 	{
 			$this->tablename="ngs_temp_lane_files";
 			$this->fieldname="lane_id";
 		$this->value=$this->lane_id;
-	}
-		$sql="select id from `biocore`.`$this->tablename` where `file_name`='$file->file_name' and `sample_id`='$this->sample_id'";
+		
+		$sql="select id from `biocore`.`$this->tablename` where `file_name`='$file->file_name' and `lane_id`='$this->lane_id'";
 		return $this->model->query($sql,1);
+	}
+		
 	}
 
 	function insert($file)
 	{
-
 		$sql="INSERT INTO `biocore`.`$this->tablename`
 			(`file_name`,
 			`$this->fieldname`, `dir_id`,
@@ -1043,7 +1128,6 @@ class files extends main{
 
 	function update($file)
 	{
-
 		$sql="update `biocore`.`$this->tablename` set
 			`fieldname`='$this->value', `dir_id`='$this->dir_id',
 			`group_id`='".$this->model->gid."', `perms`='".$this->model->sid."',
