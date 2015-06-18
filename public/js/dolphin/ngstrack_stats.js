@@ -341,7 +341,17 @@ $(function() {
 									s[i].molecule,
 									"<input type=\"checkbox\" class=\"ngs_checkbox\" name=\""+s[i].id+"\" id=\"sample_checkbox_"+s[i].id+"\" onClick=\"manageChecklists(this.name, 'sample_checkbox');\">",
 								]);
-							}
+							}else{
+									samplesTable.fnAddData([
+										s[i].id,
+										"<a href=\"/dolphin/search/details/samples/"+s[i].id+'/'+theSearch+"\">"+s[i].name+"</a>",
+										s[i].title,
+										s[i].source,
+										s[i].organism,
+										s[i].molecule,
+										"<input type=\"checkbox\" class=\"ngs_checkbox\" name=\""+s[i].id+"\" id=\"sample_checkbox_"+s[i].id+"\" onClick=\"manageChecklists(this.name, 'sample_checkbox');\" disabled>",
+									]);
+								}
 						}
 					});
 				} // End For
@@ -394,6 +404,16 @@ $(function() {
 										s[i].molecule,
 										"<input type=\"checkbox\" class=\"ngs_checkbox\" name=\""+s[i].id+"\" id=\"sample_checkbox_"+s[i].id+"\" onClick=\"manageChecklists(this.name, 'sample_checkbox');\">",
 									]);
+								}else{
+									samplesTable.fnAddData([
+										s[i].id,
+										"<a href=\"/dolphin/search/details/samples/"+s[i].id+'/'+theSearch+"\">"+s[i].name+"</a>",
+										s[i].title,
+										s[i].source,
+										s[i].organism,
+										s[i].molecule,
+										"<input type=\"checkbox\" class=\"ngs_checkbox\" name=\""+s[i].id+"\" id=\"sample_checkbox_"+s[i].id+"\" onClick=\"manageChecklists(this.name, 'sample_checkbox');\" disabled>",
+									]);
 								}
 							}
 						});
@@ -437,6 +457,15 @@ $(function() {
 										s[i].total_reads,
 										s[i].total_samples,
 										"<input type=\"checkbox\" class=\"ngs_checkbox\" name=\""+s[i].id+"\" id=\"lane_checkbox_"+s[i].id+"\" onClick=\"manageChecklists(this.name, 'lane_checkbox');\">",	
+										]);
+									}else{
+										lanesTable.fnAddData([
+										s[i].id,
+										"<a href=\"/dolphin/search/details/experiments/"+s[i].id+'/'+theSearch+"\">"+s[i].name+"</a>",
+										s[i].facility,
+										s[i].total_reads,
+										s[i].total_samples,
+										"<input type=\"checkbox\" class=\"ngs_checkbox\" name=\""+s[i].id+"\" id=\"lane_checkbox_"+s[i].id+"\" onClick=\"manageChecklists(this.name, 'lane_checkbox');\" disabled>",	
 										]);
 									}
 								}
@@ -483,6 +512,15 @@ $(function() {
 										s[i].total_reads,
 										s[i].total_samples,
 										"<input type=\"checkbox\" class=\"ngs_checkbox\" name=\""+s[i].id+"\" id=\"lane_checkbox_"+s[i].id+"\" onClick=\"manageChecklists(this.name, 'lane_checkbox');\">",	
+										]);
+									}else{
+										lanesTable.fnAddData([
+										s[i].id,
+										"<a href=\"/dolphin/search/details/experiments/"+s[i].id+'/'+theSearch+"\">"+s[i].name+"</a>",
+										s[i].facility,
+										s[i].total_reads,
+										s[i].total_samples,
+										"<input type=\"checkbox\" class=\"ngs_checkbox\" name=\""+s[i].id+"\" id=\"lane_checkbox_"+s[i].id+"\" onClick=\"manageChecklists(this.name, 'lane_checkbox');\" disabled>",	
 										]);
 									}
 								}
