@@ -173,38 +173,42 @@ $(function() {
 					if (typeLocSelected > 0 || typeLocRerun > 0) {
 						theSearch = '';
 					}
-					for(var i = 0; i < s.length; i++) {
-						$.ajax({ type: "GET",
+					var passedSamples = [];
+					$.ajax({ type: "GET",
 						url: "/dolphin/public/ajax/initialmappingdb.php",
-						data: { p: 'sampleChecking', sample_id: s[i].id},
+						data: { p: 'sampleChecking', uid: uid, gids: gids},
 						async: false,
 						success : function(r)
 						{
-							if (r[0] != undefined) {
-								samplesTable.fnAddData([
-									s[i].id,
-									"<a href=\"/dolphin/search/details/samples/"+s[i].id+'/'+theSearch+"\">"+s[i].name+"</a>",
-									s[i].title,
-									s[i].source,
-									s[i].organism,
-									s[i].molecule,
-									"<input type=\"checkbox\" class=\"ngs_checkbox\" name=\""+s[i].id+"\" id=\"sample_checkbox_"+s[i].id+"\" onClick=\"manageChecklists(this.name, 'sample_checkbox');\">",
-								]);
-							}else{
-									samplesTable.fnAddData([
-										s[i].id,
-										"<a href=\"/dolphin/search/details/samples/"+s[i].id+'/'+theSearch+"\">"+s[i].name+"</a>",
-										s[i].title,
-										s[i].source,
-										s[i].organism,
-										s[i].molecule,
-										"<input type=\"checkbox\" class=\"ngs_checkbox\" name=\""+s[i].id+"\" id=\"sample_checkbox_"+s[i].id+"\" onClick=\"manageChecklists(this.name, 'sample_checkbox');\" disabled>",
-									]);
-								}
+							for(var x = 0; x < r.length; x++){
+								passedSamples.push(r[x].id);
+							}
 						}
 					});
-				} // End For
-			}
+					for(var i = 0; i < s.length; i++) {
+						if (passedSamples.indexOf(s[i].id) >= 0) {
+							samplesTable.fnAddData([
+								s[i].id,
+								"<a href=\"/dolphin/search/details/samples/"+s[i].id+'/'+theSearch+"\">"+s[i].name+"</a>",
+								s[i].title,
+								s[i].source,
+								s[i].organism,
+								s[i].molecule,
+								"<input type=\"checkbox\" class=\"ngs_checkbox\" name=\""+s[i].id+"\" id=\"sample_checkbox_"+s[i].id+"\" onClick=\"manageChecklists(this.name, 'sample_checkbox');\">",
+							]);
+						}else{
+							samplesTable.fnAddData([
+								s[i].id,
+								"<a href=\"/dolphin/search/details/samples/"+s[i].id+'/'+theSearch+"\">"+s[i].name+"</a>",
+								s[i].title,
+								s[i].source,
+								s[i].organism,
+								s[i].molecule,
+								"<input type=\"checkbox\" class=\"ngs_checkbox\" name=\""+s[i].id+"\" id=\"sample_checkbox_"+s[i].id+"\" onClick=\"manageChecklists(this.name, 'sample_checkbox');\" disabled>",
+							]);
+						}
+					} // End For
+				}
 		});
 
 	$('.daterange_samples').daterangepicker(
@@ -223,11 +227,11 @@ $(function() {
 			},
 	function(start, end) {
 			$.ajax({ type: "GET",
-					 url: "/dolphin/public/ajax/ngsquerydb.php",
-					 data: { p: samplesType, q: qvar, r: rvar, seg: segment, search: theSearch, uid: uid, gids: gids, start:start.format('YYYY-MM-DD'), end:end.format('YYYY-MM-DD') },
-					 async: false,
-					 success : function(s)
-					 {
+					url: "/dolphin/public/ajax/ngsquerydb.php",
+					data: { p: samplesType, q: qvar, r: rvar, seg: segment, search: theSearch, uid: uid, gids: gids, start:start.format('YYYY-MM-DD'), end:end.format('YYYY-MM-DD') },
+					async: false,
+					success : function(s)
+					{
 						samplesTable.fnClearTable();
 						var changeHTML = '';
 						var hrefSplit = window.location.href.split("/");
@@ -236,37 +240,41 @@ $(function() {
 						if (typeLocSelected > 0 || typeLocRerun > 0) {
 							theSearch = '';
 						}
-						for(var i = 0; i < s.length; i++) {
-							$.ajax({ type: "GET",
+						var passedSamples = [];
+						$.ajax({ type: "GET",
 							url: "/dolphin/public/ajax/initialmappingdb.php",
-							data: { p: 'sampleChecking', sample_id: s[i].id},
+							data: { p: 'sampleChecking', uid: uid, gids: gids},
 							async: false,
 							success : function(r)
 							{
-								if (r[0] != undefined) {
-									samplesTable.fnAddData([
-										s[i].id,
-										"<a href=\"/dolphin/search/details/samples/"+s[i].id+'/'+theSearch+"\">"+s[i].name+"</a>",
-										s[i].title,
-										s[i].source,
-										s[i].organism,
-										s[i].molecule,
-										"<input type=\"checkbox\" class=\"ngs_checkbox\" name=\""+s[i].id+"\" id=\"sample_checkbox_"+s[i].id+"\" onClick=\"manageChecklists(this.name, 'sample_checkbox');\">",
-									]);
-								}else{
-									samplesTable.fnAddData([
-										s[i].id,
-										"<a href=\"/dolphin/search/details/samples/"+s[i].id+'/'+theSearch+"\">"+s[i].name+"</a>",
-										s[i].title,
-										s[i].source,
-										s[i].organism,
-										s[i].molecule,
-										"<input type=\"checkbox\" class=\"ngs_checkbox\" name=\""+s[i].id+"\" id=\"sample_checkbox_"+s[i].id+"\" onClick=\"manageChecklists(this.name, 'sample_checkbox');\" disabled>",
-									]);
+								for(var x = 0; x < r.length; x++){
+									passedSamples.push(r[x].id);
 								}
 							}
 						});
-					} // End For
+						for(var i = 0; i < s.length; i++) {
+							if (passedSamples.indexOf(s[i].id) >= 0) {
+								samplesTable.fnAddData([
+									s[i].id,
+									"<a href=\"/dolphin/search/details/samples/"+s[i].id+'/'+theSearch+"\">"+s[i].name+"</a>",
+									s[i].title,
+									s[i].source,
+									s[i].organism,
+									s[i].molecule,
+									"<input type=\"checkbox\" class=\"ngs_checkbox\" name=\""+s[i].id+"\" id=\"sample_checkbox_"+s[i].id+"\" onClick=\"manageChecklists(this.name, 'sample_checkbox');\">",
+								]);
+							}else{
+								samplesTable.fnAddData([
+									s[i].id,
+									"<a href=\"/dolphin/search/details/samples/"+s[i].id+'/'+theSearch+"\">"+s[i].name+"</a>",
+									s[i].title,
+									s[i].source,
+									s[i].organism,
+									s[i].molecule,
+									"<input type=\"checkbox\" class=\"ngs_checkbox\" name=\""+s[i].id+"\" id=\"sample_checkbox_"+s[i].id+"\" onClick=\"manageChecklists(this.name, 'sample_checkbox');\" disabled>",
+								]);
+							}
+						} // End For
 				}
 			});
 	});
@@ -290,34 +298,38 @@ $(function() {
 					 success : function(s)
 					 {
 						lanesTable.fnClearTable();
-						for(var i = 0; i < s.length; i++) {
-							$.ajax({ type: "GET",
+						var passedLanes = [];
+						$.ajax({ type: "GET",
 								url: "/dolphin/public/ajax/initialmappingdb.php",
-								data: { p: 'laneChecking', lane_id: s[i].id},
+								data: { p: 'laneChecking', uid: uid, gids: gids},
 								async: false,
 								success : function(r)
 								{
-									if (r[0] != undefined) {
-										lanesTable.fnAddData([
-										s[i].id,
-										"<a href=\"/dolphin/search/details/experiments/"+s[i].id+'/'+theSearch+"\">"+s[i].name+"</a>",
-										s[i].facility,
-										s[i].total_reads,
-										s[i].total_samples,
-										"<input type=\"checkbox\" class=\"ngs_checkbox\" name=\""+s[i].id+"\" id=\"lane_checkbox_"+s[i].id+"\" onClick=\"manageChecklists(this.name, 'lane_checkbox');\">",	
-										]);
-									}else{
-										lanesTable.fnAddData([
-										s[i].id,
-										"<a href=\"/dolphin/search/details/experiments/"+s[i].id+'/'+theSearch+"\">"+s[i].name+"</a>",
-										s[i].facility,
-										s[i].total_reads,
-										s[i].total_samples,
-										"<input type=\"checkbox\" class=\"ngs_checkbox\" name=\""+s[i].id+"\" id=\"lane_checkbox_"+s[i].id+"\" onClick=\"manageChecklists(this.name, 'lane_checkbox');\" disabled>",	
-										]);
+									for (var x = 0; x < r.length; x++){
+										passedLanes.push(r[x].lane_id);
 									}
 								}
-							});
+						});
+						for(var i = 0; i < s.length; i++) {
+							if (passedLanes.indexOf(s[i].id) >= 0) {
+								lanesTable.fnAddData([
+								s[i].id,
+								"<a href=\"/dolphin/search/details/experiments/"+s[i].id+'/'+theSearch+"\">"+s[i].name+"</a>",
+								s[i].facility,
+								s[i].total_reads,
+								s[i].total_samples,
+								"<input type=\"checkbox\" class=\"ngs_checkbox\" name=\""+s[i].id+"\" id=\"lane_checkbox_"+s[i].id+"\" onClick=\"manageChecklists(this.name, 'lane_checkbox');\">",	
+								]);
+							}else{
+								lanesTable.fnAddData([
+								s[i].id,
+								"<a href=\"/dolphin/search/details/experiments/"+s[i].id+'/'+theSearch+"\">"+s[i].name+"</a>",
+								s[i].facility,
+								s[i].total_reads,
+								s[i].total_samples,
+								"<input type=\"checkbox\" class=\"ngs_checkbox\" name=\""+s[i].id+"\" id=\"lane_checkbox_"+s[i].id+"\" onClick=\"manageChecklists(this.name, 'lane_checkbox');\" disabled>",	
+								]);
+							}
 						} // End For
 				} 
 			});
@@ -344,35 +356,38 @@ $(function() {
 					 success : function(s)
 					 {
 						lanesTable.fnClearTable();
-						for(var i = 0; i < s.length; i++) {
-							$.ajax({ type: "GET",
+						var passedLanes = [];
+						$.ajax({ type: "GET",
 								url: "/dolphin/public/ajax/initialmappingdb.php",
-								data: { p: 'laneChecking', lane_id: s[i].id},
+								data: { p: 'laneChecking', uid: uid, gids: gids},
 								async: false,
 								success : function(r)
 								{
-									console.log(r);
-									if (r[0] != undefined) {
-										lanesTable.fnAddData([
-										s[i].id,
-										"<a href=\"/dolphin/search/details/experiments/"+s[i].id+'/'+theSearch+"\">"+s[i].name+"</a>",
-										s[i].facility,
-										s[i].total_reads,
-										s[i].total_samples,
-										"<input type=\"checkbox\" class=\"ngs_checkbox\" name=\""+s[i].id+"\" id=\"lane_checkbox_"+s[i].id+"\" onClick=\"manageChecklists(this.name, 'lane_checkbox');\">",	
-										]);
-									}else{
-										lanesTable.fnAddData([
-										s[i].id,
-										"<a href=\"/dolphin/search/details/experiments/"+s[i].id+'/'+theSearch+"\">"+s[i].name+"</a>",
-										s[i].facility,
-										s[i].total_reads,
-										s[i].total_samples,
-										"<input type=\"checkbox\" class=\"ngs_checkbox\" name=\""+s[i].id+"\" id=\"lane_checkbox_"+s[i].id+"\" onClick=\"manageChecklists(this.name, 'lane_checkbox');\" disabled>",	
-										]);
+									for (var x = 0; x < r.length; x++){
+										passedLanes.push(r[x].lane_id);
 									}
 								}
-							});
+						});
+						for(var i = 0; i < s.length; i++) {
+							if (passedLanes.indexOf(s[i].id) >= 0) {
+								lanesTable.fnAddData([
+								s[i].id,
+								"<a href=\"/dolphin/search/details/experiments/"+s[i].id+'/'+theSearch+"\">"+s[i].name+"</a>",
+								s[i].facility,
+								s[i].total_reads,
+								s[i].total_samples,
+								"<input type=\"checkbox\" class=\"ngs_checkbox\" name=\""+s[i].id+"\" id=\"lane_checkbox_"+s[i].id+"\" onClick=\"manageChecklists(this.name, 'lane_checkbox');\">",	
+								]);
+							}else{
+								lanesTable.fnAddData([
+								s[i].id,
+								"<a href=\"/dolphin/search/details/experiments/"+s[i].id+'/'+theSearch+"\">"+s[i].name+"</a>",
+								s[i].facility,
+								s[i].total_reads,
+								s[i].total_samples,
+								"<input type=\"checkbox\" class=\"ngs_checkbox\" name=\""+s[i].id+"\" id=\"lane_checkbox_"+s[i].id+"\" onClick=\"manageChecklists(this.name, 'lane_checkbox');\" disabled>",	
+								]);
+							}
 						} // End For
 					 }
 			});
