@@ -784,7 +784,7 @@ e range"><i class="fa fa-calendar"></i></button>
 										<h4 style="text-align: center" class="margin">Info</h3>
 								</li>
                                 <li>
-										<div id="'.$id.'_info" class="slimScrollDiv margin" style="position: relative; overflow: hidden; width: auto; height: auto;">
+										<div id="'.$id.'_info" class="slimScrollDiv margin" style="position: relative; overflow: hidden; width: 400px; height: auto;">
 										</div>
                                 </li>
                                 <li class="footer">

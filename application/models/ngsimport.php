@@ -313,7 +313,7 @@ class Ngsimport extends VanillaModel {
 			 */
 			//	Lane Name
 			if(isset($lane->name)){
-				if($this->checkAlphaNumWithAddChars('_', $lane->name)){
+				if($this->checkAlphaNumWithAddChars('_-', $lane->name)){
 					$this->lane_arr[$lane->name]=$lane;
 				}else{
 					$text.= $this->errorText("Lane name does not contain proper characters, please use alpha-numeric characters and underscores (row " . $i . ")");
@@ -524,7 +524,7 @@ class Ngsimport extends VanillaModel {
 			 */
 			//	Sample Name
 			if(isset($samp->name)){
-				if($this->checkAlphaNumWithAddChars('_', $samp->name)){
+				if($this->checkAlphaNumWithAddChars('_-', $samp->name)){
 					//	Need to check the database for similar names as well at a later date
 					if(isset($this->sample_arr[$samp->name])){
 						$text.= $this->errorText("Sample name already exists in that lane (row " . $i . ")");
@@ -547,7 +547,7 @@ class Ngsimport extends VanillaModel {
 			//	Lane Name
 			//	For now, it's just checking the Lane given in the excel file, possible to check the database later
 			if(isset($samp->lane_name)){
-				if(!$this->lane_arr[$samp->lane_name]){
+				if(!isset($this->lane_arr[$samp->lane_name])){
 					$text.= $this->errorText("Lane name does not match any lane given in the excel file (row " . $i . ")");
 					$this->final_check = false;
 					$samp_check = false;
@@ -693,7 +693,7 @@ class Ngsimport extends VanillaModel {
 			 */
 			//	Sample/Lane Name
 			if(isset($file->name)){
-				if($this->checkAlphaNumWithAddChars('_', $file->name)){
+				if($this->checkAlphaNumWithAddChars('_-', $file->name)){
 					if(!(isset($this->sample_arr[$file->name])) & !(isset($this->lane_arr[$file->name]))){
 						$text.= $this->errorText("sample/lane name does not match the samples/lanes given (row " . $i . ")");
 						$this->final_check = false;
@@ -986,7 +986,6 @@ class protocols extends main{
 				'$prot->fragmentation_method', '$prot->strand_specific', '$prot->library_strategy',
 				'".$this->model->uid."', '".$this->model->gid."', '".$this->model->sid."',
 				now(), now(), '".$this->model->uid."');";
-				echo $sql . ' <br>';
 		$this->insert++;
 		return $this->model->query($sql);
 	}

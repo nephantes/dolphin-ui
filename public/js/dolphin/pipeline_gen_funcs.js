@@ -37,7 +37,7 @@ function rerunLoad() {
 	jsonObj = JSON.parse(json_primer);
 	//repopulate page
 	for (var x = 0; x < (jsonTypeList.length); x++) {
-		if (jsonObj.hasOwnProperty(jsonTypeList[x]) && jsonObj[jsonTypeList[x]] != 'none') {
+		if (jsonObj.hasOwnProperty(jsonTypeList[x]) && jsonObj[jsonTypeList[x]] != 'none' && jsonTypeList[x] != 'barcodes') {
 			var element = document.getElementById(jsonTypeList[x]);
 			if (element != null) {
 				if (element.id == "spaired") {
@@ -465,7 +465,7 @@ function submitPipeline(type) {
 			//insert new values into ngs_runlist
 			var submitted = postInsertRunlist(runparamsInsert[0], ids, runparamsInsert[1]);
 			if (submitted) {
-				window.location.href = "/dolphin/pipeline/status";
+				window.location.href = "/dolphin/stat/status";
 			}
 		}
 	}
@@ -480,7 +480,7 @@ function sendToFastlane(){
 }
 
 function sendToStatus(){
-	window.location.href = "/dolphin/pipeline/status/";
+	window.location.href = "/dolphin/stat/status/";
 }
 
 function backFromDetails(back_type){
