@@ -84,7 +84,7 @@ class FastlaneController extends VanillaController {
 		}
 		$text.="<br><br>";
 		$text.= '<div>
-				<input type="button" class="btn btn-primary" value="Return to Fastlane" onclick="sentToNewFastlane()">
+				<input type="button" class="btn btn-primary" value="Return to Fastlane" onclick="backToFastlane()">
 				<input type="button" class="btn btn-primary" value="Go to Status" onclick="sendToStatus()">
 				</div>';
 		$this->set('mytext', $text);
