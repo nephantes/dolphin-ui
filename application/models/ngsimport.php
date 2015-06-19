@@ -547,7 +547,7 @@ class Ngsimport extends VanillaModel {
 			//	Lane Name
 			//	For now, it's just checking the Lane given in the excel file, possible to check the database later
 			if(isset($samp->lane_name)){
-				if(!$this->lane_arr[$samp->lane_name]){
+				if(!isset($this->lane_arr[$samp->lane_name])){
 					$text.= $this->errorText("Lane name does not match any lane given in the excel file (row " . $i . ")");
 					$this->final_check = false;
 					$samp_check = false;
