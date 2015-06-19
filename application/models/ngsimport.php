@@ -986,7 +986,6 @@ class protocols extends main{
 				'$prot->fragmentation_method', '$prot->strand_specific', '$prot->library_strategy',
 				'".$this->model->uid."', '".$this->model->gid."', '".$this->model->sid."',
 				now(), now(), '".$this->model->uid."');";
-				echo $sql . ' <br>';
 		$this->insert++;
 		return $this->model->query($sql);
 	}
