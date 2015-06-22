@@ -1126,10 +1126,18 @@ class samples extends main{
 		$this->insert++;
 		
 		foreach($returned_ids as $id){
-			if($this->model->query("SELECT `id` FROM `biocore`.`ngs_sample_conds` WHERE `sample_id` = '".$this->getId($sample)."' AND cond_id = '$id'") == "[]"){
+			if($this->model->query("SELECT `id` FROM `biocore`.`ngs_sample_conds` WHERE `sample_id` = '".$this->getId($sample)."' AND cond_id = $id") == "[]"){
 				$this->model->query("INSERT INTO `biocore`.`ngs_sample_conds` (`sample_id`, `cond_id`) VALUES ('".$this->getId($sample)."', '$id')");
 			}
 		}
+		
+		$all_sample_cond = json_decode($this->model->query("SELECT `cond_id` FROM `biocore`.`ngs_sample_conds` WHERE `sample_id` = '".$this->getId($sample)."'"));
+		foreach($all_sample_cond as $key => $object){
+			if(!in_array($object->cond_id, $returned_ids)){
+				$this->model->query("DELETE FROM `biocore`.`ngs_sample_conds` WHERE `sample_id` = '".$this->getId($sample)."' AND `cond_id` = ".$object->cond_id);
+			}
+		}
+		
 		return $this->model->query($sql);
 	}
 
@@ -1210,8 +1218,15 @@ class samples extends main{
 		$this->update++;
 		
 		foreach($returned_ids as $id){
-			if($this->model->query("SELECT `id` FROM `biocore`.`ngs_sample_conds` WHERE `sample_id` = '".$this->getId($sample)."' AND cond_id = '$id'") == "[]"){
+			if($this->model->query("SELECT `id` FROM `biocore`.`ngs_sample_conds` WHERE `sample_id` = '".$this->getId($sample)."' AND cond_id = $id") == "[]"){
 				$this->model->query("INSERT INTO `biocore`.`ngs_sample_conds` (`sample_id`, `cond_id`) VALUES ('".$this->getId($sample)."', '$id')");
+			}
+		}
+		
+		$all_sample_cond = json_decode($this->model->query("SELECT `cond_id` FROM `biocore`.`ngs_sample_conds` WHERE `sample_id` = '".$this->getId($sample)."'"));
+		foreach($all_sample_cond as $key => $object){
+			if(!in_array($object->cond_id, $returned_ids)){
+				$this->model->query("DELETE FROM `biocore`.`ngs_sample_conds` WHERE `sample_id` = '".$this->getId($sample)."' AND `cond_id` = ".$object->cond_id);
 			}
 		}
 		return $this->model->query($sql);
