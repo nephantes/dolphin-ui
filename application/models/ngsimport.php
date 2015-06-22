@@ -1061,14 +1061,49 @@ class samples extends main{
 		$lane_id=$this->getLaneId($sample->lane_name);
 		$protocol_id=$this->getProtocolId($sample->protocol_name);
 
+		$conds = explode(",", $sample->condition);
+		$conds_symbs = explode(",", $sample->condition_symbol);
+		$returned_ids = array();
+		$returned_cond = array();
+		
+		$cond_check="SELECT `id`,`condition`
+					FROM ngs_conds
+					WHERE `condition` in (";
+		foreach($conds as $c){
+			if($c == end($conds)){
+				$cond_check.="'$c'";
+			}else{
+				$cond_check.="'$c',";
+			}
+		}
+		$cond_check.=");";
+		$cond_check_result = json_decode($this->model->query($cond_check));
+		foreach ($cond_check_result as $key => $object) {
+			if(isset($returned_ids[0])){
+				array_push($returned_ids, $object->id);
+				array_push($returned_conditions, $object->condition);
+			}else{
+				$returned_ids[0] = $object->id;
+				$returned_cond[0] = $object->condition;
+			}
+		}
+		
+		for($x = 0; $x < count($returned_cond); $x++){
+			if(!in_array($conds[$x], $returned_cond)){
+				$this->model->query("INSERT INTO `biocore`.`ngs_conds` (`cond_symbol`, `condition`) VALUES ('$conds_symbs[$x]', '$conds[$x]')");
+				$new_cond_id = $this->model->query("SELECT `id` FROM `biocore`.`ngs_conds` WHERE cond_symbol = '$conds_symbs[$x]' AND condition = '$conds[$x]'");
+				array_push($returned_ids, $new_cond_id);
+			}
+		}
+		
 		$sql="INSERT INTO `biocore`.`ngs_samples`
 			(`series_id`, `protocol_id`, `lane_id`,
 			`name`, `barcode`, `title`, `batch_id`,
 			`source_symbol`, `source`, `organism`,
-			`biosample_type`, `condition_symbol`, `concentration`,
+			`biosample_type`, `concentration`,
 			`molecule`, `description`, `instrument_model`,
 			`avg_insert_size`, `read_length`, `genotype`,
-			`condition`, `adapter`, `treatment_manufacturer`,
+			`adapter`, `treatment_manufacturer`,
 			`donor`, `time`, `biological_replica`,
 			`spike_ins`,
 			`technical_replica`, `notebook_ref`, `notes`,
@@ -1079,10 +1114,10 @@ class samples extends main{
 			'".$this->model->series_id."', '$protocol_id', '$lane_id',
 			'$sample->name', '$sample->barcode', '$sample->title',
 			'$sample->batch', '$sample->source_symbol', '$sample->source', '$sample->organism',
-			'$sample->biosample_type', '$sample->condition_symbol', '$sample->concentration',
+			'$sample->biosample_type', '$sample->concentration',
 			'$sample->molecule', '$sample->description', '$sample->instrument_model',
 			'$sample->avg_insert_size', '$sample->read_length', '$sample->genotype',
-			'$sample->condition', '$sample->adapter', '$sample->treatment_manufacturer',
+			'$sample->adapter', '$sample->treatment_manufacturer',
 			'$sample->donor', '$sample->time', '$sample->biological_replica',
 			'$sample->spikeins',
 			'$sample->technical_replica', '$sample->notebook_ref', '$sample->notes',
@@ -1090,6 +1125,11 @@ class samples extends main{
 			now(), now(), '".$this->model->uid."');";
 		$this->insert++;
 		
+		foreach($returned_ids as $id){
+			if($this->model->query("SELECT `id` FROM `biocore`.`ngs_sample_conds` WHERE `sample_id` = '".$this->getId($sample)."' AND cond_id = '$id'") == "[]"){
+				$this->model->query("INSERT INTO `biocore`.`ngs_sample_conds` (`sample_id`, `cond_id`) VALUES ('".$this->getId($sample)."', '$id')");
+			}
+		}
 		return $this->model->query($sql);
 	}
 
@@ -1097,6 +1137,42 @@ class samples extends main{
 	{
 		$lane_id=$this->getLaneId($sample->lane_name);
 		$protocol_id=$this->getProtocolId($sample->protocol_name);
+		
+		$conds = explode(",", $sample->condition);
+		$conds_symbs = explode(",", $sample->condition_symbol);
+		$returned_ids = array();
+		$returned_cond = array();
+		
+		$cond_check="SELECT `id`,`condition`
+					FROM ngs_conds
+					WHERE `condition` in (";
+		foreach($conds as $c){
+			if($c == end($conds)){
+				$cond_check.="'$c'";
+			}else{
+				$cond_check.="'$c',";
+			}
+		}
+		$cond_check.=");";
+		$cond_check_result = json_decode($this->model->query($cond_check));
+		foreach ($cond_check_result as $key => $object) {
+			if(isset($returned_ids[0])){
+				array_push($returned_ids, $object->id);
+				array_push($returned_conditions, $object->condition);
+			}else{
+				$returned_ids[0] = $object->id;
+				$returned_cond[0] = $object->condition;
+			}
+		}
+		
+		for($x = 0; $x < count($returned_cond); $x++){
+			if(!in_array($conds[$x], $returned_cond)){
+				$this->model->query("INSERT INTO `biocore`.`ngs_conds` (`cond_symbol`, `condition`) VALUES ('$conds_symbs[$x]', '$conds[$x]')");
+				$new_cond_id = $this->model->query("SELECT `id` FROM `biocore`.`ngs_conds` WHERE cond_symbol = '$conds_symbs[$x]' AND condition = '$conds[$x]'");
+				array_push($returned_ids, $new_cond_id);
+			}
+		}
+		
 		$sql="UPDATE `biocore`.`ngs_samples`
 			SET
 			`series_id` = '".$this->model->series_id."',
@@ -1110,7 +1186,6 @@ class samples extends main{
 			`source` = '$sample->source',
 			`organism` = '$sample->organism',
 			`biosample_type` = '$sample->biosample_type',
-			`condition_symbol` = '$sample->condition_symbol',
 			`concentration` = '$sample->concentration',
 			`molecule` = '$sample->molecule',
 			`description` = '$sample->description',
@@ -1118,7 +1193,6 @@ class samples extends main{
 			`avg_insert_size` = '$sample->avg_insert_size',
 			`read_length` = '$sample->read_length',
 			`genotype` = '$sample->genotype',
-			`condition` = '$sample->condition',
 			`adapter` = '$sample->adapter',
 			`treatment_manufacturer` = '$sample->treatment_manufacturer',
 			`donor` = '$sample->donor',
@@ -1134,7 +1208,12 @@ class samples extends main{
 			`last_modified_user`='".$this->model->uid."'
 			where `id` = ".$this->getId($sample);
 		$this->update++;
-
+		
+		foreach($returned_ids as $id){
+			if($this->model->query("SELECT `id` FROM `biocore`.`ngs_sample_conds` WHERE `sample_id` = '".$this->getId($sample)."' AND cond_id = '$id'") == "[]"){
+				$this->model->query("INSERT INTO `biocore`.`ngs_sample_conds` (`sample_id`, `cond_id`) VALUES ('".$this->getId($sample)."', '$id')");
+			}
+		}
 		return $this->model->query($sql);
 	}
 }
