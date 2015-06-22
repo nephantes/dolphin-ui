@@ -1088,7 +1088,7 @@ class samples extends main{
 			}
 		}
 		
-		for($x = 0; $x < count($returned_cond); $x++){
+		for($x = 0; $x < count($conds); $x++){
 			if(!in_array($conds[$x], $returned_cond)){
 				$this->model->query("INSERT INTO `biocore`.`ngs_conds` (`cond_symbol`, `condition`) VALUES ('$conds_symbs[$x]', '$conds[$x]')");
 				$new_cond_id = $this->model->query("SELECT `id` FROM `biocore`.`ngs_conds` WHERE cond_symbol = '$conds_symbs[$x]' AND condition = '$conds[$x]'");
@@ -1173,7 +1173,7 @@ class samples extends main{
 			}
 		}
 		
-		for($x = 0; $x < count($returned_cond); $x++){
+		for($x = 0; $x < count($conds); $x++){
 			if(!in_array($conds[$x], $returned_cond)){
 				$this->model->query("INSERT INTO `biocore`.`ngs_conds` (`cond_symbol`, `condition`) VALUES ('$conds_symbs[$x]', '$conds[$x]')");
 				$new_cond_id = $this->model->query("SELECT `id` FROM `biocore`.`ngs_conds` WHERE cond_symbol = '$conds_symbs[$x]' AND condition = '$conds[$x]'");
