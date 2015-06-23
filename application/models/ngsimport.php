@@ -1061,38 +1061,50 @@ class samples extends main{
 		$lane_id=$this->getLaneId($sample->lane_name);
 		$protocol_id=$this->getProtocolId($sample->protocol_name);
 
-		$conds = explode(",", $sample->condition);
-		$conds_symbs = explode(",", $sample->condition_symbol);
-		$returned_ids = array();
-		$returned_cond = array();
-		
-		$cond_check="SELECT `id`,`condition`
-					FROM ngs_conds
-					WHERE `condition` in (";
-		foreach($conds as $c){
-			if($c == end($conds)){
-				$cond_check.="'$c'";
-			}else{
-				$cond_check.="'$c',";
-			}
-		}
-		$cond_check.=");";
-		$cond_check_result = json_decode($this->model->query($cond_check));
-		foreach ($cond_check_result as $key => $object) {
-			if(isset($returned_ids[0])){
-				array_push($returned_ids, $object->id);
-				array_push($returned_conditions, $object->condition);
-			}else{
-				$returned_ids[0] = $object->id;
-				$returned_cond[0] = $object->condition;
-			}
+		//	Source
+		if($sample->source != NULL || $sample->source != ''){
+			$source_check="SELECT `id`,`source`
+						FROM ngs_source
+						WHERE `source` = '" . $sample->source . "'";
+			$source_check_result = json_decode($this->model->query($source_check));
+			echo $source_check_result . ' @ ';
 		}
 		
-		for($x = 0; $x < count($conds); $x++){
-			if(!in_array($conds[$x], $returned_cond)){
-				$this->model->query("INSERT INTO `biocore`.`ngs_conds` (`cond_symbol`, `condition`) VALUES ('$conds_symbs[$x]', '$conds[$x]')");
-				$new_cond_id = $this->model->query("SELECT `id` FROM `biocore`.`ngs_conds` WHERE cond_symbol = '$conds_symbs[$x]' AND condition = '$conds[$x]'");
-				array_push($returned_ids, $new_cond_id);
+		//	Conditions
+		if($sample->condition != NULL || $sample->condition != ''){
+			$conds = explode(",", $sample->condition);
+			$conds_symbs = explode(",", $sample->condition_symbol);
+			$returned_ids = array();
+			$returned_cond = array();
+			
+			$cond_check="SELECT `id`,`condition`
+						FROM ngs_conds
+						WHERE `condition` in (";
+			foreach($conds as $c){
+				if($c == end($conds)){
+					$cond_check.="'$c'";
+				}else{
+					$cond_check.="'$c',";
+				}
+			}
+			$cond_check.=");";
+			$cond_check_result = json_decode($this->model->query($cond_check));
+			foreach ($cond_check_result as $key => $object) {
+				if(isset($returned_ids[0])){
+					array_push($returned_ids, $object->id);
+					array_push($returned_conditions, $object->condition);
+				}else{
+					$returned_ids[0] = $object->id;
+					$returned_cond[0] = $object->condition;
+				}
+			}
+			
+			for($x = 0; $x < count($conds); $x++){
+				if(!in_array($conds[$x], $returned_cond)){
+					$this->model->query("INSERT INTO `biocore`.`ngs_conds` (`cond_symbol`, `condition`) VALUES ('$conds_symbs[$x]', '$conds[$x]')");
+					$new_cond_id = $this->model->query("SELECT `id` FROM `biocore`.`ngs_conds` WHERE cond_symbol = '$conds_symbs[$x]' AND condition = '$conds[$x]'");
+					array_push($returned_ids, $new_cond_id);
+				}
 			}
 		}
 		
@@ -1125,16 +1137,19 @@ class samples extends main{
 			now(), now(), '".$this->model->uid."');";
 		$this->insert++;
 		
-		foreach($returned_ids as $id){
-			if($this->model->query("SELECT `id` FROM `biocore`.`ngs_sample_conds` WHERE `sample_id` = '".$this->getId($sample)."' AND cond_id = $id") == "[]"){
-				$this->model->query("INSERT INTO `biocore`.`ngs_sample_conds` (`sample_id`, `cond_id`) VALUES ('".$this->getId($sample)."', '$id')");
+		//	Conditions Cont.
+		if($sample->condition != NULL || $sample->condition != ''){
+			foreach($returned_ids as $id){
+				if($this->model->query("SELECT `id` FROM `biocore`.`ngs_sample_conds` WHERE `sample_id` = '".$this->getId($sample)."' AND cond_id = $id") == "[]"){
+					$this->model->query("INSERT INTO `biocore`.`ngs_sample_conds` (`sample_id`, `cond_id`) VALUES ('".$this->getId($sample)."', '$id')");
+				}
 			}
-		}
-		
-		$all_sample_cond = json_decode($this->model->query("SELECT `cond_id` FROM `biocore`.`ngs_sample_conds` WHERE `sample_id` = '".$this->getId($sample)."'"));
-		foreach($all_sample_cond as $key => $object){
-			if(!in_array($object->cond_id, $returned_ids)){
-				$this->model->query("DELETE FROM `biocore`.`ngs_sample_conds` WHERE `sample_id` = '".$this->getId($sample)."' AND `cond_id` = ".$object->cond_id);
+			
+			$all_sample_cond = json_decode($this->model->query("SELECT `cond_id` FROM `biocore`.`ngs_sample_conds` WHERE `sample_id` = '".$this->getId($sample)."'"));
+			foreach($all_sample_cond as $key => $object){
+				if(!in_array($object->cond_id, $returned_ids)){
+					$this->model->query("DELETE FROM `biocore`.`ngs_sample_conds` WHERE `sample_id` = '".$this->getId($sample)."' AND `cond_id` = ".$object->cond_id);
+				}
 			}
 		}
 		
@@ -1146,38 +1161,53 @@ class samples extends main{
 		$lane_id=$this->getLaneId($sample->lane_name);
 		$protocol_id=$this->getProtocolId($sample->protocol_name);
 		
-		$conds = explode(",", $sample->condition);
-		$conds_symbs = explode(",", $sample->condition_symbol);
-		$returned_ids = array();
-		$returned_cond = array();
-		
-		$cond_check="SELECT `id`,`condition`
-					FROM ngs_conds
-					WHERE `condition` in (";
-		foreach($conds as $c){
-			if($c == end($conds)){
-				$cond_check.="'$c'";
+		//	Source
+		if($sample->source != NULL || $sample->source != ''){
+			$source_check="SELECT `id`,`source`
+						FROM ngs_source
+						WHERE `source` = '" . $sample->source . "'";
+			$source_check_result = json_decode($this->model->query($source_check));
+			if($source_check_result == array()){
+				
 			}else{
-				$cond_check.="'$c',";
-			}
-		}
-		$cond_check.=");";
-		$cond_check_result = json_decode($this->model->query($cond_check));
-		foreach ($cond_check_result as $key => $object) {
-			if(isset($returned_ids[0])){
-				array_push($returned_ids, $object->id);
-				array_push($returned_conditions, $object->condition);
-			}else{
-				$returned_ids[0] = $object->id;
-				$returned_cond[0] = $object->condition;
+				
 			}
 		}
 		
-		for($x = 0; $x < count($conds); $x++){
-			if(!in_array($conds[$x], $returned_cond)){
-				$this->model->query("INSERT INTO `biocore`.`ngs_conds` (`cond_symbol`, `condition`) VALUES ('$conds_symbs[$x]', '$conds[$x]')");
-				$new_cond_id = $this->model->query("SELECT `id` FROM `biocore`.`ngs_conds` WHERE cond_symbol = '$conds_symbs[$x]' AND condition = '$conds[$x]'");
-				array_push($returned_ids, $new_cond_id);
+		if($sample->condition != NULL || $sample->condition != ''){
+			$conds = explode(",", $sample->condition);
+			$conds_symbs = explode(",", $sample->condition_symbol);
+			$returned_ids = array();
+			$returned_cond = array();
+			
+			$cond_check="SELECT `id`,`condition`
+						FROM ngs_conds
+						WHERE `condition` in (";
+			foreach($conds as $c){
+				if($c == end($conds)){
+					$cond_check.="'$c'";
+				}else{
+					$cond_check.="'$c',";
+				}
+			}
+			$cond_check.=");";
+			$cond_check_result = json_decode($this->model->query($cond_check));
+			foreach ($cond_check_result as $key => $object) {
+				if(isset($returned_ids[0])){
+					array_push($returned_ids, $object->id);
+					array_push($returned_conditions, $object->condition);
+				}else{
+					$returned_ids[0] = $object->id;
+					$returned_cond[0] = $object->condition;
+				}
+			}
+			
+			for($x = 0; $x < count($conds); $x++){
+				if(!in_array($conds[$x], $returned_cond)){
+					$this->model->query("INSERT INTO `biocore`.`ngs_conds` (`cond_symbol`, `condition`) VALUES ('$conds_symbs[$x]', '$conds[$x]')");
+					$new_cond_id = $this->model->query("SELECT `id` FROM `biocore`.`ngs_conds` WHERE cond_symbol = '$conds_symbs[$x]' AND condition = '$conds[$x]'");
+					array_push($returned_ids, $new_cond_id);
+				}
 			}
 		}
 		
@@ -1217,16 +1247,18 @@ class samples extends main{
 			where `id` = ".$this->getId($sample);
 		$this->update++;
 		
-		foreach($returned_ids as $id){
-			if($this->model->query("SELECT `id` FROM `biocore`.`ngs_sample_conds` WHERE `sample_id` = '".$this->getId($sample)."' AND cond_id = $id") == "[]"){
-				$this->model->query("INSERT INTO `biocore`.`ngs_sample_conds` (`sample_id`, `cond_id`) VALUES ('".$this->getId($sample)."', '$id')");
+		if($sample->condition != NULL || $sample->condition != ''){
+			foreach($returned_ids as $id){
+				if($this->model->query("SELECT `id` FROM `biocore`.`ngs_sample_conds` WHERE `sample_id` = '".$this->getId($sample)."' AND cond_id = $id") == "[]"){
+					$this->model->query("INSERT INTO `biocore`.`ngs_sample_conds` (`sample_id`, `cond_id`) VALUES ('".$this->getId($sample)."', '$id')");
+				}
 			}
-		}
-		
-		$all_sample_cond = json_decode($this->model->query("SELECT `cond_id` FROM `biocore`.`ngs_sample_conds` WHERE `sample_id` = '".$this->getId($sample)."'"));
-		foreach($all_sample_cond as $key => $object){
-			if(!in_array($object->cond_id, $returned_ids)){
-				$this->model->query("DELETE FROM `biocore`.`ngs_sample_conds` WHERE `sample_id` = '".$this->getId($sample)."' AND `cond_id` = ".$object->cond_id);
+			
+			$all_sample_cond = json_decode($this->model->query("SELECT `cond_id` FROM `biocore`.`ngs_sample_conds` WHERE `sample_id` = '".$this->getId($sample)."'"));
+			foreach($all_sample_cond as $key => $object){
+				if(!in_array($object->cond_id, $returned_ids)){
+					$this->model->query("DELETE FROM `biocore`.`ngs_sample_conds` WHERE `sample_id` = '".$this->getId($sample)."' AND `cond_id` = ".$object->cond_id);
+				}
 			}
 		}
 		return $this->model->query($sql);
