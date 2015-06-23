@@ -450,12 +450,10 @@ else if ($p == 'getSampleNames')
 else if ($p == 'getWKey')
 {
     if (isset($_GET['run_id'])){$run_id = $_GET['run_id'];}
-    $time="";
-    if (isset($start)){$time="WHERE `date_created`>='$start' and `date_created`<='$end'";}
     $data=$query->queryTable("
     SELECT wkey
     FROM ngs_runparams
-    WHERE id = $run_id $time
+    WHERE id = $run_id
     ");
 }
 else if ($p == 'getFastQCBool')
@@ -472,7 +470,7 @@ else if ($p == 'getReportList')
     if (isset($_GET['wkey'])){$wkey = $_GET['wkey'];}
     $data=$query->queryTable("
     SELECT version, type, file
-    FROM biocore.report_list
+    FROM report_list
     WHERE wkey = '$wkey'
     ");
 }
