@@ -165,6 +165,7 @@ $(function() {
 				async: false,
 				success : function(s)
 				{
+					console.log(s);
 					samplesTable.fnClearTable();
 					var changeHTML = '';
 					var hrefSplit = window.location.href.split("/");

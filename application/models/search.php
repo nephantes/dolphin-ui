@@ -8,7 +8,20 @@ class Search extends VanillaModel {
         if($gids == ''){
             $gids = -1;
         }
-		$result = $this->query("select $fieldname name, count($fieldname) count from $tablename where $fieldname !='' AND (((group_id in ($gids)) AND (perms >= 15)) OR (owner_id = $uid)) group by $fieldname");
+
+        if($tablename == 'ngs_samples'){
+            $result = $this->query("select $fieldname name, count($fieldname) count from $tablename where $fieldname !='' AND (((group_id in ($gids)) AND (perms >= 15)) OR (owner_id = $uid)) group by $fieldname");
+            //var_dump($result);
+        }else{
+            $result = $this->query("select $fieldname name, count(ngs_samples.id) count
+                                                FROM `ngs_samples`
+                                                INNER JOIN ngs_sample_$fieldname
+                                                ON ngs_samples.id = ngs_sample_$fieldname.sample_id
+                                                INNER JOIN $tablename
+                                                ON ngs_sample_$fieldname."."$fieldname"."_id = $tablename.id
+                                                WHERE (((group_id in ($gids)) AND (perms >= 15)) OR (owner_id = $uid))
+                                                GROUP BY $fieldname");
+        }
 		return json_decode($result, true);
 	}
 	function getAccItemsCont($fieldname, $tablename, $search, $uid, $gids){
@@ -22,10 +35,32 @@ class Search extends VanillaModel {
 				$split = explode('=', $s);
 				$advQuery.= " AND " . $split[0]. " = " . '"'. $split[1] . '"';
 			}
-			$result = $this->query("select $fieldname name, count($fieldname) count from $tablename where $fieldname !='' $advQuery AND (((group_id in ($gids)) AND (perms >= 15)) OR (owner_id = $uid)) group by $fieldname");
-		}
-		else{
-			$result = $this->query("select $fieldname name, count($fieldname) count from $tablename where $fieldname !='' AND (((group_id in ($gids)) AND (perms >= 15)) OR (owner_id = $uid)) group by $fieldname" );
+			if($tablename == 'ngs_samples'){
+                $result = $this->query("select $fieldname name, count($fieldname) count from $tablename where $fieldname !='' $advQuery AND (((group_id in ($gids)) AND (perms >= 15)) OR (owner_id = $uid)) group by $fieldname");
+            }else{
+                $result = $this->query("select $fieldname name, count(ngs_samples.id) count
+                                                    FROM `ngs_samples`
+                                                    INNER JOIN ngs_sample_$fieldname
+                                                    ON ngs_samples.id = ngs_sample_$fieldname.sample_id
+                                                    INNER JOIN $tablename
+                                                    ON ngs_sample_$fieldname."."$fieldname"."_id = $tablename.id
+                                                    WHERE (((group_id in ($gids)) AND (perms >= 15)) OR (owner_id = $uid))
+                                                    $advQuery
+                                                    GROUP BY $fieldname");
+        }
+		}else{
+			if($tablename == 'ngs_samples'){
+                $result = $this->query("select $fieldname name, count($fieldname) count from $tablename where $fieldname !='' AND (((group_id in ($gids)) AND (perms >= 15)) OR (owner_id = $uid)) group by $fieldname");
+            }else{
+                $result = $this->query("select $fieldname name, count(ngs_samples.id) count
+                                                    FROM `ngs_samples`
+                                                    INNER JOIN ngs_sample_$fieldname
+                                                    ON ngs_samples.id = ngs_sample_$fieldname.sample_id
+                                                    INNER JOIN $tablename
+                                                    ON ngs_sample_$fieldname."."$fieldname"."_id = $tablename.id
+                                                    WHERE (((group_id in ($gids)) AND (perms >= 15)) OR (owner_id = $uid))
+                                                    GROUP BY $fieldname");
+            }
 		}
 		return json_decode($result, true);
 	}

@@ -35,6 +35,11 @@ if (isset($_GET['gids'])){$gids = $_GET['gids'];}
 if($uid != "" && $gids != ""){
     $perms = "WHERE (((group_id in ($gids)) AND (perms >= 15)) OR (owner_id = $uid))";
     $andPerms = "AND (((group_id in ($gids)) AND (perms >= 15)) OR (owner_id = $uid))";
+    
+    $innerJoin = "INNER JOIN ngs_sample_source
+            ON ngs_samples.id = ngs_sample_source.sample_id
+            INNER JOIN ngs_source
+            ON ngs_sample_source.source_id = ngs_source.id";
 }
 
 if (isset($_GET['start'])){$start = $_GET['start'];}
@@ -59,6 +64,7 @@ if($search != "" && !in_array($p, $pDictionary)){
             }
         }
 	}
+    
 	//browse (search incnluded)
 	if($seg == "browse")
 	{
@@ -80,6 +86,7 @@ if($search != "" && !in_array($p, $pDictionary)){
 			$data=$query->queryTable("
 			SELECT id, name, title, source, organism, molecule
 			FROM biocore.ngs_samples
+            $innerJoin
 			WHERE $searchQuery $andPerms $time
 			");
 		}
@@ -117,6 +124,7 @@ if($search != "" && !in_array($p, $pDictionary)){
 			$data=$query->queryTable("
 			SELECT id, name, title, source, organism, molecule
 			FROM biocore.ngs_samples
+            $innerJoin
 			WHERE $searchQuery
 			AND biocore.ngs_samples.lane_id = $r $andPerms $time
 			");
@@ -128,6 +136,7 @@ if($search != "" && !in_array($p, $pDictionary)){
 			$data=$query->queryTable("
 			SELECT id, name, title, source, organism, molecule
 			FROM biocore.ngs_samples
+            $innerJoin
 			WHERE $searchQuery
 			AND biocore.ngs_samples.series_id = $q $andPerms $time
 			");
@@ -179,6 +188,7 @@ else if (!in_array($p, $pDictionary))
 			$data=$query->queryTable("
 			SELECT id, name, title, source, organism, molecule
 			FROM biocore.ngs_samples
+            $innerJoin
 			WHERE biocore.ngs_samples.$q = \"$r\" $andPerms $time
 			");
 		}
@@ -213,6 +223,7 @@ else if (!in_array($p, $pDictionary))
 			$data=$query->queryTable("
 			SELECT id, name, title, source, organism, molecule
 			FROM biocore.ngs_samples
+            $innerJoin
 			WHERE biocore.ngs_samples.lane_id = $r $andPerms $time
 			");
 		}
@@ -223,6 +234,7 @@ else if (!in_array($p, $pDictionary))
 			$data=$query->queryTable("
 			SELECT id, name, title, source, organism, molecule
 			FROM biocore.ngs_samples
+            $innerJoin
 			WHERE biocore.ngs_samples.series_id = $q $andPerms $time
 			");
 		}
@@ -261,7 +273,9 @@ else if (!in_array($p, $pDictionary))
 			if (isset($start)){$time="and `date_created`>='$start' and `date_created`<='$end'";}
 			$data=$query->queryTable("
 			SELECT id, name, title, source, organism, molecule
-			FROM biocore.ngs_samples $perms $time
+			FROM biocore.ngs_samples
+            $innerJoin
+            $perms $time
 			");
 		}
 	}
@@ -316,6 +330,7 @@ else if ($p == "getSelectedSamples")
 	$data=$query->queryTable("
 	SELECT id, name, title, source, organism, molecule
 	FROM biocore.ngs_samples
+    $innerJoin
 	WHERE $searchQuery $andPerms $time
 	");
 }
