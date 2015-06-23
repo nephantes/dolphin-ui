@@ -37,7 +37,7 @@ function rerunLoad() {
 	jsonObj = JSON.parse(json_primer);
 	//repopulate page
 	for (var x = 0; x < (jsonTypeList.length); x++) {
-		if (jsonObj.hasOwnProperty(jsonTypeList[x]) && jsonObj[jsonTypeList[x]] != 'none' && jsonTypeList[x] != 'barcodes') {
+		if (jsonObj.hasOwnProperty(jsonTypeList[x]) && jsonObj[jsonTypeList[x]] != 'none' && jsonObj[jsonTypeList[x]] != 'no' && jsonObj[jsonTypeList[x]] != 'NONE' && jsonObj[jsonTypeList[x]] != 'NO' && jsonTypeList[x] != 'barcodes') {
 			var element = document.getElementById(jsonTypeList[x]);
 			if (element != null) {
 				if (element.id == "spaired") {
