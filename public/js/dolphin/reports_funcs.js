@@ -425,7 +425,7 @@ function downloadTSV(type){
 	window.open(URL, '_blank');
 }
 
-function getWKey(run_id){
+function getReportWKey(run_id){
 	var wkey = "";
 	$.ajax({ type: "GET",
 			url: "/dolphin/public/ajax/ngsquerydb.php",
@@ -433,7 +433,7 @@ function getWKey(run_id){
 			async: false,
 			success : function(s)
 			{
-			   wkey = s[0].wkey;
+				wkey = s[0].wkey;
 			}
 	});
 	return wkey;
@@ -454,7 +454,7 @@ $(function() {
 
 	var hrefSplit = window.location.href.split("/");
 	var runId = hrefSplit[hrefSplit.length - 2];
-	wkey = getWKey(runId);
+	var wkey = getReportWKey(runId);
 	var samples = hrefSplit[hrefSplit.length - 1].substring(0, hrefSplit[hrefSplit.length - 1].length - 1).split(",");
 	
 	var summary_files = [];
@@ -491,7 +491,6 @@ $(function() {
 		document.getElementById(summary_rna_type[z]).innerHTML = summary_rna_type[z];
 	}
 	
-	console.log(samples.toString());
 	$.ajax({ type: "GET",
 			url: "/dolphin/public/ajax/ngsquerydb.php",
 			data: { p: 'getSampleNames', samples: samples.toString() },
@@ -517,8 +516,6 @@ $(function() {
 				}
 			}
 	});
-	
-	console.log(read_counts);
 	
 	if (summary_files.length > 0) {
 		document.getElementById('tablerow').appendChild(createElement('th', ['id'], ['unused']));
