@@ -223,6 +223,24 @@ class HTML {
 	}
 
 	
+	function getRespBoxTableStream($title, $table, $fields){
+		$html = '';
+		$html.= '<div class="box">
+						<div class="box-header">
+								<h3 class="box-title">'.$title.'</h3>
+						</div><!-- /.box-head -->
+						<div class="box-body table-responsive">
+								<table id="jsontable_'.$table.'" class="table table-hover table-striped table-condensed table-scrollable">
+										<thead>
+										<tr>'.$fields.'</tr>
+										</thead>
+								</table>
+						</div><!-- /.box-body -->
+				</div><!-- /.box -->';
+		
+		return $html;
+	}
+	
 	function getBoxTable_ng($title, $table, $fields)
 	{
 	$html='				<style>

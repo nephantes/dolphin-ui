@@ -2,6 +2,31 @@
 
 class Search extends VanillaModel {
 
+    public $innerJoin = "LEFT JOIN ngs_sample_source
+                ON ngs_samples.id = ngs_sample_source.sample_id
+                LEFT JOIN ngs_source
+                ON ngs_sample_source.source_id = ngs_source.id
+                LEFT JOIN ngs_sample_organism
+                ON ngs_samples.id = ngs_sample_organism.sample_id
+                LEFT JOIN ngs_organism
+                ON ngs_sample_organism.organism_id = ngs_organism.id
+                LEFT JOIN ngs_sample_molecule
+                ON ngs_samples.id = ngs_sample_molecule.sample_id
+                LEFT JOIN ngs_molecule
+                ON ngs_sample_molecule.molecule_id = ngs_molecule.id
+                LEFT JOIN ngs_sample_genotype
+                ON ngs_samples.id = ngs_sample_genotype.sample_id
+                LEFT JOIN ngs_genotype
+                ON ngs_sample_genotype.genotype_id = ngs_genotype.id
+                LEFT JOIN ngs_sample_library_type
+                ON ngs_samples.id = ngs_sample_library_type.sample_id
+                LEFT JOIN ngs_library_type
+                ON ngs_sample_library_type.library_type_id = ngs_library_type.id
+                LEFT JOIN ngs_sample_conds
+                ON ngs_samples.id = ngs_sample_conds.sample_id
+                LEFT JOIN ngs_conds
+                ON ngs_sample_conds.cond_id = ngs_conds.id";
+                
 /** Get menuitems for this user **/
 	function getAccItems($fieldname, $tablename, $uid, $gids) {
         
@@ -11,7 +36,6 @@ class Search extends VanillaModel {
 
         if($tablename == 'ngs_samples'){
             $result = $this->query("select $fieldname name, count($fieldname) count from $tablename where $fieldname !='' AND (((group_id in ($gids)) AND (perms >= 15)) OR (owner_id = $uid)) group by $fieldname");
-            //var_dump($result);
         }else{
             $result = $this->query("select $fieldname name, count(ngs_samples.id) count
                                                 FROM `ngs_samples`
@@ -43,31 +67,31 @@ class Search extends VanillaModel {
 				$advQuery.= " AND " . $split[0]. " = " . '"'. $split[1] . '"';
 			}
 			if($tablename == 'ngs_samples'){
-                $result = $this->query("select $fieldname name, count($fieldname) count from $tablename where $fieldname !='' $advQuery AND (((group_id in ($gids)) AND (perms >= 15)) OR (owner_id = $uid)) group by $fieldname");
+                $result = $this->query("SELECT $fieldname name, count($fieldname) count FROM $tablename WHERE $fieldname !='' $advQuery AND (((group_id in ($gids)) AND (perms >= 15)) OR (owner_id = $uid)) group by $fieldname");
             }else{
-                $result = $this->query("select $fieldname name, count(ngs_samples.id) count
-                                                    FROM `ngs_samples`
-                                                    INNER JOIN ngs_sample_$fieldname
-                                                    ON ngs_samples.id = ngs_sample_$fieldname.sample_id
-                                                    INNER JOIN $tablename
-                                                    ON ngs_sample_$fieldname."."$fieldname"."_id = $tablename.id
-                                                    $advJoin
-                                                    WHERE (((group_id in ($gids)) AND (perms >= 15)) OR (owner_id = $uid))
-                                                    $advQuery
-                                                    GROUP BY $fieldname");
+                $result = $this->query("SELECT $fieldname name, count(ngs_samples.id) count
+                                        FROM `ngs_samples`
+                                        INNER JOIN ngs_sample_$fieldname
+                                        ON ngs_samples.id = ngs_sample_$fieldname.sample_id
+                                        INNER JOIN $tablename
+                                        ON ngs_sample_$fieldname."."$fieldname"."_id = $tablename.id
+                                        $advJoin
+                                        WHERE (((group_id in ($gids)) AND (perms >= 15)) OR (owner_id = $uid))
+                                        $advQuery
+                                        GROUP BY $fieldname");
         }
 		}else{
 			if($tablename == 'ngs_samples'){
-                $result = $this->query("select $fieldname name, count($fieldname) count from $tablename where $fieldname !='' AND (((group_id in ($gids)) AND (perms >= 15)) OR (owner_id = $uid)) group by $fieldname");
+                $result = $this->query("SELECT $fieldname name, count($fieldname) count FROM $tablename WHERE $fieldname !='' AND (((group_id in ($gids)) AND (perms >= 15)) OR (owner_id = $uid)) group by $fieldname");
             }else{
-                $result = $this->query("select $fieldname name, count(ngs_samples.id) count
-                                                    FROM `ngs_samples`
-                                                    INNER JOIN ngs_sample_$fieldname
-                                                    ON ngs_samples.id = ngs_sample_$fieldname.sample_id
-                                                    INNER JOIN $tablename
-                                                    ON ngs_sample_$fieldname."."$fieldname"."_id = $tablename.id
-                                                    WHERE (((group_id in ($gids)) AND (perms >= 15)) OR (owner_id = $uid))
-                                                    GROUP BY $fieldname");
+                $result = $this->query("SELECT $fieldname name, count(ngs_samples.id) count
+                                        FROM `ngs_samples`
+                                        INNER JOIN ngs_sample_$fieldname
+                                        ON ngs_samples.id = ngs_sample_$fieldname.sample_id
+                                        INNER JOIN $tablename
+                                        ON ngs_sample_$fieldname."."$fieldname"."_id = $tablename.id
+                                        WHERE (((group_id in ($gids)) AND (perms >= 15)) OR (owner_id = $uid))
+                                        GROUP BY $fieldname");
             }
 		}
 		return json_decode($result, true);
@@ -77,7 +101,11 @@ class Search extends VanillaModel {
 		return $result;
 	}
 	function getValues($value, $table) {
-		$result = $this->query("select * from $table where `id`='$value'");
+        if($table == 'ngs_samples'){
+            $result = $this->query("select * from $table ".$this->innerJoin." where $table.`id`='$value'");
+        }else{
+            $result = $this->query("select * from $table where `id`='$value'");
+        }
 		return json_decode($result, true);
 	}
 	function getFields($table){

@@ -166,6 +166,10 @@ $(function() {
 				success : function(s)
 				{
 					console.log(s);
+					console.log("q: "+qvar);
+					console.log("r: "+rvar);
+					console.log("seg: "+segment);
+					console.log("search: "+theSearch);
 					samplesTable.fnClearTable();
 					var changeHTML = '';
 					var hrefSplit = window.location.href.split("/");
@@ -174,20 +178,8 @@ $(function() {
 					if (typeLocSelected > 0 || typeLocRerun > 0) {
 						theSearch = '';
 					}
-					var passedSamples = [];
-					$.ajax({ type: "GET",
-						url: "/dolphin/public/ajax/initialmappingdb.php",
-						data: { p: 'sampleChecking', uid: uid, gids: gids},
-						async: false,
-						success : function(r)
-						{
-							for(var x = 0; x < r.length; x++){
-								passedSamples.push(r[x].id);
-							}
-						}
-					});
 					for(var i = 0; i < s.length; i++) {
-						if (passedSamples.indexOf(s[i].id) >= 0) {
+						if (s[i].total_reads >= 0 && s[i].total_reads != null) {
 							samplesTable.fnAddData([
 								s[i].id,
 								"<a href=\"/dolphin/search/details/samples/"+s[i].id+'/'+theSearch+"\">"+s[i].name+"</a>",

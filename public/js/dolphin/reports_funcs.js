@@ -218,6 +218,8 @@ function showTable(type){
 		createStreamScript(keys, type)
 		var data = objList, html = $.trim($("#template_"+type).html()), template = Mustache.compile(html);
 		var view = function(record, index){
+			console.log(record);
+			console.log(index);
 			return template({record: record, index: index});
 		};
 		
