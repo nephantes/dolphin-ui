@@ -141,7 +141,8 @@ function checkFastlaneInput(info_array){
 		return database_checks;
 	}else{
 		//	May submit into database
-		var organism = info_array[0].split(",")[0];
+		var organism = info_array[0];
+		console.log(organism);
 		if (experiment_series_id > 0) {
 			//	If adding to a experiment series
 			if (lane_id > 0) {
@@ -255,7 +256,7 @@ function insertLane(experiment_id, lane_name){
 function insertSample(experiment_id, lane_id, sample_name, organism, barcode){
 	var id;
 	$.ajax({
-			type: 	'POST',
+			type: 	'GET',
 			url: 	'/dolphin/public/ajax/ngsfastlanedb.php',
 			data:  	{ p: 'insertSample', experiment: experiment_id, lane: lane_id, sample: sample_name,
 					organism: organism, barcode: barcode, gids: phpGrab.gids },
