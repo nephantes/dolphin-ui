@@ -165,11 +165,6 @@ $(function() {
 				async: false,
 				success : function(s)
 				{
-					console.log(s);
-					console.log("q: "+qvar);
-					console.log("r: "+rvar);
-					console.log("seg: "+segment);
-					console.log("search: "+theSearch);
 					samplesTable.fnClearTable();
 					var changeHTML = '';
 					var hrefSplit = window.location.href.split("/");
