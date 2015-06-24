@@ -35,12 +35,28 @@ if (isset($_GET['gids'])){$gids = $_GET['gids'];}
 if($uid != "" && $gids != ""){
     $perms = "WHERE (((group_id in ($gids)) AND (perms >= 15)) OR (owner_id = $uid))";
     $andPerms = "AND (((group_id in ($gids)) AND (perms >= 15)) OR (owner_id = $uid))";
-    
-    $innerJoin = "INNER JOIN ngs_sample_source
-            ON ngs_samples.id = ngs_sample_source.sample_id
-            INNER JOIN ngs_source
-            ON ngs_sample_source.source_id = ngs_source.id";
 }
+
+$innerJoin = "LEFT JOIN ngs_sample_source
+                ON ngs_samples.id = ngs_sample_source.sample_id
+                LEFT JOIN ngs_source
+                ON ngs_sample_source.source_id = ngs_source.id
+                LEFT JOIN ngs_sample_organism
+                ON ngs_samples.id = ngs_sample_organism.sample_id
+                LEFT JOIN ngs_organism
+                ON ngs_sample_organism.organism_id = ngs_organism.id
+                LEFT JOIN ngs_sample_molecule
+                ON ngs_samples.id = ngs_sample_molecule.sample_id
+                LEFT JOIN ngs_molecule
+                ON ngs_sample_molecule.molecule_id = ngs_molecule.id
+                LEFT JOIN ngs_sample_genotype
+                ON ngs_samples.id = ngs_sample_genotype.sample_id
+                LEFT JOIN ngs_genotype
+                ON ngs_sample_genotype.genotype_id = ngs_genotype.id
+                LEFT JOIN ngs_sample_library_type
+                ON ngs_samples.id = ngs_sample_library_type.sample_id
+                LEFT JOIN ngs_library_type
+                ON ngs_sample_library_type.library_type_id = ngs_library_type.id";
 
 if (isset($_GET['start'])){$start = $_GET['start'];}
 if (isset($_GET['end'])){$end = $_GET['end'];}
@@ -272,7 +288,7 @@ else if (!in_array($p, $pDictionary))
 			$time="";
 			if (isset($start)){$time="and `date_created`>='$start' and `date_created`<='$end'";}
 			$data=$query->queryTable("
-			SELECT id, name, title, source, organism, molecule
+			SELECT ngs_samples.id, name, title, source, organism, molecule
 			FROM biocore.ngs_samples
             $innerJoin
             $perms $time
