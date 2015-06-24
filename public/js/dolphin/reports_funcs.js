@@ -35,11 +35,13 @@ function parseMoreTSV(jsonNameArray, url_path){
 			async: false,
 			success : function(s)
 			{
+				console.log(BASE_PATH + "/public/api/?source=" + API_PATH + "/public/pub/" + wkey + "/" + url_path);
 				for( var j = 0; j < s.length; j++){
 					var parsed = [];
 					for(var k = 0; k < jsonNameArray.length; k++){
 						parsed.push(s[j][jsonNameArray[k]]);
 					}
+					console.log(parsed);
 					parsedArray.push(parsed);
 				}
 			}
@@ -425,7 +427,7 @@ function downloadTSV(type){
 	window.open(URL, '_blank');
 }
 
-function getWKey(run_id){
+function getReportWKey(run_id){
 	var wkey = "";
 	$.ajax({ type: "GET",
 			url: "/dolphin/public/ajax/ngsquerydb.php",
@@ -433,7 +435,7 @@ function getWKey(run_id){
 			async: false,
 			success : function(s)
 			{
-			   wkey = s[0].wkey;
+				wkey = s[0].wkey;
 			}
 	});
 	return wkey;
@@ -454,7 +456,7 @@ $(function() {
 
 	var hrefSplit = window.location.href.split("/");
 	var runId = hrefSplit[hrefSplit.length - 2];
-	wkey = getWKey(runId);
+	wkey = getReportWKey(runId);
 	var samples = hrefSplit[hrefSplit.length - 1].substring(0, hrefSplit[hrefSplit.length - 1].length - 1).split(",");
 	
 	var summary_files = [];
@@ -491,7 +493,6 @@ $(function() {
 		document.getElementById(summary_rna_type[z]).innerHTML = summary_rna_type[z];
 	}
 	
-	console.log(samples.toString());
 	$.ajax({ type: "GET",
 			url: "/dolphin/public/ajax/ngsquerydb.php",
 			data: { p: 'getSampleNames', samples: samples.toString() },
@@ -518,8 +519,6 @@ $(function() {
 			}
 	});
 	
-	console.log(read_counts);
-	
 	if (summary_files.length > 0) {
 		document.getElementById('tablerow').appendChild(createElement('th', ['id'], ['unused']));
 		document.getElementById('unused').innerHTML = 'Reads Left';
@@ -535,7 +534,9 @@ $(function() {
 					}
 				}else{
 					var table_array_raw = (parseMoreTSV(['File','Total Reads','Reads 1','Reads >1'], summary_files[z]['file']));
+					console.log(summary_files[z]['file']);
 					for(var x = 0; x < table_array_raw.length; x++){
+						console.log(table_array_raw[x]);
 						var table_array_push = [table_array_raw[x][0], table_array_raw[x][1], parseInt(table_array_raw[x][2].split(" ")[0]) + parseInt(table_array_raw[x][3].split(" ")[0])];
 						table_array.push(table_array_push);
 					}
