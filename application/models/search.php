@@ -30,9 +30,16 @@ class Search extends VanillaModel {
         }
 		if($search != ""){
 			$advQuery = "";
+            $advJoin = "";
 			foreach(explode('$', $search) as $s){
 				$s = urldecode($s);
 				$split = explode('=', $s);
+                if($split[0] != $fieldname){
+                    $advJoin.= "INNER JOIN ngs_sample_".$split[0]."
+                                ON ngs_samples.id = ngs_sample_".$split[0].".sample_id
+                                INNER JOIN ngs_".$split[0]."
+                                ON ngs_sample_".$split[0].".".$split[0]."_id = ngs_".$split[0].".id ";
+                }
 				$advQuery.= " AND " . $split[0]. " = " . '"'. $split[1] . '"';
 			}
 			if($tablename == 'ngs_samples'){
@@ -44,6 +51,7 @@ class Search extends VanillaModel {
                                                     ON ngs_samples.id = ngs_sample_$fieldname.sample_id
                                                     INNER JOIN $tablename
                                                     ON ngs_sample_$fieldname."."$fieldname"."_id = $tablename.id
+                                                    $advJoin
                                                     WHERE (((group_id in ($gids)) AND (perms >= 15)) OR (owner_id = $uid))
                                                     $advQuery
                                                     GROUP BY $fieldname");
