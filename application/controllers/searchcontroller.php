@@ -14,11 +14,11 @@ class SearchController extends VanillaController {
         $gids = $this->Search->getGroup($_SESSION['user']);
         $this->set('gids', $gids);
         
-		$this->set('assay', $this->Search->getAccItems("library_type", "ngs_samples", $_SESSION['uid'], $gids));
-		$this->set('organism', $this->Search->getAccItems("organism", "ngs_samples", $_SESSION['uid'], $gids));
-		$this->set('molecule', $this->Search->getAccItems("molecule", "ngs_samples", $_SESSION['uid'], $gids));
+		$this->set('assay', $this->Search->getAccItems("library_type", "ngs_library_type", $_SESSION['uid'], $gids));
+		$this->set('organism', $this->Search->getAccItems("organism", "ngs_organism", $_SESSION['uid'], $gids));
+		$this->set('molecule', $this->Search->getAccItems("molecule", "ngs_molecule", $_SESSION['uid'], $gids));
 		$this->set('source', $this->Search->getAccItems("source", "ngs_source", $_SESSION['uid'], $gids));
-		$this->set('genotype', $this->Search->getAccItems("genotype", "ngs_samples", $_SESSION['uid'], $gids));
+		$this->set('genotype', $this->Search->getAccItems("genotype", "ngs_genotype", $_SESSION['uid'], $gids));
 	}
 
 	function browse($field, $value, $search) {
@@ -32,11 +32,11 @@ class SearchController extends VanillaController {
         $gids = $this->Search->getGroup($_SESSION['user']);
         $this->set('gids', $gids);
         
-		$this->set('assay', $this->Search->getAccItemsCont("library_type", "ngs_samples", $search, $_SESSION['uid'], $gids), $search);
-		$this->set('organism', $this->Search->getAccItemsCont("organism", "ngs_samples", $search, $_SESSION['uid'], $gids), $search);
-		$this->set('molecule', $this->Search->getAccItemsCont("molecule", "ngs_samples", $search, $_SESSION['uid'], $gids), $search);
+		$this->set('assay', $this->Search->getAccItemsCont("library_type", "ngs_library_type", $search, $_SESSION['uid'], $gids), $search);
+		$this->set('organism', $this->Search->getAccItemsCont("organism", "ngs_organism", $search, $_SESSION['uid'], $gids), $search);
+		$this->set('molecule', $this->Search->getAccItemsCont("molecule", "ngs_molecule", $search, $_SESSION['uid'], $gids), $search);
 		$this->set('source', $this->Search->getAccItemsCont("source", "ngs_source", $search, $_SESSION['uid'], $gids), $search);
-		$this->set('genotype', $this->Search->getAccItemsCont("genotype", "ngs_samples", $search, $_SESSION['uid'], $gids), $search);
+		$this->set('genotype', $this->Search->getAccItemsCont("genotype", "ngs_genotype", $search, $_SESSION['uid'], $gids), $search);
 	}
 	function details($table, $value, $search) {
 		$this->set('field', "Search");
@@ -49,11 +49,11 @@ class SearchController extends VanillaController {
         $gids = $this->Search->getGroup($_SESSION['user']);
         $this->set('gids', $gids);
         
-		$this->set('assay', $this->Search->getAccItemsCont("library_type", "ngs_samples", $search, $_SESSION['uid'], $gids), $search);
-		$this->set('organism', $this->Search->getAccItemsCont("organism", "ngs_samples", $search, $_SESSION['uid'], $gids), $search);
-		$this->set('molecule', $this->Search->getAccItemsCont("molecule", "ngs_samples", $search, $_SESSION['uid'], $gids), $search);
+		$this->set('assay', $this->Search->getAccItemsCont("library_type", "ngs_library_type", $search, $_SESSION['uid'], $gids), $search);
+		$this->set('organism', $this->Search->getAccItemsCont("organism", "ngs_organism", $search, $_SESSION['uid'], $gids), $search);
+		$this->set('molecule', $this->Search->getAccItemsCont("molecule", "ngs_molecule", $search, $_SESSION['uid'], $gids), $search);
 		$this->set('source', $this->Search->getAccItemsCont("source", "ngs_source", $search, $_SESSION['uid'], $gids), $search);
-		$this->set('genotype', $this->Search->getAccItemsCont("genotype", "ngs_samples", $search, $_SESSION['uid'], $gids), $search);
+		$this->set('genotype', $this->Search->getAccItemsCont("genotype", "ngs_genotype", $search, $_SESSION['uid'], $gids), $search);
         
 		if ($table=='experiment_series')
 		{

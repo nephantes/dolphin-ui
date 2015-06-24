@@ -487,6 +487,7 @@ class Ngsimport extends VanillaModel {
 				if($this->sheetData[3][$j]=="3' Adapter sequence"){$samp->adapter=$this->esc($this->sheetData[$i][$j]);}
 				if($this->sheetData[3][$j]=="Notebook reference"){$samp->notebook_ref=$this->esc($this->sheetData[$i][$j]);}
 				if($this->sheetData[3][$j]=="Notes"){$samp->notes=$this->esc($this->sheetData[$i][$j]);}
+				if($this->sheetData[3][$j]=="Library type"){$samp->lib_type=$this->esc($this->sheetData[$i][$j]);}
 	
 				if($this->sheetData[3][$j]=="Sample name"){
 					if($this->namesList == null){
@@ -618,6 +619,11 @@ class Ngsimport extends VanillaModel {
 			//	Spikeins
 			if(!isset($samp->spikeins)){
 				$samp->spikeins = NULL;
+			}
+			
+			//	Library Type
+			if(!isset($samp->lib_type)){
+				$samp->lib_type = NULL;
 			}
 			
 			//	Other Values
@@ -1064,10 +1070,9 @@ class samples extends main{
 		$sql="INSERT INTO `biocore`.`ngs_samples`
 			(`series_id`, `protocol_id`, `lane_id`,
 			`name`, `barcode`, `title`, `batch_id`,
-			`organism`,
 			`biosample_type`, `concentration`,
-			`molecule`, `description`, `instrument_model`,
-			`avg_insert_size`, `read_length`, `genotype`,
+			`description`, `instrument_model`,
+			`avg_insert_size`, `read_length`,
 			`adapter`, `treatment_manufacturer`,
 			`donor`, `time`, `biological_replica`,
 			`spike_ins`,
@@ -1078,10 +1083,10 @@ class samples extends main{
 			(
 			'".$this->model->series_id."', '$protocol_id', '$lane_id',
 			'$sample->name', '$sample->barcode', '$sample->title',
-			'$sample->batch', '$sample->organism',
+			'$sample->batch',
 			'$sample->biosample_type', '$sample->concentration',
-			'$sample->molecule', '$sample->description', '$sample->instrument_model',
-			'$sample->avg_insert_size', '$sample->read_length', '$sample->genotype',
+			'$sample->description', '$sample->instrument_model',
+			'$sample->avg_insert_size', '$sample->read_length',
 			'$sample->adapter', '$sample->treatment_manufacturer',
 			'$sample->donor', '$sample->time', '$sample->biological_replica',
 			'$sample->spikeins',
@@ -1166,6 +1171,101 @@ class samples extends main{
 			}
 		}
 		
+		//	Organism
+		if($sample->organism != NULL || $sample->organism != ''){
+			$org_check = "SELECT `id`, `organism`
+						FROM ngs_organism
+						WHERE `organism` = '".$sample->organism."'";
+			$org_check_result = json_decode($this->model->query($org_check));
+			if($org_check_result == array()){
+				//	Empty
+				$this->model->query("INSERT INTO `ngs_organism` (`organism`) VALUES ('".$sample->organism."')");
+				$organism_id = json_decode($this->model->query("SELECT `id` FROM `ngs_organism` WHERE organism = '".$sample->organism."'"));
+				$this->model->query("INSERT INTO `ngs_sample_organism` (`sample_id`, `organism_id`) VALUES ($sample_id, ".$organism_id[0]->id.")");
+			}else{
+				//	Organism exists
+				$organism_id = json_decode($this->model->query("SELECT `id` FROM `ngs_organism` WHERE organism = '".$sample->organism."'"));
+				$sample_organism = json_decode($this->model->query("SELECT id, organism_id FROM `ngs_sample_organism` WHERE `sample_id` = $sample_id"));
+				
+				if($sample_organism == array()){
+					$this->model->query("INSERT INTO `ngs_sample_organism` (`sample_id`, `organism_id`) VALUES ('$sample_id', '".$organism_id[0]->id."')");	
+				}else if($sample_organism[0]->organism_id != $organism_id[0]->id){
+					$this->model->query("UPDATE `ngs_sample_organism` SET `organism_id` = ".$organism_id[0]->id." WHERE `sample_id` = $sample_id");
+				}
+			}
+		}
+		
+		//	Genotype
+		if($sample->genotype != NULL || $sample->genotype != ''){
+			$genotype_check = "SELECT `id`, `genotype`
+						FROM ngs_genotype
+						WHERE `genotype` = '".$sample->genotype."'";
+			$genotype_check_result = json_decode($this->model->query($genotype_check));
+			if($genotype_check_result == array()){
+				//	Empty
+				$this->model->query("INSERT INTO `ngs_genotype` (`genotype`) VALUES ('".$sample->genotype."')");
+				$genotype_id = json_decode($this->model->query("SELECT `id` FROM `ngs_genotype` WHERE genotype = '".$sample->genotype."'"));
+				$this->model->query("INSERT INTO `ngs_sample_genotype` (`sample_id`, `genotype_id`) VALUES ($sample_id, ".$genotype_id[0]->id.")");
+			}else{
+				//	Genotype exists
+				$genotype_id = json_decode($this->model->query("SELECT `id` FROM `ngs_genotype` WHERE genotype = '".$sample->genotype."'"));
+				$sample_genotype = json_decode($this->model->query("SELECT id, genotype_id FROM `ngs_sample_genotype` WHERE `sample_id` = $sample_id"));
+				
+				if($sample_genotype == array()){
+					$this->model->query("INSERT INTO `ngs_sample_genotype` (`sample_id`, `genotype_id`) VALUES ('$sample_id', '".$genotype_id[0]->id."')");	
+				}else if($sample_genotype[0]->genotype_id != $genotype_id[0]->id){
+					$this->model->query("UPDATE `ngs_sample_genotype` SET `genotype_id` = ".$genotype_id[0]->id." WHERE `sample_id` = $sample_id");
+				}
+			}
+		}
+		
+		//	Molecule
+		if($sample->molecule != NULL || $sample->molecule != ''){
+			$molecule_check = "SELECT `id`, `molecule`
+						FROM ngs_molecule
+						WHERE `molecule` = '".$sample->molecule."'";
+			$molecule_check_result = json_decode($this->model->query($molecule_check));
+			if($molecule_check_result == array()){
+				//	Empty
+				$this->model->query("INSERT INTO `ngs_molecule` (`molecule`) VALUES ('".$sample->molecule."')");
+				$molecule_id = json_decode($this->model->query("SELECT `id` FROM `ngs_molecule` WHERE molecule = '".$sample->molecule."'"));
+				$this->model->query("INSERT INTO `ngs_sample_molecule` (`sample_id`, `molecule_id`) VALUES ($sample_id, ".$molecule_id[0]->id.")");
+			}else{
+				//	Molecule exists
+				$molecule_id = json_decode($this->model->query("SELECT `id` FROM `ngs_molecule` WHERE molecule = '".$sample->molecule."'"));
+				$sample_molecule = json_decode($this->model->query("SELECT id, molecule_id FROM `ngs_sample_molecule` WHERE `sample_id` = $sample_id"));
+				
+				if($sample_molecule == array()){
+					$this->model->query("INSERT INTO `ngs_sample_molecule` (`sample_id`, `molecule_id`) VALUES ('$sample_id', '".$molecule_id[0]->id."')");	
+				}else if($sample_molecule[0]->molecule_id != $molecule_id[0]->id){
+					$this->model->query("UPDATE `ngs_sample_molecule` SET `molecule_id` = ".$molecule_id[0]->id." WHERE `sample_id` = $sample_id");
+				}
+			}
+		}
+		
+		//	Library Type
+		if($sample->lib_type != NULL || $sample->lib_type != ''){
+			$lib_type_check = "SELECT `id`, `library_type`
+						FROM ngs_library_type
+						WHERE `library_type` = '".$sample->lib_type."'";
+			$lib_type_check_result = json_decode($this->model->query($lib_type_check));
+			if($lib_type_check_result == array()){
+				//	Empty
+				$this->model->query("INSERT INTO `ngs_library_type` (`library_type`) VALUES ('".$sample->lib_type."')");
+				$lib_type_id = json_decode($this->model->query("SELECT `id` FROM `ngs_library_type` WHERE library_type = '".$sample->lib_type."'"));
+				$this->model->query("INSERT INTO `ngs_sample_library_type` (`sample_id`, `library_type_id`) VALUES ($sample_id, ".$lib_type_id[0]->id.")");
+			}else{
+				//	Molecule exists
+				$lib_type_id = json_decode($this->model->query("SELECT `id` FROM `ngs_library_type` WHERE library_type = '".$sample->lib_type."'"));
+				$sample_lib_type = json_decode($this->model->query("SELECT id, library_type_id FROM `ngs_sample_library_type` WHERE `sample_id` = $sample_id"));
+				
+				if($sample_lib_type == array()){
+					$this->model->query("INSERT INTO `ngs_sample_library_type` (`sample_id`, `library_type_id`) VALUES ('$sample_id', '".$lib_type_id[0]->id."')");	
+				}else if($sample_lib_type[0]->library_type_id != $lib_type_id[0]->id){
+					$this->model->query("UPDATE `ngs_sample_library_type` SET `library_type_id` = ".$lib_type_id[0]->id." WHERE `sample_id` = $sample_id");
+				}
+			}
+		}
 		
 		return $this->model->query($sql);
 	}
@@ -1184,15 +1284,12 @@ class samples extends main{
 			`barcode` = '$sample->barcode',
 			`title` = '$sample->title',
 			`batch_id` = '$sample->batch',
-			`organism` = '$sample->organism',
 			`biosample_type` = '$sample->biosample_type',
 			`concentration` = '$sample->concentration',
-			`molecule` = '$sample->molecule',
 			`description` = '$sample->description',
 			`instrument_model` = '$sample->instrument_model',
 			`avg_insert_size` = '$sample->avg_insert_size',
 			`read_length` = '$sample->read_length',
-			`genotype` = '$sample->genotype',
 			`adapter` = '$sample->adapter',
 			`treatment_manufacturer` = '$sample->treatment_manufacturer',
 			`donor` = '$sample->donor',
@@ -1284,6 +1381,103 @@ class samples extends main{
 				}
 			}
 		}
+		
+		//	Organism
+		if($sample->organism != NULL || $sample->organism != ''){
+			$org_check = "SELECT `id`, `organism`
+						FROM ngs_organism
+						WHERE `organism` = '".$sample->organism."'";
+			$org_check_result = json_decode($this->model->query($org_check));
+			if($org_check_result == array()){
+				//	Empty
+				$this->model->query("INSERT INTO `ngs_organism` (`organism`) VALUES ('".$sample->organism."')");
+				$organism_id = json_decode($this->model->query("SELECT `id` FROM `ngs_organism` WHERE organism = '".$sample->organism."'"));
+				$this->model->query("INSERT INTO `ngs_sample_organism` (`sample_id`, `organism_id`) VALUES ($sample_id, ".$organism_id[0]->id.")");
+			}else{
+				//	Organism exists
+				$organism_id = json_decode($this->model->query("SELECT `id` FROM `ngs_organism` WHERE organism = '".$sample->organism."'"));
+				$sample_organism = json_decode($this->model->query("SELECT id, organism_id FROM `ngs_sample_organism` WHERE `sample_id` = $sample_id"));
+				
+				if($sample_organism == array()){
+					$this->model->query("INSERT INTO `ngs_sample_organism` (`sample_id`, `organism_id`) VALUES ('$sample_id', '".$organism_id[0]->id."')");	
+				}else if($sample_organism[0]->organism_id != $organism_id[0]->id){
+					$this->model->query("UPDATE `ngs_sample_organism` SET `organism_id` = ".$organism_id[0]->id." WHERE `sample_id` = $sample_id");
+				}
+			}
+		}
+		
+		//	Genotype
+		if($sample->genotype != NULL || $sample->genotype != ''){
+			$genotype_check = "SELECT `id`, `genotype`
+						FROM ngs_genotype
+						WHERE `genotype` = '".$sample->genotype."'";
+			$genotype_check_result = json_decode($this->model->query($genotype_check));
+			if($genotype_check_result == array()){
+				//	Empty
+				$this->model->query("INSERT INTO `ngs_genotype` (`genotype`) VALUES ('".$sample->genotype."')");
+				$genotype_id = json_decode($this->model->query("SELECT `id` FROM `ngs_genotype` WHERE genotype = '".$sample->genotype."'"));
+				$this->model->query("INSERT INTO `ngs_sample_genotype` (`sample_id`, `genotype_id`) VALUES ($sample_id, ".$genotype_id[0]->id.")");
+			}else{
+				//	Genotype exists
+				$genotype_id = json_decode($this->model->query("SELECT `id` FROM `ngs_genotype` WHERE genotype = '".$sample->genotype."'"));
+				$sample_genotype = json_decode($this->model->query("SELECT id, genotype_id FROM `ngs_sample_genotype` WHERE `sample_id` = $sample_id"));
+				
+				if($sample_genotype == array()){
+					$this->model->query("INSERT INTO `ngs_sample_genotype` (`sample_id`, `genotype_id`) VALUES ('$sample_id', '".$genotype_id[0]->id."')");	
+				}else if($sample_genotype[0]->genotype_id != $genotype_id[0]->id){
+					$this->model->query("UPDATE `ngs_sample_genotype` SET `genotype_id` = ".$genotype_id[0]->id." WHERE `sample_id` = $sample_id");
+				}
+			}
+		}
+		
+		//	Molecule
+		if($sample->molecule != NULL || $sample->molecule != ''){
+			$molecule_check = "SELECT `id`, `molecule`
+						FROM ngs_molecule
+						WHERE `molecule` = '".$sample->molecule."'";
+			$molecule_check_result = json_decode($this->model->query($molecule_check));
+			if($molecule_check_result == array()){
+				//	Empty
+				$this->model->query("INSERT INTO `ngs_molecule` (`molecule`) VALUES ('".$sample->molecule."')");
+				$molecule_id = json_decode($this->model->query("SELECT `id` FROM `ngs_molecule` WHERE molecule = '".$sample->molecule."'"));
+				$this->model->query("INSERT INTO `ngs_sample_molecule` (`sample_id`, `molecule_id`) VALUES ($sample_id, ".$molecule_id[0]->id.")");
+			}else{
+				//	Molecule exists
+				$molecule_id = json_decode($this->model->query("SELECT `id` FROM `ngs_molecule` WHERE molecule = '".$sample->molecule."'"));
+				$sample_molecule = json_decode($this->model->query("SELECT id, molecule_id FROM `ngs_sample_molecule` WHERE `sample_id` = $sample_id"));
+				
+				if($sample_molecule == array()){
+					$this->model->query("INSERT INTO `ngs_sample_molecule` (`sample_id`, `molecule_id`) VALUES ('$sample_id', '".$molecule_id[0]->id."')");	
+				}else if($sample_molecule[0]->molecule_id != $molecule_id[0]->id){
+					$this->model->query("UPDATE `ngs_sample_molecule` SET `molecule_id` = ".$molecule_id[0]->id." WHERE `sample_id` = $sample_id");
+				}
+			}
+		}
+		
+		//	Library Type
+		if($sample->lib_type != NULL || $sample->lib_type != ''){
+			$lib_type_check = "SELECT `id`, `library_type`
+						FROM ngs_library_type
+						WHERE `library_type` = '".$sample->lib_type."'";
+			$lib_type_check_result = json_decode($this->model->query($lib_type_check));
+			if($lib_type_check_result == array()){
+				//	Empty
+				$this->model->query("INSERT INTO `ngs_library_type` (`library_type`) VALUES ('".$sample->lib_type."')");
+				$lib_type_id = json_decode($this->model->query("SELECT `id` FROM `ngs_library_type` WHERE library_type = '".$sample->lib_type."'"));
+				$this->model->query("INSERT INTO `ngs_sample_library_type` (`sample_id`, `library_type_id`) VALUES ($sample_id, ".$lib_type_id[0]->id.")");
+			}else{
+				//	Molecule exists
+				$lib_type_id = json_decode($this->model->query("SELECT `id` FROM `ngs_library_type` WHERE library_type = '".$sample->lib_type."'"));
+				$sample_lib_type = json_decode($this->model->query("SELECT id, library_type_id FROM `ngs_sample_library_type` WHERE `sample_id` = $sample_id"));
+				
+				if($sample_lib_type == array()){
+					$this->model->query("INSERT INTO `ngs_sample_library_type` (`sample_id`, `library_type_id`) VALUES ('$sample_id', '".$lib_type_id[0]->id."')");	
+				}else if($sample_lib_type[0]->library_type_id != $lib_type_id[0]->id){
+					$this->model->query("UPDATE `ngs_sample_library_type` SET `library_type_id` = ".$lib_type_id[0]->id." WHERE `sample_id` = $sample_id");
+				}
+			}
+		}
+		
 		return $this->model->query($sql);
 	}
 }
