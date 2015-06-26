@@ -11,7 +11,7 @@ $query = new dbfuncs();
 $pDictionary = ['getSelectedSamples', 'submitPipeline', 'getStatus', 'getRunSamples', 'grabReload', 'getReportNames', 'lanesToSamples',
 				'checkMatePaired', 'getAllSampleIds', 'getLaneIdFromSample', 'getSingleSample', 'getSeriesIdFromLane', 'getAllLaneIds',
                 'getGIDs', 'getSampleNames', 'getWKey', 'getFastQCBool', 'getReportList', 'getTSVFileList', 'profileLoad',
-                'obtainAmazonKeys', 'checkAmazonPermissions', 'getInfoBoxData', 'getSamplesFromName'];
+                'obtainAmazonKeys', 'checkAmazonPermissions', 'getInfoBoxData', 'getSamplesFromName', 'getLanesWithSamples'];
 
 $data = "";
                 
@@ -367,7 +367,7 @@ else if ($p == "getSelectedSamples")
 	$time="";
 	if (isset($start)){$time="and `date_created`>='$start' and `date_created`<='$end'";}
 	$data=$query->queryTable("
-	SELECT id, name, title, source, organism, molecule
+	SELECT ngs_samples.id, name, title, source, organism, molecule
 	FROM biocore.ngs_samples
     $innerJoin
 	WHERE $searchQuery $andPerms $time
@@ -594,6 +594,22 @@ else if($p == 'getSamplesFromName')
     WHERE ns.name in ($sqlnames)
     AND ns.lane_id = nl.id and nl.name = '$lane'
     AND ns.series_id = ne.id and ne.experiment_name = '$experiment';
+    ");
+}
+else if ($p == 'getLanesWithSamples')
+{
+    $data=$query->queryTable("
+    SELECT ngs_lanes.id
+    FROM ngs_lanes
+    WHERE ngs_lanes.id in (
+        SELECT ngs_samples.lane_id
+        FROM ngs_samples
+        WHERE id in (
+            SELECT ngs_fastq_files.sample_id
+            FROM ngs_fastq_files
+            WHERE total_reads > 0
+        )
+    )
     ");
 }
 

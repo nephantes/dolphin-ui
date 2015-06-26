@@ -223,17 +223,29 @@ class HTML {
 	}
 
 	
-	function getRespBoxTableStream($title, $table, $fields){
+	function getRespBoxTableStream($title, $table, $fields, $tableKeys){
 		$html = '';
 		$html.= '<div class="box">
 						<div class="box-header">
 								<h3 class="box-title">'.$title.'</h3>
 						</div><!-- /.box-head -->
-						<div class="box-body table-responsive">
+						<div id="table_div_'.$table.'" class="box-body table-responsive">
 								<table id="jsontable_'.$table.'" class="table table-hover table-striped table-condensed table-scrollable">
 										<thead>
-										<tr>'.$fields.'</tr>
+										<tr>';
+										for($x = 0; $x < count($tableKeys); $x++){
+												if($tableKeys[$x] == "id"){
+		$html.=									'<th data-sort="'.$tableKeys[$x].'::number" onclick="shiftColumns(this)">'
+												.$fields[$x].'<i id="'.$tableKeys[$x].'" class="pull-right fa fa-unsorted"></i></th>';
+												}else{
+		$html.=									'<th data-sort="'.$tableKeys[$x].'::string" onclick="shiftColumns(this)">'
+												.$fields[$x].'<i id="'.$tableKeys[$x].'" class="pull-right fa fa-unsorted"></i></th>';
+												}
+										}
+		$html.=							'</tr>
 										</thead>
+										<tbody>
+										</tbody>
 								</table>
 						</div><!-- /.box-body -->
 				</div><!-- /.box -->';
