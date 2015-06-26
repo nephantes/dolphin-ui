@@ -70,7 +70,7 @@ function generateStreamTable(type, queryData, queryType, qvar, rvar, seg, theSea
 				}
 			}
 		}
-		if (record.total_reads > 0 || record.total_reads != '' && type == 'samples'){
+		if (record.total_reads != '' && type == 'samples'){
 			disabled = '';
 		}
 		if (type == 'samples') {
