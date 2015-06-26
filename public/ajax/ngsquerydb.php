@@ -37,26 +37,16 @@ if($uid != "" && $gids != ""){
     $andPerms = "AND (((group_id in ($gids)) AND (perms >= 15)) OR (owner_id = $uid))";
 }
 
-$innerJoin = "LEFT JOIN ngs_sample_source
-                ON ngs_samples.id = ngs_sample_source.sample_id
-                LEFT JOIN ngs_source
-                ON ngs_sample_source.source_id = ngs_source.id
-                LEFT JOIN ngs_sample_organism
-                ON ngs_samples.id = ngs_sample_organism.sample_id
+$innerJoin = "LEFT JOIN ngs_source
+                ON ngs_samples.source_id = ngs_source.id
                 LEFT JOIN ngs_organism
-                ON ngs_sample_organism.organism_id = ngs_organism.id
-                LEFT JOIN ngs_sample_molecule
-                ON ngs_samples.id = ngs_sample_molecule.sample_id
+                ON ngs_samples.organism_id = ngs_organism.id
                 LEFT JOIN ngs_molecule
-                ON ngs_sample_molecule.molecule_id = ngs_molecule.id
-                LEFT JOIN ngs_sample_genotype
-                ON ngs_samples.id = ngs_sample_genotype.sample_id
+                ON ngs_samples.molecule_id = ngs_molecule.id
                 LEFT JOIN ngs_genotype
-                ON ngs_sample_genotype.genotype_id = ngs_genotype.id
-                LEFT JOIN ngs_sample_library_type
-                ON ngs_samples.id = ngs_sample_library_type.sample_id
+                ON ngs_samples.genotype_id = ngs_genotype.id
                 LEFT JOIN ngs_library_type
-                ON ngs_sample_library_type.library_type_id = ngs_library_type.id";
+                ON ngs_samples.library_type_id = ngs_library_type.id";
                 
 $sampleJoin = "LEFT JOIN ngs_fastq_files
                 ON ngs_samples.id = ngs_fastq_files.sample_id";

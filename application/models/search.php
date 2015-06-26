@@ -2,30 +2,21 @@
 
 class Search extends VanillaModel {
 
-    public $innerJoin = "LEFT JOIN ngs_sample_source
-                ON ngs_samples.id = ngs_sample_source.sample_id
+    public $innerJoin = "
                 LEFT JOIN ngs_source
-                ON ngs_sample_source.source_id = ngs_source.id
-                LEFT JOIN ngs_sample_organism
-                ON ngs_samples.id = ngs_sample_organism.sample_id
+                ON ngs_samples.source_id = ngs_source.id
                 LEFT JOIN ngs_organism
-                ON ngs_sample_organism.organism_id = ngs_organism.id
-                LEFT JOIN ngs_sample_molecule
-                ON ngs_samples.id = ngs_sample_molecule.sample_id
+                ON ngs_samples.organism_id = ngs_organism.id
                 LEFT JOIN ngs_molecule
-                ON ngs_sample_molecule.molecule_id = ngs_molecule.id
-                LEFT JOIN ngs_sample_genotype
-                ON ngs_samples.id = ngs_sample_genotype.sample_id
+                ON ngs_samples.molecule_id = ngs_molecule.id
                 LEFT JOIN ngs_genotype
-                ON ngs_sample_genotype.genotype_id = ngs_genotype.id
-                LEFT JOIN ngs_sample_library_type
-                ON ngs_samples.id = ngs_sample_library_type.sample_id
+                ON ngs_samples.genotype_id = ngs_genotype.id
                 LEFT JOIN ngs_library_type
-                ON ngs_sample_library_type.library_type_id = ngs_library_type.id
-                LEFT JOIN ngs_sample_conds
-                ON ngs_samples.id = ngs_sample_conds.sample_id
+                ON ngs_samples.library_type_id = ngs_library_type.id
                 LEFT JOIN ngs_conds
-                ON ngs_sample_conds.cond_id = ngs_conds.id";
+                ON ngs_samples.conditions_id = ngs_conds.id
+                LEFT JOIN ngs_instrument_model
+                ON ngs_samples.instrument_model_id = ngs_instrument_model.id";
                 
 /** Get menuitems for this user **/
 	function getAccItems($fieldname, $tablename, $uid, $gids) {
@@ -39,10 +30,8 @@ class Search extends VanillaModel {
         }else{
             $result = $this->query("select $fieldname name, count(ngs_samples.id) count
                                                 FROM `ngs_samples`
-                                                INNER JOIN ngs_sample_$fieldname
-                                                ON ngs_samples.id = ngs_sample_$fieldname.sample_id
                                                 INNER JOIN $tablename
-                                                ON ngs_sample_$fieldname."."$fieldname"."_id = $tablename.id
+                                                ON ngs_samples."."$fieldname"."_id = $tablename.id
                                                 WHERE (((group_id in ($gids)) AND (perms >= 15)) OR (owner_id = $uid))
                                                 GROUP BY $fieldname");
         }
@@ -59,10 +48,8 @@ class Search extends VanillaModel {
 				$s = urldecode($s);
 				$split = explode('=', $s);
                 if($split[0] != $fieldname){
-                    $advJoin.= "INNER JOIN ngs_sample_".$split[0]."
-                                ON ngs_samples.id = ngs_sample_".$split[0].".sample_id
-                                INNER JOIN ngs_".$split[0]."
-                                ON ngs_sample_".$split[0].".".$split[0]."_id = ngs_".$split[0].".id ";
+                    $advJoin.= "INNER JOIN ngs_".$split[0]."
+                                ON ngs_samples.".$split[0]."_id = ngs_".$split[0].".id ";
                 }
 				$advQuery.= " AND " . $split[0]. " = " . '"'. $split[1] . '"';
 			}
@@ -71,10 +58,8 @@ class Search extends VanillaModel {
             }else{
                 $result = $this->query("SELECT $fieldname name, count(ngs_samples.id) count
                                         FROM `ngs_samples`
-                                        INNER JOIN ngs_sample_$fieldname
-                                        ON ngs_samples.id = ngs_sample_$fieldname.sample_id
                                         INNER JOIN $tablename
-                                        ON ngs_sample_$fieldname."."$fieldname"."_id = $tablename.id
+                                        ON ngs_samples."."$fieldname"."_id = $tablename.id
                                         $advJoin
                                         WHERE (((group_id in ($gids)) AND (perms >= 15)) OR (owner_id = $uid))
                                         $advQuery
@@ -86,10 +71,8 @@ class Search extends VanillaModel {
             }else{
                 $result = $this->query("SELECT $fieldname name, count(ngs_samples.id) count
                                         FROM `ngs_samples`
-                                        INNER JOIN ngs_sample_$fieldname
-                                        ON ngs_samples.id = ngs_sample_$fieldname.sample_id
                                         INNER JOIN $tablename
-                                        ON ngs_sample_$fieldname."."$fieldname"."_id = $tablename.id
+                                        ON ngs_samples."."$fieldname"."_id = $tablename.id
                                         WHERE (((group_id in ($gids)) AND (perms >= 15)) OR (owner_id = $uid))
                                         GROUP BY $fieldname");
             }
