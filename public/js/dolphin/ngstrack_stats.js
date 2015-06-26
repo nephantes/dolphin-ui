@@ -61,17 +61,17 @@ function generateStreamTable(type, queryData, queryType, qvar, rvar, seg, theSea
 			record.design = '';
 		}
 
-		var disabled = '';
-		if (!(record.total_reads > 0) || record.total_reads == ''){
-			if (type == 'lanes') {
-				for(var y = 0; y < lanes_with_good_samples.length; y++){
-					if (!(lanes_with_good_samples[y].id == record.id)) {
-						disabled = 'disabled';
-					}
+		var disabled = 'disabled';
+		
+		if (type == 'lanes') {
+			for(var y = 0; y < lanes_with_good_samples.length; y++){
+				if (lanes_with_good_samples[y].id == record.id) {
+					disabled = '';
 				}
-			}else{
-				disabled = 'disabled';
 			}
+		}
+		if (record.total_reads > 0 || record.total_reads != '' && type == 'samples'){
+			disabled = '';
 		}
 		if (type == 'samples') {
 			if (queryType == 'getSamples') {
