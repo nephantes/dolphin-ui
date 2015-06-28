@@ -487,6 +487,7 @@ class Ngsimport extends VanillaModel {
 				if($this->sheetData[3][$j]=="3' Adapter sequence"){$samp->adapter=$this->esc($this->sheetData[$i][$j]);}
 				if($this->sheetData[3][$j]=="Notebook reference"){$samp->notebook_ref=$this->esc($this->sheetData[$i][$j]);}
 				if($this->sheetData[3][$j]=="Notes"){$samp->notes=$this->esc($this->sheetData[$i][$j]);}
+				if($this->sheetData[3][$j]=="Library type"){$samp->lib_type=$this->esc($this->sheetData[$i][$j]);}
 	
 				if($this->sheetData[3][$j]=="Sample name"){
 					if($this->namesList == null){
@@ -618,6 +619,11 @@ class Ngsimport extends VanillaModel {
 			//	Spikeins
 			if(!isset($samp->spikeins)){
 				$samp->spikeins = NULL;
+			}
+			
+			//	Library Type
+			if(!isset($samp->lib_type)){
+				$samp->lib_type = NULL;
 			}
 			
 			//	Other Values
@@ -972,6 +978,31 @@ class protocols extends main{
 		$sql="select id from biocore.ngs_protocols where `name`='$prot->name'";
 		return $this->model->query($sql,1);
 	}
+	function simpleDenormalize($prot, $php_name, $prot_id, $database_name, $database_id_name)
+	{
+		if($prot->$php_name != NULL || $prot->$php_name != ''){
+			$check = "SELECT `id`, `$database_name`
+						FROM ngs_$database_name
+						WHERE `$database_name` = '".$prot->$php_name."'";
+			$check_result = json_decode($this->model->query($check));
+			if($check_result == array()){
+				//	Empty
+				$this->model->query("INSERT INTO `ngs_$database_name` (`$database_name`) VALUES ('".$prot->$php_name."')");
+				$id = json_decode($this->model->query("SELECT `id` FROM `ngs_$database_name` WHERE $database_name = '".$prot->$php_name."'"));
+				$this->model->query("INSERT INTO `ngs_protocol_$database_name` (`protocol_id`, `$database_id_name`) VALUES ($prot_id, ".$id[0]->id.")");
+			}else{
+				//	Molecule exists
+				$id = json_decode($this->model->query("SELECT `id` FROM `ngs_$database_name` WHERE $database_name = '".$prot->$php_name."'"));
+				$prot = json_decode($this->model->query("SELECT id, $database_id_name FROM `ngs_protocol_$database_name` WHERE `prot_id` = $prot_id"));
+				
+				if($prot == array()){
+					$this->model->query("INSERT INTO `ngs_protocol_$database_name` (`protocol_id`, `$database_id_name`) VALUES ('$prot_id', '".$id[0]->id."')");	
+				}else if($prot[0]->$database_id_name != $id[0]->id){
+					$this->model->query("UPDATE `ngs_protocol_$database_name` SET `$database_id_name` = ".$id[0]->id." WHERE `protocol_id` = $sample_id");
+				}
+			}
+		}
+	}
 	function insert($prot)
 	{
 		$sql="insert into biocore.ngs_protocols(
@@ -1042,7 +1073,7 @@ class samples extends main{
 	{
 		$lane_id=$this->getLaneId($sample->lane_name);
 
-		$sql="select id from biocore.ngs_samples where `name`='$sample->name' and `lane_id`='$lane_id' and `series_id`='".$this->model->series_id."'";
+		$sql="select `id` from biocore.ngs_samples where `name`='".$sample->name."' and `lane_id`='$lane_id' and `series_id`='".$this->model->series_id."'";
 		return $this->model->query($sql,1);
 	}
 	function getLaneId($name)
@@ -1055,21 +1086,40 @@ class samples extends main{
 		$sql="select id from biocore.ngs_protocols where `name`='$name'";
 		return $this->model->query($sql,1);
 	}
-
+	
+	function simpleDenormalize($sample, $php_name, $sample_id, $database_name, $database_id_name)
+	{
+		if($sample->$php_name != NULL || $sample->$php_name != ''){
+			$check = "SELECT `id`, `$database_name`
+						FROM ngs_$database_name
+						WHERE `$database_name` = '".$sample->$php_name."'";
+			$check_result = json_decode($this->model->query($check));
+			if($check_result == array()){
+				//	Empty
+				$this->model->query("INSERT INTO `ngs_$database_name` (`$database_name`) VALUES ('".$sample->$php_name."')");
+				$id = json_decode($this->model->query("SELECT `id` FROM `ngs_$database_name` WHERE $database_name = '".$sample->$php_name."'"));
+				$this->model->query("UPDATE `biocore`.`ngs_samples` SET `$database_id_name` = ".$id[0]->id);
+			}else{
+				//	Exists
+				$id = json_decode($this->model->query("SELECT `id` FROM `ngs_$database_name` WHERE $database_name = '".$sample->$php_name."'"));
+				$this->model->query("UPDATE `biocore`.`ngs_samples` SET `$database_id_name` = ".$id[0]->id." WHERE `id` = $sample_id");
+			}
+		}
+	}
+	
 	function insert($sample)
 	{
 		$lane_id=$this->getLaneId($sample->lane_name);
 		$protocol_id=$this->getProtocolId($sample->protocol_name);
-
+		
 		$sql="INSERT INTO `biocore`.`ngs_samples`
 			(`series_id`, `protocol_id`, `lane_id`,
 			`name`, `barcode`, `title`, `batch_id`,
-			`source_symbol`, `source`, `organism`,
-			`biosample_type`, `condition_symbol`, `concentration`,
-			`molecule`, `description`, `instrument_model`,
-			`avg_insert_size`, `read_length`, `genotype`,
-			`condition`, `adapter`, `treatment_manufacturer`,
-			`donor`, `time`, `biological_replica`,
+			`concentration`,
+			`description`,
+			`avg_insert_size`, `read_length`,
+			`adapter`,
+			`time`, `biological_replica`,
 			`spike_ins`,
 			`technical_replica`, `notebook_ref`, `notes`,
 			`owner_id`, `group_id`, `perms`, `date_created`,
@@ -1078,25 +1128,113 @@ class samples extends main{
 			(
 			'".$this->model->series_id."', '$protocol_id', '$lane_id',
 			'$sample->name', '$sample->barcode', '$sample->title',
-			'$sample->batch', '$sample->source_symbol', '$sample->source', '$sample->organism',
-			'$sample->biosample_type', '$sample->condition_symbol', '$sample->concentration',
-			'$sample->molecule', '$sample->description', '$sample->instrument_model',
-			'$sample->avg_insert_size', '$sample->read_length', '$sample->genotype',
-			'$sample->condition', '$sample->adapter', '$sample->treatment_manufacturer',
-			'$sample->donor', '$sample->time', '$sample->biological_replica',
+			'$sample->batch',
+			'$sample->concentration',
+			'$sample->description',
+			'$sample->avg_insert_size', '$sample->read_length',
+			'$sample->adapter',
+			'$sample->time', '$sample->biological_replica',
 			'$sample->spikeins',
 			'$sample->technical_replica', '$sample->notebook_ref', '$sample->notes',
 			'".$this->model->uid."', '".$this->model->gid."', '".$this->model->sid."',
 			now(), now(), '".$this->model->uid."');";
 		$this->insert++;
 		
-		return $this->model->query($sql);
+		$returned_sql = $this->model->query($sql);
+		$sample_id = json_decode($this->getId($sample));
+		
+		//	Conditions
+		if($sample->condition != NULL || $sample->condition != ''){
+			$conds = explode(",", $sample->condition);
+			$conds_symbs = explode(",", $sample->condition_symbol);
+			$returned_ids = array();
+			$returned_cond = array();
+			
+			$cond_check="SELECT `id`,`condition`
+						FROM ngs_conds
+						WHERE `condition` in (";
+			foreach($conds as $c){
+				if($c == end($conds)){
+					$cond_check.="'$c'";
+				}else{
+					$cond_check.="'$c',";
+				}
+			}
+			$cond_check.=");";
+			$cond_check_result = json_decode($this->model->query($cond_check));
+			foreach ($cond_check_result as $key => $object) {
+				if(isset($returned_ids[0])){
+					array_push($returned_ids, $object->id);
+					array_push($returned_conditions, $object->condition);
+				}else{
+					$returned_ids[0] = $object->id;
+					$returned_cond[0] = $object->condition;
+				}
+			}
+			
+			for($x = 0; $x < count($conds); $x++){
+				if(!in_array($conds[$x], $returned_cond)){
+					$this->model->query("INSERT INTO `biocore`.`ngs_conds` (`cond_symbol`, `condition`) VALUES ('$conds_symbs[$x]', '$conds[$x]')");
+					$new_cond_id = $this->model->query("SELECT `id` FROM `biocore`.`ngs_conds` WHERE cond_symbol = '$conds_symbs[$x]' AND condition = '$conds[$x]'");
+					array_push($returned_ids, $new_cond_id);
+				}
+			}
+			if(count($conds) > 0){
+				$this->model->query("UPDATE `biocore`.`ngs_samples` SET `conditions_id` = '".implode(",",$returned_ids)."' WHERE `id` = ".$sample_id);
+			}
+		}
+		
+		//	Source
+		if($sample->source != NULL || $sample->source != ''){
+			$source_check="SELECT `id`,`source`
+						FROM ngs_source
+						WHERE `source` = '" . $sample->source . "'";
+			$source_check_result = $this->model->query($source_check);
+			
+			if($source_check_result == "[]"){
+				//	Empty
+				$this->model->query("INSERT INTO `ngs_source` (`source`, `source_symbol`) VALUES ('".$sample->source."', '".$sample->source_symbol."')");
+				$source_id = json_decode($this->model->query("SELECT `id` FROM `ngs_source` WHERE source = '".$sample->source."'"));
+				$this->model->query("UPDATE `biocore`.`ngs_samples` SET `source_id` = ".$source_id[0]->id);	
+			}else{
+				//	Source exists
+				$source_id = json_decode($this->model->query("SELECT `id` FROM `ngs_source` WHERE source = '".$sample->source."'"));
+				$this->model->query("UPDATE `biocore`.`ngs_samples` SET `source_id` = ".$source_id[0]->id." WHERE `id` = ".$sample_id);
+			}
+		}
+		
+		//	Organism
+		$this->simpleDenormalize($sample, 'organism', $sample_id, 'organism', 'organism_id');
+		
+		//	Genotype
+		$this->simpleDenormalize($sample, 'genotype', $sample_id, 'genotype', 'genotype_id');
+		
+		//	Molecule
+		$this->simpleDenormalize($sample, 'molecule', $sample_id, 'molecule', 'molecule_id');
+		
+		//	Library Type
+		$this->simpleDenormalize($sample, 'lib_type', $sample_id, 'library_type', 'library_type_id');
+		
+		//	Donor
+		$this->simpleDenormalize($sample, 'donor', $sample_id, 'donor', 'donor_id');
+		
+		//	Biosample Type
+		$this->simpleDenormalize($sample, 'biosample_type', $sample_id, 'biosample_type', 'biosample_type_id');
+		
+		//	Instrument Model
+		$this->simpleDenormalize($sample, 'instrument_model', $sample_id, 'instrument_model', 'instrument_model_id');
+		
+		//	Treatment Manufacturer
+		$this->simpleDenormalize($sample, 'treatment_manufacturer', $sample_id, 'treatment_manufacturer', 'treatment_manufacturer_id');
+		
+		return $returned_sql;
 	}
 
 	function update($sample)
 	{
 		$lane_id=$this->getLaneId($sample->lane_name);
 		$protocol_id=$this->getProtocolId($sample->protocol_name);
+
 		$sql="UPDATE `biocore`.`ngs_samples`
 			SET
 			`series_id` = '".$this->model->series_id."',
@@ -1106,22 +1244,11 @@ class samples extends main{
 			`barcode` = '$sample->barcode',
 			`title` = '$sample->title',
 			`batch_id` = '$sample->batch',
-			`source_symbol` = '$sample->source_symbol',
-			`source` = '$sample->source',
-			`organism` = '$sample->organism',
-			`biosample_type` = '$sample->biosample_type',
-			`condition_symbol` = '$sample->condition_symbol',
 			`concentration` = '$sample->concentration',
-			`molecule` = '$sample->molecule',
 			`description` = '$sample->description',
-			`instrument_model` = '$sample->instrument_model',
 			`avg_insert_size` = '$sample->avg_insert_size',
 			`read_length` = '$sample->read_length',
-			`genotype` = '$sample->genotype',
-			`condition` = '$sample->condition',
 			`adapter` = '$sample->adapter',
-			`treatment_manufacturer` = '$sample->treatment_manufacturer',
-			`donor` = '$sample->donor',
 			`time` = '$sample->time',
 			`biological_replica` = '$sample->biological_replica',
 			`spike_ins` = '$sample->spikeins',
@@ -1134,7 +1261,91 @@ class samples extends main{
 			`last_modified_user`='".$this->model->uid."'
 			where `id` = ".$this->getId($sample);
 		$this->update++;
-
+		
+		$sample_id = $this->getId($sample);
+		
+		//	Conditions
+		if($sample->condition != NULL || $sample->condition != ''){
+			$conds = explode(",", $sample->condition);
+			$conds_symbs = explode(",", $sample->condition_symbol);
+			$returned_ids = array();
+			$returned_cond = array();
+			
+			$cond_check="SELECT `id`,`condition`
+						FROM ngs_conds
+						WHERE `condition` in (";
+			foreach($conds as $c){
+				if($c == end($conds)){
+					$cond_check.="'$c'";
+				}else{
+					$cond_check.="'$c',";
+				}
+			}
+			$cond_check.=");";
+			$cond_check_result = json_decode($this->model->query($cond_check));
+			foreach ($cond_check_result as $key => $object) {
+				if(isset($returned_ids[0])){
+					array_push($returned_ids, $object->id);
+					array_push($returned_conditions, $object->condition);
+				}else{
+					$returned_ids[0] = $object->id;
+					$returned_cond[0] = $object->condition;
+				}
+			}
+			
+			for($x = 0; $x < count($conds); $x++){
+				if(!in_array($conds[$x], $returned_cond)){
+					$this->model->query("INSERT INTO `biocore`.`ngs_conds` (`cond_symbol`, `condition`) VALUES ('$conds_symbs[$x]', '$conds[$x]')");
+					$new_cond_id = $this->model->query("SELECT `id` FROM `biocore`.`ngs_conds` WHERE cond_symbol = '$conds_symbs[$x]' AND condition = '$conds[$x]'");
+					array_push($returned_ids, $new_cond_id);
+				}
+			}
+			if(count($conds) > 0){
+				$this->model->query("UPDATE `biocore`.`ngs_samples` SET `conditions_id` = '".implode(",",$returned_ids)."' WHERE `id` = $sample_id");
+			}
+		}
+		
+		//	Source
+		if($sample->source != NULL || $sample->source != ''){
+			$source_check="SELECT `id`,`source`
+						FROM ngs_source
+						WHERE `source` = '" . $sample->source . "'";
+			$source_check_result = json_decode($this->model->query($source_check));
+			if($source_check_result == array()){
+				//	Empty
+				$this->model->query("INSERT INTO `ngs_source` (`source`, `source_symbol`) VALUES ('".$sample->source."', '".$sample->source_symbol."')");
+				$source_id = json_decode($this->model->query("SELECT `id` FROM `ngs_source` WHERE source = '".$sample->source."'"));
+			}else{
+				//	Source exists
+				$source_id = json_decode($this->model->query("SELECT `id` FROM `ngs_source` WHERE source = '".$sample->source."'"));
+				$this->model->query("UPDATE `biocore`.`ngs_samples` SET `source_id` = ".$source_id[0]->id." WHERE `id` = $sample_id");
+			}
+		}
+		
+		//	Organism
+		$this->simpleDenormalize($sample, 'organism', $sample_id, 'organism', 'organism_id');
+		
+		//	Genotype
+		$this->simpleDenormalize($sample, 'genotype', $sample_id, 'genotype', 'genotype_id');
+		
+		//	Molecule
+		$this->simpleDenormalize($sample, 'molecule', $sample_id, 'molecule', 'molecule_id');
+		
+		//	Library Type
+		$this->simpleDenormalize($sample, 'lib_type', $sample_id, 'library_type', 'library_type_id');
+		
+		//	Donor
+		$this->simpleDenormalize($sample, 'donor', $sample_id, 'donor', 'donor_id');
+		
+		//	Biosample Type
+		$this->simpleDenormalize($sample, 'biosample_type', $sample_id, 'biosample_type', 'biosample_type_id');
+		
+		//	Instrument Model
+		$this->simpleDenormalize($sample, 'instrument_model', $sample_id, 'instrument_model', 'instrument_model_id');
+		
+		//	Treatment Manufacturer
+		$this->simpleDenormalize($sample, 'treatment_manufacturer', $sample_id, 'treatment_manufacturer', 'treatment_manufacturer_id');
+		
 		return $this->model->query($sql);
 	}
 }

@@ -13,10 +13,9 @@ if (isset($_GET['p'])){$p = $_GET['p'];}
 
 if ($p == 'sampleChecking')
 {
-	if (isset($_GET['uid'])){$uid = $_GET['uid'];}
+	if (isset($_SESSION['uid'])){$uid = $_SESSION['uid'];}
 	if (isset($_GET['gids'])){$gids = $_GET['gids'];}
 	if($uid != "" && $gids != ""){
-		$perms = "WHERE (((group_id in ($gids)) AND (perms >= 15)) OR (owner_id = $uid))";
 	    $andPerms = "AND (((group_id in ($gids)) AND (perms >= 15)) OR (owner_id = $uid))";
 	}
 	$data=$query->queryTable("
@@ -30,13 +29,22 @@ else if ($p == 'laneChecking')
 	if (isset($_GET['uid'])){$uid = $_GET['uid'];}
 	if (isset($_GET['gids'])){$gids = $_GET['gids'];}
 	if($uid != "" && $gids != ""){
-		$perms = "WHERE (((group_id in ($gids)) AND (perms >= 15)) OR (owner_id = $uid))";
 	    $andPerms = "AND (((group_id in ($gids)) AND (perms >= 15)) OR (owner_id = $uid))";
 	}
 	$data=$query->queryTable("
 	SELECT 	DISTINCT lane_id
 	FROM ngs_fastq_files
 	WHERE total_reads > 0 $andPerms
+	");
+}
+else if ($p == 'laneToSampleChecking')
+{
+	if (isset($_GET['sample_ids'])){$sample_ids = $_GET['sample_ids'];}
+	$data=$query->queryTable("
+	SELECT sample_id
+	FROM ngs_fastq_files
+	WHERE total_reads > 0
+	AND sample_id in ($sample_ids)
 	");
 }
 else if ($p == 'getCounts')

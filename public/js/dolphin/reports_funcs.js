@@ -218,6 +218,8 @@ function showTable(type){
 		createStreamScript(keys, type)
 		var data = objList, html = $.trim($("#template_"+type).html()), template = Mustache.compile(html);
 		var view = function(record, index){
+			console.log(record);
+			console.log(index);
 			return template({record: record, index: index});
 		};
 		
@@ -580,8 +582,8 @@ $(function() {
 		for(var y = 0; y < read_counts.length; y++){
 			reports_table.fnAddData([libraries[y], numberWithCommas(read_counts[y])]);
 		}
-		document.getElementById('send_to_plots').disabled = true;
 	}else{
+		document.getElementById('send_to_plots').disabled = true;
 		document.getElementById('initial_mapping_exp').remove();
 	}
 	

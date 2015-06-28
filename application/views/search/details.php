@@ -10,6 +10,7 @@
 			<li class="active"><?php echo $field?></li>
 					</ol>
 				</section>
+				<?php echo $html->getBasePath(BASE_PATH, API_PATH); ?>
 				<!-- Main content -->
 				<section class="content">
 					<div class="row">
@@ -47,13 +48,13 @@
 				echo $html->getBrowserPanel($experiment_series, $experiment_series_fields, "Experiment Series", 'experiment_name');
 				}
 				else{
-					echo $html->getRespBoxTable_ng("Experiment Series", "experiment_series", "<th style=\"width:50px\" >id</th><th style=\"width:100px\">Series Name</th><th>Summary</th><th>Design</th>");
+					echo $html->getRespBoxTableStream("Experiment Series", "experiments", ["id","Series Name","Summary","Design"], ["id","name","summary","design"]);
 				}
 				if ($table=="experiments" || $table=="samples"){
 								echo $html->getBrowserPanelMore($experiments, $experiment_fields, "Import", 'name', $lane_file);
 				}
 				else{
-					echo $html->getRespBoxTable_ng("Imports", "lanes", "<th>id</th><th>Import name</th><th>Facility</th><th>Total Reads</th><th>Total Samples</th><th>Selected</th>");
+					echo $html->getRespBoxTableStream("Imports", "lanes", ["id","Import Name","Facility","Total Reads","Total Samples","Selected"], ["id","name","facility", "total_reads", "total_samples",""]);
 				}
 				if ($table=="samples"){
 				echo $html->getBrowserPanelMore($samples, $sample_fields, "Sample",'name', $sample_file);
@@ -64,7 +65,7 @@
 
 				}
 				else{
-							echo $html->getRespBoxTable_ng("Samples", "samples", "<th>id</th><th>Sample Name</th><th>Title</th><th>Source</th><th>Organism</th><th>Molecule</th><th>Selected</th>");
+							echo $html->getRespBoxTableStream("Samples", "samples", ["id","Sample Name","Title","Source","Organism","Molecule","Selected"], ["id","name","title","source","organism","molecule","total_reads"]);
 				echo $html->getSubmitBrowserButton();
 				}
 				?>
