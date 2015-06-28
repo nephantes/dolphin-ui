@@ -1073,7 +1073,7 @@ class samples extends main{
 	{
 		$lane_id=$this->getLaneId($sample->lane_name);
 
-		$sql="select id from biocore.ngs_samples where `name`='$sample->name' and `lane_id`='$lane_id' and `series_id`='".$this->model->series_id."'";
+		$sql="select `id` from biocore.ngs_samples where `name`='".$sample->name."' and `lane_id`='$lane_id' and `series_id`='".$this->model->series_id."'";
 		return $this->model->query($sql,1);
 	}
 	function getLaneId($name)
@@ -1140,7 +1140,8 @@ class samples extends main{
 			now(), now(), '".$this->model->uid."');";
 		$this->insert++;
 		
-		$sample_id = $this->getId($sample);
+		$returned_sql = $this->model->query($sql);
+		$sample_id = json_decode($this->getId($sample));
 		
 		//	Conditions
 		if($sample->condition != NULL || $sample->condition != ''){
@@ -1179,7 +1180,7 @@ class samples extends main{
 				}
 			}
 			if(count($conds) > 0){
-				$this->model->query("UPDATE `biocore`.`ngs_samples` SET `conditions_id` = '".implode(",",$returned_ids)."' WHERE `id` = $sample_id");
+				$this->model->query("UPDATE `biocore`.`ngs_samples` SET `conditions_id` = '".implode(",",$returned_ids)."' WHERE `id` = ".$sample_id);
 			}
 		}
 		
@@ -1189,7 +1190,8 @@ class samples extends main{
 						FROM ngs_source
 						WHERE `source` = '" . $sample->source . "'";
 			$source_check_result = $this->model->query($source_check);
-			if($source_check_result == array()){
+			
+			if($source_check_result == "[]"){
 				//	Empty
 				$this->model->query("INSERT INTO `ngs_source` (`source`, `source_symbol`) VALUES ('".$sample->source."', '".$sample->source_symbol."')");
 				$source_id = json_decode($this->model->query("SELECT `id` FROM `ngs_source` WHERE source = '".$sample->source."'"));
@@ -1197,7 +1199,7 @@ class samples extends main{
 			}else{
 				//	Source exists
 				$source_id = json_decode($this->model->query("SELECT `id` FROM `ngs_source` WHERE source = '".$sample->source."'"));
-				$this->model->query("UPDATE `biocore`.`ngs_samples` SET `source_id` = ".$source_id[0]->id." WHERE `id` = $sample_id");	
+				$this->model->query("UPDATE `biocore`.`ngs_samples` SET `source_id` = ".$source_id[0]->id." WHERE `id` = ".$sample_id);
 			}
 		}
 		
@@ -1225,7 +1227,7 @@ class samples extends main{
 		//	Treatment Manufacturer
 		$this->simpleDenormalize($sample, 'treatment_manufacturer', $sample_id, 'treatment_manufacturer', 'treatment_manufacturer_id');
 		
-		return $this->model->query($sql);
+		return $returned_sql;
 	}
 
 	function update($sample)
