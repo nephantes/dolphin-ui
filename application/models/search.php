@@ -13,6 +13,8 @@ class Search extends VanillaModel {
                 ON ngs_samples.genotype_id = ngs_genotype.id
                 LEFT JOIN ngs_library_type
                 ON ngs_samples.library_type_id = ngs_library_type.id
+                LEFT JOIN ngs_sample_conds
+                ON ngs_samples.id = ngs_sample_conds.sample_id
                 LEFT JOIN ngs_conds
                 ON ngs_samples.conditions_id = ngs_conds.id
                 LEFT JOIN ngs_instrument_model

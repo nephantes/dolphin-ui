@@ -978,7 +978,7 @@ class protocols extends main{
 		$sql="select id from biocore.ngs_protocols where `name`='$prot->name'";
 		return $this->model->query($sql,1);
 	}
-	function simpleDenormalize($prot, $php_name, $prot_id, $database_name, $database_id_name)
+	function simpleNormalize($prot, $php_name, $prot_id, $database_name, $database_id_name)
 	{
 		if($prot->$php_name != NULL || $prot->$php_name != ''){
 			$check = "SELECT `id`, `$database_name`
@@ -1087,7 +1087,7 @@ class samples extends main{
 		return $this->model->query($sql,1);
 	}
 	
-	function simpleDenormalize($sample, $php_name, $sample_id, $database_name, $database_id_name)
+	function simpleNormalize($sample, $php_name, $sample_id, $database_name, $database_id_name)
 	{
 		if($sample->$php_name != NULL || $sample->$php_name != ''){
 			$check = "SELECT `id`, `$database_name`
@@ -1179,8 +1179,17 @@ class samples extends main{
 					array_push($returned_ids, $new_cond_id);
 				}
 			}
-			if(count($conds) > 0){
-				$this->model->query("UPDATE `biocore`.`ngs_samples` SET `conditions_id` = '".implode(",",$returned_ids)."' WHERE `id` = ".$sample_id);
+			foreach($returned_ids as $id){		
+				if($this->model->query("SELECT `id` FROM `biocore`.`ngs_sample_conds` WHERE `sample_id` = '".$this->getId($sample)."' AND cond_id = $id") == "[]"){		
+					$this->model->query("INSERT INTO `biocore`.`ngs_sample_conds` (`sample_id`, `cond_id`) VALUES ('".$this->getId($sample)."', '$id')");		
+				}		
+			}		
+					
+			$all_sample_cond = json_decode($this->model->query("SELECT `cond_id` FROM `biocore`.`ngs_sample_conds` WHERE `sample_id` = '".$this->getId($sample)."'"));		
+			foreach($all_sample_cond as $key => $object){		
+				if(!in_array($object->cond_id, $returned_ids)){		
+					$this->model->query("DELETE FROM `biocore`.`ngs_sample_conds` WHERE `sample_id` = '".$this->getId($sample)."' AND `cond_id` = ".$object->cond_id);		
+				}		
 			}
 		}
 		
@@ -1204,28 +1213,28 @@ class samples extends main{
 		}
 		
 		//	Organism
-		$this->simpleDenormalize($sample, 'organism', $sample_id, 'organism', 'organism_id');
+		$this->simpleNormalize($sample, 'organism', $sample_id, 'organism', 'organism_id');
 		
 		//	Genotype
-		$this->simpleDenormalize($sample, 'genotype', $sample_id, 'genotype', 'genotype_id');
+		$this->simpleNormalize($sample, 'genotype', $sample_id, 'genotype', 'genotype_id');
 		
 		//	Molecule
-		$this->simpleDenormalize($sample, 'molecule', $sample_id, 'molecule', 'molecule_id');
+		$this->simpleNormalize($sample, 'molecule', $sample_id, 'molecule', 'molecule_id');
 		
 		//	Library Type
-		$this->simpleDenormalize($sample, 'lib_type', $sample_id, 'library_type', 'library_type_id');
+		$this->simpleNormalize($sample, 'lib_type', $sample_id, 'library_type', 'library_type_id');
 		
 		//	Donor
-		$this->simpleDenormalize($sample, 'donor', $sample_id, 'donor', 'donor_id');
+		$this->simpleNormalize($sample, 'donor', $sample_id, 'donor', 'donor_id');
 		
 		//	Biosample Type
-		$this->simpleDenormalize($sample, 'biosample_type', $sample_id, 'biosample_type', 'biosample_type_id');
+		$this->simpleNormalize($sample, 'biosample_type', $sample_id, 'biosample_type', 'biosample_type_id');
 		
 		//	Instrument Model
-		$this->simpleDenormalize($sample, 'instrument_model', $sample_id, 'instrument_model', 'instrument_model_id');
+		$this->simpleNormalize($sample, 'instrument_model', $sample_id, 'instrument_model', 'instrument_model_id');
 		
 		//	Treatment Manufacturer
-		$this->simpleDenormalize($sample, 'treatment_manufacturer', $sample_id, 'treatment_manufacturer', 'treatment_manufacturer_id');
+		$this->simpleNormalize($sample, 'treatment_manufacturer', $sample_id, 'treatment_manufacturer', 'treatment_manufacturer_id');
 		
 		return $returned_sql;
 	}
@@ -1323,28 +1332,28 @@ class samples extends main{
 		}
 		
 		//	Organism
-		$this->simpleDenormalize($sample, 'organism', $sample_id, 'organism', 'organism_id');
+		$this->simpleNormalize($sample, 'organism', $sample_id, 'organism', 'organism_id');
 		
 		//	Genotype
-		$this->simpleDenormalize($sample, 'genotype', $sample_id, 'genotype', 'genotype_id');
+		$this->simpleNormalize($sample, 'genotype', $sample_id, 'genotype', 'genotype_id');
 		
 		//	Molecule
-		$this->simpleDenormalize($sample, 'molecule', $sample_id, 'molecule', 'molecule_id');
+		$this->simpleNormalize($sample, 'molecule', $sample_id, 'molecule', 'molecule_id');
 		
 		//	Library Type
-		$this->simpleDenormalize($sample, 'lib_type', $sample_id, 'library_type', 'library_type_id');
+		$this->simpleNormalize($sample, 'lib_type', $sample_id, 'library_type', 'library_type_id');
 		
 		//	Donor
-		$this->simpleDenormalize($sample, 'donor', $sample_id, 'donor', 'donor_id');
+		$this->simpleNormalize($sample, 'donor', $sample_id, 'donor', 'donor_id');
 		
 		//	Biosample Type
-		$this->simpleDenormalize($sample, 'biosample_type', $sample_id, 'biosample_type', 'biosample_type_id');
+		$this->simpleNormalize($sample, 'biosample_type', $sample_id, 'biosample_type', 'biosample_type_id');
 		
 		//	Instrument Model
-		$this->simpleDenormalize($sample, 'instrument_model', $sample_id, 'instrument_model', 'instrument_model_id');
+		$this->simpleNormalize($sample, 'instrument_model', $sample_id, 'instrument_model', 'instrument_model_id');
 		
 		//	Treatment Manufacturer
-		$this->simpleDenormalize($sample, 'treatment_manufacturer', $sample_id, 'treatment_manufacturer', 'treatment_manufacturer_id');
+		$this->simpleNormalize($sample, 'treatment_manufacturer', $sample_id, 'treatment_manufacturer', 'treatment_manufacturer_id');
 		
 		return $this->model->query($sql);
 	}
