@@ -103,3 +103,37 @@ CREATE TABLE `biocore`.`ngs_library_strategy` (
   `library_strategy` VARCHAR(100) NULL DEFAULT NULL,
   PRIMARY KEY (`id`));
 
+ALTER TABLE `biocore`.`ngs_protocols` 
+DROP COLUMN `library_strategy`,
+ADD COLUMN `library_strategy_id` INT NULL DEFAULT NULL AFTER `strand_specific`;
+
+CREATE TABLE `biocore`.`ngs_organization` (
+  `id` INT NOT NULL AUTO_INCREMENT,
+  `organization` VARCHAR(100) NULL DEFAULT NULL,
+  PRIMARY KEY (`id`));
+
+ALTER TABLE `biocore`.`ngs_experiment_series` 
+DROP COLUMN `organization`;
+
+CREATE TABLE `biocore`.`ngs_lab` (
+  `id` INT NOT NULL AUTO_INCREMENT,
+  `lab` VARCHAR(100) NULL DEFAULT NULL,
+  `organization_id` INT NULL DEFAULT NULL,
+  PRIMARY KEY (`id`));
+
+ALTER TABLE `biocore`.`ngs_experiment_series` 
+DROP COLUMN `lab`,
+ADD COLUMN `lab_id` INT NULL DEFAULT NULL AFTER `design`;
+
+CREATE TABLE `biocore`.`ngs_facility` (
+  `id` INT NOT NULL AUTO_INCREMENT,
+  `facility` VARCHAR(100) NULL DEFAULT NULL,
+  PRIMARY KEY (`id`));
+
+ALTER TABLE `biocore`.`ngs_lanes` 
+DROP COLUMN `facility`,
+ADD COLUMN `facility_id` INT NULL DEFAULT NULL AFTER `lane_id`;
+
+ALTER TABLE `biocore`.`ngs_source` 
+CHANGE COLUMN `source` `source` VARCHAR(255) NULL DEFAULT NULL ;
+
