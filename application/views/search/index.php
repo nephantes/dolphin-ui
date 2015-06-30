@@ -10,6 +10,7 @@
 			<li class="active"><?php echo $field?></li
 					</ol>
 				</section>
+				<?php echo $html->getBasePath(BASE_PATH, API_PATH); ?>
 				<!-- Main content -->
 				<section class="content">
 					<div class="row">
@@ -42,10 +43,9 @@
 		<!-- END ACCORDION & CAROUSEL-->
 			</div><!-- /.col (LEFT) -->
 						<div class="col-md-9">
-				<?php echo $html->getRespBoxTable_ng("Experiment Series", "experiment_series", "<th style=\"width:50px\" >id</th><th style=\"width:100px\">Series Name</th><th>Summary</th><th>Design</th>"); ?>
-
-				<?php echo $html->getRespBoxTable_ng("Imports", "lanes", "<th>id</th><th>Import Name</th><th>Facility</th><th>Total Reads</th><th>Total Samples</th><th>Selected</th>"); ?>
-							<?php echo $html->getRespBoxTable_ng("Samples", "samples", "<th>id</th><th>Sample Name</th><th>Title</th><th>Source</th><th>Organism</th><th>Molecule</th><th>Selected</th>"); ?>
+				<?php echo $html->getRespBoxTableStream("Experiments", "experiments", ["id","Series Name","Summary","Design"], ["id","name","summary","design"]); ?>
+				<?php echo $html->getRespBoxTableStream("Imports", "lanes", ["id","Import Name","Facility","Total Reads","Total Samples","Selected"], ["id","experiment_name","facility", "total_reads", "total_samples",""]); ?>
+				<?php echo $html->getRespBoxTableStream("Samples", "samples", ["id","Sample Name","Title","Source","Organism","Molecule","Selected"], ["id","name","title","source","organism","molecule","total_reads"]); ?>
 				<?php echo $html->getSubmitBrowserButton()?>
 						</div><!-- /.col (RIGHT) -->
 					</div><!-- /.row -->

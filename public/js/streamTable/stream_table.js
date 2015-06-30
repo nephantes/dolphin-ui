@@ -508,6 +508,12 @@
     }
 
     return function(i, j){
+      if (data[i][field] == null) {
+        data[i][field] = '';
+      }
+      if (data[j][field] == null) {
+        data[j][field] = '';
+      }
       var t1 = data[i][field].toLowerCase()
         ,t2 = data[j][field].toLowerCase();
 

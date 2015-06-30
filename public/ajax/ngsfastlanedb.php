@@ -66,20 +66,40 @@ if ($p == 'experimentSeriesCheck'){
 		VALUES ('$experiment', '$lane', 'In house', ".$_SESSION['uid'].", $gids, 15, now(), now(), ".$_SESSION['uid'].");
 	");
 }else if ($p == 'insertSample'){
-	if (isset($_POST['experiment'])){$experiment = $_POST['experiment'];}
-	if (isset($_POST['lane'])){$lane = $_POST['lane'];}
-	if (isset($_POST['sample'])){$sample = $_POST['sample'];}
-	if (isset($_POST['organism'])){$organism = $_POST['organism'];}
-	if (isset($_POST['barcode'])){$barcode = $_POST['barcode'];}
-	if (isset($_POST['gids'])){$gids = $_POST['gids'];}
-	print 'experiment:'.$experiment.'<br>';
+	if (isset($_GET['experiment'])){$experiment = $_GET['experiment'];}
+	if (isset($_GET['lane'])){$lane = $_GET['lane'];}
+	if (isset($_GET['sample'])){$sample = $_GET['sample'];}
+	if (isset($_GET['organism'])){$organism = $_GET['organism'];}
+	if (isset($_GET['barcode'])){$barcode = $_GET['barcode'];}
+	if (isset($_GET['gids'])){$gids = $_GET['gids'];}
+
 	$data=$query->runSQL("
 	INSERT INTO ngs_samples
-		(series_id, lane_id, name, title, barcode, organism,
+		(series_id, lane_id, name, title, barcode,
 		owner_id, group_id, perms, date_created, date_modified, last_modified_user)
-		VALUES ($experiment, $lane, '$sample', '$sample', '$barcode', '$organism',
+		VALUES ($experiment, $lane, '$sample', '$sample', '$barcode',
 		".$_SESSION['uid'].", $gids, 15, now(), now(), ".$_SESSION['uid'].");
 	");
+	
+	$sample_id = $query->queryAVal("SELECT `id` FROM ngs_samples WHERE series_id = $experiment AND lane_id = $lane and name = '$sample'");
+	$org_array = explode(",", $organism);
+	var_dump($org_array);
+	//	Organism
+	$org_check = "SELECT `id` FROM ngs_organism WHERE `organism` = '".$org_array[0]."'";
+	$org_check_result = $query->queryAVal($org_check);
+	var_dump($org_check_result);
+	
+	if($org_check_result == NULL || $org_check_result == '' || $org_check_result == '0'){
+		//	Empty
+		$query->runSQL("INSERT INTO `ngs_organism` (`organism`, `organism_symbol`) VALUES ('".$org_array[0]."', '".$org_array[1]."')");
+		$organism_id = $query->queryAVal("SELECT `id` FROM `ngs_organism` WHERE organism = '".$org_array[0]."'");
+		$query->runSQL("UPDATE `ngs_samples` SET `organism_id` = ".$organism_id." WHERE `id` = $sample_id");
+	}else{
+		//	Organism exists
+		$organism_id = $query->queryAVal("SELECT `id` FROM `ngs_organism` WHERE organism = '".$org_array[0]."'");
+		$query->runSQL("UPDATE `ngs_samples` SET `organism_id` = ".$organism_id." WHERE `id` = $sample_id");
+	}
+	
 }else if ($p == 'insertDirectories'){
 	if (isset($_POST['input'])){$input = $_POST['input'];}
 	if (isset($_POST['backup'])){$backup = $_POST['backup'];}

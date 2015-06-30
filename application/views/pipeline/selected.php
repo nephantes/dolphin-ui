@@ -39,7 +39,8 @@
 					<div class="row">
 						<div class="col-md-12">
 							<?php echo $html->sendJScript("selected", "", "", $selection, $uid, $gids); ?>
-							<?php echo $html->getRespBoxTable_ng("Samples Selected", "samples", "<th>id</th><th>Sample Name</th><th>Title</th><th>Source</th><th>Organism</th><th>Molecule</th>"); ?>
+							<?php echo $html->getBasePath(BASE_PATH, API_PATH); ?>
+							<?php echo $html->getRespBoxTableStream("Samples", "samples", ["id","Sample Name","Title","Source","Organism","Molecule"], ["id","name","title","source","organism","molecule"]); ?>
 						</div><!-- /.col (RIGHT) -->
 					</div><!-- /.row -->
 					<div class="row">

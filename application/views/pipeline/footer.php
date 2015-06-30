@@ -24,7 +24,6 @@
 		<script src="<?php echo BASE_PATH?>/js/AdminLTE/app.js" type="text/javascript"></script>
 		<!-- AdminLTE for demo purposes -->
 		<script src='<?php echo BASE_PATH?>/js/dolphin/js_to_html_funcs.js' type="text/javascript"></script>
-		<script src="http://d3js.org/d3.v3.min.js" charset="utf-8"></script>
 		<script src='<?php echo BASE_PATH?>/js/dolphin/pipeline_gen_funcs.js' type="text/javascript"></script>
 		<script src='<?php echo BASE_PATH?>/js/dolphin/ngsget_funcs.js' type="text/javascript"></script>
 		<script src='<?php echo BASE_PATH?>/js/dolphin/ngspost_funcs.js' type="text/javascript"></script>

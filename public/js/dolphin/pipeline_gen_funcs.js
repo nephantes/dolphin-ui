@@ -21,6 +21,7 @@ var currentPipelineID = [];
 var currentPipelineVal =[];
 var rsemSwitch = false;
 var deseqList = ['RSEM'];
+var valid_samples;
 
 /*##### FILL A RERUN PIPELINE WITH PREVIOUS SELECTIONS #####*/
 function rerunLoad() {
@@ -534,19 +535,22 @@ function manageChecklists(name, type){
 
 		var lane_check = getLaneIdFromSample(name);
 		if (checklist_lanes.indexOf(lane_check) > -1) {
-		if (document.getElementById('lane_checkbox_' + lane_check) != undefined) {
-			document.getElementById('lane_checkbox_' + lane_check).checked = false;
-		}
-		checklist_lanes.splice(checklist_lanes.indexOf(lane_check), 1);
+			if (document.getElementById('lane_checkbox_' + lane_check) != undefined) {
+				var check = document.getElementById('lane_checkbox_' + lane_check);
+				check.checked = !check.checked;
+			}
+			checklist_lanes.splice(checklist_lanes.indexOf(lane_check), 1);
 		}
 		if (document.getElementById('sample_checkbox_' + name) != undefined) {
-		if (document.getElementById('sample_checkbox_' + name).checked != false) {
-			document.getElementById('sample_checkbox_' + name).checked = false;
-		}
+			if (document.getElementById('sample_checkbox_' + name).checked != false) {
+				var check = document.getElementById('sample_checkbox_' + name);
+				check.checked = !check.checked;
+			}
 		}
 		if (checklist_samples.length == 0) {
-		document.getElementById('clear_basket').disabled = 'true';
+			document.getElementById('clear_basket').disabled = 'true';
 		}
+		checkCheckedLanes();
 	}else{
 		//add
 		checklist_samples.push(name);
@@ -556,27 +560,34 @@ function manageChecklists(name, type){
 		var lane_check = getLaneIdFromSample(name);
 		var lane_samples = getLanesToSamples(lane_check);
 		var lanes_bool = true;
+		var valid_samples = getValidSamples(lane_samples);
 
 		if (document.getElementById('clear_basket').disabled) {
-		document.getElementById('clear_basket').disabled = false;
+			document.getElementById('clear_basket').disabled = false;
 		}
 		if (document.getElementById('sample_checkbox_' + name) != undefined) {
 			if (document.getElementById('sample_checkbox_' + name).checked != true) {
-				document.getElementById('sample_checkbox_' + name).checked = true;
+				var check = document.getElementById('sample_checkbox_' + name);
+				check.checked = !check.checked;
 			}
 		}
 		if (checklist_lanes.indexOf(lane_check) == -1) {
-		for(var x = 0; x < lane_samples.length; x++){
-			if (checklist_samples.indexOf(lane_samples[x]) == -1 && lanes_bool) {
-			lanes_bool = false;
+			for(var x = 0; x < valid_samples.length; x++){
+				if (valid_samples[x] == undefined) {
+					lanes_bool = false;
+				}else{
+					if (checklist_samples.indexOf(valid_samples[x].sample_id) == -1 && lanes_bool) {
+						lanes_bool = false;
+					}
+				}
 			}
-		}
-		if (lanes_bool) {
-			if (document.getElementById('lane_checkbox_' + lane_check) != undefined) {
-			document.getElementById('lane_checkbox_' + lane_check).checked = true;
+			if (lanes_bool) {
+				if (document.getElementById('lane_checkbox_' + lane_check) != undefined) {
+					var check = document.getElementById('lane_checkbox_' + lane_check);
+					check.checked = !check.checked;
+				}
+				checklist_lanes.push(lane_check);
 			}
-			checklist_lanes.push(lane_check);
-		}
 		}
 	}
 	}
@@ -587,18 +598,20 @@ function manageChecklists(name, type){
 		//remove
 		checklist_lanes.splice(checklist_lanes.indexOf(name), 1);
 		var lane_samples = getLanesToSamples(name);
-		for (var x = 0; x < lane_samples.length; x++) {
-		if ( document.getElementById('sample_checkbox_' + lane_samples[x]) != null ) {
-			document.getElementById('sample_checkbox_' + lane_samples[x]).checked = false;
-		}
-		if ( checklist_samples.indexOf( lane_samples[x] ) > -1 ){
-			removeFromDolphinBasket(lane_samples[x]);
-			checklist_samples.splice(checklist_samples.indexOf(lane_samples[x]), 1);
-			removeBasketInfo();
-		}
+		var valid_samples = getValidSamples(lane_samples);
+		for (var x = 0; x < valid_samples.length; x++) {
+			if ( document.getElementById('sample_checkbox_' + valid_samples[x].sample_id) != null ) {
+				var check = document.getElementById('sample_checkbox_' + valid_samples[x].sample_id);
+				check.checked = !check.checked;
+			}
+			if ( checklist_samples.indexOf( valid_samples[x].sample_id ) > -1 ){
+				removeFromDolphinBasket(valid_samples[x].sample_id);
+				checklist_samples.splice(checklist_samples.indexOf(valid_samples[x].sample_id), 1);
+				removeBasketInfo();
+			}
 		}
 		if (checklist_samples.length == 0) {
-		document.getElementById('clear_basket').disabled = 'true';
+			document.getElementById('clear_basket').disabled = 'true';
 		}
 	}
 	else
@@ -607,31 +620,26 @@ function manageChecklists(name, type){
 		checklist_lanes.push(name);
 		var sampleBoolCheck = false;
 		var lane_samples = getLanesToSamples(name);
-		for (var x = 0; x < lane_samples.length; x++) {
-			$.ajax({ type: "GET",
-				url: "/dolphin/public/ajax/initialmappingdb.php",
-				data: { p: 'sampleChecking', sample_id: lane_samples[x]},
-				async: false,
-				success : function(r)
-				{
-					if (r[0] != undefined) {
-						sampleBoolCheck = true;
-						if ( checklist_samples.indexOf( lane_samples[x] ) == -1 ){
-							checklist_samples.push(lane_samples[x]);
-							addToDolphinBasket(lane_samples[x]);
-							sendBasketInfo(lane_samples[x]);
-						}
-					}
+		var valid_samples = getValidSamples(lane_samples);
+		
+		for (var x = 0; x < valid_samples.length; x++) {
+			if (lane_samples.indexOf(valid_samples[x].sample_id) > -1) {
+				sampleBoolCheck = true;
+				if ( checklist_samples.indexOf( valid_samples[x].sample_id ) == -1 ){
+					checklist_samples.push(valid_samples[x].sample_id);
+					addToDolphinBasket(valid_samples[x].sample_id);
+					sendBasketInfo(valid_samples[x].sample_id);
 				}
-			});
+			}
 		}
 		if (document.getElementById('clear_basket').disabled && sampleBoolCheck) {
 			document.getElementById('clear_basket').disabled = false;
 		}
 		for(var y = 0; y < checklist_samples.length; y++){
-		if ( document.getElementById('sample_checkbox_' + checklist_samples[y]) != null) {
-			document.getElementById('sample_checkbox_' + checklist_samples[y]).checked = true;
-		}
+			if ( document.getElementById('sample_checkbox_' + checklist_samples[y]) != null) {
+				var check = document.getElementById('sample_checkbox_' + checklist_samples[y]);
+				check.checked = !check.checked;
+			}
 		}
 	}
 	}
@@ -679,65 +687,85 @@ function removeFromDolphinBasket(sampleID){
 
 function clearBasket(){
 	for(var x = (checklist_samples.length - 1); x >= 0; x = x - 1){
-	manageChecklists(checklist_samples[x], 'sample_checkbox');
+		manageChecklists(checklist_samples[x], 'sample_checkbox');
 	}
 	flushBasketInfo();
 }
 
+/*
+ *	Used for datatables, discontinued
+ */
 function checkOffAllSamples(){
 	var hrefSplit = window.location.href.split("/");
 	var searchLoc = $.inArray('search', hrefSplit);
 
 	if (searchLoc != -1) {
-	var pagination = document.getElementById('jsontable_samples_paginate');
-	var pagination_ul = pagination.childNodes;
-	var pagination_li = pagination_ul[0].childNodes;
-	for(var y = 0; y < pagination_li.length; y++){
-		pagination_li[y].setAttribute('onclick', 'checkCheckedList()');
-	}
+		var pagination = document.getElementById('st_pagination_samples');
+		var pagination_ul = pagination.childNodes;
+		var pagination_li = pagination_ul[0].childNodes;
+		for(var y = 0; y < pagination_li.length; y++){
+			pagination_li[y].setAttribute('onClick', 'checkCheckedList()');
+		}
 	}
 }
 
+/*
+ *	Used for datatables, discontinued
+ */
 function checkOffAllLanes(){
 	var hrefSplit = window.location.href.split("/");
 	var searchLoc = $.inArray('search', hrefSplit);
 
 	if (searchLoc != -1) {
-	var pagination = document.getElementById('jsontable_lanes_paginate');
-	var pagination_ul = pagination.childNodes;
-	var pagination_li = pagination_ul[0].childNodes;
-	for(var y = 0; y < pagination_li.length; y++){
-		pagination_li[y].setAttribute('onclick', 'checkCheckedLanes()');
+		var pagination = document.getElementById('st_pagination_lanes');
+		var pagination_ul = pagination.childNodes;
+		pagination_ul[0].setAttribute('onClick', 'checkCheckedLanes()');
+		var pagination_li = pagination_ul[0].childNodes;
+		for(var y = 0; y < pagination_li.length; y++){
+			pagination_li[y].setAttribute('onClick', 'checkCheckedLanes()');
+		}
 	}
-	}
+}
+
+function getValidSamples(lane_samples){
+	var valid_samples;
+	$.ajax({ type: "GET",
+					url: "/dolphin/public/ajax/initialmappingdb.php",
+					data: { p: 'laneToSampleChecking', sample_ids: lane_samples.toString()},
+					async: false,
+					success : function(r)
+					{
+						valid_samples = r;
+					}
+				});
+	return valid_samples;
 }
 
 function checkCheckedList(){
 	var allSamples = getAllSampleIds();
 	for (var x = 0; x < allSamples.length; x++){
-	if ( document.getElementById('sample_checkbox_' + allSamples[x]) != null) {
-		if (checklist_samples.indexOf(allSamples[x]) > -1) {
-		document.getElementById('sample_checkbox_' + allSamples[x]).checked = true;
-		}else{
-		document.getElementById('sample_checkbox_' + allSamples[x]).checked = false;
+		if ( document.getElementById('sample_checkbox_' + allSamples[x]) != null) {
+			if (checklist_samples.indexOf(allSamples[x]) > -1) {
+				document.getElementById('sample_checkbox_' + allSamples[x]).setAttribute('checked', 'true');
+			}else{
+				document.getElementById('sample_checkbox_' + allSamples[x]).removeAttribute('checked');
+			}
 		}
 	}
-	}
-	checkOffAllSamples();
+	
 }
 
 function checkCheckedLanes(){
 	var allLanes = getAllLaneIds();
 	for (var x = 0; x < allLanes.length; x++){
-	if ( document.getElementById('lane_checkbox_' + allLanes[x]) != null) {
-		if (checklist_lanes.indexOf(allLanes[x]) > -1) {
-		document.getElementById('lane_checkbox_' + allLanes[x]).checked = true;
-		}else{
-		document.getElementById('lane_checkbox_' + allLanes[x]).checked = false;
+		if ( document.getElementById('lane_checkbox_' + allLanes[x]) != null) {
+			if (checklist_lanes.indexOf(allLanes[x]) > -1) {
+				document.getElementById('lane_checkbox_' + allLanes[x]).setAttribute('checked', 'true');
+			}else{
+				document.getElementById('lane_checkbox_' + allLanes[x]).removeAttribute('checked');
+			}
 		}
 	}
-	}
-	checkOffAllLanes();
 }
 
 function passIDData(run_group_id, id){
