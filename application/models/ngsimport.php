@@ -1435,7 +1435,11 @@ class samples extends main{
 		$this->simpleNormalize($sample, 'treatment_manufacturer', $sample_id, 'treatment_manufacturer', 'treatment_manufacturer_id');
 		
 		//	Samplename
-		$this->createSampleName($sample, $sample_id);
+		if($this->model->series_id == 1){
+			$this->createSampleName($sample, $sample_id);	
+		}else{
+			$this->model->query("UPDATE `biocore`.`ngs_samples` SET `samplename` = '".$sample->name."' WHERE `id` = $sample_id");
+		}
 		
 		return $returned_sql;
 	}
@@ -1558,7 +1562,11 @@ class samples extends main{
 		$this->simpleNormalize($sample, 'treatment_manufacturer', $sample_id, 'treatment_manufacturer', 'treatment_manufacturer_id');
 		
 		//	Samplename
-		$this->createSampleName($sample, $sample_id);
+		if($this->model->series_id == 1){
+			$this->createSampleName($sample, $sample_id);	
+		}else{
+			$this->model->query("UPDATE `biocore`.`ngs_samples` SET `samplename` = '".$sample->name."' WHERE `id` = $sample_id");
+		}
 		
 		return $returned_sql;
 	}

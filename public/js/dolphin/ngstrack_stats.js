@@ -62,6 +62,7 @@ function generateStreamTable(type, queryData, queryType, qvar, rvar, seg, theSea
 		}
 
 		var disabled = 'disabled';
+		var sample_name = '';
 		
 		if (type == 'lanes') {
 			for(var y = 0; y < lanes_with_good_samples.length; y++){
@@ -73,13 +74,18 @@ function generateStreamTable(type, queryData, queryType, qvar, rvar, seg, theSea
 		if (record.total_reads != '' && type == 'samples'){
 			disabled = '';
 		}
+		if (record.samplename == 'null' || record.samplename == 'NULL' || record.samplename == '' || record.samplename == null || record.samplename == undefined) {
+			sample_name = record.name;
+		}else{
+			sample_name = record.samplename;
+		}
 		if (type == 'samples') {
 			if (queryType == 'getSamples') {
-				return "<tr><td>"+record.id+"</td><td>"+"<a href=\""+BASE_PATH+"/search/details/samples/"+record.id+'/'+theSearch+"\">"+record.name+"</a>"+"</td><td>"+record.title+
+				return "<tr><td>"+record.id+"</td><td>"+"<a href=\""+BASE_PATH+"/search/details/samples/"+record.id+'/'+theSearch+"\">"+sample_name+"</a>"+"</td><td>"+record.title+
 					"</td><td>"+record.source+"</td><td>"+record.organism+"</td><td>"+record.molecule+"</td><td>"+
 					"<input type=\"checkbox\" class=\"ngs_checkbox\" name=\""+record.id+"\" id=\"sample_checkbox_"+record.id+"\" onClick=\"manageChecklists(this.name, 'sample_checkbox');\" "+disabled+">"+"</td></tr>";
 			}else{
-				return "<tr><td>"+record.id+"</td><td>"+"<a href=\""+BASE_PATH+"/search/details/samples/"+record.id+'/'+theSearch+"\">"+record.name+"</a>"+"</td><td>"+record.title+
+				return "<tr><td>"+record.id+"</td><td>"+"<a href=\""+BASE_PATH+"/search/details/samples/"+record.id+'/'+theSearch+"\">"+sample_name+"</a>"+"</td><td>"+record.title+
 				"</td><td>"+record.source+"</td><td>"+record.organism+"</td><td>"+record.molecule+"</td><tr>";
 			}
 		}else if (type == 'lanes') {

@@ -75,9 +75,9 @@ if ($p == 'experimentSeriesCheck'){
 
 	$data=$query->runSQL("
 	INSERT INTO ngs_samples
-		(series_id, lane_id, name, title, barcode,
+		(series_id, lane_id, name, samplename, title, barcode,
 		owner_id, group_id, perms, date_created, date_modified, last_modified_user)
-		VALUES ($experiment, $lane, '$sample', '$sample', '$barcode',
+		VALUES ($experiment, $lane, '$sample', '$sample', '$sample', '$barcode',
 		".$_SESSION['uid'].", $gids, 15, now(), now(), ".$_SESSION['uid'].");
 	");
 	
