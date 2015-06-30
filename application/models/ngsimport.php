@@ -306,6 +306,7 @@ class Ngsimport extends VanillaModel {
 				if($this->sheetData[3][$j]=="# of Samples"){$lane->total_samples=$this->esc($this->sheetData[$i][$j]);}
 				if($this->sheetData[3][$j]=="Resequenced?"){$lane->resequenced=$this->esc($this->sheetData[$i][$j]);}
 				if($this->sheetData[3][$j]=="Notes"){$lane->notes=$this->esc($this->sheetData[$i][$j]);}
+				if($this->sheetData[3][$j]=="Total reads"){$lane->total_reads=$this->esc($this->sheetData[$i][$j]);}
 			}
 			
 			/*
@@ -336,6 +337,10 @@ class Ngsimport extends VanillaModel {
 			}else{
 				$text.= $this->warningText("Lane id not specified.  Specific lane id set to 0, please change (row " . $i . ")");
 				$lane->lane_id=0;
+			}
+			
+			if(!isset($lane->total_reads)){
+				$lane->total_reads = NULL;
 			}
 			
 			//	Other Values
@@ -805,17 +810,17 @@ class series extends main{
 	{
 
 		$sql="insert into biocore.ngs_experiment_series(`experiment_name`, `summary`, `design`,
-			`lab`, `grant`, `owner_id`, `group_id`, `perms`, `date_created`,
+			`grant`, `owner_id`, `group_id`, `perms`, `date_created`,
 			`date_modified`, `last_modified_user`)
 			values('$this->experiment_name', '$this->summary', '$this->design',
-			'$this->lab', '$this->grant',
+			'$this->grant',
 			'".$this->model->uid."', '".$this->model->gid."', '".$this->model->sid."',
 			now(), now(), '".$this->model->uid."');";
 
 		$this->insert++;
 		
 		$returned_sql = $this->model->query($sql);
-		$experiment_id = json_decode($this->getId());
+		$experiment_id = $this->getId();
 		$organization_id;
 		
 		//	Organization
@@ -861,7 +866,6 @@ class series extends main{
 		$sql="update biocore.ngs_experiment_series set
 			`summary`='$this->summary',
 			`design`='$this->design',
-			`lab`='$this->lab',
 			`grant`='$this->grant',
 			`group_id`='".$this->model->gid."',
 			`perms`='".$this->model->sid."',
@@ -870,7 +874,7 @@ class series extends main{
 		$this->update++;
 		
 		$returned_sql = $this->model->query($sql);
-		$experiment_id = json_decode($this->getId());
+		$experiment_id = $this->getId();
 		$organization_id;
 		
 		//	Organization
@@ -1316,7 +1320,6 @@ class samples extends main{
 				//	Empty
 				$this->model->query("INSERT INTO `ngs_source` (`source`, `source_symbol`) VALUES ('".$sample->source."', '".$sample->source_symbol."')");
 				$source_id = json_decode($this->model->query("SELECT `id` FROM `ngs_source` WHERE source = '".$sample->source."'"));
-				var_dump("SELECT `id` FROM `ngs_source` WHERE source = '".$sample->source."'");
 				$this->model->query("UPDATE `biocore`.`ngs_samples` SET `source_id` = ".$source_id[0]->id." WHERE `id` = $sample_id");	
 			}else{
 				//	Source exists
