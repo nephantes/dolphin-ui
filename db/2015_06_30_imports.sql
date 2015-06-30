@@ -137,3 +137,6 @@ ADD COLUMN `facility_id` INT NULL DEFAULT NULL AFTER `lane_id`;
 ALTER TABLE `biocore`.`ngs_source` 
 CHANGE COLUMN `source` `source` VARCHAR(255) NULL DEFAULT NULL ;
 
+ALTER TABLE `biocore`.`ngs_samples` 
+ADD COLUMN `samplename` VARCHAR(255) NULL DEFAULT NULL AFTER `name`;
+
