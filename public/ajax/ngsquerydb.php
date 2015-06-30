@@ -50,6 +50,9 @@ $innerJoin = "LEFT JOIN ngs_source
                 
 $sampleJoin = "LEFT JOIN ngs_fastq_files
                 ON ngs_samples.id = ngs_fastq_files.sample_id";
+                
+$laneJoin = "LEFT JOIN ngs_facility
+                ON ngs_lanes.facility_id = ngs_facility.id";
 
 if (isset($_GET['start'])){$start = $_GET['start'];}
 if (isset($_GET['end'])){$end = $_GET['end'];}
@@ -82,8 +85,9 @@ if($search != "" && !in_array($p, $pDictionary)){
 			$time="";
 			if (isset($start)){$time="WHERE `date_created`>='$start' and `date_created`<='$end'";}
 			$data=$query->queryTable("
-			SELECT id,name, facility, total_reads, total_samples
+			SELECT ngs_lanes.id,name, facility, total_reads, total_samples
 			FROM biocore.ngs_lanes
+            $laneJoin
 			WHERE biocore.ngs_lanes.id
 			IN (SELECT biocore.ngs_samples.lane_id FROM biocore.ngs_samples $innerJoin WHERE $searchQuery) $andPerms $time
 			");
@@ -122,8 +126,9 @@ if($search != "" && !in_array($p, $pDictionary)){
 			$time="";
 			if (isset($start)){$time="WHERE `date_created`>='$start' and `date_created`<='$end'";}
 			$data=$query->queryTable("
-			SELECT id,name, facility, total_reads, total_samples
+			SELECT ngs_lanes.id,name, facility, total_reads, total_samples
 			FROM biocore.ngs_lanes
+            $laneJoin
 			WHERE biocore.ngs_lanes.id
 			IN (SELECT biocore.ngs_samples.lane_id FROM biocore.ngs_samples $innerJoin WHERE $searchQuery)
 			AND biocore.ngs_lanes.series_id = $q $andPerms $time
@@ -193,8 +198,9 @@ else if (!in_array($p, $pDictionary))
 			$time="";
 			if (isset($start)){$time="WHERE `date_created`>='$start' and `date_created`<='$end'";}
 			$data=$query->queryTable("
-			SELECT id,name, facility, total_reads, total_samples
+			SELECT ngs_lanes.id,name, facility, total_reads, total_samples
 			FROM biocore.ngs_lanes
+            $laneJoin
 			WHERE biocore.ngs_lanes.id
 			IN (SELECT biocore.ngs_samples.lane_id FROM biocore.ngs_samples $innerJoin WHERE biocore.ngs_samples.$q = \"$r\") $andPerms $time
 			");
@@ -232,8 +238,9 @@ else if (!in_array($p, $pDictionary))
 			$time="";
 			if (isset($start)){$time="WHERE `date_created`>='$start' and `date_created`<='$end'";}
 			$data=$query->queryTable("
-			SELECT id,name, facility, total_reads, total_samples
+			SELECT ngs_lanes.id,name, facility, total_reads, total_samples
 			FROM biocore.ngs_lanes
+            $laneJoin
 			WHERE biocore.ngs_lanes.series_id = $q $andPerms $time
 			");
 		}
@@ -290,8 +297,10 @@ else if (!in_array($p, $pDictionary))
 			$time="";
 			if (isset($start)){$time="WHERE `date_created`>='$start' and `date_created`<='$end'";}
 			$data=$query->queryTable("
-			SELECT id,name, facility, total_reads, total_samples
-			FROM biocore.ngs_lanes $perms $time
+			SELECT ngs_lanes.id,name, facility, total_reads, total_samples
+			FROM biocore.ngs_lanes
+            $laneJoin
+            $perms $time
 			");
 		}
 		else if($p == "getSamples")

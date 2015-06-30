@@ -83,27 +83,21 @@ if ($p == 'experimentSeriesCheck'){
 	
 	$sample_id = $query->queryAVal("SELECT `id` FROM ngs_samples WHERE series_id = $experiment AND lane_id = $lane and name = '$sample'");
 	$org_array = explode(",", $organism);
-	
+	var_dump($org_array);
 	//	Organism
 	$org_check = "SELECT `id` FROM ngs_organism WHERE `organism` = '".$org_array[0]."'";
 	$org_check_result = $query->queryAVal($org_check);
-
+	var_dump($org_check_result);
+	
 	if($org_check_result == NULL || $org_check_result == '' || $org_check_result == '0'){
 		//	Empty
 		$query->runSQL("INSERT INTO `ngs_organism` (`organism`, `organism_symbol`) VALUES ('".$org_array[0]."', '".$org_array[1]."')");
 		$organism_id = $query->queryAVal("SELECT `id` FROM `ngs_organism` WHERE organism = '".$org_array[0]."'");
-		$query->runSQL("INSERT INTO `ngs_sample_organism` (`sample_id`, `organism_id`) VALUES ($sample_id, ".$organism_id.")");
+		$query->runSQL("UPDATE `ngs_samples` SET `organism_id` = ".$organism_id." WHERE `id` = $sample_id");
 	}else{
 		//	Organism exists
 		$organism_id = $query->queryAVal("SELECT `id` FROM `ngs_organism` WHERE organism = '".$org_array[0]."'");
-		$sample_organism = $query->queryAVal("SELECT `id` FROM `ngs_sample_organism` WHERE `sample_id` = $sample_id");
-		$sample_organism_id = $query->queryAVal("SELECT `organism_id` FROM `ngs_sample_organism` WHERE `sample_id` = $sample_id");
-		
-		if($sample_organism == NULL || $sample_organism == '' || $sample_organism == "0"){
-			$query->runSQL("INSERT INTO `ngs_sample_organism` (`sample_id`, `organism_id`) VALUES ('$sample_id', '".$organism_id."')");	
-		}else if($sample_organism_id != $organism_id){
-			$query->runSQL("UPDATE `ngs_sample_organism` SET `organism_id` = ".$organism_id." WHERE `sample_id` = $sample_id");
-		}
+		$query->runSQL("UPDATE `ngs_samples` SET `organism_id` = ".$organism_id." WHERE `id` = $sample_id");
 	}
 	
 }else if ($p == 'insertDirectories'){
