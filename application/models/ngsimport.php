@@ -1202,7 +1202,6 @@ class samples extends main{
 		$sql="select id from biocore.ngs_protocols where `name`='$name'";
 		return $this->model->query($sql,1);
 	}
-	
 	function simpleNormalize($sample, $php_name, $sample_id, $database_name, $database_id_name)
 	{
 		if($sample->$php_name != NULL && $sample->$php_name != '' && $sample->$php_name != null && $sample->$php_name != 'null'){
@@ -1222,7 +1221,90 @@ class samples extends main{
 			}
 		}
 	}
-	
+	function createSampleName($sample, $sample_id){
+		$samplename = '';
+		$underscore_mark = true;
+		//	Donor
+		if(isset($sample->donor)){
+			if($sample->donor != NULL && $sample->donor != '' && $sample->donor != null && $sample->donor != 'null'){
+				$samplename.= $sample->donor;
+				if($underscore_mark){
+					$underscore_mark = false;
+				}
+			}
+		}
+		//	Source
+		if(isset($sample->source_symbol)){
+			if($sample->source_symbol != NULL && $sample->source_symbol != '' && $sample->source_symbol != null && $sample->source_symbol != 'null'){
+				if(!$underscore_mark){
+					$samplename.="_";
+				}
+				$samplename.= $sample->source_symbol;
+				if($underscore_mark){
+					$underscore_mark = false;
+				}
+			}
+		}
+		//	Conditions
+		if(isset($sample->condition_symbol)){
+			if($sample->condition_symbol != NULL && $sample->condition_symbol != '' && $sample->condition_symbol != null && $sample->condition_symbol != 'null'){
+				if(!$underscore_mark){
+					$samplename.="_";
+				}
+				$conds = explode(",", $sample->condition_symbol);
+				foreach($conds as $c){
+					$samplename.= strtoupper(substr($c, 0, 1)) . strtolower(substr($c, 1, strlen($c)));
+				}
+				if($underscore_mark){
+					$underscore_mark = false;
+				}
+			}
+		}
+		//	Time
+		if(isset($sample->time)){
+			if($sample->time != NULL && $sample->time != '' && $sample->time != null && $sample->time != 'null'){
+				if(!$underscore_mark){
+					$samplename.="_";
+				}
+				$samplename.= floor($sample->time/60)."h";
+				if($underscore_mark){
+					$underscore_mark = false;
+				}
+			}
+		}
+		//	Biological Replicas
+		if(isset($sample->biological_replica)){
+			if($sample->biological_replica != NULL && $sample->biological_replica != '' && $sample->biological_replica != null && $sample->biological_replica != 'null'){
+				if(!$underscore_mark){
+					$samplename.="_";
+				}
+				$samplename.= "b".$sample->biological_replica;
+				if($underscore_mark){
+					$underscore_mark = false;
+				}
+			}
+		}
+		//	Technical Replicas
+		if(isset($sample->technical_replica)){
+			if($sample->technical_replica != NULL && $sample->technical_replica != '' && $sample->technical_replica != null && $sample->technical_replica != 'null'){
+				if(!$underscore_mark){
+					$samplename.="_";
+				}
+				$samplename.= "t".$sample->technical_replica;
+				if($underscore_mark){
+					$underscore_mark = false;
+				}
+			}
+		}
+		if(strtolower($sample->name) == 'nobarcode'){
+			if(!$underscore_mark){
+					$samplename.="_";
+				}
+			$samplename.= "nobarcode";
+		}
+		
+		$this->model->query("UPDATE `biocore`.`ngs_samples` SET `samplename` = '$samplename' WHERE `id` = $sample_id");
+	}
 	function insert($sample)
 	{
 		$lane_id=$this->getLaneId($sample->lane_name);
@@ -1352,6 +1434,9 @@ class samples extends main{
 		//	Treatment Manufacturer
 		$this->simpleNormalize($sample, 'treatment_manufacturer', $sample_id, 'treatment_manufacturer', 'treatment_manufacturer_id');
 		
+		//	Samplename
+		$this->createSampleName($sample, $sample_id);
+		
 		return $returned_sql;
 	}
 
@@ -1471,6 +1556,9 @@ class samples extends main{
 		
 		//	Treatment Manufacturer
 		$this->simpleNormalize($sample, 'treatment_manufacturer', $sample_id, 'treatment_manufacturer', 'treatment_manufacturer_id');
+		
+		//	Samplename
+		$this->createSampleName($sample, $sample_id);
 		
 		return $returned_sql;
 	}

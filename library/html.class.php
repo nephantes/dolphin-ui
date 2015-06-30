@@ -234,7 +234,7 @@ class HTML {
 										<thead>
 										<tr>';
 										for($x = 0; $x < count($tableKeys); $x++){
-												if($tableKeys[$x] == "id"){
+												if($tableKeys[$x] == "id" || $tableKeys[$x] == "total_reads" || $tableKeys[$x] == "total_samples"){
 		$html.=									'<th data-sort="'.$tableKeys[$x].'::number" onclick="shiftColumns(this)">'
 												.$fields[$x].'<i id="'.$tableKeys[$x].'" class="pull-right fa fa-unsorted"></i></th>';
 												}else{
