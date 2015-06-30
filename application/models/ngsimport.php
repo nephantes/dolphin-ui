@@ -1296,6 +1296,13 @@ class samples extends main{
 				}
 			}
 		}
+		if(strtolower($sample->name) == 'nobarcode'){
+			if(!$underscore_mark){
+					$samplename.="_";
+				}
+			$samplename.= "nobarcode";
+		}
+		
 		$this->model->query("UPDATE `biocore`.`ngs_samples` SET `samplename` = '$samplename' WHERE `id` = $sample_id");
 	}
 	function insert($sample)
