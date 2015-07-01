@@ -97,7 +97,7 @@ if($search != "" && !in_array($p, $pDictionary)){
 			$time="";
 			if (isset($start)){$time="and `date_created`>='$start' and `date_created`<='$end'";}
 			$data=$query->queryTable("
-			SELECT ngs_samples.id, name, title, source, organism, molecule, total_reads
+			SELECT ngs_samples.id, name, samplename, title, source, organism, molecule, total_reads
 			FROM biocore.ngs_samples
             $innerJoin
             $sampleJoin
@@ -139,7 +139,7 @@ if($search != "" && !in_array($p, $pDictionary)){
 			$time="";
 			if (isset($start)){$time="and `date_created`>='$start' and `date_created`<='$end'";}
 			$data=$query->queryTable("
-			SELECT ngs_samples.id, name, title, source, organism, molecule, total_reads
+			SELECT ngs_samples.id, name, samplename, title, source, organism, molecule, total_reads
 			FROM biocore.ngs_samples
             $innerJoin
             $sampleJoin
@@ -154,7 +154,7 @@ if($search != "" && !in_array($p, $pDictionary)){
 			$time="";
 			if (isset($start)){$time="and `date_created`>='$start' and `date_created`<='$end'";}
 			$data=$query->queryTable("
-			SELECT ngs_samples.id, name, title, source, organism, molecule, total_reads
+			SELECT ngs_samples.id, name, samplename, title, source, organism, molecule, total_reads
 			FROM biocore.ngs_samples
             $innerJoin
             $sampleJoin
@@ -210,7 +210,7 @@ else if (!in_array($p, $pDictionary))
 			$time="";
 			if (isset($start)){$time="and `date_created`>='$start' and `date_created`<='$end'";}
 			$data=$query->queryTable("
-			SELECT ngs_samples.id, name, title, source, organism, molecule, total_reads
+			SELECT ngs_samples.id, name, samplename, title, source, organism, molecule, total_reads
 			FROM biocore.ngs_samples
             $innerJoin
             $sampleJoin
@@ -249,7 +249,7 @@ else if (!in_array($p, $pDictionary))
 			$time="";
 			if (isset($start)){$time="and `date_created`>='$start' and `date_created`<='$end'";}
 			$data=$query->queryTable("
-			SELECT ngs_samples.id, name, title, source, organism, molecule, total_reads
+			SELECT ngs_samples.id, name, samplename, title, source, organism, molecule, total_reads
 			FROM biocore.ngs_samples
             $innerJoin
             $sampleJoin
@@ -263,7 +263,7 @@ else if (!in_array($p, $pDictionary))
 			$time="";
 			if (isset($start)){$time="and `date_created`>='$start' and `date_created`<='$end'";}
 			$data=$query->queryTable("
-			SELECT ngs_samples.id, name, title, source, organism, molecule, total_reads
+			SELECT ngs_samples.id, name, samplename, title, source, organism, molecule, total_reads
 			FROM biocore.ngs_samples
             $innerJoin
             $sampleJoin
@@ -308,7 +308,7 @@ else if (!in_array($p, $pDictionary))
 			$time="";
 			if (isset($start)){$time="and `date_created`>='$start' and `date_created`<='$end'";}
 			$data=$query->queryTable("
-			SELECT ngs_samples.id, name, title, source, organism, molecule, total_reads
+			SELECT ngs_samples.id, name, samplename, title, source, organism, molecule, total_reads
 			FROM biocore.ngs_samples
             $innerJoin
             $sampleJoin
@@ -366,7 +366,7 @@ else if ($p == "getSelectedSamples")
 	$time="";
 	if (isset($start)){$time="and `date_created`>='$start' and `date_created`<='$end'";}
 	$data=$query->queryTable("
-	SELECT ngs_samples.id, name, title, source, organism, molecule
+	SELECT ngs_samples.id, name, samplename, title, source, organism, molecule
 	FROM biocore.ngs_samples
     $innerJoin
 	WHERE $searchQuery $andPerms $time
