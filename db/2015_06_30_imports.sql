@@ -139,4 +139,3 @@ CHANGE COLUMN `source` `source` VARCHAR(255) NULL DEFAULT NULL ;
 
 ALTER TABLE `biocore`.`ngs_samples` 
 ADD COLUMN `samplename` VARCHAR(255) NULL DEFAULT NULL AFTER `name`;
-

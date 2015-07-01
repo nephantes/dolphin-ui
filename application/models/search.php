@@ -88,7 +88,12 @@ class Search extends VanillaModel {
 	function getValues($value, $table) {
         if($table == 'ngs_samples'){
             $result = $this->query("select * from $table ".$this->innerJoin." where $table.`id`='$value'");
+        }elseif($table == 'ngs_lanes'){
+            $result = $this->query("select $table.id, $table.series_id, $table.name, $table.sequencing_id, $table.lane_id, $table.cost, $table.date_submitted, $table.date_received, $table.total_reads,
+                                   $table.phix_requested, $table.phix_in_lane, $table.total_samples, $table.resequenced, $table.notes, $table.owner_id, $table.group_id, $table.perms, ngs_facility.facility
+                                   from $table left join ngs_facility on ngs_lanes.facility_id = ngs_facility.id where $table.`id`='$value'");
         }else{
+            
             $result = $this->query("select * from $table where `id`='$value'");
         }
 		return json_decode($result, true);

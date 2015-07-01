@@ -103,6 +103,7 @@ function generateStreamTable(type, queryData, queryType, qvar, rvar, seg, theSea
 	
 	var callbacks = {
 		pagination: function(summary){
+			$('#'+type+'_summary').text( summary.from + ' to '+ summary.to +' of '+ summary.total +' entries');
 			if (type == "samples") {
 				checkCheckedList();
 			}else if (type == 'lanes') {
@@ -117,11 +118,18 @@ function generateStreamTable(type, queryData, queryType, qvar, rvar, seg, theSea
 			}
 		}
 	}
+	console.log(document.getElementById('jsontable_'+type));
+	
+	var type_summary = createElement('div', ['id', 'class'], [type+'_summary', 'pull-left margin']);
+	var the_table = document.getElementById('table_div_'+type);
+	the_table.appendChild(type_summary);
+	
 	var st = StreamTable('#jsontable_'+type,
 	  { view: view, 
 		per_page: 10, 
 		data_url: BASE_PATH + "/public/ajax/ngsquerydb.php?p="+queryType+"&q="+qvar+"&r="+rvar+"&seg="+seg+"&search="+theSearch+"&uid="+uid+"&gids="+gids,
 		stream_after: 0.2,
+		auto_sorting: true,  //Default is false
 		fetch_data_limit: 100,
 		callbacks: callbacks,
 		pagination:{
@@ -149,8 +157,13 @@ function generateStreamTable(type, queryData, queryType, qvar, rvar, seg, theSea
 	num_search.setAttribute('class',"st_per_page margin pull-left input-sm");
 	
 	document.getElementById('st_pagination').id = 'st_pagination_' + type;
-	document.getElementById('st_pagination_'+type).setAttribute('class',"st_pagination_"+type+" margin");
-	document.getElementById('st_pagination_'+type).setAttribute('style',"text-align:right");
+	var pagination = document.getElementById('st_pagination_'+type);
+	pagination.setAttribute('class',"st_pagination_"+type+" margin");
+	pagination.setAttribute('style',"text-align:right");
+	
+	type_summary = document.getElementById(type+'_summary');
+	document.getElementById(type+'_summary').remove();
+	the_table.insertBefore(type_summary, pagination);
 }
 
 function shiftColumns(id){
