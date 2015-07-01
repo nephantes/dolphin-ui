@@ -493,7 +493,8 @@ class Ngsimport extends VanillaModel {
 				if($this->sheetData[3][$j]=="Notebook reference"){$samp->notebook_ref=$this->esc($this->sheetData[$i][$j]);}
 				if($this->sheetData[3][$j]=="Notes"){$samp->notes=$this->esc($this->sheetData[$i][$j]);}
 				if($this->sheetData[3][$j]=="Library type"){$samp->lib_type=$this->esc($this->sheetData[$i][$j]);}
-	
+				if($this->sheetData[3][$j]=="Antibody Target"){$samp->target=$this->esc($this->sheetData[$i][$j]);}
+				
 				if($this->sheetData[3][$j]=="Sample name"){
 					if($this->namesList == null){
 						$this->namesList = $samp->name;
@@ -629,6 +630,11 @@ class Ngsimport extends VanillaModel {
 			//	Library Type
 			if(!isset($samp->lib_type)){
 				$samp->lib_type = NULL;
+			}
+			
+			//	Antibody Target
+			if(!isset($samp->target)){
+				$samp->target = NULL;
 			}
 			
 			//	Other Values
@@ -1272,6 +1278,18 @@ class samples extends main{
 				}
 			}
 		}
+		//	Antibody Targets
+		if(isset($sample->target)){
+			if($sample->target != NULL && $sample->target != '' && $sample->target != null && $sample->target != 'null'){
+				if(!$underscore_mark){
+					$samplename.="_";
+				}
+				$samplename.= $sample->target;
+				if($underscore_mark){
+					$underscore_mark = false;
+				}
+			}
+		}
 		//	Biological Replicas
 		if(isset($sample->biological_replica)){
 			if($sample->biological_replica != NULL && $sample->biological_replica != '' && $sample->biological_replica != null && $sample->biological_replica != 'null'){
@@ -1434,6 +1452,26 @@ class samples extends main{
 		//	Treatment Manufacturer
 		$this->simpleNormalize($sample, 'treatment_manufacturer', $sample_id, 'treatment_manufacturer', 'treatment_manufacturer_id');
 		
+		//	Antibody Target
+		if($sample->target != NULL){
+			if($sample->target != NULL && $sample->target != '' && $sample->target != null && $sample->target != 'null'){
+				$check = "SELECT `id`, `target_symbol`
+							FROM ngs_antibody_target
+							WHERE `target_symbol` = '".$sample->target."'";
+				$check_result = json_decode($this->model->query($check));
+				if($check_result == array()){
+					//	Empty
+					$this->model->query("INSERT INTO `ngs_antibody_target` (`target_symbol`) VALUES ('".$sample->target."')");
+					$id = json_decode($this->model->query("SELECT `id` FROM `ngs_antibody_target` WHERE target_symbol = '".$sample->target."'"));
+					$this->model->query("UPDATE `biocore`.`ngs_samples` SET `target_id` = ".$id[0]->id." WHERE `id` = $sample_id");
+				}else{
+					//	Exists
+					$id = json_decode($this->model->query("SELECT `id` FROM `ngs_antibody_target` WHERE target_symbol = '".$sample->target."'"));
+					$this->model->query("UPDATE `biocore`.`ngs_samples` SET `target_id` = ".$id[0]->id." WHERE `id` = $sample_id");
+				}
+			}
+		}
+		
 		//	Samplename
 		if($this->model->series_id == 1){
 			$this->createSampleName($sample, $sample_id);	
@@ -1560,6 +1598,26 @@ class samples extends main{
 		
 		//	Treatment Manufacturer
 		$this->simpleNormalize($sample, 'treatment_manufacturer', $sample_id, 'treatment_manufacturer', 'treatment_manufacturer_id');
+		
+		//	Antibody Target
+		if($sample->target != NULL){
+			if($sample->target != NULL && $sample->target != '' && $sample->target != null && $sample->target != 'null'){
+				$check = "SELECT `id`, `target_symbol`
+							FROM ngs_antibody_target
+							WHERE `target_symbol` = '".$sample->target."'";
+				$check_result = json_decode($this->model->query($check));
+				if($check_result == array()){
+					//	Empty
+					$this->model->query("INSERT INTO `ngs_antibody_target` (`target_symbol`) VALUES ('".$sample->target."')");
+					$id = json_decode($this->model->query("SELECT `id` FROM `ngs_antibody_target` WHERE target_symbol = '".$sample->target."'"));
+					$this->model->query("UPDATE `biocore`.`ngs_samples` SET `target_id` = ".$id[0]->id." WHERE `id` = $sample_id");
+				}else{
+					//	Exists
+					$id = json_decode($this->model->query("SELECT `id` FROM `ngs_antibody_target` WHERE target_symbol = '".$sample->target."'"));
+					$this->model->query("UPDATE `biocore`.`ngs_samples` SET `target_id` = ".$id[0]->id." WHERE `id` = $sample_id");
+				}
+			}
+		}
 		
 		//	Samplename
 		if($this->model->series_id == 1){

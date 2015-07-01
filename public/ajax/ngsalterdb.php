@@ -9,22 +9,26 @@ require_once("../../includes/dbfuncs.php");
 $query = new dbfuncs();
 //header
 
-if (isset($_POST['p'])){$p = $_POST['p'];}
+if (isset($_GET['p'])){$p = $_GET['p'];}
 
-if (isset($_POST['start'])){$start = $_POST['start'];}
-if (isset($_POST['end'])){$end = $_POST['end'];}
+if (isset($_GET['start'])){$start = $_GET['start'];}
+if (isset($_GET['end'])){$end = $_GET['end'];}
 
 if ($p == "submitPipeline" )
 {
 	//Grab the inputs
-	if (isset($_POST['json'])){$json = $_POST['json'];}
-	if (isset($_POST['outdir'])){$outdir = $_POST['outdir'];}
-	if (isset($_POST['name'])){$name = $_POST['name'];}
-	if (isset($_POST['desc'])){$desc = $_POST['desc'];}
-	if (isset($_POST['runGroupID'])){$runGroupID = $_POST['runGroupID'];}
-    if (isset($_POST['barcode'])){$barcode = $_POST['barcode'];}
-    if (isset($_POST['uid'])){$uid = $_POST['uid'];}
-    if (isset($_POST['gids'])){$gids = $_POST['gids'];}
+	if (isset($_GET['json'])){$json = $_GET['json'];}
+	if (isset($_GET['outdir'])){$outdir = $_GET['outdir'];}
+	if (isset($_GET['name'])){$name = $_GET['name'];}
+	if (isset($_GET['desc'])){$desc = $_GET['desc'];}
+	if (isset($_GET['runGroupID'])){$runGroupID = $_GET['runGroupID'];}
+    if (isset($_GET['barcode'])){$barcode = $_GET['barcode'];}
+    if (isset($_GET['uid'])){$uid = $_GET['uid'];}
+    if (isset($_GET['gids'])){$gids = $_GET['gids'];}
+    
+    var_dump('test');
+    var_dump($query->queryAVal("SELECT id FROM biocore.ngs_runparams WHERE run_group_id = -1 and run_name = '$name' order by id desc limit 1"));
+    var_dump($query->runSQL("select id from biocore.ngs_runparams where run_name = '$name'"));
     
 	//run_group_id set to -1 as a placeholder.Cannot grab primary key as it's being made, so a placeholder is needed.
 	$data=$query->runSQL("
