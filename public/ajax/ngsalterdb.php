@@ -26,10 +26,6 @@ if ($p == "submitPipeline" )
     if (isset($_POST['uid'])){$uid = $_POST['uid'];}
     if (isset($_POST['gids'])){$gids = $_POST['gids'];}
     
-    var_dump('test');
-    var_dump($query->queryAVal("SELECT id FROM biocore.ngs_runparams WHERE run_group_id = -1 and run_name = '$name' order by id desc limit 1"));
-    var_dump($query->runSQL("select id from biocore.ngs_runparams where run_name = '$name'"));
-    
 	//run_group_id set to -1 as a placeholder.Cannot grab primary key as it's being made, so a placeholder is needed.
 	$data=$query->runSQL("
 	INSERT INTO biocore.ngs_runparams (run_group_id, outdir, run_status, barcode, json_parameters, run_name, run_description,
