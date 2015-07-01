@@ -74,13 +74,13 @@ def getAmazonCredentials(username):
 def getDirs(runparamsid, isbarcode):
 
     tablename="ngs_fastq_files"
-    fields="d.backup_dir fastq_dir, d.backup_dir, d.amazon_bucket, rp.outdir, s.organism, s.library_type"
+    fields="d.backup_dir fastq_dir, d.backup_dir, d.amazon_bucket, rp.outdir"
     idmatch="s.id=tl.sample_id"
     sql = "SELECT DISTINCT %(fields)s FROM biocore.ngs_runlist nr, biocore.ngs_samples s, biocore.%(tablename)s tl, biocore.ngs_dirs d, biocore.ngs_runparams rp where nr.sample_id=s.id and rp.run_status=0 and %(idmatch)s and d.id=tl.dir_id and rp.id=nr.run_id and nr.run_id='"+str(runparamsid)+"';"
 
     results=runSQL(sql%locals())
     if (not results):
-       fields="d.fastq_dir, d.backup_dir, d.amazon_bucket, rp.outdir, s.organism, s.library_type"
+       fields="d.fastq_dir, d.backup_dir, d.amazon_bucket, rp.outdir"
        if (isbarcode):
            idmatch="s.lane_id=tl.lane_id"
            tablename="ngs_temp_lane_files"
@@ -91,7 +91,7 @@ def getDirs(runparamsid, isbarcode):
 
 def getSampleList(runparamsid):
     tablename="ngs_fastq_files"
-    sql = "SELECT s.name, s.adapter, s.genotype, s.name, ts.file_name FROM biocore.ngs_runparams nrp, biocore.ngs_runlist nr, biocore.ngs_samples s, biocore.%(tablename)s ts, biocore.ngs_dirs d where nr.run_id=nrp.id and nr.sample_id=s.id and nrp.run_status=0 and s.id=ts.sample_id and d.id=ts.dir_id and nr.run_id='"+str(runparamsid)+"';"
+    sql = "SELECT s.samplename, ts.file_name FROM biocore.ngs_runparams nrp, biocore.ngs_runlist nr, biocore.ngs_samples s, biocore.%(tablename)s ts, biocore.ngs_dirs d where nr.run_id=nrp.id and nr.sample_id=s.id and nrp.run_status=0 and s.id=ts.sample_id and d.id=ts.dir_id and nr.run_id='"+str(runparamsid)+"';"
     samplelist=runSQL(sql%locals())
     if (not samplelist):
         tablename="ngs_temp_sample_files"
@@ -103,9 +103,9 @@ def getInputParams(samplelist):
     for row in samplelist:
         if (inputparams):
            inputparams=inputparams+":"
-        inputparams=inputparams+row[3]+","+row[4]
+        inputparams=inputparams+row[0]+","+row[1]
     spaired=None
-    if (',' in row[4]):
+    if (',' in row[1]):
         spaired="paired"
     return (spaired, inputparams)
 
@@ -128,7 +128,7 @@ def getLaneList(runparamsid):
     if (',' in row[0]):
         spaired="paired"
 
-    fields='s.name, s.barcode'
+    fields='s.samplename, s.barcode'
     result=runSQL(sql%locals())
     if (not result):
         tablename="ngs_fastq_files"
@@ -191,15 +191,15 @@ def main():
            if (amazon != () and BACKUP):
               amazonupload     = "Yes"
 
-           (inputdir, backup_dir, amazon_bucket, outdir, organism, library_type) = getDirs(runparamsid, isbarcode)
+           (inputdir, backup_dir, amazon_bucket, outdir) = getDirs(runparamsid, isbarcode)
            if(inputdir == backup_dir):
               backupS3 = None
               gettotalreads = None
            else:
               gettotalreads = "Yes"
 
-           print "%s %s %s %s %s %s"%(inputdir, backup_dir, amazon_bucket, outdir, organism, library_type )
-           logging.info("%s %s %s %s %s %s"%(inputdir, backup_dir, amazon_bucket, outdir, organism, library_type ))
+           print "%s %s %s %s"%(inputdir, backup_dir, amazon_bucket, outdir)
+           logging.info("%s %s %s %s"%(inputdir, backup_dir, amazon_bucket, outdir))
 
            if (isbarcode):
                spaired, inputparams, barcodes=getLaneList(runparamsid)
@@ -256,7 +256,7 @@ def main():
 
            write_input(input_fn, inputdir, content, genomebuild, spaired, barcodes, adapter, quality, trim, trimpaired, split, commonind, advparams, customind, pipeline )
 
-           workflow = join( bin_dir, 'seqmapping_workflow.txt' )
+           workflow = join( bin_dir, '../tmp/files/seqmapping_workflow.txt' )
 
            write_workflow(resume, gettotalreads, amazonupload, backupS3, runparamsid, customind, commonind, pipeline, barcodes, fastqc, adapter, quality, trim, split, workflow, clean)
 

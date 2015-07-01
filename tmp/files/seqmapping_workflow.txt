@@ -1,0 +1,2 @@
+stepCheck	@RUNCHECK -i @INPUT -u @USERNAME -b @BARCODES -w @WKEY -p 1 -d @DBCOMMCMD -a @ADAPTER -t @TRIM -o @OUTDIR -r no -s stepCheck -j @JGEN	1
+stepClean	@RUNCLEAN -l 0 -u @USERNAME -p @PUBDIR -w @WKEY -d @DBCOMMCMD  -o @OUTDIR	1
