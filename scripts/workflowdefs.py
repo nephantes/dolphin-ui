@@ -1,5 +1,4 @@
-
-stepCheck = 'stepCheck%(sep)s@RUNCHECK -i @INPUT -b @BARCODES -w @WKEY -p %(runparamsid)s -d @DBCOMMCMD -a @ADAPTER -t @TRIM -o @OUTDIR -r %(resume)s -s stepCheck -j @JGEN%(sep)s1'
+stepCheck = 'stepCheck%(sep)s@RUNCHECK -i @INPUT -u @USERNAME -b @BARCODES -w @WKEY -p %(runparamsid)s -d @DBCOMMCMD -a @ADAPTER -t @TRIM -o @OUTDIR -r %(resume)s -s stepCheck -j @JGEN%(sep)s1'
 stepSeqMapping = 'stepSeqMapping%(indexname)s%(sep)s@RUNRECMAPPING -i @INPUT -a @AWKDIR -d @SPAIRED -m @SAMTOOLS -o @OUTDIR -b @PARAM%(indexname)s -c @BOWTIE2CMD -s stepSeqMapping%(indexname)s -r @ADVPARAMS -j @JMAPPING%(sep)s1'
 stepBarcode = 'stepBarcode%(sep)s@RUNBARCODE -i @INPUT -d @SPAIRED -b @BARCODES -o @OUTDIR -c @SINGLEBSPLITTERCMD:@PAIREDBSPLITTERCMD -s stepBarcode -j @JGEN%(sep)s1'
 stepGetTotalReads = 'stepGetTotalReads%(sep)s@RUNGETTOTALREADS -b @BARCODES -r %(runparamsid)s -p @SPAIRED -o @OUTDIR -u @USERNAME -j @JGEN%(sep)s10'
@@ -21,5 +20,5 @@ stepBam2BW='stepBam2BW%(type)s%(sep)s@RUNBAM2BW -o @OUTDIR -g @GENOMESIZE -p @PU
 stepPicard='stepPicard%(type)s%(sep)s@PERL @RUNPICARD -o @OUTDIR -pu @PUBDIR -w @WKEY -t %(type)s -r @REFFLAT -pi @PICARDCMD -s stepPicard%(type)s -j @JGEN%(sep)s0'
 stepCounts = 'stepCounts%(sep)s@RUNCOUNTS -m @MAPNAMES -o @OUTDIR -g @GCOMMONDB -p @PUBDIR -w @WKEY -b @MAKEBED -c @BEDTOOLSCMD -s stepCounts -j @JGEN%(sep)s1'
 stepDESeq2 = 'stepDESeq2p%(deseq_count)s%(sep)s@RUNDESEQ2 -c @COLS%(deseq_count)s -pu @PUBDIR -da @DATASET%(deseq_count)s -w @WKEY -dc @CONDS%(deseq_count)s -r @RSCRIPT -o @OUTDIR -n %(deseq_count)s -e @HEATMAP%(deseq_count)s -t @FITTYPE%(deseq_count)s -pa @PADJ%(deseq_count)s -f @FOLDCHANGE%(deseq_count)s -s stepDESeq2p%(deseq_count)s -j @JGEN%(sep)s0'
-stepClean      = 'stepClean%(sep)s@RUNCLEAN -l %(level)s -p @PUBDIR -w @WKEY -d @DBCOMMCMD  -o @OUTDIR%(sep)s1'
+stepClean      = 'stepClean%(sep)s@RUNCLEAN -l %(level)s -u @USERNAME -p @PUBDIR -w @WKEY -d @DBCOMMCMD  -o @OUTDIR%(sep)s1'
 
