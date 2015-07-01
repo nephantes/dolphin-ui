@@ -52,7 +52,7 @@ $(function() {
 			}else{
 				json = json + ',"spaired":"no"';
 			}
-			json = json + ',"resume":"no","fastqc":"yes"';
+			json = json + ',"resume":"no","fastqc":"no"';
 			if (initial_split[2] == 'no') {
 				json = json + ',"barcodes":"none","adapters":"none"';
 			}else{
@@ -90,7 +90,7 @@ $(function() {
 			}else{
 				json = json + ',"spaired":"no"';
 			}
-			json = json + ',"resume":"no","fastqc":"yes",';
+			json = json + ',"resume":"no","fastqc":"no",';
 			if (initial_split[3] == 'lane') {
 				json = json + '"barcodes":"distance,1:format,5 end read 1",';
 			}else{
