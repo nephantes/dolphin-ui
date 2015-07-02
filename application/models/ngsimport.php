@@ -1472,8 +1472,10 @@ class samples extends main{
 			}
 		}
 		
+		$DC_PROJECT = json_decode($this->model->query("SELECT experiment_name FROM ngs_experiment_series WHERE `id` = ".$this->model->series_id));
+		
 		//	Samplename
-		if($this->model->series_id == 1){
+		if(strtolower($DC_PROJECT[0]->experiment_name) == 'dendritic cell transcriptional landscape'){
 			$this->createSampleName($sample, $sample_id);	
 		}else{
 			$this->model->query("UPDATE `biocore`.`ngs_samples` SET `samplename` = '".$sample->name."' WHERE `id` = $sample_id");
@@ -1619,8 +1621,10 @@ class samples extends main{
 			}
 		}
 		
+		$DC_PROJECT = json_decode($this->model->query("SELECT experiment_name FROM ngs_experiment_series WHERE `id` = ".$this->model->series_id));
+		
 		//	Samplename
-		if($this->model->series_id == 1){
+		if(strtolower($DC_PROJECT[0]->experiment_name) == 'dendritic cell transcriptional landscape'){
 			$this->createSampleName($sample, $sample_id);	
 		}else{
 			$this->model->query("UPDATE `biocore`.`ngs_samples` SET `samplename` = '".$sample->name."' WHERE `id` = $sample_id");
