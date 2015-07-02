@@ -60,19 +60,30 @@ else if ($p == 'checkRunList')
 {
 	if (isset($_GET['sample_ids'])){$sample_ids = $_GET['sample_ids'];}
 	if (isset($_GET['run_id'])){$run_id = $_GET['run_id'];}
-	$run_id_check=$query->queryAVal("
+	$data=$query->queryTable("
 	SELECT DISTINCT run_id
 	FROM ngs_runlist
 	WHERE sample_id in ( $sample_ids )
 	");
-	if($run_id_check > 0){
-		$query->runSQL("UPDATE ngs_runlist
-					   SET run_id = $run_id
-					   WHERE sample_id in ( $sample_ids )");
-		$data='false';
-	}else{
-		$data='true';
-	}
+}
+else if($p == 'checkRunParams')
+{
+	if (isset($_GET['run_ids'])){$run_ids = $_GET['run_ids'];}
+	$data=$query->queryTable("
+	SELECT id
+	FROM biocore.ngs_runparams
+	WHERE id IN ($run_ids)
+	AND (run_name = 'Fastlane Initial Run' OR run_name = 'Import Initial Run')
+	");
+}
+else if ($p == 'checkRunToSamples')
+{
+	if (isset($_GET['run_id'])){$run_id = $_GET['run_id'];}
+	$data=$query->queryTable("
+	SELECT id
+	FROM biocore.ngs_runlist
+	WHERE run_id = 69
+	");
 }
 
 header('Cache-Control: no-cache, must-revalidate');

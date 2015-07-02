@@ -106,10 +106,10 @@ $(function() {
 		}
 		
 		if (json != undefined & outdir != undefined && runname != undefined && rundesc != undefined) {
-			//insert new values into ngs_runparams
-			var runparamsInsert = postInsertRunparams(json, outdir, runname, rundesc);
-			var runlist_check;
-			names_to_ids = [];
+			//	Check to see if runparams has already launched
+			var run_ids = [];
+			var initial_run_ids = [];
+			var names_to_ids = [];
 			
 			$.ajax({
 				type: 	'GET',
@@ -118,33 +118,68 @@ $(function() {
 				async:	false,
 				success: function(s)
 				{
-					console.log(s);
 					for(var x = 0; x < s.length; x++){
 						names_to_ids.push(s[x].id);
 					}
 				}
 			});
-			
 			$.ajax({
 				type: 	'GET',
 				url: 	'/dolphin/public/ajax/initialmappingdb.php',
-				data:  	{ p: 'checkRunList', sample_ids: names_to_ids.toString(), run_id: runparamsInsert[1]},
+				data:  	{ p: 'checkRunList', sample_ids: names_to_ids.toString()},
 				async:	false,
 				success: function(s)
 				{
-					runlist_check = s;
+					for(var x = 0; x < s.length; x++){
+						run_ids.push(s[x].run_id);
+					}
 				}
 			});
-			console.log(runparamsInsert);
-			console.log(names_list);
-			console.log(sample_lane);
-			console.log(experiment_series);
-			console.log(names_to_ids);
-			console.log(runlist_check);
-			//insert new values into ngs_runlist
-			if (runlist_check == true) {
+			if (run_ids.length > 0) {
+				$.ajax({
+					type: 	'GET',
+					url: 	'/dolphin/public/ajax/initialmappingdb.php',
+					data:  	{ p: 'checkRunParams', run_ids: run_ids.toString()},
+					async:	false,
+					success: function(s)
+					{
+						for(var x = 0; x < s.length; x++){
+							initial_run_ids.push(s[x].id);
+						}
+					}
+				});
+				if (initial_run_ids.length > 0){
+					for(var x = 0; x < initial_run_ids.length; x++){
+						var added_samples = [];
+						$.ajax({
+							type: 	'GET',
+							url: 	'/dolphin/public/ajax/initialmappingdb.php',
+							data:  	{ p: 'checkRunToSamples', run_id: initial_run_ids[x], sample_ids: names_to_ids.toString()},
+							async:	false,
+							success: function(s)
+							{
+								for(var x = 0; x < s.length; x++){
+									if (names_to_ids.indexOf(s[x].id) > -1) {
+										added_samples.push(s[x].id);
+									}
+								}
+							}
+						});
+						if (added_samples.length > 0) {
+							var submitted = postInsertRunlist('insertRunList', added_samples, initial_run_ids[x]);
+						}else{
+							console.log('works?');
+						}
+					}
+				}
+			}else{
+				//insert new values into ngs_runparams
+				var runparamsInsert = postInsertRunparams(json, outdir, runname, rundesc);
+				console.log(runparamsInsert);
+				//insert new values into ngs_runlist
 				var submitted = postInsertRunlist(runparamsInsert[0], names_to_ids, runparamsInsert[1]);	
 			}
+			
 		}
 	}
 	
