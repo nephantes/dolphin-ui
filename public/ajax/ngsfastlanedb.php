@@ -62,8 +62,8 @@ if ($p == 'experimentSeriesCheck'){
 	if (isset($_POST['gids'])){$gids = $_POST['gids'];}
 	$data=$query->runSQL("
 	INSERT INTO ngs_lanes
-		(series_id, name, facility, owner_id, group_id, perms, date_created, date_modified, last_modified_user)
-		VALUES ('$experiment', '$lane', 'In house', ".$_SESSION['uid'].", $gids, 15, now(), now(), ".$_SESSION['uid'].");
+		(series_id, name, owner_id, group_id, perms, date_created, date_modified, last_modified_user)
+		VALUES ('$experiment', '$lane', ".$_SESSION['uid'].", $gids, 15, now(), now(), ".$_SESSION['uid'].");
 	");
 }else if ($p == 'insertSample'){
 	if (isset($_GET['experiment'])){$experiment = $_GET['experiment'];}

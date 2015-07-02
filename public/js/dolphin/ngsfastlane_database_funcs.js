@@ -15,6 +15,8 @@ function checkFastlaneInput(info_array){
 	
 	//	Non-database checks
 	//	For each input passed
+	console.log(info_array);
+	console.log(id_array);
 	for(var x = 0; x < (id_array.length - 1); x ++){
 		if (info_array[x] == '' && id_array[x] != 'amazon_bucket') {
 			//	Left a field blank
@@ -64,7 +66,6 @@ function checkFastlaneInput(info_array){
 							//	Not proper file input (single end)
 							input_bool_check = false;
 						}else{
-							
 							single_input_array.unshift(barcode_array[y][0]);
 							input_array.push(single_input_array);
 						}
@@ -101,7 +102,7 @@ function checkFastlaneInput(info_array){
 	//	Database checks
 	//	Experiment Series
 	var experiment_series_id = experimentSeriesCheck(info_array[3]);
-	
+
 	//	Experiments (Lanes)
 	if (experiment_series_id > 0) {
 		var lane_id = laneCheck(experiment_series_id, info_array[4]);
@@ -111,13 +112,13 @@ function checkFastlaneInput(info_array){
 	if (experiment_series_id > 0 && lane_id > 0) {
 		if (input_array[1] == 'yes') {
 			for(z in barcode_array){
-				if(!sampleCheck(experiment_series_id, lane_id, barcode_array[z][0]) == 0){
+				if(sampleCheck(experiment_series_id, lane_id, barcode_array[z][0]) != 0){
 					bad_samples.push(barcode_array[z][0]);
 				}
 			}
 		}else{
 			for(z in input_array){
-				if(!sampleCheck(experiment_series_id, lane_id, input_array[z][0]) == 0){
+				if(sampleCheck(experiment_series_id, lane_id, input_array[z][0]) != 0){
 					bad_samples.push(input_array[z][0]);
 				}
 			}
@@ -142,7 +143,7 @@ function checkFastlaneInput(info_array){
 	}else{
 		//	May submit into database
 		var organism = info_array[0];
-		console.log(organism);
+
 		if (experiment_series_id > 0) {
 			//	If adding to a experiment series
 			if (lane_id > 0) {
