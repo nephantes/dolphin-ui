@@ -730,7 +730,7 @@ function checkOffAllLanes(){
 function getValidSamples(lane_samples){
 	var valid_samples;
 	$.ajax({ type: "GET",
-					url: "/dolphin/public/ajax/initialmappingdb.php",
+					url: BASE_PATH+"/public/ajax/initialmappingdb.php",
 					data: { p: 'laneToSampleChecking', sample_ids: lane_samples.toString()},
 					async: false,
 					success : function(r)
@@ -783,12 +783,12 @@ function passIDData(run_group_id, id){
 }
 
 function returnToIndex(){
-	window.location.href = "/dolphin/search/index/";
+	window.location.href = BASE_PATH+"/search/index/";
 }
 
 /*##### SEND TO PIPELINE WITH SELECTION #####*/
 function submitSelected(){
-	window.location.href = "/dolphin/pipeline/selected/" + checklist_samples + "$";
+	window.location.href = BASE_PATH+"/pipeline/selected/" + checklist_samples + "$";
 }
 
 /*##### CHECK RADIO SELECTED FUNCTION #####*/

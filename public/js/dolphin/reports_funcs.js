@@ -510,7 +510,7 @@ $(function() {
 	var read_counts = [];
 	
 	$.ajax({ type: "GET",
-			url: "/dolphin/public/ajax/initialmappingdb.php",
+			url: BASE_PATH+"/public/ajax/initialmappingdb.php",
 			data: { p: 'getCounts', samples: samples.toString() },
 			async: false,
 			success : function(s)
