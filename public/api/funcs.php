@@ -95,7 +95,7 @@ class funcs
             }
             $res->close();
         }
-        return json_encode($data);
+        return $data;
     }
     
     function syscall($command)
@@ -372,7 +372,7 @@ class funcs
                     
                     $edir = $this->tool_path;
                     if ($this->remotehost != "") {
-                        $com = "ssh -o ConnectTimeout=30 $username@" . $this->remotehost . " \"" . $this->python . " " . $edir . "/src/runService.py  -d " . $this->dbhost . " $ipf $dpf -o $outdir -u $username -k $wkey -c \\\"$command\\\" -n $servicename -s $servicename\" 2>&1";
+                        $com = "ssh -o ConnectTimeout=30 $username@" . $this->remotehost . " \"" . $this->python . " " . $edir . "/runService.py  -d " . $this->dbhost . " $ipf $dpf -o $outdir -u $username -k $wkey -c \\\"$command\\\" -n $servicename -s $servicename\" 2>&1";
                     } else {
                         $com = $this->python . " " . $edir . "/runService.py  -d " . $this->dbhost . " $ipf $dpf -o $outdir -u $username -k $wkey -c \"$command\" -n $servicename -s $servicename 2>&1";
                     }
