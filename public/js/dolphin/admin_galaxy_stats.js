@@ -10,7 +10,7 @@ $(function() {
     /* Morris.js Charts */
      var responseTopGalaxyUsers = '';
             $.ajax({ type: "GET",   
-                     url: "/dolphin/public/ajax/adminstatquerydb.php",
+                     url: BASE_PATH+"/public/ajax/adminstatquerydb.php",
                      data: { p: "getTopUsers", type:"Galaxy" },
                      async: false,
                      success : function(text)
@@ -64,7 +64,7 @@ $(function() {
     /* Morris.js Charts */
      var responseDaily = '';
             $.ajax({ type: "GET",   
-                     url: "/dolphin/public/ajax/adminstatquerydb.php",
+                     url: BASE_PATH+"/public/ajax/adminstatquerydb.php",
                      data: { p: "getDailyRuns" },
                      async: false,
                      success : function(text)
@@ -89,7 +89,7 @@ $(function() {
      var userTable = $('#jsontable_User').dataTable();
      
         $.ajax({ type: "GET",   
-                     url: "/dolphin/public/ajax/adminstatquerydb.php",
+                     url: BASE_PATH+"/public/ajax/adminstatquerydb.php",
                      data: { p: "getUsersTime", type:"Galaxy"},
                      async: false,
                      success : function(s)
@@ -121,7 +121,7 @@ $(function() {
             },
             function(start, end) {
             $.ajax({ type: "GET",   
-                     url: "/dolphin/public/ajax/adminstatquerydb.php",
+                     url: BASE_PATH+"/public/ajax/adminstatquerydb.php",
                      data: { p: "getUsersTime", type:"Galaxy", start:start.format('YYYY-MM-DD'), end:end.format('YYYY-MM-DD') },
                      async: false,
                      success : function(s)

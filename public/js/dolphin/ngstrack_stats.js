@@ -27,7 +27,7 @@ function generateStreamTable(type, queryData, queryType, qvar, rvar, seg, theSea
 	var lanes_with_good_samples;
 	if (type == 'lanes') {
 			$.ajax({ type: "GET",
-					url: "/dolphin/public/ajax/ngsquerydb.php",
+					url: BASE_PATH+"/public/ajax/ngsquerydb.php",
 					data: { p: 'getLanesWithSamples' },
 					async: false,
 					success : function(s)
@@ -267,7 +267,7 @@ $(function() {
 	var protocolsTable = $('#jsontable_protocols').dataTable();
 
 	 $.ajax({ type: "GET",
-					 url: "/dolphin/public/ajax/ngsquerydb.php",
+					 url: BASE_PATH+"/public/ajax/ngsquerydb.php",
 					 data: { p: "getProtocols", type:"Dolphin", q: qvar, r: rvar, seg: segment, search: theSearch, uid: uid, gids: gids},
 					 async: false,
 					 success : function(s)
@@ -276,7 +276,7 @@ $(function() {
 						for(var i = 0; i < s.length; i++) {
 						protocolsTable.fnAddData([
 			s[i].id,
-			"<a href=\"/dolphin/search/details/protocols/"+s[i].id+'/'+theSearch+"\">"+s[i].name+"</a>",
+			"<a href="+BASE_PATH+"\"/search/details/protocols/"+s[i].id+'/'+theSearch+"\">"+s[i].name+"</a>",
 						s[i].growth,
 			s[i].treatment,
 						]);
@@ -300,7 +300,7 @@ $(function() {
 			},
 	function(start, end) {
 			$.ajax({ type: "GET",
-					 url: "/dolphin/public/ajax/ngsquerydb.php",
+					 url: BASE_PATH+"/public/ajax/ngsquerydb.php",
 					 data: { p: "getProtocols", q: qvar, r: rvar, seg: segment, uid: uid, gids: gids, search: theSearch, start:start.format('YYYY-MM-DD'), end:end.format('YYYY-MM-DD') },
 					 async: false,
 					 success : function(s)
@@ -309,7 +309,7 @@ $(function() {
 						for(var i = 0; i < s.length; i++) {
 						protocolsTable.fnAddData([
 			s[i].id,
-			"<a href=\"/dolphin/search/details/protocols/"+s[i].id+'/'+theSearch+"\">"+s[i].name+"</a>",
+			"<a href="+BASE_PATH+"\"/search/details/protocols/"+s[i].id+'/'+theSearch+"\">"+s[i].name+"</a>",
 						s[i].growth,
 			s[i].treatment,
 						]);
@@ -333,7 +333,7 @@ $(function() {
 		samplesType = "getSamples";
 	}
 	$.ajax({ type: "GET",
-				url: "/dolphin/public/ajax/ngsquerydb.php",
+				url: BASE_PATH+"/public/ajax/ngsquerydb.php",
 				data: { p: samplesType, q: qvar, r: rvar, seg: segment, search: theSearch, uid: uid, gids: gids },
 				async: false,
 				success : function(s)
@@ -368,7 +368,7 @@ $(function() {
 			},
 	function(start, end) {
 			$.ajax({ type: "GET",
-					url: "/dolphin/public/ajax/ngsquerydb.php",
+					url: BASE_PATH+"/public/ajax/ngsquerydb.php",
 					data: { p: samplesType, q: qvar, r: rvar, seg: segment, search: theSearch, uid: uid, gids: gids, start:start.format('YYYY-MM-DD'), end:end.format('YYYY-MM-DD') },
 					async: false,
 					success : function(s)
@@ -397,7 +397,7 @@ $(function() {
 	//var lanesTable = $('#jsontable_lanes').dataTable();
 
 	$.ajax({ type: "GET",
-					url: "/dolphin/public/ajax/ngsquerydb.php",
+					url: BASE_PATH+"/public/ajax/ngsquerydb.php",
 					data: { p: "getLanes", q: qvar, r: rvar, seg: segment, search: theSearch, uid: uid, gids: gids },
 					async: false,
 					success : function(s)
@@ -424,7 +424,7 @@ $(function() {
 			},
 	function(start, end) {
 			$.ajax({ type: "GET",
-					 url: "/dolphin/public/ajax/ngsquerydb.php",
+					 url: BASE_PATH+"/public/ajax/ngsquerydb.php",
 					 data: { p: "getLanes", q: qvar, r: rvar, seg: segment, search: theSearch, uid: uid, gids: gids, start:start.format('YYYY-MM-DD'), end:end.format('YYYY-MM-DD') },
 					 async: false,
 					 success : function(s)
@@ -448,7 +448,7 @@ $(function() {
 
 	//var experiment_seriesTable = $('#jsontable_experiment_series').dataTable({responsive: true});
 	$.ajax({ type: "GET",
-					url: "/dolphin/public/ajax/ngsquerydb.php",
+					url: BASE_PATH+"/public/ajax/ngsquerydb.php",
 					data: { p: "getExperimentSeries", q: qvar, r: rvar, seg: segment, search: theSearch, uid: uid, gids: gids },
 					async: false,
 					success : function(s)
@@ -475,7 +475,7 @@ $(function() {
 		   },
    function(start, end) {
 		   $.ajax({ type: "GET",
-					url: "/dolphin/public/ajax/ngsquerydb.php",
+					url: BASE_PATH+"/public/ajax/ngsquerydb.php",
 					data: { p: "getExperimentSeries", q: qvar, r: rvar, seg: segment, search: theSearch, uid: uid, gids: gids, start:start.format('YYYY-MM-DD'), end:end.format('YYYY-MM-DD') },
 					async: false,
 					success : function(s)
@@ -484,7 +484,7 @@ $(function() {
 					   for(var i = 0; i < s.length; i++) {
 					   experiment_seriesTable.fnAddData([
 		   s[i].id,
-		   "<a href=\"/dolphin/search/details/experiment_series/"+s[i].id+'/'+theSearch+"\">"+s[i].experiment_name+"</a>",
+		   "<a href="+BASE_PATH+"\"/search/details/experiment_series/"+s[i].id+'/'+theSearch+"\">"+s[i].experiment_name+"</a>",
 					   s[i].summary,
 					   s[i].design,
 					   ]);

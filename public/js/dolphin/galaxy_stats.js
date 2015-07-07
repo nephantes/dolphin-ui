@@ -10,7 +10,7 @@ $(function() {
     /* Morris.js Charts */
      var responseTopGalaxyUsers = '';
             $.ajax({ type: "GET",   
-                     url: "/dolphin/public/ajax/statquerydb.php",
+                     url: BASE_PATH+"/public/ajax/statquerydb.php",
                      data: { p: "getTopUsers", type:"Galaxy" },
                      async: false,
                      success : function(text)
@@ -49,7 +49,7 @@ $(function() {
     function(start, end) {
         var responseTopGalaxyUsers = '';
             $.ajax({ type: "GET",
-                     url: "/dolphin/public/ajax/statquerydb.php",
+                     url: BASE_PATH+"/public/ajax/statquerydb.php",
                      data: { p: "getTopUsersTime", type:"Galaxy", start:start.format('YYYY-MM-DD'), end:end.format('YYYY-MM-DD') },
                      async: false,
                      success : function(text)
@@ -64,7 +64,7 @@ $(function() {
     /* Morris.js Charts */
      var responseDaily = '';
             $.ajax({ type: "GET",   
-                     url: "/dolphin/public/ajax/statquerydb.php",
+                     url: BASE_PATH+"/public/ajax/statquerydb.php",
                      data: { p: "getDailyRuns" },
                      async: false,
                      success : function(text)
@@ -89,7 +89,7 @@ $(function() {
      var userTable = $('#jsontable_User').dataTable();
      
         $.ajax({ type: "GET",   
-                     url: "/dolphin/public/ajax/statquerydb.php",
+                     url: BASE_PATH+"/public/ajax/statquerydb.php",
                      data: { p: "getUsersTime", type:"Galaxy"},
                      async: false,
                      success : function(s)
@@ -121,7 +121,7 @@ $(function() {
             },
             function(start, end) {
             $.ajax({ type: "GET",   
-                     url: "/dolphin/public/ajax/statquerydb.php",
+                     url: BASE_PATH+"/public/ajax/statquerydb.php",
                      data: { p: "getUsersTime", type:"Galaxy", start:start.format('YYYY-MM-DD'), end:end.format('YYYY-MM-DD') },
                      async: false,
                      success : function(s)
@@ -143,7 +143,7 @@ $(function() {
     
     var labTable = $('#jsontable_Lab').dataTable();
                 $.ajax({ type: "GET",   
-                     url: "/dolphin/public/ajax/statquerydb.php",
+                     url: BASE_PATH+"/public/ajax/statquerydb.php",
                      data: { p: "getLabsTime", type:"Galaxy" },
                      async: false,
                      success : function(s)
@@ -173,7 +173,7 @@ $(function() {
             },
             function(start, end) {
             $.ajax({ type: "GET",   
-                     url: "/dolphin/public/ajax/statquerydb.php",
+                     url: BASE_PATH+"/public/ajax/statquerydb.php",
                      data: { p: "getLabsTime", type:"Galaxy", start:start.format('YYYY-MM-DD'), end:end.format('YYYY-MM-DD') },
                      async: false,
                      success : function(s)
@@ -194,7 +194,7 @@ $(function() {
     
     var toolTable = $('#jsontable_Tool').dataTable();
     $.ajax({ type: "GET",   
-                     url: "/dolphin/public/ajax/statquerydb.php",
+                     url: BASE_PATH+"/public/ajax/statquerydb.php",
                      data: { p: "getToolTime", type:"Galaxy"},
                      async: false,
                      success : function(s)
@@ -224,7 +224,7 @@ $(function() {
             },
     function(start, end) {
             $.ajax({ type: "GET",   
-                     url: "/dolphin/public/ajax/statquerydb.php",
+                     url: BASE_PATH+"/public/ajax/statquerydb.php",
                      data: { p: "getToolTime", type:"Galaxy", start:start.format('YYYY-MM-DD'), end:end.format('YYYY-MM-DD') },
                      async: false,
                      success : function(s)

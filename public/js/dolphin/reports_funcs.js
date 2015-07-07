@@ -428,7 +428,7 @@ function downloadTSV(type){
 function getReportWKey(run_id){
 	var wkey = "";
 	$.ajax({ type: "GET",
-			url: "/dolphin/public/ajax/ngsquerydb.php",
+			url: BASE_PATH+"/public/ajax/ngsquerydb.php",
 			data: { p: 'getWKey', run_id: run_id },
 			async: false,
 			success : function(s)
@@ -463,7 +463,7 @@ $(function() {
 	var DESEQ_files = [];
 	
 	$.ajax({ type: "GET",
-			url: "/dolphin/public/ajax/ngsquerydb.php",
+			url: BASE_PATH+"/public/ajax/ngsquerydb.php",
 			data: { p: 'getReportList', wkey: wkey },
 			async: false,
 			success : function(s)
@@ -493,7 +493,7 @@ $(function() {
 	
 	var samplenames = [];
 	$.ajax({ type: "GET",
-			url: "/dolphin/public/ajax/ngsquerydb.php",
+			url: BASE_PATH+"/public/ajax/ngsquerydb.php",
 			data: { p: 'getSampleNames', samples: samples.toString() },
 			async: false,
 			success : function(s)

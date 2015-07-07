@@ -466,7 +466,7 @@ function submitPipeline(type) {
 			//insert new values into ngs_runlist
 			var submitted = postInsertRunlist(runparamsInsert[0], ids, runparamsInsert[1]);
 			if (submitted) {
-				window.location.href = "/dolphin/stat/status";
+				window.location.href = BASE_PATH+"/stat/status";
 			}
 		}
 	}
@@ -477,11 +477,11 @@ function commonRNACheck(id){
 }
 
 function sendToFastlane(){
-	window.location.href = "/dolphin/fastlane";
+	window.location.href = BASE_PATH+"/fastlane";
 }
 
 function sendToStatus(){
-	window.location.href = "/dolphin/stat/status/";
+	window.location.href = BASE_PATH+"/stat/status/";
 }
 
 function backFromDetails(back_type){

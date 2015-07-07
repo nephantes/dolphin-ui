@@ -6,17 +6,17 @@ function backToStatus(basepath){
 function sendToPlot(id){
 	var wkey = getWKey(id);
 	sendWKey(wkey);
-	window.location.href = '/dolphin/plot';
+	window.location.href = BASE_PATH+'/plot';
 }
 
 function sendToAdvancedStatus(run_id){
-	window.location.href = '/dolphin/stat/advstatus/' + run_id;
+	window.location.href = BASE_PATH+'/stat/advstatus/' + run_id;
 }
 
 function getWKey(run_id){
 	var wkey = "";
 	$.ajax({ type: "GET",
-			url: "/dolphin/public/ajax/ngsquerydb.php",
+			url: BASE_PATH+"/public/ajax/ngsquerydb.php",
 			data: { p: 'getWKey', run_id: run_id },
 			async: false,
 			success : function(s)
@@ -30,7 +30,7 @@ function getWKey(run_id){
 function selectService(id){
 	var runparams = $('#jsontable_jobs').dataTable();
 	$.ajax({ type: "GET",
-			 url: BASE_PATH + "/public/ajax/datajobs.php?id=" + id,
+			 url: BASE_PATH + BASE_PATH+"/ajax/datajobs.php?id=" + id,
 			 async: false,
 			 success : function(s)
 			 {

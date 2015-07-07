@@ -126,7 +126,7 @@ $(function() {
     /* Morris.js Charts */
      var responseJobs = '';
             $.ajax({ type: "GET",   
-                     url: "/dolphin/public/ajax/dashboardquerydb.php",
+                     url: BASE_PATH+"/public/ajax/dashboardquerydb.php",
                      data: { p: "getMonthlyJobs" },
                      async: false,
                      success : function(text)
@@ -146,7 +146,7 @@ $(function() {
     });
      var response = '';
             $.ajax({ type: "GET",   
-                     url: "/dolphin/public/ajax/dashboardquerydb.php",
+                     url: BASE_PATH+"/public/ajax/dashboardquerydb.php",
                      data: { p: "getMonthlyRuns" },
                      async: false,
                      success : function(text)
