@@ -2,38 +2,38 @@
 
 class funcs
 {
-    private $dbhost = "";
-    private $db = "";
-    private $dbuser = "";
-    private $dbpass = "";
-    private $tool_path = "";
-    private $remotehost = "";
-    private $jobstatus = "source /etc/profile;bjobs";
-    private $python = "source /etc/profile;module load python/2.7.5;python";
-    private $params_section = "Docker";
+    public $dbhost = "";
+    public $db = "";
+    public $dbuser = "";
+    public $dbpass = "";
+    public $tool_path = "";
+    public $remotehost = "";
+    public $jobstatus = "";
+    public $python = "";
+    public $params_section = "";
     
     function readINI()
     {
-        if ($this->dbhost == "") {
+        if ($this->params_section == "") {
             if (!empty($_SERVER["HTTP_HOST"])){
-               $param_section=$_SERVER["HTTP_HOST"];
+               $this->params_section=$_SERVER["HTTP_HOST"];
             }
-            $ini             = parse_ini_file("../../config/config.ini", true);
-            $ini_array       = $ini[$this->params_section];
-            $this->dbhost    = $ini_array['DB_HOST'];
-            $this->db        = $ini_array['DB_NAME'];
-            $this->dbpass    = $ini_array['DB_PASSWORD'];
-            $this->dbuser    = $ini_array['DB_USER'];
-            $this->tool_path = $ini_array['DOLPHIN_TOOLS_SRC_PATH'];
-            $this->remotehost= $ini_array['REMOTE_HOST'];
-            #$this->jobstatus=$ini_array['JOB_STATUS'];
-            #$this->python=$ini_array['PYTHON'];
+            $ini              = parse_ini_file("../../config/config.ini", true);
+            $ini_array        = $ini[$this->params_section];
+            $this->dbhost     = $ini_array['DB_HOST'];
+            $this->db         = $ini_array['DB_NAME'];
+            $this->dbpass     = $ini_array['DB_PASSWORD'];
+            $this->dbuser     = $ini_array['DB_USER'];
+            $this->tool_path  = $ini_array['DOLPHIN_TOOLS_SRC_PATH'];
+            $this->remotehost = $ini_array['REMOTE_HOST'];
+            $this->jobstatus  =$ini_array['JOB_STATUS'];
+            $this->python     =$ini_array['PYTHON'];
         }
     }
     function getINI()
     {
         $this->readINI();
-        return $this->python;
+        return $this;
     }
     
     function getKey()
@@ -116,7 +116,7 @@ class funcs
     {
         $this->readINI();
         
-        if ($this->params_section != "Docker") {
+        if ($this->remotehost != "") {
             $com = "ssh -o ConnectTimeout=30 $username@" . $this->remotehost . " \"" . $this->jobstatus . " $job_num\"|grep " . $job_num . "|awk '{print \$3\"\\t\"\$1}'";
         } else {
             $com = "ps -ef|grep \"[[:space:]]" . $job_num . "[[:space:]]\"|awk '{print \$8\"\\t\"\$1}'";
@@ -359,7 +359,7 @@ class funcs
                     $ipf = "";
                     if ($inputparam != "" && $inputparam != "None") {
                         #If the service will run over ssh we need \\\ otherwise \
-                        if ($this->params_section != "Docker") {
+                        if ($this->remotehost != "") {
                             $ipf = "-i \\\"$inputparam\\\"";
                         } else {
                             $ipf = "-i \"$inputparam\"";
@@ -371,7 +371,7 @@ class funcs
                     
                     
                     $edir = $this->tool_path;
-                    if ($this->params_section != "Docker") {
+                    if ($this->remotehost != "") {
                         $com = "ssh -o ConnectTimeout=30 $username@" . $this->remotehost . " \"" . $this->python . " " . $edir . "/src/runService.py  -d " . $this->dbhost . " $ipf $dpf -o $outdir -u $username -k $wkey -c \\\"$command\\\" -n $servicename -s $servicename\" 2>&1";
                     } else {
                         $com = $this->python . " " . $edir . "/runService.py  -d " . $this->dbhost . " $ipf $dpf -o $outdir -u $username -k $wkey -c \"$command\" -n $servicename -s $servicename 2>&1";
