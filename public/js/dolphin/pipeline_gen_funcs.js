@@ -466,7 +466,7 @@ function submitPipeline(type) {
 			//insert new values into ngs_runlist
 			var submitted = postInsertRunlist(runparamsInsert[0], ids, runparamsInsert[1]);
 			if (submitted) {
-				window.location.href = "/dolphin/stat/status";
+				window.location.href = BASE_PATH+"/stat/status";
 			}
 		}
 	}
@@ -477,11 +477,11 @@ function commonRNACheck(id){
 }
 
 function sendToFastlane(){
-	window.location.href = "/dolphin/fastlane";
+	window.location.href = BASE_PATH+"/fastlane";
 }
 
 function sendToStatus(){
-	window.location.href = "/dolphin/stat/status/";
+	window.location.href = BASE_PATH+"/stat/status/";
 }
 
 function backFromDetails(back_type){
@@ -730,7 +730,7 @@ function checkOffAllLanes(){
 function getValidSamples(lane_samples){
 	var valid_samples;
 	$.ajax({ type: "GET",
-					url: "/dolphin/public/ajax/initialmappingdb.php",
+					url: BASE_PATH+"/public/ajax/initialmappingdb.php",
 					data: { p: 'laneToSampleChecking', sample_ids: lane_samples.toString()},
 					async: false,
 					success : function(r)
@@ -783,12 +783,12 @@ function passIDData(run_group_id, id){
 }
 
 function returnToIndex(){
-	window.location.href = "/dolphin/search/index/";
+	window.location.href = BASE_PATH+"/search/index/";
 }
 
 /*##### SEND TO PIPELINE WITH SELECTION #####*/
 function submitSelected(){
-	window.location.href = "/dolphin/pipeline/selected/" + checklist_samples + "$";
+	window.location.href = BASE_PATH+"/pipeline/selected/" + checklist_samples + "$";
 }
 
 /*##### CHECK RADIO SELECTED FUNCTION #####*/

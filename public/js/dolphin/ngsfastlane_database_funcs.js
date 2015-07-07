@@ -233,7 +233,7 @@ function checkFastlaneInput(info_array){
 function insertExperimentSeries(experiment_name){
 	$.ajax({
 			type: 	'POST',
-			url: 	'/dolphin/public/ajax/ngsfastlanedb.php',
+			url: 	BASE_PATH+'/public/ajax/ngsfastlanedb.php',
 			data:  	{ p: 'insertExperimentSeries', name: experiment_name, gids: phpGrab.gids },
 			async:	false,
 			success: function(s)
@@ -245,7 +245,7 @@ function insertExperimentSeries(experiment_name){
 function insertLane(experiment_id, lane_name){
 	$.ajax({
 			type: 	'POST',
-			url: 	'/dolphin/public/ajax/ngsfastlanedb.php',
+			url: 	BASE_PATH+'/public/ajax/ngsfastlanedb.php',
 			data:  	{ p: 'insertLane', experiment: experiment_id, lane: lane_name, gids: phpGrab.gids },
 			async:	false,
 			success: function(s)
@@ -258,7 +258,7 @@ function insertSample(experiment_id, lane_id, sample_name, organism, barcode){
 	var id;
 	$.ajax({
 			type: 	'GET',
-			url: 	'/dolphin/public/ajax/ngsfastlanedb.php',
+			url: 	BASE_PATH+'/public/ajax/ngsfastlanedb.php',
 			data:  	{ p: 'insertSample', experiment: experiment_id, lane: lane_id, sample: sample_name,
 					organism: organism, barcode: barcode, gids: phpGrab.gids },
 			async:	false,
@@ -273,7 +273,7 @@ function insertSample(experiment_id, lane_id, sample_name, organism, barcode){
 function insertDirectories(input, backup, amazon){
 	$.ajax({
 			type: 	'POST',
-			url: 	'/dolphin/public/ajax/ngsfastlanedb.php',
+			url: 	BASE_PATH+'/public/ajax/ngsfastlanedb.php',
 			data:  	{ p: 'insertDirectories', input: input, backup: backup, amazon: amazon, gids: phpGrab.gids },
 			async:	false,
 			success: function(s)
@@ -285,7 +285,7 @@ function insertDirectories(input, backup, amazon){
 function insertTempSampleFiles(filename, sample_id, input_directory_id){
 	$.ajax({
 			type: 	'POST',
-			url: 	'/dolphin/public/ajax/ngsfastlanedb.php',
+			url: 	BASE_PATH+'/public/ajax/ngsfastlanedb.php',
 			data:  	{ p: 'insertTempSample', filename: filename, sample_id: sample_id, input: input_directory_id, gids: phpGrab.gids },
 			async:	false,
 			success: function(s)
@@ -297,7 +297,7 @@ function insertTempSampleFiles(filename, sample_id, input_directory_id){
 function insertTempLaneFiles(file_name, lane_id, dir_id){
 	$.ajax({
 			type: 	'POST',
-			url: 	'/dolphin/public/ajax/ngsfastlanedb.php',
+			url: 	BASE_PATH+'/public/ajax/ngsfastlanedb.php',
 			data:  	{ p: 'insertTempLane', file_name: file_name, lane_id: lane_id, dir_id: dir_id, gids: phpGrab.gids },
 			async:	false,
 			success: function(s)
@@ -310,7 +310,7 @@ function experimentSeriesCheck(experiment_name){
 	var id;
 	$.ajax({
 			type: 	'GET',
-			url: 	'/dolphin/public/ajax/ngsfastlanedb.php',
+			url: 	BASE_PATH+'/public/ajax/ngsfastlanedb.php',
 			data:  	{ p: 'experimentSeriesCheck', name: experiment_name },
 			async:	false,
 			success: function(s)
@@ -325,7 +325,7 @@ function laneCheck(experiment_id, lane_name){
 	var id;
 	$.ajax({
 			type: 	'GET',
-			url: 	'/dolphin/public/ajax/ngsfastlanedb.php',
+			url: 	BASE_PATH+'/public/ajax/ngsfastlanedb.php',
 			data:  	{ p: 'laneCheck', experiment: experiment_id, lane: lane_name },
 			async:	false,
 			success: function(s)
@@ -340,7 +340,7 @@ function sampleCheck(experiment_id, lane_id, sample_name){
 	var id;
 	$.ajax({
 			type: 	'GET',
-			url: 	'/dolphin/public/ajax/ngsfastlanedb.php',
+			url: 	BASE_PATH+'/public/ajax/ngsfastlanedb.php',
 			data:  	{ p: 'sampleCheck', experiment: experiment_id, lane: lane_id, sample: sample_name },
 			async:	false,
 			success: function(s)
@@ -355,7 +355,7 @@ function directoryCheck(input, backup, amazon){
 	var id;
 	$.ajax({
 			type: 	'GET',
-			url: 	'/dolphin/public/ajax/ngsfastlanedb.php',
+			url: 	BASE_PATH+'/public/ajax/ngsfastlanedb.php',
 			data:  	{ p: 'directoryCheck', input: input, backup: backup, amazon: amazon},
 			async:	false,
 			success: function(s)
@@ -369,7 +369,7 @@ function directoryCheck(input, backup, amazon){
 function sendProcessData(info_array, post_name){
 	$.ajax({
 			type: 	'GET',
-			url: 	'/dolphin/public/ajax/ngsfastlanedb.php',
+			url: 	BASE_PATH+'/public/ajax/ngsfastlanedb.php',
 			data:  	{ p: 'sendProcessData', info_array: info_array, post: post_name},
 			async:	false,
 			success: function(s)

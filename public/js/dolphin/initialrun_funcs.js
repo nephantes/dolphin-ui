@@ -113,7 +113,7 @@ $(function() {
 			
 			$.ajax({
 				type: 	'GET',
-				url: 	'/dolphin/public/ajax/ngsquerydb.php',
+				url: 	BASE_PATH+'/public/ajax/ngsquerydb.php',
 				data:  	{ p: 'getSamplesFromName', names: names_list.toString(), lane: sample_lane, experiment: experiment_series },
 				async:	false,
 				success: function(s)
@@ -125,7 +125,7 @@ $(function() {
 			});
 			$.ajax({
 				type: 	'GET',
-				url: 	'/dolphin/public/ajax/initialmappingdb.php',
+				url: 	BASE_PATH+'/public/ajax/initialmappingdb.php',
 				data:  	{ p: 'checkRunList', sample_ids: names_to_ids.toString()},
 				async:	false,
 				success: function(s)
@@ -138,7 +138,7 @@ $(function() {
 			if (run_ids.length > 0) {
 				$.ajax({
 					type: 	'GET',
-					url: 	'/dolphin/public/ajax/initialmappingdb.php',
+					url: 	BASE_PATH+'/public/ajax/initialmappingdb.php',
 					data:  	{ p: 'checkRunParams', run_ids: run_ids.toString()},
 					async:	false,
 					success: function(s)
@@ -153,7 +153,7 @@ $(function() {
 						var added_samples = [];
 						$.ajax({
 							type: 	'GET',
-							url: 	'/dolphin/public/ajax/initialmappingdb.php',
+							url: 	BASE_PATH+'/public/ajax/initialmappingdb.php',
 							data:  	{ p: 'checkRunToSamples', run_id: initial_run_ids[x], sample_ids: names_to_ids.toString()},
 							async:	false,
 							success: function(s)

@@ -89,7 +89,7 @@ class HTML {
 	
 	$(document).ready(function() {
 		editor = new $.fn.dataTable.Editor( {
-			"ajax": "/dolphin/public/php/ajax/ajax.php?t='.$table[0]['tablename'].'",
+			"ajax": "'.BASE_PATH.'/public/php/ajax/ajax.php?t='.$table[0]['tablename'].'",
 			"display": "lightbox",
 			"table": "#'.$table[0]['tablename'].'",
 			"fields": [';
@@ -109,7 +109,7 @@ class HTML {
 	
 		$("#'.$table[0]['tablename'].'").DataTable( {
 			dom: "Tfrtip",
-			ajax: "/dolphin/public/php/ajax/ajax.php?t='.$table[0]['tablename'].'",
+			ajax: "'.BASE_PATH.'/public/php/ajax/ajax.php?t='.$table[0]['tablename'].'",
 			columns: [';
 			foreach ($fields as $field):
 			$datafield=($field['joinedtablename']!="")? $field['joinedtablename'].'.'.$field['joinedtargetfield']:$usetablename.$field['fieldname'];
@@ -341,7 +341,7 @@ e range"><i class="fa fa-calendar"></i></button>
 				else{ $adjName = $name; }
 				if($search == ""){
 				foreach ($object as $obj):
-					$html.='<li><a href="/dolphin/search/browse/'
+					$html.='<li><a href="'.BASE_PATH.'/search/browse/'
 					.$name."/".$obj['name']."/".strtolower($adjName)."=".$obj['name']."".
 					'">'.$obj['name'].' ('.$obj['count'].')</a></li>';
 				endforeach;
@@ -359,20 +359,20 @@ e range"><i class="fa fa-calendar"></i></button>
 						unset($tmpSelectCheck[$key]);
 						if(empty($tmpSelectCheck)){
 							$modSearch = implode('$',$tmpSelectCheck);
-							$html.='<li><a href="/dolphin/search/'
+							$html.='<li><a href="'.BASE_PATH.'/search/'
 								."index".'">'.$obj['name'].' ('.$obj['count'].') +</a></li>';
 						}
 						else
 						{
 							$modSearch = implode('$',$tmpSelectCheck);
-							$html.='<li><a href="/dolphin/search/browse/'
+							$html.='<li><a href="'.BASE_PATH.'/search/browse/'
 								.$name."/".$obj['name']."/".$modSearch.
 								'">'.$obj['name'].' ('.$obj['count'].') +</a></li>';	
 						}
 						
 					}
 					else{
-						$html.='<li><a href="/dolphin/search/browse/'
+						$html.='<li><a href="'.BASE_PATH.'/search/browse/'
 							.$name."/".$obj['name']."/".$search. "$" .$modSearch.
 							'">'.$obj['name'].' ('.$obj['count'].')</a></li>';
 					}
@@ -509,7 +509,7 @@ e range"><i class="fa fa-calendar"></i></button>
 		<h4>Analysis Results <small>Comprehensive Analysis</small></h4>
 		</div>
 		<div class="panel-body">
-	 <iframe src="http://localhost/dolphin/bs.html" seamless frameborder=0 onload="this.width=855;this.height=600;"></iframe>
+	 <iframe src="'.BASE_PATH.'/bs.html" seamless frameborder=0 onload="this.width=855;this.height=600;"></iframe>
 	</div>
 	</div>
 	';

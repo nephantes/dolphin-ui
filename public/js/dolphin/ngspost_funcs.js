@@ -31,7 +31,7 @@ function postInsertRunparams(json, outputdir, name, description){
    
    $.ajax({
            type: 	'POST',
-           url: 	'/dolphin/public/ajax/ngsalterdb.php',
+           url: 	BASE_PATH+'/public/ajax/ngsalterdb.php',
            data:  	{ p: "submitPipeline", json: json, outdir: outputdir, name: name, desc: description, runGroupID: runGroupID, barcode: barcode, uid: uid, gids: gids},
            async:	false,
            success: function(r)
@@ -60,7 +60,7 @@ function postInsertRunlist(runlistCheck, sample_ids, runID){
        if (runlistCheck == 'insertRunlist') {
            $.ajax({
                type: 	'POST',
-               url: 	'/dolphin/public/ajax/ngsalterdb.php',
+               url: 	BASE_PATH+'/public/ajax/ngsalterdb.php',
                data:  	{ p: runlistCheck, sampID: sample_ids, runID: runID, uid: uid, gids: gids},
                async:	false,
                success: function(r)
@@ -83,7 +83,7 @@ function deleteRunparams(run_id) {
 
 function resumeSelected(run_id, groupID){
     $.ajax({ type: "POST",
-		url: "/dolphin/public/ajax/ngsalterdb.php",
+		url: BASE_PATH+"/public/ajax/ngsalterdb.php",
 		data: { p: "noAddedParamsRerun", run_id: run_id },
 		async: false,
 		success : function(s)
@@ -99,7 +99,7 @@ function resumeSelected(run_id, groupID){
 function confirmDeleteRunparams(run_id){
    $.ajax({
             type: 	'POST',
-            url: 	'/dolphin/public/ajax/ngsalterdb.php',
+            url: 	BASE_PATH+'/public/ajax/ngsalterdb.php',
             data:  	{ p: 'deleteRunparams', run_id: run_id },
             async:	false,
             success: function(r)

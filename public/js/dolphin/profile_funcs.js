@@ -24,7 +24,7 @@ function updateProfile(){
 	if (access_key_change.length > 0) {
 		for(var x = 0; x < access_key_change.length; x++){
 			$.ajax({ type: "POST",
-				url: "/dolphin/public/ajax/ngsalterdb.php",
+				url: BASE_PATH+"/public/ajax/ngsalterdb.php",
 				data: { p: 'alterAccessKey', id: access_key_change[x].split("_")[0], a_key: document.getElementById(access_key_change).value},
 				async: false,
 				success : function(s)
@@ -36,7 +36,7 @@ function updateProfile(){
 	if (secret_key_change.length > 0) {
 		for(var x = 0; x < secret_key_change.length; x++){
 			$.ajax({ type: "POST",
-				url: "/dolphin/public/ajax/ngsalterdb.php",
+				url: BASE_PATH+"/public/ajax/ngsalterdb.php",
 				data: { p: 'alterSecretKey', id: secret_key_change[x].split("_")[0], s_key: document.getElementById(secret_key_change).value},
 				async: false,
 				success : function(s)
@@ -48,7 +48,7 @@ function updateProfile(){
 	
 	if (change_check) {
 		$.ajax({ type: "POST",
-			url: "/dolphin/public/ajax/ngsalterdb.php",
+			url: BASE_PATH+"/public/ajax/ngsalterdb.php",
 			data: { p: 'updateProfile', img: change_value},
 			async: false,
 			success : function(s)
@@ -62,7 +62,7 @@ function updateProfile(){
 function obtainPermissions(id){
 	var verdict = false;
 	$.ajax({ type: "GET",
-			url: "/dolphin/public/ajax/ngsquerydb.php",
+			url: BASE_PATH+"/public/ajax/ngsquerydb.php",
 			data: { p: 'checkAmazonPermissions', a_id: id},
 			async: false,
 			success : function(s)
@@ -89,7 +89,7 @@ function obtainKeys(){
 	var bucket_list = $('#jsontable_amazon').dataTable();
 
 	$.ajax({ type: "GET",
-			url: "/dolphin/public/ajax/ngsquerydb.php",
+			url: BASE_PATH+"/public/ajax/ngsquerydb.php",
 			data: { p: 'obtainAmazonKeys' },
 			async: false,
 			success : function(s)
@@ -120,7 +120,7 @@ $(function() {
 	
 	//	PROFILE AVATAR
 	$.ajax({ type: "GET",
-			url: "/dolphin/public/ajax/ngsquerydb.php",
+			url: BASE_PATH+"/public/ajax/ngsquerydb.php",
 			data: { p: 'profileLoad' },
 			async: false,
 			success : function(s)

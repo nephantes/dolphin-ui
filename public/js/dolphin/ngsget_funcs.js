@@ -7,7 +7,7 @@
 function rerunSelected(runID, groupID){
 	var sample_ids = [];
 	$.ajax({ type: "GET",
-		url: "/dolphin/public/ajax/ngsquerydb.php",
+		url: BASE_PATH+"/public/ajax/ngsquerydb.php",
 		data: { p: "getRunSamples", runID: runID },
 		async: false,
 		success : function(s)
@@ -17,13 +17,13 @@ function rerunSelected(runID, groupID){
 			}
 		}
 	});
-	window.location.href = "/dolphin/pipeline/rerun/" + runID + "/" + sample_ids + "$";
+	window.location.href = BASE_PATH+"/pipeline/rerun/" + runID + "/" + sample_ids + "$";
 }
 
 function reportSelected(runID, groupID){
 	var ids = [];
 	$.ajax({ type: "GET",
-		url: "/dolphin/public/ajax/ngsquerydb.php",
+		url: BASE_PATH+"/public/ajax/ngsquerydb.php",
 		data: { p: "getRunSamples", runID: runID },
 		async: false,
 		success : function(s)
@@ -33,13 +33,13 @@ function reportSelected(runID, groupID){
 			}
 		}
 	});
-	window.location.href = "/dolphin/pipeline/report/" + runID + '/' + ids + "$";
+	window.location.href = BASE_PATH+"/pipeline/report/" + runID + '/' + ids + "$";
 }
 
 function getSampleIDs(search){
 	var ids= [];
 	$.ajax({ type: "GET",
-		url: "/dolphin/public/ajax/ngsquerydb.php",
+		url: BASE_PATH+"/public/ajax/ngsquerydb.php",
 		data: { p: "getSelectedSamples", search: search },
 		async: false,
 		success : function(s)
@@ -55,7 +55,7 @@ function getSampleIDs(search){
 function getSampleNames(samples_string){
     var sample_name_array = [];
     $.ajax({ type: "GET",
-		url: "/dolphin/public/ajax/ngsquerydb.php",
+		url: BASE_PATH+"/public/ajax/ngsquerydb.php",
 		data: { p: "getSampleNames", samples: samples_string },
 		async: false,
 		success : function(s)
@@ -71,7 +71,7 @@ function getSampleNames(samples_string){
 function grabReload(groupID){
 	jsonArray = [];
 	$.ajax({ type: "GET",
-		url: "/dolphin/public/ajax/ngsquerydb.php",
+		url: BASE_PATH+"/public/ajax/ngsquerydb.php",
 		data: { p: "grabReload", groupID: groupID },
 		async: false,
 		success : function(s)
@@ -89,7 +89,7 @@ function getSummaryInfo(runid, sampleids){
 	var nameArray = [];
 	var dirArray = [];
 	$.ajax({ type: "GET",
-		url: "/dolphin/public/ajax/ngsquerydb.php",
+		url: BASE_PATH+"/public/ajax/ngsquerydb.php",
 		data: { p: "getReportNames", runid: runid, samp: sampleids.toString() },
 		async: false,
 		success : function(s)
@@ -106,7 +106,7 @@ function getSummaryInfo(runid, sampleids){
 function getLanesToSamples(lane_id){
 	samples_returned = [];
 	$.ajax({ type: "GET",
-		url: "/dolphin/public/ajax/ngsquerydb.php",
+		url: BASE_PATH+"/public/ajax/ngsquerydb.php",
 		data: { p: "lanesToSamples", lane: lane_id},
 		async: false,
 		success : function(s)
@@ -122,7 +122,7 @@ function getLanesToSamples(lane_id){
 function getAllSampleIds(){
 	samples_returned = [];
 	$.ajax({ type: "GET",
-		url: "/dolphin/public/ajax/ngsquerydb.php",
+		url: BASE_PATH+"/public/ajax/ngsquerydb.php",
 		data: { p: "getAllSampleIds" },
 		async: false,
 		success : function(s)
@@ -138,7 +138,7 @@ function getAllSampleIds(){
 function getAllLaneIds(){
 	lanes_returned = [];
 	$.ajax({ type: "GET",
-		url: "/dolphin/public/ajax/ngsquerydb.php",
+		url: BASE_PATH+"/public/ajax/ngsquerydb.php",
 		data: { p: "getAllLaneIds" },
 		async: false,
 		success : function(s)
@@ -154,7 +154,7 @@ function getAllLaneIds(){
 function getSeriesIdFromLane(lane){
 	series_id_returned = -1;
 	$.ajax({ type: "GET",
-		url: "/dolphin/public/ajax/ngsquerydb.php",
+		url: BASE_PATH+"/public/ajax/ngsquerydb.php",
 		data: { p: "getSeriesIdFromLane", lane: lane },
 		async: false,
 		success : function(s)
@@ -168,7 +168,7 @@ function getSeriesIdFromLane(lane){
 function getLaneIdFromSample(sample){
 	lane_id_returned = -1;
 	$.ajax({ type: "GET",
-		url: "/dolphin/public/ajax/ngsquerydb.php",
+		url: BASE_PATH+"/public/ajax/ngsquerydb.php",
 		data: { p: "getLaneIdFromSample", sample: sample },
 		async: false,
 		success : function(s)
@@ -184,7 +184,7 @@ function getLaneIdFromSample(sample){
 function getFastQCBool(id){
     var bool = false;
     $.ajax({ type: "GET",
-		url: "/dolphin/public/ajax/ngsquerydb.php",
+		url: BASE_PATH+"/public/ajax/ngsquerydb.php",
 		data: { p: "getFastQCBool", id: id },
 		async: false,
 		success : function(s)
@@ -204,7 +204,7 @@ function getFastQCBool(id){
 function getSingleSample(sampleID){
 	var sample_info = [];
 	$.ajax({ type: "GET",
-		url: "/dolphin/public/ajax/ngsquerydb.php",
+		url: BASE_PATH+"/public/ajax/ngsquerydb.php",
 		data: { p: "getSingleSample", sample: sampleID },
 		async: false,
 		success : function(s)
@@ -221,7 +221,7 @@ function getSingleSample(sampleID){
 function findIfMatePaired(runID){
 	var checkMP = false;
 	$.ajax({ type: "GET",
-		url: "/dolphin/public/ajax/ngsquerydb.php",
+		url: BASE_PATH+"/public/ajax/ngsquerydb.php",
 		data: { p: "checkMatePaired", runid: runID },
 		async: false,
 		success : function(s)

@@ -11,7 +11,7 @@ function getInfoBoxData(id){
 	if (filled_info_div == undefined) {
 		
 		$.ajax({ type: "GET",
-			url: "/dolphin/public/ajax/ngsquerydb.php",
+			url: BASE_PATH+"/public/ajax/ngsquerydb.php",
 			data: { p: "getInfoBoxData", fieldname: id },
 			async: false,
 			success : function(s)

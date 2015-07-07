@@ -1,5 +1,4 @@
 			<?php echo $html->sendJScript("fastlane", "", "", "", $uid, $gids); ?>
-			<?php echo $html->getBasePath(BASE_PATH, API_PATH); ?>
 		<section class="content">
 					<div class="row">
 						<!-- left column -->

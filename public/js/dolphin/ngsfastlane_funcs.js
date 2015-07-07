@@ -53,7 +53,7 @@ function backToFastlane(){
 }
 
 function fastlaneToPipeline(sample_ids){
-	window.location.href = "/dolphin/pipeline/selected/" + sample_ids + "$";
+	window.location.href = BASE_PATH+"/pipeline/selected/" + sample_ids + "$";
 }
 
 $(function() {
