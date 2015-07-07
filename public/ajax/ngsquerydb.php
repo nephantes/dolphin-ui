@@ -495,7 +495,7 @@ else if ($p == 'getSampleNames')
 {
     if (isset($_GET['samples'])){$samples = $_GET['samples'];}
 	$data=$query->queryTable("
-		SELECT name
+		SELECT name, samplename
 		FROM ngs_samples
 		where id in ($samples) $andPerms
 	");  
