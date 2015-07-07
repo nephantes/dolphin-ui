@@ -202,6 +202,28 @@ class Pipeline{
                 return $res;
          }
 
+         /** updates run params table sets the status to 2 
+         *
+         * @return string Response
+         */
+         public function updateRunParams($params)
+         {
+                $myClass = new funcs();
+                $res = $myClass->updateRunParams($params['wkey'], $params['runparamsid']);
+                return $res;
+         }
+
+         /** inserts report table to db
+         *
+         * @return string Response
+         */
+         public function insertReportTable($params)
+         {
+                $myClass = new funcs();
+                $res = $myClass->insertReportTable($params['wkey'], $params['version'], $params['type'], $params['file']);
+                return $res;
+         }
+
 }
 
 error_reporting(E_ALL);

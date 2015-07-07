@@ -24,7 +24,7 @@ from workflowdefs import *
 bin_dir = dirname(argv[0])
 cmd = 'python %(dolphin_tools_dir)s/runWorkflow.py -i %(input_fn)s -d %(galaxyhost)s -w %(workflow)s -p %(dolphin_default_params)s -u %(username)s -o %(outdir)s %(wkeystr)s'
 Config = ConfigParser.ConfigParser()
-params_section = 'Default'
+params_section = 'biocore.umassmed.edu'
 
 def runSQL(sql):
     db = MySQLdb.connect(
@@ -172,7 +172,7 @@ def main():
            rpid=-1
 
         Config.read("../config/config.ini")
-        params_section = "Default"
+        params_section = "biocore.umassmed.edu"
         if (os.environ.has_key('DOLPHIN_PARAMS_SECTION')):
             params_section=os.environ['DOLPHIN_PARAMS_SECTION']
         print params_section

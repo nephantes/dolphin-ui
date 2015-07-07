@@ -95,7 +95,7 @@ class funcs
             }
             $res->close();
         }
-        return json_encode($data);
+        return $data;
     }
     
     function syscall($command)
@@ -372,7 +372,7 @@ class funcs
                     
                     $edir = $this->tool_path;
                     if ($this->remotehost != "") {
-                        $com = "ssh -o ConnectTimeout=30 $username@" . $this->remotehost . " \"" . $this->python . " " . $edir . "/src/runService.py  -d " . $this->dbhost . " $ipf $dpf -o $outdir -u $username -k $wkey -c \\\"$command\\\" -n $servicename -s $servicename\" 2>&1";
+                        $com = "ssh -o ConnectTimeout=30 $username@" . $this->remotehost . " \"" . $this->python . " " . $edir . "/runService.py  -d " . $this->dbhost . " $ipf $dpf -o $outdir -u $username -k $wkey -c \\\"$command\\\" -n $servicename -s $servicename\" 2>&1";
                     } else {
                         $com = $this->python . " " . $edir . "/runService.py  -d " . $this->dbhost . " $ipf $dpf -o $outdir -u $username -k $wkey -c \"$command\" -n $servicename -s $servicename 2>&1";
                     }
@@ -544,5 +544,35 @@ class funcs
         $sql = "select job_num from jobs where wkey='$wkey'";
         return $this->queryTable($sql);
     }
+
+    /** updates run params table sets the status to 2   
+     *
+     * @return string Response
+     */
+     public function updateRunParams($wkey, $runparamsid)
+     {
+         $sql = "UPDATE biocore.ngs_runparams set run_status=2, wkey='$wkey' where id=$runparamsid";
+         $res = $this->runSQL($sql);
+
+         return $res;
+     }
+
+    /** inserts report table to db                   
+     *
+     * @return string Response
+     */
+     function insertReportTable($wkey, $version, $type, $file)
+     {
+         $sql = "select id from biocore.reports_ where wkey='$wkey' and jobnum='$jobnum' and username='$username'";
+         $res = $this->queryAVal($sql);
+         if ($res == 0) {
+            $sql = "INSERT INTO report_list(wkey, version, type, file) VALUES ('$wkey', '$version', '$type', '$file')";
+            $res = $this->runSQL($sql);
+         } else {
+            $res=1;
+         }
+         return $res;
+     }
+
 }
 ?>
