@@ -173,22 +173,41 @@ class Pipeline{
 
                 return $res;
          }
+         /**
+         * Insert a job stats to db
+         * 
+         * @return string Response
+         */
+         public function insertJobStats($params)
+         {
+
+                $myClass = new funcs();
+                $res = $myClass->insertJobStats($params['username'], $params['wkey'] , $params['jobnum'], $params['stats']);
+                if ($res!="True")
+                {
+                    return "ERROR 154: There is an error in the stats for job# $jobnum!";
+                }
+
+                return $res;
+         }
+
+         /** get job numbers for a given wkey
+         * 
+         * @return string Response
+         */
+         public function getJobNums($params)
+         {
+                $myClass = new funcs();
+                $res = $myClass->getJobNums($params['wkey']);
+                return $res;
+         }
+
 }
 
 error_reporting(E_ALL);
 ini_set('report_errors','on');
 
 $myClass = new Pipeline();
-
-#$username="svcgalaxy";
-#$workflow="ChipSeqWorkflow";
-#$data="b3PIGiDj5xu95kuonZaBWSxk52B";
-#$data=json_encode($data);
-#$data=json_encode($_POST);
-
-#$result=$myClass->getKey();
-#$result=$myClass->getINI();
-#$data.=json_encode($result);
 
 $result=$myClass->parse_params();
 $func=$result['params']['func'];
