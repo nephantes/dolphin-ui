@@ -5,8 +5,8 @@ The configuration parameters will be read from that section**/
 
 $param_section = "Default";
 
-if (!empty(getenv('DOLPHIN_PARAMS_SECTION'))){
-   $param_section=getenv('DOLPHIN_PARAMS_SECTION');
+if (!empty($_SERVER["HTTP_HOST"])){
+   $param_section=$_SERVER["HTTP_HOST"];
 }
  
 $ini = parse_ini_file("config.ini", true);
