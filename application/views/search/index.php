@@ -10,7 +10,6 @@
 			<li class="active"><?php echo $field?></li
 					</ol>
 				</section>
-				<?php echo $html->getBasePath(BASE_PATH, API_PATH); ?>
 				<!-- Main content -->
 				<section class="content">
 					<div class="row">

@@ -19,7 +19,6 @@
 									
 								</div><!-- /.box-header -->			
 				<!-- form start -->
-								<?php echo $html->getBasePath(BASE_PATH, API_PATH); ?>
 								<form role="form" enctype="multipart/form-data" action="profile" method="post">
 									<div class="box-body margin">
 										<div class="form-group" ">

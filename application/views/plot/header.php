@@ -54,6 +54,8 @@
                         height:600px;
                     }
         </style>
+        
+        <?php echo $html->getBasePath(BASE_PATH, API_PATH); ?>
     </head>
     <body class="skin-blue">
         <!-- header logo: style can be found in header.less -->

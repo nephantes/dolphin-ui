@@ -11,7 +11,6 @@
 					</ol>
 				</section>
 			<?php echo $html->sendJScript("fastlane", "", "", "", $uid, $gids); ?>
-			<?php echo $html->getBasePath(BASE_PATH, API_PATH); ?>
 			<form role="form" enctype="multipart/form-data" action="fastlane/process" method="post">
 				<section class="content">
 					<div class="row">
