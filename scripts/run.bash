@@ -1,1 +1,0 @@
-python /usr/local/share/dolphin_lsf/runWorkflow.py -i /galaxy-central/database/files/000/dataset_3.dat -d localhost -w /galaxy-central/tools/UMassTools/SeqMapping_v1.1/seqmapping_workflow.txt -p  /usr/local/share/dolphin_lsf/tools/workflows/SeqMapping_v1_default.txt -u galaxy -o /home/galaxy/testbarcode

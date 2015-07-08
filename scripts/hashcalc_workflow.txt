@@ -1,1 +1,0 @@
-stepHashCalc	@RUNHASHCALC -o @OUTDIR -i @INPUT -d @FASTQDIR	0
