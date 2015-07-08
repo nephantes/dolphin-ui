@@ -6,8 +6,7 @@ public/pub
 .com.greenworldsoft.syncfolderspro
 scripts/seqmapping_workflow.txt
 scripts/workflowdefs.pyc
-tmp/files/input.txt
-tmp/logs/*
+tmp/*
 
 /blib/
 /.build/

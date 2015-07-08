@@ -400,6 +400,8 @@ class Dolphin:
                     print >>fp, '%s'%stepline
                  stepline=stepPicard % locals()
                  print >>fp, '%s'%stepline
+                 stepline=stepMergePicard % locals()
+                 print >>fp, '%s'%stepline
      
               if (pipename == "DESeq"):
                  stepline=stepDESeq2 % locals()
@@ -433,6 +435,8 @@ class Dolphin:
                      stepline=stepBam2BW % locals()
                      print >>fp, '%s'%stepline
                  stepline=stepPicard % locals()
+                 print >>fp, '%s'%stepline
+                 stepline=stepMergePicard % locals()
                  print >>fp, '%s'%stepline
      
         

@@ -1,9 +1,0 @@
-stepCheck	@RUNCHECK -i @INPUT -u @USERNAME -b @BARCODES -w @WKEY -p 2 -d @DBCOMMCMD -a @ADAPTER -t @TRIM -o @OUTDIR -r no -s stepCheck -j @JGEN	1
-stepFastQC	@PERL @RUNFASTQC -b @BARCODES -o @OUTDIR -p @FASTQCPROG -s stepFastQC -j @JGEN	1
-stepMergeFastQC	@PERL @RUNFASTQCMERGE -p @PUBDIR -w @WKEY -o @OUTDIR	0
-stepSeqMappingrRNA	@RUNRECMAPPING -i @INPUT -a @AWKDIR -d @SPAIRED -m @SAMTOOLS -o @OUTDIR -b @PARAMrRNA -c @BOWTIE2CMD -s stepSeqMappingrRNA -r @ADVPARAMS -j @JMAPPING	1
-stepSeqMappingmiRNA	@RUNRECMAPPING -i @INPUT -a @AWKDIR -d @SPAIRED -m @SAMTOOLS -o @OUTDIR -b @PARAMmiRNA -c @BOWTIE2CMD -s stepSeqMappingmiRNA -r @ADVPARAMS -j @JMAPPING	1
-stepCounts	@RUNCOUNTS -m @MAPNAMES -o @OUTDIR -g @GCOMMONDB -p @PUBDIR -w @WKEY -b @MAKEBED -c @BEDTOOLSCMD -s stepCounts -j @JGEN	1
-stepTophat2	@PERL @RUNTOPHAT2 -o @OUTDIR -g @GTF -d @SPAIRED -pa @PARAMSTOPHAT -pr @PREVIOUSPIPE -t @TOPHAT2CMD -b @BOWTIE2INDEX -sa @SAMTOOLS -se stepTophat2 -j @JTOPHAT	5
-stepPicardTophat	@PERL @RUNPICARD -o @OUTDIR -pu @PUBDIR -w @WKEY -t Tophat -r @REFFLAT -pi @PICARDCMD -s stepPicardTophat -j @JGEN	0
-stepClean	@RUNCLEAN -l 0 -u @USERNAME -p @PUBDIR -w @WKEY -d @DBCOMMCMD  -o @OUTDIR	1
