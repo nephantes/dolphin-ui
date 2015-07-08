@@ -183,11 +183,6 @@ class Pipeline{
 
                 $myClass = new funcs();
                 $res = $myClass->insertJobStats($params['username'], $params['wkey'] , $params['jobnum'], $params['stats']);
-                if ($res!="True")
-                {
-                    return "ERROR 154: There is an error in the stats for job# $jobnum!";
-                }
-
                 return $res;
          }
 

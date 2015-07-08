@@ -563,7 +563,7 @@ class funcs
      */
      function insertReportTable($wkey, $version, $type, $file)
      {
-         $sql = "select id from biocore.reports_ where wkey='$wkey' and jobnum='$jobnum' and username='$username'";
+         $sql = "select id from biocore.report_list where wkey='$wkey' and file='$file'";
          $res = $this->queryAVal($sql);
          if ($res == 0) {
             $sql = "INSERT INTO report_list(wkey, version, type, file) VALUES ('$wkey', '$version', '$type', '$file')";
