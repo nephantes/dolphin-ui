@@ -80,10 +80,48 @@ else if ($p == 'checkRunToSamples')
 {
 	if (isset($_GET['run_id'])){$run_id = $_GET['run_id'];}
 	$data=$query->queryTable("
-	SELECT id
+	SELECT distinct sample_id
 	FROM biocore.ngs_runlist
-	WHERE run_id = 69
+	WHERE run_id = '$run_id'
 	");
+}
+else if ($p == 'checkFileToSamples')
+{
+	if (isset($_GET['run_id'])){$run_id = $_GET['run_id'];}
+	if (isset($_GET['file_name'])){$file_name = $_GET['file_name'];}
+	$data=$query->queryTable("
+	SELECT distinct file_name
+	FROM biocore.ngs_fastq_files
+	WHERE file_name = '$name'
+	");
+}
+else if ($p == 'removeRunlistSamples')
+{
+	if (isset($_GET['run_id'])){$run_id = $_GET['run_id'];}
+	if (isset($_GET['sample_ids'])){$sample_ids = $_GET['sample_ids'];}
+	$sample_ids_array = explode(",",$sample_ids);
+	$ids=json_decode($query->queryTable("
+	SELECT sample_id
+	FROM biocore.ngs_runlist
+	WHERE run_id = $run_id
+	"));
+	foreach($ids as $i){
+		if(!in_array(strval($i->sample_id), $sample_ids_array)){
+			$query->runSQL("
+			DELETE FROM ngs_runlist
+			WHERE run_id = $run_id
+			AND sample_id = ".$i->sample_id
+			);
+			$query->runSQL("
+			DELETE FROM ngs_samples
+			WHERE id = ".$i->sample_id
+			);
+			$query->runSQL("
+			DELETE FROM ngs_fastq_files
+			WHERE sample_id = ".$i->sample_id
+			);
+		}
+	}
 }
 
 header('Cache-Control: no-cache, must-revalidate');

@@ -11,6 +11,7 @@ class Ngsimport extends VanillaModel {
 	public $backup_dir;
 	public $amazon_bucket;
 	public $samples=[];
+	public $sample_ids = [];
 	
 	public $organismCheck;
 	public $pairedEndCheck;
@@ -29,6 +30,7 @@ class Ngsimport extends VanillaModel {
 	
 	//	LANES
 	public $lane_arr = [];
+	public $lane_ids = [];
 	
 	//	PROTOCOLS
 	public $prot_arr = [];
@@ -39,6 +41,7 @@ class Ngsimport extends VanillaModel {
 	
 	//	FILES
 	public $file_arr = [];
+	public $file_names = [];
 	
 	//	Sheet Check bools
 	public $final_check;
@@ -65,7 +68,102 @@ class Ngsimport extends VanillaModel {
         endforeach;
         return rtrim($group_str, ",");
     }
-	
+	function createSampleName($sample){
+		$samplename = '';
+		$underscore_mark = true;
+		//	Donor
+		if(isset($sample->donor)){
+			if($sample->donor != NULL && $sample->donor != '' && $sample->donor != null && $sample->donor != 'null'){
+				$samplename.= $sample->donor;
+				if($underscore_mark){
+					$underscore_mark = false;
+				}
+			}
+		}
+		//	Source
+		if(isset($sample->source_symbol)){
+			if($sample->source_symbol != NULL && $sample->source_symbol != '' && $sample->source_symbol != null && $sample->source_symbol != 'null'){
+				if(!$underscore_mark){
+					$samplename.="_";
+				}
+				$samplename.= $sample->source_symbol;
+				if($underscore_mark){
+					$underscore_mark = false;
+				}
+			}
+		}
+		//	Conditions
+		if(isset($sample->condition_symbol)){
+			if($sample->condition_symbol != NULL && $sample->condition_symbol != '' && $sample->condition_symbol != null && $sample->condition_symbol != 'null'){
+				if(!$underscore_mark){
+					$samplename.="_";
+				}
+				$conds = explode(",", $sample->condition_symbol);
+				foreach($conds as $c){
+					$samplename.= strtoupper(substr($c, 0, 1)) . strtolower(substr($c, 1, strlen($c)));
+				}
+				if($underscore_mark){
+					$underscore_mark = false;
+				}
+			}
+		}
+		//	Time
+		if(isset($sample->time)){
+			if($sample->time != NULL && $sample->time != '' && $sample->time != null && $sample->time != 'null'){
+				if(!$underscore_mark){
+					$samplename.="_";
+				}
+				$samplename.= floor($sample->time/60)."h";
+				if($underscore_mark){
+					$underscore_mark = false;
+				}
+			}
+		}
+		//	Antibody Targets
+		if(isset($sample->target)){
+			if($sample->target != NULL && $sample->target != '' && $sample->target != null && $sample->target != 'null'){
+				if(!$underscore_mark){
+					$samplename.="_";
+				}
+				$samplename.= $sample->target;
+				if($underscore_mark){
+					$underscore_mark = false;
+				}
+			}
+		}
+		//	Biological Replicas
+		if(isset($sample->biological_replica)){
+			if($sample->biological_replica != NULL && $sample->biological_replica != '' && $sample->biological_replica != null && $sample->biological_replica != 'null'){
+				if(!$underscore_mark){
+					$samplename.="_";
+				}
+				$samplename.= "b".$sample->biological_replica;
+				if($underscore_mark){
+					$underscore_mark = false;
+				}
+			}
+		}
+		//	Technical Replicas
+		if(isset($sample->technical_replica)){
+			if($sample->technical_replica != NULL && $sample->technical_replica != '' && $sample->technical_replica != null && $sample->technical_replica != 'null'){
+				if(!$underscore_mark){
+					$samplename.="_";
+				}
+				$samplename.= "t".$sample->technical_replica;
+				if($underscore_mark){
+					$underscore_mark = false;
+				}
+			}
+		}
+		if(strpos(strtolower($sample->name), 'nobarcode') !== false){
+			if(!$underscore_mark){
+					$samplename.="_";
+				}
+			$samplename.= "$sample->name";
+		}
+		//$this->model->query("UPDATE `biocore`.`ngs_samples` SET `samplename` = '$samplename' WHERE `id` = $sample_id");
+		return $samplename;
+	}
 	function parseExcel($gid, $sid, $worksheet, $sheetData, $passed_final_check) {
 		$this->worksheet=$worksheet;
 		$this->sheetData=$sheetData;
@@ -130,6 +228,7 @@ class Ngsimport extends VanillaModel {
 		$text.="<script type='text/javascript'>";
 		$text.="var initialSubmission = '" . implode(",", $this->initialSubmission) . "';";
 		$text.="var initialNameList = '" . $this->namesList . "';";
+		$text.="var initialSampleIDS = '" .implode(",",$this->sample_ids). "';";
 		$text.="</script>";
 		
 		return $text;
@@ -367,6 +466,11 @@ class Ngsimport extends VanillaModel {
 		$new_lanes = new lanes($this, $this->lane_arr);
 		$text="LANE:".$new_lanes->getStat()."</br>";
 		#$text.="LANE:".$new_lanes->getSQL();
+		foreach(explode(",",$this->laneList) as $ll){
+			$ll_id = json_decode($this->query("SELECT id FROM ngs_lanes WHERE name = '$ll' and series_id in 
+											(SELECT id FROM ngs_experiment_series WHERE experiment_name = '".$this->experiment_name."')"))[0]->id;
+			array_push($this->lane_ids, $ll_id);
+		}
 		return $text;
 	}
 
@@ -505,6 +609,8 @@ class Ngsimport extends VanillaModel {
 				if($this->sheetData[3][$j]=="Lane name"){
 					if ($this->laneList == null){
 						$this->laneList = $samp->lane_name;
+					}else if(strpos($this->laneList, $samp->lane_name) === false){
+						$this->laneList .= ','.$samp->lane_name;
 					}
 				}
 				if($this->sheetData[3][$j]=="organism" && $this->organismCheck == null){
@@ -529,7 +635,41 @@ class Ngsimport extends VanillaModel {
 			/*
 			 *	Check for proper data input
 			 */
-			//	Sample Name
+			
+			//	Samplename
+			//$all_samplenames = json_decode($this->query("SELECT samplename FROM ngs_samples"));
+			if($this->experiment_name == 'Dendritic Cell Transcriptional Landscape'){
+				$samp->samplename = $this->createSampleName($samp);
+			}else{
+				$samp->samplename = $samp->name;
+			}
+			
+			$samplename_bool = true;
+			
+			if(isset($this->sample_arr)){
+				if($this->experiment_name == 'Dendritic Cell Transcriptional Landscape'){
+					foreach($this->sample_arr as $sa){
+						if($samp->samplename == $sa->samplename && $samp->samplename != '' && $samplename_bool){
+							$text.= $this->errorText("samplename naming scheme already exists for another sample (row " . $i . "). <br>
+													 DC project sample naming scheme = Donor_Source_Conditions_Time_Bio-rep_Tech-rep.");
+							$this->final_check = false;
+							$samp_check = false;
+							$samplename_bool = false;
+						}
+					}
+				}else{
+					foreach($this->sample_arr as $sa){
+						if($samp->samplename == $sa->samplename && $samp->samplename != '' && $samplename_bool){
+							$text.= $this->errorText("samplename naming scheme already exists for another sample (row " . $i . ")");
+							$this->final_check = false;
+							$samp_check = false;
+							$samplename_bool = false;
+						}
+					}
+				}
+			}
+			
+			//	Name
 			if(isset($samp->name)){
 				if($this->checkAlphaNumWithAddChars('_-', $samp->name)){
 					//	Need to check the database for similar names as well at a later date
@@ -667,6 +807,12 @@ class Ngsimport extends VanillaModel {
 		$text="SAMPLE:".$new_samples->getStat()."<BR>";
 		$new_chars = new characteristics($this, $this->char_arr);
 		$text.="CHAR:".$new_chars->getStat();
+		foreach(explode(",",$this->namesList) as $nl){
+			$nl_id = json_decode($this->query("SELECT id FROM ngs_samples WHERE name = '$nl' and lane_id in
+																   (SELECT id FROM ngs_lanes WHERE name in ('".implode("','", explode(",",$this->laneList))."') and series_id in 
+																   (SELECT id FROM ngs_experiment_series WHERE experiment_name = '$this->experiment_name'))"))[0]->id;
+			array_push($this->sample_ids, $nl_id);
+		}
 		return $text;
 	}
 	
@@ -730,6 +876,7 @@ class Ngsimport extends VanillaModel {
 			//	File Name
 			if(isset($file->file_name)){
 				$this->file_arr[$file->file_name]=$file;
+				array_push($this->file_names, $file->file_name);
 			}else{
 				$text.= $this->errorText("file name is required for submission (row " . $i . ")");
 				$this->final_check = false;
@@ -748,6 +895,71 @@ class Ngsimport extends VanillaModel {
 		$new_files = new files($this, $this->file_arr, $this->samples);
 		$text.="FILES:".$new_files->getStat();
 		//var_dump($sheetData);
+		
+		//	Checks for new file_names of same samples/lanes
+		if($this->laneArrayCheck == 'lane'){
+			$all_file_names_array = [];
+			$all_file_names = json_decode($this->query("select file_name from ngs_temp_lane_files where lane_id in 
+													(SELECT id from ngs_lanes WHERE name in ('".implode("','", explode(",",$this->laneList))."') and series_id in 
+													(SELECT id FROM ngs_experiment_series WHERE experiment_name = '$this->experiment_name'))"));
+			foreach($all_file_names as $afn){
+				array_push($all_file_names_array, $afn->file_name);
+			}
+			foreach($all_file_names_array as $afna){
+				if(!in_array($afna, $this->file_names)){
+					//remove
+					$this->query("DELETE FROM ngs_temp_lane_files where file_name = '$afna' and lane_id in
+								(SELECT id FROM ngs_lanes WHERE name in ('".implode("','", explode(",",$this->laneList))."') and series_id in 
+								(SELECT id FROM ngs_experiment_series WHERE experiment_name = '$this->experiment_name'))");
+				}
+				$count_files = json_decode($this->query("SELECT lane_id, count(file_name) as count FROM ngs_temp_lane_files LEFT JOIN ngs_dirs ON ngs_temp_lane_files.dir_id = ngs_dirs.id
+									WHERE file_name = '$afna'"));
+				if($count_files[0]->count > 1){
+					$lane_name_removal = json_decode($this->query("SELECT ngs_lanes.id, ngs_lanes.name FROM ngs_temp_lane_files LEFT JOIN ngs_lanes ON ngs_temp_lane_files.lane_id = ngs_lanes.id
+																	WHERE file_name = '$afna'"));
+					foreach($lane_name_removal as $lnr){
+						if(!in_array($lnr->id, $this->lane_ids)){
+							$this->query("DELETE FROM ngs_temp_lane_files where lane_id = $lnr->id");
+							$this->query("DELETE FROM ngs_lanes where id = $lnr->id");
+							$this->query("DELETE FROM ngs_samples where lane_id = $lnr->id");
+						}
+					}
+				}
+			}
+		}else{
+			$all_file_names_array = [];
+			$all_file_names = json_decode($this->query("select file_name from ngs_temp_sample_files where sample_id in (".implode(",",$this->sample_ids).");"));
+			foreach($all_file_names as $afn){
+				array_push($all_file_names_array, $afn->file_name);
+			}
+			foreach($all_file_names_array as $afna){
+				if(!in_array($afna, $this->file_names)){
+					//remove
+					$this->query("DELETE FROM ngs_temp_sample_files where file_name = '$afna' and sample_id in (".implode(",",$this->sample_ids).");");
+				}
+				$count_files = json_decode($this->query("SELECT sample_id, count(file_name) as count FROM ngs_temp_sample_files LEFT JOIN ngs_dirs ON ngs_temp_sample_files.dir_id = ngs_dirs.id
+									WHERE file_name = '$afna'"));
+				if($count_files[0]->count > 1){
+					$sample_name_removal = json_decode($this->query("SELECT ngs_samples.id, ngs_samples.name FROM ngs_temp_sample_files LEFT JOIN ngs_samples ON ngs_temp_sample_files.sample_id = ngs_samples.id
+																	WHERE file_name = '$afna'"));
+					foreach($sample_name_removal as $snr){
+						if(!in_array($snr->id, $this->sample_ids)){
+							$this->query("DELETE FROM ngs_temp_sample_files where sample_id = $snr->id");
+							$this->query("DELETE FROM ngs_samples where id = $snr->id");
+						}
+					}
+				}
+				
+			}
+		}
+		
+		//	Checks for new names for files with same file_names
+		if($this->laneArrayCheck == 'lane'){
+			
+		}else{
+			
+		}
+		
 		return $text;
 	}
 }
@@ -1188,7 +1400,11 @@ class samples extends main{
 
 	function getStat()
 	{
-		return "Update:$this->update, Insert:$this->insert";
+		
+		return "<script type='text/javascript'>
+		var sample_inserts = ".$this->insert . 
+		"</script>
+		Update:$this->update, Insert:$this->insert";
 	}
 
 	function getId($sample)
@@ -1226,102 +1442,6 @@ class samples extends main{
 				$this->model->query("UPDATE `biocore`.`ngs_samples` SET `$database_id_name` = ".$id[0]->id." WHERE `id` = $sample_id");
 			}
 		}
-	}
-	function createSampleName($sample, $sample_id){
-		$samplename = '';
-		$underscore_mark = true;
-		//	Donor
-		if(isset($sample->donor)){
-			if($sample->donor != NULL && $sample->donor != '' && $sample->donor != null && $sample->donor != 'null'){
-				$samplename.= $sample->donor;
-				if($underscore_mark){
-					$underscore_mark = false;
-				}
-			}
-		}
-		//	Source
-		if(isset($sample->source_symbol)){
-			if($sample->source_symbol != NULL && $sample->source_symbol != '' && $sample->source_symbol != null && $sample->source_symbol != 'null'){
-				if(!$underscore_mark){
-					$samplename.="_";
-				}
-				$samplename.= $sample->source_symbol;
-				if($underscore_mark){
-					$underscore_mark = false;
-				}
-			}
-		}
-		//	Conditions
-		if(isset($sample->condition_symbol)){
-			if($sample->condition_symbol != NULL && $sample->condition_symbol != '' && $sample->condition_symbol != null && $sample->condition_symbol != 'null'){
-				if(!$underscore_mark){
-					$samplename.="_";
-				}
-				$conds = explode(",", $sample->condition_symbol);
-				foreach($conds as $c){
-					$samplename.= strtoupper(substr($c, 0, 1)) . strtolower(substr($c, 1, strlen($c)));
-				}
-				if($underscore_mark){
-					$underscore_mark = false;
-				}
-			}
-		}
-		//	Time
-		if(isset($sample->time)){
-			if($sample->time != NULL && $sample->time != '' && $sample->time != null && $sample->time != 'null'){
-				if(!$underscore_mark){
-					$samplename.="_";
-				}
-				$samplename.= floor($sample->time/60)."h";
-				if($underscore_mark){
-					$underscore_mark = false;
-				}
-			}
-		}
-		//	Antibody Targets
-		if(isset($sample->target)){
-			if($sample->target != NULL && $sample->target != '' && $sample->target != null && $sample->target != 'null'){
-				if(!$underscore_mark){
-					$samplename.="_";
-				}
-				$samplename.= $sample->target;
-				if($underscore_mark){
-					$underscore_mark = false;
-				}
-			}
-		}
-		//	Biological Replicas
-		if(isset($sample->biological_replica)){
-			if($sample->biological_replica != NULL && $sample->biological_replica != '' && $sample->biological_replica != null && $sample->biological_replica != 'null'){
-				if(!$underscore_mark){
-					$samplename.="_";
-				}
-				$samplename.= "b".$sample->biological_replica;
-				if($underscore_mark){
-					$underscore_mark = false;
-				}
-			}
-		}
-		//	Technical Replicas
-		if(isset($sample->technical_replica)){
-			if($sample->technical_replica != NULL && $sample->technical_replica != '' && $sample->technical_replica != null && $sample->technical_replica != 'null'){
-				if(!$underscore_mark){
-					$samplename.="_";
-				}
-				$samplename.= "t".$sample->technical_replica;
-				if($underscore_mark){
-					$underscore_mark = false;
-				}
-			}
-		}
-		if(strtolower($sample->name) == 'nobarcode'){
-			if(!$underscore_mark){
-					$samplename.="_";
-				}
-			$samplename.= "nobarcode";
-		}
-		
-		$this->model->query("UPDATE `biocore`.`ngs_samples` SET `samplename` = '$samplename' WHERE `id` = $sample_id");
 	}
 	function insert($sample)
 	{
@@ -1494,7 +1614,7 @@ class samples extends main{
 		
 		//	Samplename
 		if(strtolower($DC_PROJECT[0]->experiment_name) == 'dendritic cell transcriptional landscape'){
-			$this->createSampleName($sample, $sample_id);	
+			$this->model->query("UPDATE `biocore`.`ngs_samples` SET `samplename` = '".$sample->samplename."' WHERE `id` = $sample_id");
 		}else{
 			$this->model->query("UPDATE `biocore`.`ngs_samples` SET `samplename` = '".$sample->name."' WHERE `id` = $sample_id");
 		}
@@ -1653,7 +1773,7 @@ class samples extends main{
 		
 		//	Samplename
 		if(strtolower($DC_PROJECT[0]->experiment_name) == 'dendritic cell transcriptional landscape'){
-			$this->createSampleName($sample, $sample_id);	
+			$this->model->query("UPDATE `biocore`.`ngs_samples` SET `samplename` = '".$sample->samplename."' WHERE `id` = $sample_id");
 		}else{
 			$this->model->query("UPDATE `biocore`.`ngs_samples` SET `samplename` = '".$sample->name."' WHERE `id` = $sample_id");
 		}
@@ -1814,13 +1934,16 @@ class files extends main{
 		now(), now(), '".$this->model->uid."');";
 		$this->insert++;
 		//return $sql;
+		
 		return $this->model->query($sql);
 	}
 
 	function update($file)
 	{
+		$original_file_name = $this->model->query("SELECT `file_name` FROM `$this->tablename` WHERE
+												  `$this->fieldname` = `$this->value` and `file_name` = `$file->file_name`");
 		$sql="update `biocore`.`$this->tablename` set
-			`fieldname`='$this->value', `dir_id`='$this->dir_id',
+			`$this->fieldname`='$this->value', `dir_id`='$this->dir_id',
 			`group_id`='".$this->model->gid."', `perms`='".$this->model->sid."',
 		`date_modified`=now(), `last_modified_user`='".$this->model->uid."'
 			where `id` = ".$this->getId($file);
