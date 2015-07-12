@@ -133,7 +133,7 @@ class Ngsimport extends VanillaModel {
 		}
 		//	Biological Replicas
 		if(isset($sample->biological_replica)){
-			if($sample->biological_replica != NULL && $sample->biological_replica != '' && $sample->biological_replica != null && $sample->biological_replica != 'null'){
+			if(is_numeric($sample->biological_replica)){
 				if(!$underscore_mark){
 					$samplename.="_";
 				}
@@ -145,7 +145,7 @@ class Ngsimport extends VanillaModel {
 		}
 		//	Technical Replicas
 		if(isset($sample->technical_replica)){
-			if($sample->technical_replica != NULL && $sample->technical_replica != '' && $sample->technical_replica != null && $sample->technical_replica != 'null'){
+			if(is_numeric($sample->technical_replica)){
 				if(!$underscore_mark){
 					$samplename.="_";
 				}
