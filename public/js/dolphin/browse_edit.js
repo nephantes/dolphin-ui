@@ -38,28 +38,42 @@ function editBox(uid, id, type, table, element){
 		element_highlighted_onclick = element.onclick;
 		element.innerHTML = '';
 		
-		if (type == 'source') {
+		if (type == 'source' || type == 'organism' || type == 'molecule' || type == 'facility') {
 			
 			element.onclick = '';
 			
 			var masterDiv = document.createElement('div');
 			masterDiv.setAttribute('class','combobox input-group');
+			
 			var input = document.createElement('input');
 			input.setAttribute('type', 'text');
 			input.setAttribute('name', 'comboboxfieldname');
 			input.setAttribute('id','cb_identifier');
-			input.setAttribute('onkeydown', 'submitChanges(this)');
+			input.setAttribute('class','cb_identifier')
+			
 			var button = document.createElement('button');
-			button.setAttribute('class', 'btn btn-default btn-xs pull-right')
-			button.innerHTML = 'Select';
+			button.setAttribute('class', 'btn btn-default btn-group pull-right')
+			
+			var span = document.createElement('span');
+			span.setAttribute('class','caret');
+			button.appendChild(span);
+			
 			var div = document.createElement('div');
 			div.setAttribute('class','dropdownlist');
-			var a = document.createElement('a');
-			a.innerHTML = 'test';
-			div.appendChild(a);
-			var ab = document.createElement('a');
-			ab.innerHTML = 'another';
-			div.appendChild(ab);
+			
+			$.ajax({ type: "GET",
+				url: BASE_PATH+"/public/ajax/browse_edit.php",
+				data: { p: 'getDropdownValues', type: type},
+				async: false,
+				success : function(r)
+				{
+					for(var x = 0; x < r.length; x++){
+						var a = document.createElement('a');
+						a.innerHTML = (r[x][type]);
+						div.appendChild(a);
+					}
+				}
+			});
 			
 			element.appendChild(masterDiv);
 			masterDiv.appendChild(input);
@@ -85,7 +99,7 @@ function editBox(uid, id, type, table, element){
 function submitChanges(ele) {
 	console.log(ele);
 	var successBool = false;
-    if(event.keyCode == 13) {
+    if(event.keyCode == 13 && ele.value != '' && ele.value != null) {
         $.ajax({ type: "GET",
 					url: BASE_PATH+"/public/ajax/browse_edit.php",
 					data: { p: 'updateDatabase', id: element_highlighted_id, type: element_highlighted_type, table: element_highlighted_table, value: ele.value},
@@ -104,7 +118,7 @@ function submitChanges(ele) {
 			
 			clearElementHighlighted();
 		}
-    }else if(event.keyCode == 27) {
+    }else if(event.keyCode == 27 || ele.value == '' || ele.value == null) {
 		element_highlighted.innerHTML = element_highlighted_value;
 		element_highlighted.onclick = element_highlighted_onclick;
 		

@@ -32,11 +32,12 @@
 		<![endif]-->
 		<style>
 			div.combobox	{position: relative;}
+			div.combobox	.cb_identifier		{height: 34px;}
 			div.combobox	div.dropdownlist	{display: none;width: 200px;
 				border: solid 1px #000;background-color: #fff;
 				height: 200px;overflow: auto;position: absolute;}
 			div.combobox	.dropdownlist	a	{display: block;text-decoration: none;
-				color: #000;padding: 1px;height: 2em;cursor: default}
+				color: #000;padding: 1px;height: auto;cursor: default}
 			div.combobox	.dropdownlist	a.light	{color: #fff;
 				background-color: #007}
 			

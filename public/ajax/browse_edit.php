@@ -46,6 +46,11 @@ else if($p == 'checkPerms')
 		$data = 0;
 	}
 }
+else if($p == 'getDropdownValues')
+{
+	if (isset($_GET['type'])){$type = $_GET['type'];}
+	$data=$query->queryTable("SELECT $type FROM ngs_".$type); 	
+}
 
 
 header('Cache-Control: no-cache, must-revalidate');

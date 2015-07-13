@@ -131,6 +131,8 @@ ComboBox = function (object_name) {
 				e.stopPropagation();
 			}
 			return false;
+		}else if (e.keyCode == 27) {
+			submitChanges(this);
 		}
 		
 	};
