@@ -118,7 +118,7 @@ function submitChanges(ele) {
 			
 			clearElementHighlighted();
 		}
-    }else if(event.keyCode == 27 || ele.value == '' || ele.value == null) {
+    }else if(event.keyCode == 27) {
 		element_highlighted.innerHTML = element_highlighted_value;
 		element_highlighted.onclick = element_highlighted_onclick;
 		
