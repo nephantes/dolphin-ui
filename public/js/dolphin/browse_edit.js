@@ -38,22 +38,52 @@ function editBox(uid, id, type, table, element){
 		element_highlighted_onclick = element.onclick;
 		element.innerHTML = '';
 		
-		console.log(uid);
-		
-		var textarea = document.createElement('textarea');
-		textarea.setAttribute('type', 'text');
-		textarea.setAttribute('class', 'form-control');
-		textarea.setAttribute('rows', '5');
-		textarea.setAttribute('onkeydown', 'submitChanges(this)');
-		
-		element.setAttribute('value', element_highlighted_value);
-		element.appendChild(textarea);
-		textarea.innerHTML = element_highlighted_value;
-		element.onclick = '';
+		if (type == 'source') {
+			
+			element.onclick = '';
+			
+			var masterDiv = document.createElement('div');
+			masterDiv.setAttribute('class','combobox input-group');
+			var input = document.createElement('input');
+			input.setAttribute('type', 'text');
+			input.setAttribute('name', 'comboboxfieldname');
+			input.setAttribute('id','cb_identifier');
+			input.setAttribute('onkeydown', 'submitChanges(this)');
+			var button = document.createElement('button');
+			button.setAttribute('class', 'btn btn-default btn-xs pull-right')
+			button.innerHTML = 'Select';
+			var div = document.createElement('div');
+			div.setAttribute('class','dropdownlist');
+			var a = document.createElement('a');
+			a.innerHTML = 'test';
+			div.appendChild(a);
+			var ab = document.createElement('a');
+			ab.innerHTML = 'another';
+			div.appendChild(ab);
+			
+			element.appendChild(masterDiv);
+			masterDiv.appendChild(input);
+			masterDiv.appendChild(button);
+			masterDiv.appendChild(div);
+			var no = new ComboBox('cb_identifier');
+			
+		}else{
+			var textarea = document.createElement('textarea');
+			textarea.setAttribute('type', 'text');
+			textarea.setAttribute('class', 'form-control');
+			textarea.setAttribute('rows', '5');
+			textarea.setAttribute('onkeydown', 'submitChanges(this)');
+			
+			element.setAttribute('value', element_highlighted_value);
+			element.appendChild(textarea);
+			textarea.innerHTML = element_highlighted_value;
+			element.onclick = '';
+		}
 	}
 }
 
 function submitChanges(ele) {
+	console.log(ele);
 	var successBool = false;
     if(event.keyCode == 13) {
         $.ajax({ type: "GET",
@@ -81,6 +111,7 @@ function submitChanges(ele) {
 		clearElementHighlighted();
 	}
 }
+
 
 function clearElementHighlighted(){
 	element_highlighted = null;
