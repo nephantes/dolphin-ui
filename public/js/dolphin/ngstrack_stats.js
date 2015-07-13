@@ -81,21 +81,21 @@ function generateStreamTable(type, queryData, queryType, qvar, rvar, seg, theSea
 		}
 		if (type == 'samples') {
 			if (queryType == 'getSamples') {
-				return "<tr><td>"+record.id+"</td><td>"+"<a href=\""+BASE_PATH+"/search/details/samples/"+record.id+'/'+theSearch+"\">"+sample_name+"</a>"+"</td><td>"+record.title+
-					"</td><td>"+record.source+"</td><td>"+record.organism+"</td><td>"+record.molecule+"</td><td>"+
+				return "<tr><td>"+record.id+"</td><td>"+"<a href=\""+BASE_PATH+"/search/details/samples/"+record.id+'/'+theSearch+"\">"+sample_name+"</a>"+"</td><td onclick=\"editBox("+uid+", "+record.id+", 'title', 'ngs_samples', this)\">"+record.title+
+					"</td><td onclick=\"editBox("+uid+", "+record.id+", 'source', 'ngs_samples', this)\">"+record.source+"</td><td onclick=\"editBox("+uid+", "+record.id+", 'organism', 'ngs_samples', this)\">"+record.organism+"</td><td onclick=\"editBox("+uid+", "+record.id+", 'molecule', 'ngs_samples', this)\">"+record.molecule+"</td><td>"+
 					"<input type=\"checkbox\" class=\"ngs_checkbox\" name=\""+record.id+"\" id=\"sample_checkbox_"+record.id+"\" onClick=\"manageChecklists(this.name, 'sample_checkbox');\" "+disabled+">"+"</td></tr>";
 			}else{
-				return "<tr><td>"+record.id+"</td><td>"+"<a href=\""+BASE_PATH+"/search/details/samples/"+record.id+'/'+theSearch+"\">"+sample_name+"</a>"+"</td><td>"+record.title+
-				"</td><td>"+record.source+"</td><td>"+record.organism+"</td><td>"+record.molecule+"</td><tr>";
+				return "<tr><td>"+record.id+"</td><td>"+"<a href=\""+BASE_PATH+"/search/details/samples/"+record.id+'/'+theSearch+"\">"+sample_name+"</a>"+"</td><td onclick=\"editBox("+uid+", "+record.id+", 'title', 'ngs_samples', this)\">"+record.title+
+				"</td><td onclick=\"editBox("+uid+", "+record.id+", 'source', 'ngs_samples', this)\">"+record.source+"</td><td onclick=\"editBox("+uid+", "+record.id+", 'organism', 'ngs_samples', this)\">"+record.organism+"</td><td onclick=\"editBox("+uid+", "+record.id+", 'molecule', 'ngs_samples', this)\">"+record.molecule+"</td><tr>";
 			}
 		}else if (type == 'lanes') {
-			return "<tr><td>"+record.id+"</td><td>"+"<a href=\""+BASE_PATH+"/search/details/experiments/"+record.id+'/'+theSearch+"\">"+record.name+"</a>"+"</td><td>"+record.facility+
-				"</td><td>"+record.total_reads+"</td><td>"+record.total_samples+"</td><td>"+
+			return "<tr><td>"+record.id+"</td><td>"+"<a href=\""+BASE_PATH+"/search/details/experiments/"+record.id+'/'+theSearch+"\">"+record.name+"</a>"+"</td><td onclick=\"editBox("+uid+", "+record.id+", 'facility', 'ngs_lanes', this)\">"+record.facility+
+				"</td><td onclick=\"editBox("+uid+", "+record.id+", 'total_reads', 'ngs_lanes', this)\">"+record.total_reads+"</td><td onclick=\"editBox("+uid+", "+record.id+", 'total_samples', 'ngs_lanes', this)\">"+record.total_samples+"</td><td>"+
 				"<input type=\"checkbox\" class=\"ngs_checkbox\" name=\""+record.id+"\" id=\"lane_checkbox_"+record.id+"\" onClick=\"manageChecklists(this.name, 'lane_checkbox');\" "+disabled+">"+"</td></tr>";
 				
 		}else if(type == 'experiments'){
-			return "<tr><td>"+record.id+"</td><td>"+"<a href=\""+BASE_PATH+"/search/details/experiment_series/"+record.id+'/'+theSearch+"\">"+record.experiment_name+"</a>"+"</td><td>"+record.summary+
-				"</td><td>"+record.design+"</td><tr>";
+			return "<tr><td>"+record.id+"</td><td>"+"<a href=\""+BASE_PATH+"/search/details/experiment_series/"+record.id+'/'+theSearch+"\">"+record.experiment_name+"</a>"+"</td><td onclick=\"editBox("+uid+", "+record.id+", 'summary', 'ngs_experiment_series', this)\">"+record.summary+
+				"</td><td onclick=\"editBox("+uid+", "+record.id+", 'design', 'ngs_experiment_series', this)\">"+record.design+"</td><tr>";
 		}else{
 			return null;
 		}
