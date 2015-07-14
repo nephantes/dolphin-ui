@@ -47,16 +47,29 @@
 				echo $html->getBrowserPanel($experiment_series, $experiment_series_fields, "Experiment Series", 'experiment_name');
 				}
 				else{
-					echo $html->getRespBoxTableStream("Experiment Series", "experiments", ["id","Series Name","Summary","Design"], ["id","name","summary","design"]);
+					if(!isset($_SESSION['ngs_experiments'])){
+						echo $html->getRespBoxTableStream("Experiments", "experiments", ["id","Series Name","Summary","Design"], ["id","name","summary","design"]);
+					}else if($_SESSION['ngs_experiments'] == ''){
+						echo $html->getRespBoxTableStream("Experiments", "experiments", ["id","Series Name","Summary","Design"], ["id","name","summary","design"]);
+					}else{
+						echo $html->getRespBoxTableStream("Experiments", "experiments", ["id","Series Name","Summary","Design", "Lab","Organization","Grant"], ["id","name","summary","design", "lab","organization","grant"]);
+					}
 				}
 				if ($table=="experiments" || $table=="samples"){
 								echo $html->getBrowserPanelMore($experiments, $experiment_fields, "Import", 'name', $lane_file);
 				}
 				else{
-					echo $html->getRespBoxTableStream("Imports", "lanes", ["id","Import Name","Facility","Total Reads","Total Samples","Selected"], ["id","name","facility", "total_reads", "total_samples",""]);
+					if(!isset($_SESSION['ngs_lanes'])){
+						echo $html->getRespBoxTableStream("Imports", "lanes", ["id","Import Name","Facility","Total Reads","Total Samples","Selected"], ["id","experiment_name","facility", "total_reads", "total_samples",""]);
+					}else if($_SESSION['ngs_lanes'] == ''){
+						echo $html->getRespBoxTableStream("Imports", "lanes", ["id","Import Name","Facility","Total Reads","Total Samples","Selected"], ["id","experiment_name","facility", "total_reads", "total_samples",""]);
+					}else{
+						echo $html->getRespBoxTableStream("Imports", "lanes", ["id","Import Name","Facility","Total Reads","Total Samples", "Cost", "Phix Requested", "Phix in Lane", "Notes", "Selected"],
+														  ["id","experiment_name","facility", "total_reads", "total_samples", "cost", "phix_requested", "phix_in_lane", "notes", ""]);
+					}
 				}
 				if ($table=="samples"){
-				echo $html->getBrowserPanelMore($samples, $sample_fields, "Sample",'name', $sample_file);
+					echo $html->getBrowserPanelMore($samples, $sample_fields, "Sample",'name', $sample_file);
 				//echo $html->getQCPanel();
 				//echo $html->getRSEMPanel();
 				//echo $html->getDESeqPanel();
@@ -64,9 +77,20 @@
 
 				}
 				else{
-							echo $html->getRespBoxTableStream("Samples", "samples", ["id","Sample Name","Title","Source","Organism","Molecule","Selected"], ["id","name","title","source","organism","molecule","total_reads"]);
-				echo $html->getSubmitBrowserButton();
+					if(!isset($_SESSION['ngs_samples'])){
+						echo $html->getRespBoxTableStream("Samples", "samples", ["id","Sample Name","Title","Source","Organism","Molecule","Selected"], ["id","name","title","source","organism","molecule","total_reads"]);
+					}else if($_SESSION['ngs_samples'] == ''){
+						echo $html->getRespBoxTableStream("Samples", "samples", ["id","Sample Name","Title","Source","Organism","Molecule","Selected"], ["id","name","title","source","organism","molecule","total_reads"]);
+					}else{
+						echo $html->getRespBoxTableStream("Samples", "samples", ["id","Sample Name","Title","Source","Organism","Molecule", "Barcode", "Description", "Avg Insert Size", "Read Length",
+																				"Concentration", "Time", "Biological Replica", "Technical Replica", "Spike-ins", "Adapter",
+																				"Notebook Ref", "Notes", "Genotype", "Library Type", "Biosample Type", "Instrument Model", "Treatment Manufacturer","Selected"],
+																				["id","name","title","source","organism","molecule","total_reads", "barcode", "description", "avg_insert_size", "read_length",
+																				"concentration", "time", "biological_replica", "technical_replica", "spike_ins", "adapter",
+																				"notebook_ref", "notes", "genotype", "library_type", "biosample_type", "instrument_model", "treatment_manufacturer"]);
+					}
 				}
+				echo $html->getSubmitBrowserButton();
 				?>
 						</div><!-- /.col (RIGHT) -->
 					</div><!-- /.row -->

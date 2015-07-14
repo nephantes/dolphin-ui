@@ -228,6 +228,11 @@ class HTML {
 		$html.= '<div class="box">
 						<div class="box-header">
 								<h3 class="box-title">'.$title.'</h3>
+								<div class="pull-right">
+										<button class="btn btn-default" value="'.$table.'" onclick="expandTable(this.value)">
+										<span class="fa fa-arrows-h"></span>
+										</button>
+								</div>
 						</div><!-- /.box-head -->
 						<div id="table_div_'.$table.'" class="box-body table-responsive">
 								<table id="jsontable_'.$table.'" class="table table-hover table-striped table-condensed table-scrollable">

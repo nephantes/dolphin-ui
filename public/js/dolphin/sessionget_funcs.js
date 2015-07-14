@@ -4,6 +4,34 @@
  *Ascription:
  */
 
+function tableToggle(table){
+	var type;
+	$.ajax({ type: "GET",
+		url: BASE_PATH+"/public/ajax/sessionrequests.php",
+		data: { p:"tableToggle", table:table },
+		async: false,
+		success : function(s)
+		{
+			type = s;
+		}
+	});
+	return type;
+}
+
+function getTableToggle(table){
+	var type;
+	$.ajax({ type: "GET",
+		url: BASE_PATH+"/public/ajax/sessionrequests.php",
+		data: { p:"getTableToggle", table:table },
+		async: false,
+		success : function(s)
+		{
+			type = s;
+		}
+	});
+	return type;
+}
+
 function sessionTest(){
 	var uid = '';
 	$.ajax({ type: "GET",

@@ -11,6 +11,9 @@ var element_highlighted_id;
 var element_highlighted_type;
 var element_highlighted_onclick;
 
+var normalized = ['facility', 'source', 'organism', 'molecule', 'lab', 'organization', 'genotype', 'library_type',
+				  'biosample_type', 'instrument_model', 'treatment_manufacturer'];
+
 function editBox(uid, id, type, table, element){
 	
 	var havePermission = 0;
@@ -38,7 +41,7 @@ function editBox(uid, id, type, table, element){
 		element_highlighted_onclick = element.onclick;
 		element.innerHTML = '';
 		
-		if (type == 'source' || type == 'organism' || type == 'molecule' || type == 'facility') {
+		if (normalized.indexOf(type) > -1) {
 			
 			element.onclick = '';
 			
@@ -98,6 +101,7 @@ function editBox(uid, id, type, table, element){
 
 function submitChanges(ele) {
 	console.log(ele);
+	console.log(ele.value);
 	var successBool = false;
     if(event.keyCode == 13 && ele.value != '' && ele.value != null) {
         $.ajax({ type: "GET",

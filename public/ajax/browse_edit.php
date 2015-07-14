@@ -9,6 +9,8 @@ if (!isset($_SESSION) || !is_array($_SESSION)) session_start();
 $query = new dbfuncs();
 
 $p = '';
+$normalized = ['facility', 'source', 'organism', 'molecule', 'lab', 'organization', 'genotype', 'library_type',
+				  'biosample_type', 'instrument_model', 'treatment_manufacturer'];
 
 if (isset($_GET['p'])){$p = $_GET['p'];}
 
@@ -20,7 +22,7 @@ if($p == 'updateDatabase')
 	if (isset($_GET['table'])){$table = $_GET['table'];}
 	if (isset($_GET['value'])){$value = $_GET['value'];}
 	
-	if($type == 'facility' || $type == 'source' || $type == 'organism' || $type == 'molecule'){
+	if(in_array($type, $normalized)){
 		$type_list = json_decode($query->queryTable("SELECT id FROM ngs_".$type." WHERE $type = '$value'"));
 		if($type_list != array()){
 			$data=$query->runSQL("UPDATE $table SET ".$type."_id = ".$type_list[0]->id." WHERE id = $id"); 	
@@ -30,7 +32,7 @@ if($p == 'updateDatabase')
 			$data=$query->runSQL("UPDATE $table SET ".$type."_id = '".$insert_id[0]->id."' WHERE id = $id"); 	
 		}
 	}else{
-		$data=$query->runSQL("UPDATE $table SET $type = '$value' WHERE id = $id"); 	
+		$data=$query->runSQL("UPDATE $table SET ".$table.".".$type." = '$value' WHERE id = $id"); 	
 	}
 }
 else if($p == 'checkPerms')
