@@ -30,6 +30,18 @@
 		<script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
 		<script src="https://oss.maxcdn.com/libs/respond.js/1.3.0/respond.min.js"></script>
 		<![endif]-->
+		<style>
+			div.combobox	{position: relative;}
+			div.combobox	.cb_identifier		{height: 34px;}
+			div.combobox	div.dropdownlist	{display: none;width: 200px;
+				border: solid 1px #000;background-color: #fff;
+				height: 200px;overflow: auto;position: absolute;}
+			div.combobox	.dropdownlist	a	{display: block;text-decoration: none;
+				color: #000;padding: 1px;height: auto;cursor: default}
+			div.combobox	.dropdownlist	a.light	{color: #fff;
+				background-color: #007}
+			
+		</style>
 		
 		<?php echo $html->getBasePath(BASE_PATH, API_PATH); ?>
 	</head>
