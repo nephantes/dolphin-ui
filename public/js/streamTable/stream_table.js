@@ -71,7 +71,7 @@
   }
 
   var _F = _StreamTable.prototype;
-
+  
   _F.getIndex = function(){
     return this.last_search_text.length > 0 ? this.last_search_record_index : this.records_index
   };
