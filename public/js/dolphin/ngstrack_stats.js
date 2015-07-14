@@ -132,6 +132,7 @@ function generateStreamTable(type, queryData, queryType, qvar, rvar, seg, theSea
 	
 	var type_summary = createElement('div', ['id', 'class'], [type+'_summary', 'pull-left margin']);
 	var the_table = document.getElementById('table_div_'+type);
+	the_table.setAttribute('style','overflow:scroll');
 	the_table.appendChild(type_summary);
 	
 	var st = StreamTable('#jsontable_'+type,
