@@ -49,7 +49,7 @@ else if($p == 'checkPerms')
 else if($p == 'getDropdownValues')
 {
 	if (isset($_GET['type'])){$type = $_GET['type'];}
-	$data=$query->queryTable("SELECT $type FROM ngs_".$type); 	
+	$data=$query->queryTable("SELECT $type FROM ngs_".$type);
 }
 
 

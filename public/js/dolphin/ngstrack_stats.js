@@ -6,6 +6,7 @@
  **/
 
 function generateStreamTable(type, queryData, queryType, qvar, rvar, seg, theSearch, uid, gids){
+	console.log(queryData);
 	var keys = [];
 	for (var key in queryData[0]) {
 		if (queryData[0].hasOwnProperty(key)) {
@@ -25,17 +26,20 @@ function generateStreamTable(type, queryData, queryType, qvar, rvar, seg, theSea
 	document.getElementsByTagName('body')[0].appendChild(masterScript);
 	
 	var lanes_with_good_samples;
+	var owner_ids = [];
 	if (type == 'lanes') {
-			$.ajax({ type: "GET",
-					url: BASE_PATH+"/public/ajax/ngsquerydb.php",
-					data: { p: 'getLanesWithSamples' },
-					async: false,
-					success : function(s)
-					{
-						lanes_with_good_samples = s;
-					}
-			});
-		}
+		$.ajax({ type: "GET",
+				url: BASE_PATH+"/public/ajax/ngsquerydb.php",
+				data: { p: 'getLanesWithSamples' },
+				async: false,
+				success : function(s)
+				{
+					lanes_with_good_samples = s;
+				}
+		});
+	}
+	
+	console.log(lanes_with_good_samples);
 	
 	var data = queryData, html = $.trim($("#template_"+type).html()), template = Mustache.compile(html);
 	var view = function(record, index){
@@ -80,9 +84,8 @@ function generateStreamTable(type, queryData, queryType, qvar, rvar, seg, theSea
 			sample_name = record.samplename;
 		}
 		
-		uid = 1;
 		var deleteButton = "";
-		if (uid == null) {
+		if (record.owner_id == uid) {
 			deleteButton = "<button class=\"btn btn-danger btn-xs\" value=\"Delete\">Delete</button>"
 		}
 		
