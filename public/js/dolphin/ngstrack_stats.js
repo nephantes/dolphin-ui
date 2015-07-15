@@ -110,7 +110,7 @@ function generateStreamTable(type, queryData, queryType, qvar, rvar, seg, theSea
 		
 		var deleteButton = "";
 		if (record.owner_id == uid) {
-			deleteButton = "<button class=\"btn btn-danger btn-xs\" value=\"Delete\">Delete</button>"
+			deleteButton = "<button class=\"btn btn-danger btn-xs\" value=\"Delete\" onclick=\"removeSampleOrLane('"+type+"', "+record.id+")\">Delete</button>"
 		}
 		if (tableToggle == 'extend') {
 			if (type == 'samples') {
@@ -192,7 +192,6 @@ function generateStreamTable(type, queryData, queryType, qvar, rvar, seg, theSea
 	the_table.setAttribute('style','overflow:scroll');
 	the_table.appendChild(type_summary);
 	var table_rows = the_table.getElementsByTagName('tr');
-	console.log(table_rows);
 	
 	var st = StreamTable('#jsontable_'+type,
 	  { view: view, 
@@ -248,7 +247,6 @@ function shiftColumns(id){
 
 function expandTable(table){
 	var toggle = tableToggle(table);
-	console.log(toggle);
 	location.reload();
 }
 
@@ -529,7 +527,6 @@ $(function() {
 					async: false,
 					success : function(s)
 					{
-						console.log(s);
 						var type = 'experiments';
 						var queryType = "getExperimentSeries";
 						generateStreamTable(type, s, queryType, qvar, rvar, segment, theSearch, uid, gids);

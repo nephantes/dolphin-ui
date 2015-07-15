@@ -130,6 +130,14 @@ function submitChanges(ele) {
 	}
 }
 
+function removeSampleOrLane(type, id){
+	if (type == 'lanes') {
+		
+	}else{
+		
+	}
+	location.reload();
+}
 
 function clearElementHighlighted(){
 	element_highlighted = null;
