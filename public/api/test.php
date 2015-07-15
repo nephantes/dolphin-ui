@@ -1,5 +1,7 @@
 <?php
 $data="as";
+require_once("../../config/config.php");
+$data=JOB_STATUS;
 require_once("funcs.php");
 error_reporting(E_ALL);
 ini_set('report_errors','on');
@@ -7,7 +9,6 @@ ini_set('report_errors','on');
 $myClass = new funcs();
 $result=$myClass->getINI();
 $result=json_encode($result);
-
 $data = $result;
 
 header('Cache-Control: no-cache, must-revalidate');

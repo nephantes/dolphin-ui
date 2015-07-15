@@ -1,4 +1,5 @@
 <?php
+require_once("../../config/config.php");
 
 class funcs
 {
@@ -9,26 +10,19 @@ class funcs
     public $tool_path = "";
     public $remotehost = "";
     public $jobstatus = "";
+    public $config = "";
     public $python = "";
-    public $params_section = "";
-    
     function readINI()
     {
-        if ($this->params_section == "") {
-            if (!empty($_SERVER["HTTP_HOST"])){
-               $this->params_section=$_SERVER["HTTP_HOST"];
-            }
-            $ini              = parse_ini_file("../../config/config.ini", true);
-            $ini_array        = $ini[$this->params_section];
-            $this->dbhost     = $ini_array['DB_HOST'];
-            $this->db         = $ini_array['DB_NAME'];
-            $this->dbpass     = $ini_array['DB_PASSWORD'];
-            $this->dbuser     = $ini_array['DB_USER'];
-            $this->tool_path  = $ini_array['DOLPHIN_TOOLS_SRC_PATH'];
-            $this->remotehost = $ini_array['REMOTE_HOST'];
-            $this->jobstatus  =$ini_array['JOB_STATUS'];
-            $this->python     =$ini_array['PYTHON'];
-        }
+            $this->dbhost     = DB_HOST;
+            $this->db         = DB_NAME;
+            $this->dbpass     = DB_PASSWORD;
+            $this->dbuser     = DB_USER;
+            $this->tool_path  = DOLPHIN_TOOLS_SRC_PATH;
+            $this->remotehost = REMOTE_HOST;
+            $this->jobstatus  = JOB_STATUS;
+            $this->config     = CONFIG;
+            $this->python     = PYTHON;
     }
     function getINI()
     {
@@ -116,7 +110,7 @@ class funcs
     {
         $this->readINI();
         
-        if ($this->remotehost != "") {
+        if ($this->remotehost != "N") {
             $com = "ssh -o ConnectTimeout=30 $username@" . $this->remotehost . " \"" . $this->jobstatus . " $job_num\"|grep " . $job_num . "|awk '{print \$3\"\\t\"\$1}'";
         } else {
             $com = "ps -ef|grep \"[[:space:]]" . $job_num . "[[:space:]]\"|awk '{print \$8\"\\t\"\$1}'";
@@ -371,10 +365,10 @@ class funcs
                     
                     
                     $edir = $this->tool_path;
-                    if ($this->remotehost != "") {
-                        $com = "ssh -o ConnectTimeout=30 $username@" . $this->remotehost . " \"" . $this->python . " " . $edir . "/runService.py  -d " . $this->dbhost . " $ipf $dpf -o $outdir -u $username -k $wkey -c \\\"$command\\\" -n $servicename -s $servicename\" 2>&1";
+                    if ($this->remotehost != "N") {
+                        $com = "ssh -o ConnectTimeout=30 $username@" . $this->remotehost . " \"" . $this->python . " " . $edir . "/runService.py -f ".$this->config." -d " . $this->dbhost . " $ipf $dpf -o $outdir -u $username -k $wkey -c \\\"$command\\\" -n $servicename -s $servicename\" 2>&1";
                     } else {
-                        $com = $this->python . " " . $edir . "/runService.py  -d " . $this->dbhost . " $ipf $dpf -o $outdir -u $username -k $wkey -c \"$command\" -n $servicename -s $servicename 2>&1";
+                        $com = $this->python . " " . $edir . "/runService.py -f ".$this->config." -d " . $this->dbhost . " $ipf $dpf -o $outdir -u $username -k $wkey -c \"$command\" -n $servicename -s $servicename 2>&1";
                     }
                     $retval = $this->syscall($com);
                     
