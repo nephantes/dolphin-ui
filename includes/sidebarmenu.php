@@ -12,7 +12,7 @@ foreach ($parentMenus as $parentitem):
         $menuhtml.='<i class="fa fa-angle-left pull-right"></i></a>';
         $menuhtml.='<ul class="treeview-menu">';
         $menuhtml.=$html->getSideMenuItem($query->getSubMenuFromSideBar($parentitem->{'name'}));
-        $menuhtml.=$html->getSideMenuItem($query->getSubMenuFromDataTables($parentitem->{'name'}));
+        #$menuhtml.=$html->getSideMenuItem($query->getSubMenuFromDataTables($parentitem->{'name'}));
         $menuhtml.='</ul>';
     }
     else{

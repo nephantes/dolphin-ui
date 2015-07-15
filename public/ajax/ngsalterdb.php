@@ -36,7 +36,7 @@ if ($p == "submitPipeline" )
         WHERE outdir = '$outdir'
         ");
         $idKey=$query->queryAVal("SELECT id FROM biocore.ngs_runparams WHERE outdir = '$outdir' limit 1");
-        $cmd = "cd ../../scripts && echo 'Re-run started($idKey)' >> ../tmp/run.log && python dolphin_wrapper.py -r $idKey >> ../tmp/run.log 2>&1 & echo $! &";
+        $cmd = "cd ../../scripts && echo 'Re-run started($idKey)' >> ../tmp/run.log && python dolphin_wrapper.py -r $idKey -c ".CONFIG.">> ../tmp/run.log 2>&1 & echo $! &";
         pclose(popen( $cmd, "r"));
         $data=$idKey;
     }else{
@@ -48,7 +48,7 @@ if ($p == "submitPipeline" )
         $uid, NULL, 3, now(), now(), $uid)");
         //need to grab the id for runlist insertion
             $idKey=$query->queryAVal("SELECT id FROM biocore.ngs_runparams WHERE run_group_id = -1 and run_name = '$name' order by id desc limit 1");
-            $cmd = "cd ../../scripts && echo 'Re-run started($idKey)' >> ../tmp/run.log && python dolphin_wrapper.py -r $idKey >> ../tmp/run.log 2>&1 & echo $! &";
+            $cmd = "cd ../../scripts && echo 'Re-run started($idKey)' >> ../tmp/run.log && python dolphin_wrapper.py -r $idKey -c ".CONFIG.">> ../tmp/run.log 2>&1 & echo $! &";
             pclose(popen( $cmd, "r"));
         //update required to make run_group_id equal to it's primary key "id".Replace the arbitrary -1 with the id
         if (isset($_POST['runid'])){$runGroupID = $_POST['runid'];}
@@ -105,7 +105,7 @@ else if ($p == 'noAddedParamsRerun')
     FROM ngs_runparams
     WHERE id = $run_id limit 1
     ");
-    $cmd = "cd ../../scripts && echo 'Re-run started($run_id)' >> ../tmp/run.log && python dolphin_wrapper.py -r $run_id >> ../tmp/run.log 2>&1 & echo $! &";
+    $cmd = "cd ../../scripts && echo 'Re-run started($run_id)' >> ../tmp/run.log && python dolphin_wrapper.py -r $run_id -c ".CONFIG.">> ../tmp/run.log 2>&1 & echo $! &";
     pclose(popen( $cmd, "r"));
 }
 else if($p == 'updateProfile')

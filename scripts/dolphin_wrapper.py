@@ -23,9 +23,9 @@ from workflowdefs import *
 
 class Dolphin:
     bin_dir = dirname(argv[0])
-    cmd = 'python %(dolphin_tools_dir)s/runWorkflow.py -i %(input_fn)s -d %(galaxyhost)s -w %(workflow)s -p %(dolphin_default_params)s -u %(username)s -o %(outdir)s %(wkeystr)s'
+    cmd = 'python %(dolphin_tools_dir)s/runWorkflow.py -f %(params_section)s -i %(input_fn)s -w %(workflow)s -p %(dolphin_default_params)s -u %(username)s -o %(outdir)s %(wkeystr)s'
     config = ConfigParser.ConfigParser()
-    params_section = 'biocore.umassmed.edu'
+    params_section = ''
     
     def __init__(self, params_section):
         self.params_section = params_section
@@ -156,6 +156,7 @@ class Dolphin:
        gb=genomebuild.split(',')
        previous="NONE"
        fp = open( input_fn, 'w' )
+       print >>fp, '@CONFIG=%s'%self.params_section
        print >>fp, '@GENOME=%s'%gb[0]
        gb[1] = re.sub('test', '', gb[1])
        genomeindex=gb[1]
@@ -484,14 +485,7 @@ class Dolphin:
 # main
 def main():
     
-   params_section = "biocore.umassmed.edu"
-   if (os.environ.has_key('DOLPHIN_PARAMS_SECTION')):
-       params_section=os.environ['DOLPHIN_PARAMS_SECTION']
-
-   if (params_section=="Docker"):
-       params_section = "dolphin.umassmed.edu:8080"
-
-   dolphin=Dolphin(params_section)
+   params_section = ""
    
    try:
         tmpdir = '../tmp/files'
@@ -506,12 +500,17 @@ def main():
         parser.add_option("-r", "--rungroupid", dest="rpid")
         parser.add_option("-b", "--backup", dest="backup")
         parser.add_option("-w", "--wkey", dest="wkey")
+        parser.add_option("-c", "--config", dest="config")
         # parse
         options, args = parser.parse_args()
         # retrieve options
         rpid    = options.rpid
         BACKUP  = options.backup
         WKEY    = options.wkey
+        params_section = options.config        
+
+        dolphin=Dolphin(params_section)
+
         logging.basicConfig(filename=logdir+'/'+rpid+'.log', filemode='w',format='%(asctime)s %(message)s', datefmt='%m/%d/%Y %I:%M:%S %p', level=logging.DEBUG)
 
         if (not rpid):
@@ -606,7 +605,6 @@ def main():
 
            dolphin.write_workflow(resume, gettotalreads, amazonupload, backupS3, runparamsid, customind, commonind, pipeline, barcodes, fastqc, adapter, quality, trim, split, workflow, clean)
 
-           galaxyhost=dolphin.config.get(dolphin.params_section, "galaxyhost")
            dolphin_tools_dir=dolphin.config.get(dolphin.params_section, "dolphin_tools_src_path") 
            dolphin_default_params=dolphin.config.get(dolphin.params_section, "dolphin_default_params_path")
            wkeystr=''

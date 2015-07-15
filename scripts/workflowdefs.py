@@ -1,8 +1,8 @@
-stepCheck = 'stepCheck%(sep)s@RUNCHECK -i @INPUT -u @USERNAME -b @BARCODES -w @WKEY -p %(runparamsid)s -d @DBCOMMCMD -a @ADAPTER -t @TRIM -o @OUTDIR -r %(resume)s -s stepCheck -j @JGEN%(sep)s1'
+stepCheck = 'stepCheck%(sep)s@RUNCHECK -c @CONFIG -i @INPUT -u @USERNAME -b @BARCODES -w @WKEY -p %(runparamsid)s -d @DBCOMMCMD -a @ADAPTER -t @TRIM -o @OUTDIR -r %(resume)s -s stepCheck -j @JGEN%(sep)s1'
 stepSeqMapping = 'stepSeqMapping%(indexname)s%(sep)s@RUNRECMAPPING -i @INPUT -a @AWKDIR -d @SPAIRED -m @SAMTOOLS -o @OUTDIR -b @PARAM%(indexname)s -c @BOWTIE2CMD -s stepSeqMapping%(indexname)s -r @ADVPARAMS -j @JMAPPING%(sep)s1'
 stepBarcode = 'stepBarcode%(sep)s@RUNBARCODE -i @INPUT -d @SPAIRED -b @BARCODES -o @OUTDIR -c @SINGLEBSPLITTERCMD:@PAIREDBSPLITTERCMD -s stepBarcode -j @JGEN%(sep)s1'
-stepGetTotalReads = 'stepGetTotalReads%(sep)s@RUNGETTOTALREADS -b @BARCODES -r %(runparamsid)s -p @SPAIRED -o @OUTDIR -u @USERNAME -j @JGEN%(sep)s10'
-stepBackupS3 = 'stepBackupS3%(sep)s@RUNBACKUPS3 -a %(amazonupload)s -b @BARCODES -r %(runparamsid)s -p @SPAIRED -o @OUTDIR -u @USERNAME -j @JGEN%(sep)s10'
+stepGetTotalReads = 'stepGetTotalReads%(sep)s@RUNGETTOTALREADS -c @CONFIG -b @BARCODES -r %(runparamsid)s -p @SPAIRED -o @OUTDIR -u @USERNAME -j @JGEN%(sep)s10'
+stepBackupS3 = 'stepBackupS3%(sep)s@RUNBACKUPS3 -c @CONFIG -a %(amazonupload)s -b @BARCODES -r %(runparamsid)s -p @SPAIRED -o @OUTDIR -u @USERNAME -j @JGEN%(sep)s10'
 stepFastQC = 'stepFastQC%(sep)s@PERL @RUNFASTQC -b @BARCODES -o @OUTDIR -p @FASTQCPROG -s stepFastQC -j @JGEN%(sep)s1'
 stepMergeFastQC = 'stepMergeFastQC%(sep)s@PERL @RUNFASTQCMERGE -p @PUBDIR -w @WKEY -o @OUTDIR%(sep)s0'
 stepAdapter = 'stepAdapters%(sep)s@RUNADAPTER -d @SPAIRED -p @PREVIOUSADAPTER -o @OUTDIR -a @ADAPTER -c @MATICCMD -s stepAdapter -j @JGEN%(sep)s1'
@@ -21,5 +21,5 @@ stepPicard='stepPicard%(type)s%(sep)s@PERL @RUNPICARD -o @OUTDIR -pu @PUBDIR -w 
 stepMergePicard='stepMergePicard%(type)s%(sep)s@PERL @RUNMERGEPICARD -o @OUTDIR -p @PUBDIR -w @WKEY -t %(type)s %(sep)s1'
 stepCounts = 'stepCounts%(sep)s@RUNCOUNTS -m @MAPNAMES -o @OUTDIR -g @GCOMMONDB -p @PUBDIR -w @WKEY -b @MAKEBED -c @BEDTOOLSCMD -s stepCounts -j @JGEN%(sep)s1'
 stepDESeq2 = 'stepDESeq2p%(deseq_count)s%(sep)s@RUNDESEQ2 -c @COLS%(deseq_count)s -pu @PUBDIR -da @DATASET%(deseq_count)s -w @WKEY -dc @CONDS%(deseq_count)s -r @RSCRIPT -o @OUTDIR -n %(deseq_count)s -e @HEATMAP%(deseq_count)s -t @FITTYPE%(deseq_count)s -pa @PADJ%(deseq_count)s -f @FOLDCHANGE%(deseq_count)s -s stepDESeq2p%(deseq_count)s -j @JGEN%(sep)s1'
-stepClean      = 'stepClean%(sep)s@RUNCLEAN -l %(level)s -u @USERNAME -p @PUBDIR -w @WKEY -d @DBCOMMCMD  -o @OUTDIR%(sep)s1'
+stepClean      = 'stepClean%(sep)s@RUNCLEAN -c @CONFIG -l %(level)s -u @USERNAME -p @PUBDIR -w @WKEY -d @DBCOMMCMD  -o @OUTDIR%(sep)s1'
 
