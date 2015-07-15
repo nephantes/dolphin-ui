@@ -353,7 +353,7 @@ class funcs
                     $ipf = "";
                     if ($inputparam != "" && $inputparam != "None") {
                         #If the service will run over ssh we need \\\ otherwise \
-                        if ($this->remotehost != "") {
+                        if ($this->remotehost != "N") {
                             $ipf = "-i \\\"$inputparam\\\"";
                         } else {
                             $ipf = "-i \"$inputparam\"";
