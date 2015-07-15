@@ -162,7 +162,7 @@ function generateStreamTable(type, queryData, queryType, qvar, rvar, seg, theSea
 		
 		var deleteButton = "";
 		if (record.owner_id == uid) {
-			deleteButton = "<button class=\"btn btn-danger btn-xs\" value=\"Delete\" onclick=\"removeSampleOrLane('"+type+"', "+record.id+")\">Delete</button>"
+			deleteButton = "<button class=\"btn btn-danger btn-xs\" value=\"Delete\" onclick=\"removeSampleOrLane('"+type+"', "+record.id+")\" disabled>Delete</button>"
 		}
 		if (tableToggle == 'extend') {
 			if (type == 'samples') {
@@ -193,7 +193,7 @@ function generateStreamTable(type, queryData, queryType, qvar, rvar, seg, theSea
 			}else if(type == 'experiments'){
 				return "<tr><td>"+record.id+"</td><td>"+"<a href=\""+BASE_PATH+"/search/details/experiment_series/"+record.id+'/'+theSearch+"\">"+record.experiment_name+"</a>"+"</td><td onclick=\"editBox("+uid+", "+record.id+", 'summary', 'ngs_experiment_series', this)\">"+record.summary+
 					"</td><td onclick=\"editBox("+uid+", "+record.id+", 'design', 'ngs_experiment_series', this)\">"+record.design+"</td><td onclick=\"editBox("+uid+", "+record.id+", 'lab', 'ngs_experiment_series', this)\">"+record.lab+"</td>"+
-					"<td>"+record.organization+"</td><td onclick=\"editBox("+uid+", "+record.id+", 'grant', 'ngs_experiment_series', this)\">"+record.grant+"</td><tr>";
+					"<td onclick=\"editBox("+uid+", "+record.id+", 'organization', 'ngs_experiment_series', this)\">"+record.organization+"</td><td onclick=\"editBox("+uid+", "+record.id+", 'grant', 'ngs_experiment_series', this)\">"+record.grant+"</td><tr>";
 			}else{
 				return null;
 			}
