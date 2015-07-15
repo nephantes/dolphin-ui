@@ -70,6 +70,32 @@ else if ($p == 'flushWKey')
 {
 	unset($_SESSION['wkey']);
 }
+else if ($p == 'tableToggle')
+{
+	if (isset($_GET['table'])){$table = $_GET['table'];}
+	if(!isset($_SESSION['ngs_'.$table])){
+		$_SESSION['ngs_'.$table] = 'extend';
+		echo "extend";
+	}else if($_SESSION['ngs_'.$table] == ''){
+		$_SESSION['ngs_'.$table] = 'extend';
+		echo "extend";
+	}else{
+		$_SESSION['ngs_'.$table] = '';
+		echo "";
+	}
+}
+else if ($p == 'getTableToggle')
+{
+	if (isset($_GET['table'])){$table = $_GET['table'];}
+	if(!isset($_SESSION['ngs_'.$table])){
+		$_SESSION['ngs_'.$table] = '';
+		echo "";
+	}else if($_SESSION['ngs_'.$table] == ''){
+		echo "";
+	}else{
+		echo "extend";
+	}
+}
 
 exit;
 ?>

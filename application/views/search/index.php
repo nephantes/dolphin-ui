@@ -42,9 +42,33 @@
 		<!-- END ACCORDION & CAROUSEL-->
 			</div><!-- /.col (LEFT) -->
 						<div class="col-md-9">
-				<?php echo $html->getRespBoxTableStream("Experiments", "experiments", ["id","Series Name","Summary","Design"], ["id","name","summary","design"]); ?>
-				<?php echo $html->getRespBoxTableStream("Imports", "lanes", ["id","Import Name","Facility","Total Reads","Total Samples","Selected"], ["id","experiment_name","facility", "total_reads", "total_samples",""]); ?>
-				<?php echo $html->getRespBoxTableStream("Samples", "samples", ["id","Sample Name","Title","Source","Organism","Molecule","Selected"], ["id","name","title","source","organism","molecule","total_reads"]); ?>
+							<?php if(!isset($_SESSION['ngs_experiments'])){
+								echo $html->getRespBoxTableStream("Experiments", "experiments", ["id","Series Name","Summary","Design"], ["id","name","summary","design"]);
+							}else if($_SESSION['ngs_experiments'] == ''){
+								echo $html->getRespBoxTableStream("Experiments", "experiments", ["id","Series Name","Summary","Design"], ["id","name","summary","design"]);
+							}else{
+								echo $html->getRespBoxTableStream("Experiments", "experiments", ["id","Series Name","Summary","Design", "Lab","Organization","Grant"], ["id","name","summary","design", "lab","organization","grant"]);
+							}?>
+							<?php if(!isset($_SESSION['ngs_lanes'])){
+								echo $html->getRespBoxTableStream("Imports", "lanes", ["id","Import Name","Facility","Total Reads","Total Samples","Selected"], ["id","experiment_name","facility", "total_reads", "total_samples",""]);
+							}else if($_SESSION['ngs_lanes'] == ''){
+								echo $html->getRespBoxTableStream("Imports", "lanes", ["id","Import Name","Facility","Total Reads","Total Samples","Selected"], ["id","experiment_name","facility", "total_reads", "total_samples",""]);
+							}else{
+								echo $html->getRespBoxTableStream("Imports", "lanes", ["id","Import Name","Facility","Total Reads","Total Samples", "Cost", "Phix Requested", "Phix in Lane", "Notes", "Selected"],
+																  ["id","experiment_name","facility", "total_reads", "total_samples", "cost", "phix_requested", "phix_in_lane", "notes", ""]);
+							}?>
+							<?php if(!isset($_SESSION['ngs_samples'])){
+								echo $html->getRespBoxTableStream("Samples", "samples", ["id","Sample Name","Title","Source","Organism","Molecule","Selected"], ["id","name","title","source","organism","molecule","total_reads"]);
+							}else if($_SESSION['ngs_samples'] == ''){
+								echo $html->getRespBoxTableStream("Samples", "samples", ["id","Sample Name","Title","Source","Organism","Molecule","Selected"], ["id","name","title","source","organism","molecule","total_reads"]);
+							}else{
+								echo $html->getRespBoxTableStream("Samples", "samples", ["id","Sample Name","Title","Source","Organism","Molecule", "Barcode", "Description", "Avg Insert Size", "Read Length",
+																						"Concentration", "Time", "Biological Replica", "Technical Replica", "Spike-ins", "Adapter",
+																						"Notebook Ref", "Notes", "Genotype", "Library Type", "Biosample Type", "Instrument Model", "Treatment Manufacturer","Selected"],
+																						["id","name","title","source","organism","molecule","total_reads", "barcode", "description", "avg_insert_size", "read_length",
+																						"concentration", "time", "biological_replica", "technical_replica", "spike_ins", "adapter",
+																						"notebook_ref", "notes", "genotype", "library_type", "biosample_type", "instrument_model", "treatment_manufacturer"]);
+							}?>
 				<?php echo $html->getSubmitBrowserButton()?>
 						</div><!-- /.col (RIGHT) -->
 					</div><!-- /.row -->

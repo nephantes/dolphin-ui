@@ -30,6 +30,7 @@ function parseTSV(jsonName, url_path){
 
 function parseMoreTSV(jsonNameArray, url_path){
 	var parsedArray = [];
+	console.log(BASE_PATH + "/public/api/?source=" + API_PATH + "/public/pub/" + wkey + "/" + url_path);
 	$.ajax({ type: "GET",
 			url: BASE_PATH + "/public/api/?source=" + API_PATH + "/public/pub/" + wkey + "/" + url_path,
 			async: false,
@@ -521,6 +522,8 @@ $(function() {
 			}
 	});
 	
+	console.log(summary_files);
+	
 	if (summary_files.length > 0) {
 		document.getElementById('tablerow').appendChild(createElement('th', ['id'], ['unused']));
 		document.getElementById('unused').innerHTML = 'Reads Left';
@@ -542,7 +545,9 @@ $(function() {
 					}
 				}
 			}else if (z == summary_files.length - 1) {
+				console.log(summary_files[z]['file']);
 				var parsed_add = parseMoreTSV(['Reads 1','Reads >1','Unmapped Reads'], summary_files[z]['file']);
+				console.log(parsed_add);
 				for(var x = 0; x < table_array.length; x ++){
 					var concat_array = table_array[x];
 					table_array[x] = concat_array.concat([parseInt(parsed_add[x][0].split(" ")[0]) + parseInt(parsed_add[x][1].split(" ")[0]), parsed_add[x][2].split(" ")[0]]);

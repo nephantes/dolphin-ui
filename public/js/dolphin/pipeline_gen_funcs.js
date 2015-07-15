@@ -667,7 +667,11 @@ function addToDolphinBasket(sampleID){
 	tblcol1.appendChild(document.createTextNode(sample_info[0]));
 	tblrow.appendChild(tblcol1);
 	var tblcol2 = document.createElement("td");
-	tblcol2.appendChild(document.createTextNode(sample_info[1]));
+	if (sample_info[1] != '' && sample_info[1] != 'null' && sample_info[1] != null) {
+		tblcol2.appendChild(document.createTextNode(sample_info[1]));	
+	}else{
+		tblcol2.appendChild(document.createTextNode(sample_info[2]));
+	}
 	tblrow.appendChild(tblcol2);
 	var tblcol3 = document.createElement("td");
 	var remove_button = createElement('button', ['id', 'class', 'onclick'], ['remove_basket_'+sampleID, 'btn btn-danger btn-xs pull-right', 'manageChecklists("'+sampleID+'", "sample_checkbox")']);

@@ -47,13 +47,24 @@ $innerJoin = "LEFT JOIN ngs_source
                 LEFT JOIN ngs_genotype
                 ON ngs_samples.genotype_id = ngs_genotype.id
                 LEFT JOIN ngs_library_type
-                ON ngs_samples.library_type_id = ngs_library_type.id";
+                ON ngs_samples.library_type_id = ngs_library_type.id
+                LEFT JOIN ngs_biosample_type
+                on ngs_samples.biosample_type_id = ngs_biosample_type.id
+                LEFT JOIN ngs_instrument_model
+                ON ngs_samples.instrument_model_id = ngs_instrument_model.id
+                LEFT JOIN ngs_treatment_manufacturer
+                ON ngs_samples.treatment_manufacturer_id = ngs_treatment_manufacturer.id";
                 
 $sampleJoin = "LEFT JOIN ngs_fastq_files
                 ON ngs_samples.id = ngs_fastq_files.sample_id";
                 
 $laneJoin = "LEFT JOIN ngs_facility
                 ON ngs_lanes.facility_id = ngs_facility.id";
+
+$experimentSeriesJoin = "LEFT JOIN ngs_lab
+                        ON ngs_experiment_series.lab_id = ngs_lab.id
+                        LEFT JOIN ngs_organization
+                        ON ngs_lab.organization_id = ngs_organization.id";
 
 if (isset($_GET['start'])){$start = $_GET['start'];}
 if (isset($_GET['end'])){$end = $_GET['end'];}
@@ -86,7 +97,7 @@ if($search != "" && !in_array($p, $pDictionary)){
 			$time="";
 			if (isset($start)){$time="WHERE `date_created`>='$start' and `date_created`<='$end'";}
 			$data=$query->queryTable("
-			SELECT ngs_lanes.id,name, facility, total_reads, total_samples
+			SELECT ngs_lanes.id,name, facility, total_reads, total_samples, cost, phix_requested, phix_in_lane, notes, owner_id
 			FROM biocore.ngs_lanes
             $laneJoin
 			WHERE biocore.ngs_lanes.id
@@ -98,7 +109,8 @@ if($search != "" && !in_array($p, $pDictionary)){
 			$time="";
 			if (isset($start)){$time="and `date_created`>='$start' and `date_created`<='$end'";}
 			$data=$query->queryTable("
-			SELECT ngs_samples.id, name, samplename, title, source, organism, molecule, total_reads
+			SELECT ngs_samples.id, name, samplename, title, source, organism, molecule, total_reads, barcode, description, avg_insert_size, read_length, concentration, time, biological_replica, technical_replica, spike_ins, adapter,
+            notebook_ref, notes, genotype, library_type, biosample_type, instrument_model, treatment_manufacturer, ngs_samples.owner_id
 			FROM biocore.ngs_samples
             $innerJoin
             $sampleJoin
@@ -112,8 +124,9 @@ if($search != "" && !in_array($p, $pDictionary)){
 			$time="";
 			if (isset($start)){$time="WHERE `date_created`>='$start' and `date_created`<='$end'";}
 			$data=$query->queryTable("
-			SELECT id, experiment_name, summary, design
+			SELECT ngs_experiment_series.id, experiment_name, summary, design, lab, organization, `grant`
 			FROM biocore.ngs_experiment_series
+            $experimentSeriesJoin
 			WHERE biocore.ngs_experiment_series.id
 			IN (SELECT biocore.ngs_samples.series_id FROM biocore.ngs_samples $innerJoin WHERE $searchQuery) $andPerms $time
 			");
@@ -127,7 +140,7 @@ if($search != "" && !in_array($p, $pDictionary)){
 			$time="";
 			if (isset($start)){$time="WHERE `date_created`>='$start' and `date_created`<='$end'";}
 			$data=$query->queryTable("
-			SELECT ngs_lanes.id,name, facility, total_reads, total_samples
+			SELECT ngs_lanes.id,name, facility, total_reads, total_samples, cost, phix_requested, phix_in_lane, notes, owner_id
 			FROM biocore.ngs_lanes
             $laneJoin
 			WHERE biocore.ngs_lanes.id
@@ -140,7 +153,8 @@ if($search != "" && !in_array($p, $pDictionary)){
 			$time="";
 			if (isset($start)){$time="and `date_created`>='$start' and `date_created`<='$end'";}
 			$data=$query->queryTable("
-			SELECT ngs_samples.id, name, samplename, title, source, organism, molecule, total_reads
+			SELECT ngs_samples.id, name, samplename, title, source, organism, molecule, total_reads, barcode, description, avg_insert_size, read_length, concentration, time, biological_replica, technical_replica, spike_ins, adapter,
+            notebook_ref, notes, genotype, library_type, biosample_type, instrument_model, treatment_manufacturer, ngs_samples.owner_id
 			FROM biocore.ngs_samples
             $innerJoin
             $sampleJoin
@@ -155,7 +169,8 @@ if($search != "" && !in_array($p, $pDictionary)){
 			$time="";
 			if (isset($start)){$time="and `date_created`>='$start' and `date_created`<='$end'";}
 			$data=$query->queryTable("
-			SELECT ngs_samples.id, name, samplename, title, source, organism, molecule, total_reads
+			SELECT ngs_samples.id, name, samplename, title, source, organism, molecule, total_reads, barcode, description, avg_insert_size, read_length, concentration, time, biological_replica, technical_replica, spike_ins, adapter,
+            notebook_ref, notes, genotype, library_type, biosample_type, instrument_model, treatment_manufacturer, ngs_samples.owner_id
 			FROM biocore.ngs_samples
             $innerJoin
             $sampleJoin
@@ -170,8 +185,9 @@ if($search != "" && !in_array($p, $pDictionary)){
 			$time="";
 			if (isset($start)){$time="WHERE `date_created`>='$start' and `date_created`<='$end'";}
 			$data=$query->queryTable("
-			SELECT id, experiment_name, summary, design
+			SELECT ngs_experiment_series.id, experiment_name, summary, design, lab, organization, `grant`
 			FROM biocore.ngs_experiment_series
+            $experimentSeriesJoin
 			WHERE biocore.ngs_experiment_series.id
 			IN (SELECT biocore.ngs_samples.series_id FROM biocore.ngs_samples WHERE $searchQuery) $andPerms $time
 			");
@@ -188,8 +204,9 @@ else if (!in_array($p, $pDictionary))
 			$time="";
 			if (isset($start)){$time="WHERE `date_created`>='$start' and `date_created`<='$end'";}
 			$data=$query->queryTable("
-			SELECT id, experiment_name, summary, design
+			SELECT ngs_experiment_series.id, experiment_name, summary, design, lab, organization, `grant`
 			FROM biocore.ngs_experiment_series
+            $experimentSeriesJoin
 			WHERE biocore.ngs_experiment_series.id
 			IN (SELECT biocore.ngs_samples.series_id FROM biocore.ngs_samples $innerJoin WHERE ngs_samples.$q = \"$r\") $andPerms $time
 			");
@@ -199,7 +216,7 @@ else if (!in_array($p, $pDictionary))
 			$time="";
 			if (isset($start)){$time="WHERE `date_created`>='$start' and `date_created`<='$end'";}
 			$data=$query->queryTable("
-			SELECT ngs_lanes.id,name, facility, total_reads, total_samples
+			SELECT ngs_lanes.id,name, facility, total_reads, total_samples, cost, phix_requested, phix_in_lane, notes, owner_id
 			FROM biocore.ngs_lanes
             $laneJoin
 			WHERE biocore.ngs_lanes.id
@@ -211,7 +228,8 @@ else if (!in_array($p, $pDictionary))
 			$time="";
 			if (isset($start)){$time="and `date_created`>='$start' and `date_created`<='$end'";}
 			$data=$query->queryTable("
-			SELECT ngs_samples.id, name, samplename, title, source, organism, molecule, total_reads
+			SELECT ngs_samples.id, name, samplename, title, source, organism, molecule, total_reads, barcode, description, avg_insert_size, read_length, concentration, time, biological_replica, technical_replica, spike_ins, adapter,
+            notebook_ref, notes, genotype, library_type, biosample_type, instrument_model, treatment_manufacturer, ngs_samples.owner_id
 			FROM biocore.ngs_samples
             $innerJoin
             $sampleJoin
@@ -239,7 +257,7 @@ else if (!in_array($p, $pDictionary))
 			$time="";
 			if (isset($start)){$time="WHERE `date_created`>='$start' and `date_created`<='$end'";}
 			$data=$query->queryTable("
-			SELECT ngs_lanes.id,name, facility, total_reads, total_samples
+			SELECT ngs_lanes.id,name, facility, total_reads, total_samples, cost, phix_requested, phix_in_lane, notes, owner_id
 			FROM biocore.ngs_lanes
             $laneJoin
 			WHERE biocore.ngs_lanes.series_id = $q $andPerms $time
@@ -250,7 +268,8 @@ else if (!in_array($p, $pDictionary))
 			$time="";
 			if (isset($start)){$time="and `date_created`>='$start' and `date_created`<='$end'";}
 			$data=$query->queryTable("
-			SELECT ngs_samples.id, name, samplename, title, source, organism, molecule, total_reads
+			SELECT ngs_samples.id, name, samplename, title, source, organism, molecule, total_reads, barcode, description, avg_insert_size, read_length, concentration, time, biological_replica, technical_replica, spike_ins, adapter,
+            notebook_ref, notes, genotype, library_type, biosample_type, instrument_model, treatment_manufacturer, ngs_samples.owner_id
 			FROM biocore.ngs_samples
             $innerJoin
             $sampleJoin
@@ -264,7 +283,8 @@ else if (!in_array($p, $pDictionary))
 			$time="";
 			if (isset($start)){$time="and `date_created`>='$start' and `date_created`<='$end'";}
 			$data=$query->queryTable("
-			SELECT ngs_samples.id, name, samplename, title, source, organism, molecule, total_reads
+			SELECT ngs_samples.id, name, samplename, title, source, organism, molecule, total_reads, barcode, description, avg_insert_size, read_length, concentration, time, biological_replica, technical_replica, spike_ins, adapter,
+            notebook_ref, notes, genotype, library_type, biosample_type, instrument_model, treatment_manufacturer, ngs_samples.owner_id
 			FROM biocore.ngs_samples
             $innerJoin
             $sampleJoin
@@ -279,8 +299,10 @@ else if (!in_array($p, $pDictionary))
 			$time="";
 			if (isset($start)){$time="WHERE `date_created`>='$start' and `date_created`<='$end'";}
 			$data=$query->queryTable("
-			SELECT id, experiment_name, summary, design
-			FROM biocore.ngs_experiment_series $perms $time
+			SELECT ngs_experiment_series.id, experiment_name, summary, design, lab, organization, `grant`
+			FROM biocore.ngs_experiment_series
+            $experimentSeriesJoin
+            $perms $time
 			");
 		}
 		else if($p == "getProtocols")
@@ -298,7 +320,7 @@ else if (!in_array($p, $pDictionary))
 			$time="";
 			if (isset($start)){$time="WHERE `date_created`>='$start' and `date_created`<='$end'";}
 			$data=$query->queryTable("
-			SELECT ngs_lanes.id,name, facility, total_reads, total_samples
+			SELECT ngs_lanes.id,name, facility, total_reads, total_samples, cost, phix_requested, phix_in_lane, notes, owner_id
 			FROM biocore.ngs_lanes
             $laneJoin
             $perms $time
@@ -309,7 +331,8 @@ else if (!in_array($p, $pDictionary))
 			$time="";
 			if (isset($start)){$time="and `date_created`>='$start' and `date_created`<='$end'";}
 			$data=$query->queryTable("
-			SELECT ngs_samples.id, name, samplename, title, source, organism, molecule, total_reads
+			SELECT ngs_samples.id, name, samplename, title, source, organism, molecule, total_reads, barcode, description, avg_insert_size, read_length, concentration, time, biological_replica, technical_replica, spike_ins, adapter,
+            notebook_ref, notes, genotype, library_type, biosample_type, instrument_model, treatment_manufacturer, ngs_samples.owner_id
 			FROM biocore.ngs_samples
             $innerJoin
             $sampleJoin
@@ -469,7 +492,7 @@ else if($p == 'getSingleSample')
 {
 	if (isset($_GET['sample'])){$sample = $_GET['sample'];}
 	$data=$query->queryTable("
-		SELECT id, title
+		SELECT id, name, samplename
 		FROM ngs_samples
 		where id = $sample $andPerms
 	");
@@ -607,7 +630,7 @@ else if($p == 'getSamplesFromName')
 else if ($p == 'getLanesWithSamples')
 {
     $data=$query->queryTable("
-    SELECT ngs_lanes.id
+    SELECT ngs_lanes.id, ngs_lanes.owner_id
     FROM ngs_lanes
     WHERE ngs_lanes.id in (
         SELECT ngs_samples.lane_id

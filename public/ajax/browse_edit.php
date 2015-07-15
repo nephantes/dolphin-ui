@@ -9,6 +9,8 @@ if (!isset($_SESSION) || !is_array($_SESSION)) session_start();
 $query = new dbfuncs();
 
 $p = '';
+$normalized = ['facility', 'source', 'organism', 'molecule', 'lab', 'organization', 'genotype', 'library_type',
+				  'biosample_type', 'instrument_model', 'treatment_manufacturer'];
 
 if (isset($_GET['p'])){$p = $_GET['p'];}
 
@@ -20,17 +22,34 @@ if($p == 'updateDatabase')
 	if (isset($_GET['table'])){$table = $_GET['table'];}
 	if (isset($_GET['value'])){$value = $_GET['value'];}
 	
-	if($type == 'facility' || $type == 'source' || $type == 'organism' || $type == 'molecule'){
+	if(in_array($type, $normalized)){
 		$type_list = json_decode($query->queryTable("SELECT id FROM ngs_".$type." WHERE $type = '$value'"));
 		if($type_list != array()){
-			$data=$query->runSQL("UPDATE $table SET ".$type."_id = ".$type_list[0]->id." WHERE id = $id"); 	
+			if ($type == 'organization'){
+				if(isset(json_decode($query->queryTable("SELECT lab_id FROM ngs_experiment_series WHERE id = $id"))[0]->lab_id)){
+					$lab = json_decode($query->queryTable("SELECT lab FROM ngs_experiment_series LEFT JOIN ngs_lab ON ngs_experiment_series.lab_id = ngs_lab.id WHERE ngs_experiment_series.id = $id"));
+					$query->runSQL("INSERT INTO ngs_organization ($type) VALUES ('$value')");
+					$org_id = json_decode($query->queryTable("SELECT id FROM ngs_organization WHERE $type = '$value'"));
+					$data=$query->runSQL("UPDATE ngs_lab SET lab = '".$lab[0]->lab."', organization_id = ".$org_id[0]->id);
+				}else{
+					$data=0;
+				}
+			}else{
+				$data=$query->runSQL("UPDATE $table SET ".$type."_id = ".$type_list[0]->id." WHERE id = $id"); 	
+			}
 		}else{
-			$query->runSQL("INSERT INTO ngs_".$type." ($type) VALUES ('$value')");
-			$insert_id= json_decode($query->queryTable("SELECT id FROM ngs_".$type." WHERE $type = '$value'"));
-			$data=$query->runSQL("UPDATE $table SET ".$type."_id = '".$insert_id[0]->id."' WHERE id = $id"); 	
-		}
+			if ($type == 'organization'){
+				$query->runSQL("INSERT INTO ngs_".$type." ($type) VALUES ('$value')");
+				$insert_id= json_decode($query->queryTable("SELECT id FROM ngs_".$type." WHERE $type = '$value'"));
+				$data=$query->runSQL("UPDATE $table SET ".$type."_id = '".$insert_id[0]->id."' WHERE id = $id");
+			}else{
+				$query->runSQL("INSERT INTO ngs_".$type." ($type) VALUES ('$value')");
+				$insert_id= json_decode($query->queryTable("SELECT id FROM ngs_".$type." WHERE $type = '$value'"));
+				$data=$query->runSQL("UPDATE $table SET ".$type."_id = '".$insert_id[0]->id."' WHERE id = $id");
+			}
+		}	
 	}else{
-		$data=$query->runSQL("UPDATE $table SET $type = '$value' WHERE id = $id"); 	
+		$data=$query->runSQL("UPDATE $table SET ".$table.".".$type." = '$value' WHERE id = $id"); 	
 	}
 }
 else if($p == 'checkPerms')
@@ -49,7 +68,7 @@ else if($p == 'checkPerms')
 else if($p == 'getDropdownValues')
 {
 	if (isset($_GET['type'])){$type = $_GET['type'];}
-	$data=$query->queryTable("SELECT $type FROM ngs_".$type); 	
+	$data=$query->queryTable("SELECT $type FROM ngs_".$type);
 }
 
 
