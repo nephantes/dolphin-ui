@@ -491,7 +491,7 @@ else if($p == 'getSingleSample')
 {
 	if (isset($_GET['sample'])){$sample = $_GET['sample'];}
 	$data=$query->queryTable("
-		SELECT id, title
+		SELECT id, name, samplename
 		FROM ngs_samples
 		where id = $sample $andPerms
 	");

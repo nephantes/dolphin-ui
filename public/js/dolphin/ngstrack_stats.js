@@ -43,6 +43,7 @@ function generateStreamTable(type, queryData, queryType, qvar, rvar, seg, theSea
 	
 	var data = queryData, html = $.trim($("#template_"+type).html()), template = Mustache.compile(html);
 	var view = function(record, index){
+		//	Samples
 		if (record.source == null) {
 			record.source = '';
 		}
@@ -51,27 +52,6 @@ function generateStreamTable(type, queryData, queryType, qvar, rvar, seg, theSea
 		}
 		if (record.molecule == null) {
 			record.molecule = '';
-		}
-		if (record.facility == null) {
-			record.facility = '';
-		}
-		if (record.total_reads == null) {
-			record.total_reads = '';
-		}
-		if (record.total_samples == null) {
-			record.total_samples = '';
-		}
-		if (record.design == null) {
-			record.design = '';
-		}
-		if (record.lab == null) {
-			record.lab = '';
-		}
-		if (record.organization == null) {
-			record.organization = '';
-		}
-		if (record.grant == null) {
-			record.grant = '';
 		}
 		if (record.genotype == null) {
 			record.genotype = '';
@@ -88,7 +68,79 @@ function generateStreamTable(type, queryData, queryType, qvar, rvar, seg, theSea
 		if (record.treatment_manufacturer == null) {
 			record.treatment_manufacturer = '';
 		}
+		if (record.barcode == null){
+			record.barcode = '';
+		}
+		if (record.description == null){
+			record.description = '';
+		}
+		if (record.avg_insert_size == null){
+			record.avg_insert_size = '';
+		}
+		if (record.read_length == null){
+			record.read_length = '';
+		}
+		if (record.concentration == null){
+			record.concentration = '';
+		}
+		if (record.time == null){
+			record.time = '';
+		}
+		if (record.biological_replica == null){
+			record.biological_replica = '';
+		}
+		if (record.technical_replica == null){
+			record.technical_replica = '';
+		}
+		if (record.spike_ins == null){
+			record.spike_ins = '';
+		}
+		if (record.adapter == null){
+			record.adapter = '';
+		}
+		if (record.notebook_ref == null){
+			record.notebook_ref = '';
+		}
+		
+		//	Lanes
+		if (record.facility == null) {
+			record.facility = '';
+		}
+		if (record.total_reads == null) {
+			record.total_reads = '';
+		}
+		if (record.total_samples == null) {
+			record.total_samples = '';
+		}
+		if (record.cost == null){
+			record.cost = '';
+		}
+		if (record.phix_requested == null){
+			record.phix_requested = '';
+		}
+		if (record.phix_in_lane == null){
+			record.phix_in_lane = '';
+		}
+		
+		//	Experiment Series
+		if (record.design == null) {
+			record.design = '';
+		}
+		if (record.lab == null) {
+			record.lab = '';
+		}
+		if (record.organization == null) {
+			record.organization = '';
+		}
+		if (record.grant == null) {
+			record.grant = '';
+		}
 
+		//	Multiple
+		if (record.notes == null){
+			record.notes = '';
+		}
+		
 		var disabled = 'disabled';
 		var sample_name = '';
 		
@@ -333,117 +385,81 @@ $(function() {
 		reloadBasket();
 	}
 
+	if (phpGrab.theSegment != 'report') {
 	
-
-
-	/*##### PROTOCOLS TABLE #####*/
+		/*##### PROTOCOLS TABLE #####*/
+		
+		var protocolsTable = $('#jsontable_protocols').dataTable();
 	
-	var protocolsTable = $('#jsontable_protocols').dataTable();
-
-	 $.ajax({ type: "GET",
-					 url: BASE_PATH+"/public/ajax/ngsquerydb.php",
-					 data: { p: "getProtocols", type:"Dolphin", q: qvar, r: rvar, seg: segment, search: theSearch, uid: uid, gids: gids},
-					 async: false,
-					 success : function(s)
-					 {
-						protocolsTable.fnClearTable();
-						for(var i = 0; i < s.length; i++) {
-						protocolsTable.fnAddData([
-			s[i].id,
-			"<a href="+BASE_PATH+"\"/search/details/protocols/"+s[i].id+'/'+theSearch+"\">"+s[i].name+"</a>",
-						s[i].growth,
-			s[i].treatment,
-						]);
-						} // End For
-					 }
-			});
-
-	$('.daterange_protocols').daterangepicker(
-			{
-				ranges: {
-					'Today': [moment().subtract('days', 1), moment()],
-					'Yesterday': [moment().subtract('days', 2), moment().subtract('days', 1)],
-					'Last 7 Days': [moment().subtract('days', 6), moment()],
-					'Last 30 Days': [moment().subtract('days', 29), moment()],
-					'This Month': [moment().startOf('month'), moment().endOf('month')],
-					'Last Month': [moment().subtract('month', 1).startOf('month'), moment().subtract('month', 1).endOf('month')],
-					'This Year': [moment().startOf('year'), moment().endOf('year')],
-				},
-				startDate: moment().subtract('days', 29),
-				endDate: moment()
-			},
-	function(start, end) {
-			$.ajax({ type: "GET",
-					 url: BASE_PATH+"/public/ajax/ngsquerydb.php",
-					 data: { p: "getProtocols", q: qvar, r: rvar, seg: segment, uid: uid, gids: gids, search: theSearch, start:start.format('YYYY-MM-DD'), end:end.format('YYYY-MM-DD') },
-					 async: false,
-					 success : function(s)
-					 {
-						protocolsTable.fnClearTable();
-						for(var i = 0; i < s.length; i++) {
-						protocolsTable.fnAddData([
-			s[i].id,
-			"<a href="+BASE_PATH+"\"/search/details/protocols/"+s[i].id+'/'+theSearch+"\">"+s[i].name+"</a>",
-						s[i].growth,
-			s[i].treatment,
-						]);
-						} // End For
-					 }
-			});
-
-	});
-	protocolsTable.fnSort( [ [0,'asc'] ] );
-	//protocolsTable.fnAdjustColumnSizing(true);
+		 $.ajax({ type: "GET",
+						 url: BASE_PATH+"/public/ajax/ngsquerydb.php",
+						 data: { p: "getProtocols", type:"Dolphin", q: qvar, r: rvar, seg: segment, search: theSearch, uid: uid, gids: gids},
+						 async: false,
+						 success : function(s)
+						 {
+							protocolsTable.fnClearTable();
+							for(var i = 0; i < s.length; i++) {
+							protocolsTable.fnAddData([
+				s[i].id,
+				"<a href="+BASE_PATH+"\"/search/details/protocols/"+s[i].id+'/'+theSearch+"\">"+s[i].name+"</a>",
+							s[i].growth,
+				s[i].treatment,
+							]);
+							} // End For
+						 }
+				});
 	
-	/*##### SAMPLES TABLE #####*/
-
-	//var samplesTable = $('#jsontable_samples').dataTable();
-
-	var samplesType = "";
-	if (segment == 'selected') {
-		samplesType = "getSelectedSamples";
-	}
-	else{
-		samplesType = "getSamples";
-	}
-	$.ajax({ type: "GET",
-				url: BASE_PATH+"/public/ajax/ngsquerydb.php",
-				data: { p: samplesType, q: qvar, r: rvar, seg: segment, search: theSearch, uid: uid, gids: gids },
-				async: false,
-				success : function(s)
+		$('.daterange_protocols').daterangepicker(
 				{
-					var changeHTML = '';
-					var hrefSplit = window.location.href.split("/");
-					var typeLocSelected = $.inArray('selected', hrefSplit);
-					var typeLocRerun = $.inArray('rerun', hrefSplit);
-					if (typeLocSelected > 0 || typeLocRerun > 0) {
-						theSearch = '';
-					}
-					
-					var type = 'samples';
-					var queryType = samplesType;
-					generateStreamTable(type, s, queryType, qvar, rvar, segment, theSearch, uid, gids);
-				}
-		});
-
-	$('.daterange_samples').daterangepicker(
-			{
-				ranges: {
-					'Today': [moment().subtract('days', 1), moment()],
-					'Yesterday': [moment().subtract('days', 2), moment().subtract('days', 1)],
-					'Last 7 Days': [moment().subtract('days', 6), moment()],
-					'Last 30 Days': [moment().subtract('days', 29), moment()],
-					'This Month': [moment().startOf('month'), moment().endOf('month')],
-					'Last Month': [moment().subtract('month', 1).startOf('month'), moment().subtract('month', 1).endOf('month')],
-					'This Year': [moment().startOf('year'), moment().endOf('year')],
+					ranges: {
+						'Today': [moment().subtract('days', 1), moment()],
+						'Yesterday': [moment().subtract('days', 2), moment().subtract('days', 1)],
+						'Last 7 Days': [moment().subtract('days', 6), moment()],
+						'Last 30 Days': [moment().subtract('days', 29), moment()],
+						'This Month': [moment().startOf('month'), moment().endOf('month')],
+						'Last Month': [moment().subtract('month', 1).startOf('month'), moment().subtract('month', 1).endOf('month')],
+						'This Year': [moment().startOf('year'), moment().endOf('year')],
+					},
+					startDate: moment().subtract('days', 29),
+					endDate: moment()
 				},
-				startDate: moment().subtract('days', 29),
-				endDate: moment()
-			},
-	function(start, end) {
-			$.ajax({ type: "GET",
+		function(start, end) {
+				$.ajax({ type: "GET",
+						 url: BASE_PATH+"/public/ajax/ngsquerydb.php",
+						 data: { p: "getProtocols", q: qvar, r: rvar, seg: segment, uid: uid, gids: gids, search: theSearch, start:start.format('YYYY-MM-DD'), end:end.format('YYYY-MM-DD') },
+						 async: false,
+						 success : function(s)
+						 {
+							protocolsTable.fnClearTable();
+							for(var i = 0; i < s.length; i++) {
+							protocolsTable.fnAddData([
+				s[i].id,
+				"<a href="+BASE_PATH+"\"/search/details/protocols/"+s[i].id+'/'+theSearch+"\">"+s[i].name+"</a>",
+							s[i].growth,
+				s[i].treatment,
+							]);
+							} // End For
+						 }
+				});
+	
+		});
+		protocolsTable.fnSort( [ [0,'asc'] ] );
+		//protocolsTable.fnAdjustColumnSizing(true);
+		
+		/*##### SAMPLES TABLE #####*/
+	
+		//var samplesTable = $('#jsontable_samples').dataTable();
+	
+		var samplesType = "";
+		if (segment == 'selected') {
+			samplesType = "getSelectedSamples";
+		}
+		else{
+			samplesType = "getSamples";
+		}
+		$.ajax({ type: "GET",
 					url: BASE_PATH+"/public/ajax/ngsquerydb.php",
-					data: { p: samplesType, q: qvar, r: rvar, seg: segment, search: theSearch, uid: uid, gids: gids, start:start.format('YYYY-MM-DD'), end:end.format('YYYY-MM-DD') },
+					data: { p: samplesType, q: qvar, r: rvar, seg: segment, search: theSearch, uid: uid, gids: gids },
 					async: false,
 					success : function(s)
 					{
@@ -459,122 +475,158 @@ $(function() {
 						var queryType = samplesType;
 						generateStreamTable(type, s, queryType, qvar, rvar, segment, theSearch, uid, gids);
 					}
-				});
-	});
-
-	if (phpGrab.theField == "experiments") {
-		reloadBasket();
-	}
-
-	/*##### LANES TABLE #####*/
-
-	//var lanesTable = $('#jsontable_lanes').dataTable();
-
-	$.ajax({ type: "GET",
-					url: BASE_PATH+"/public/ajax/ngsquerydb.php",
-					data: { p: "getLanes", q: qvar, r: rvar, seg: segment, search: theSearch, uid: uid, gids: gids },
-					async: false,
-					success : function(s)
-					{
-						var type = 'lanes';
-						var queryType = "getLanes";
-						generateStreamTable(type, s, queryType, qvar, rvar, segment, theSearch, uid, gids);
-					}
 			});
-
-	$('.daterange_lanes').daterangepicker(
-			{
-				ranges: {
-					'Today': [moment().subtract('days', 1), moment()],
-					'Yesterday': [moment().subtract('days', 2), moment().subtract('days', 1)],
-					'Last 7 Days': [moment().subtract('days', 6), moment()],
-					'Last 30 Days': [moment().subtract('days', 29), moment()],
-					'This Month': [moment().startOf('month'), moment().endOf('month')],
-					'Last Month': [moment().subtract('month', 1).startOf('month'), moment().subtract('month', 1).endOf('month')],
-					'This Year': [moment().startOf('year'), moment().endOf('year')],
+	
+		$('.daterange_samples').daterangepicker(
+				{
+					ranges: {
+						'Today': [moment().subtract('days', 1), moment()],
+						'Yesterday': [moment().subtract('days', 2), moment().subtract('days', 1)],
+						'Last 7 Days': [moment().subtract('days', 6), moment()],
+						'Last 30 Days': [moment().subtract('days', 29), moment()],
+						'This Month': [moment().startOf('month'), moment().endOf('month')],
+						'Last Month': [moment().subtract('month', 1).startOf('month'), moment().subtract('month', 1).endOf('month')],
+						'This Year': [moment().startOf('year'), moment().endOf('year')],
+					},
+					startDate: moment().subtract('days', 29),
+					endDate: moment()
 				},
-				startDate: moment().subtract('days', 29),
-				endDate: moment()
-			},
-	function(start, end) {
-			$.ajax({ type: "GET",
-					 url: BASE_PATH+"/public/ajax/ngsquerydb.php",
-					 data: { p: "getLanes", q: qvar, r: rvar, seg: segment, search: theSearch, uid: uid, gids: gids, start:start.format('YYYY-MM-DD'), end:end.format('YYYY-MM-DD') },
-					 async: false,
-					 success : function(s)
-					 {
-						var type = 'lanes';
-						var queryType = "getLanes";
-						generateStreamTable(type, s, queryType, qvar, rvar, segment, theSearch, uid, gids);
-					 }
-			});
-
-	});
-
-	//lanesTable.fnSort( [ [0,'asc'] ] );
-	//lanesTable.fnAdjustColumnSizing(true);
-
-	if (phpGrab.theField == "experiment_series") {
-		reloadBasket();
-	}
-
-	/*##### SERIES TABLE #####*/
-
-	//var experiment_seriesTable = $('#jsontable_experiment_series').dataTable({responsive: true});
-	$.ajax({ type: "GET",
-					url: BASE_PATH+"/public/ajax/ngsquerydb.php",
-					data: { p: "getExperimentSeries", q: qvar, r: rvar, seg: segment, search: theSearch, uid: uid, gids: gids },
-					async: false,
-					success : function(s)
-					{
-						var type = 'experiments';
-						var queryType = "getExperimentSeries";
-						generateStreamTable(type, s, queryType, qvar, rvar, segment, theSearch, uid, gids);
-					}
-		   });
-
-	$('.daterange_experiment_series').daterangepicker(
-		   {
-			   ranges: {
-				   'Today': [moment().subtract('days', 1), moment()],
-				   'Yesterday': [moment().subtract('days', 2), moment().subtract('days', 1)],
-				   'Last 7 Days': [moment().subtract('days', 6), moment()],
-				   'Last 30 Days': [moment().subtract('days', 29), moment()],
-				   'This Month': [moment().startOf('month'), moment().endOf('month')],
-				   'Last Month': [moment().subtract('month', 1).startOf('month'), moment().subtract('month', 1).endOf('month')],
-				   'This Year': [moment().startOf('year'), moment().endOf('year')],
+		function(start, end) {
+				$.ajax({ type: "GET",
+						url: BASE_PATH+"/public/ajax/ngsquerydb.php",
+						data: { p: samplesType, q: qvar, r: rvar, seg: segment, search: theSearch, uid: uid, gids: gids, start:start.format('YYYY-MM-DD'), end:end.format('YYYY-MM-DD') },
+						async: false,
+						success : function(s)
+						{
+							var changeHTML = '';
+							var hrefSplit = window.location.href.split("/");
+							var typeLocSelected = $.inArray('selected', hrefSplit);
+							var typeLocRerun = $.inArray('rerun', hrefSplit);
+							if (typeLocSelected > 0 || typeLocRerun > 0) {
+								theSearch = '';
+							}
+							
+							var type = 'samples';
+							var queryType = samplesType;
+							generateStreamTable(type, s, queryType, qvar, rvar, segment, theSearch, uid, gids);
+						}
+					});
+		});
+	
+		if (phpGrab.theField == "experiments") {
+			reloadBasket();
+		}
+	
+		/*##### LANES TABLE #####*/
+	
+		//var lanesTable = $('#jsontable_lanes').dataTable();
+	
+		$.ajax({ type: "GET",
+						url: BASE_PATH+"/public/ajax/ngsquerydb.php",
+						data: { p: "getLanes", q: qvar, r: rvar, seg: segment, search: theSearch, uid: uid, gids: gids },
+						async: false,
+						success : function(s)
+						{
+							var type = 'lanes';
+							var queryType = "getLanes";
+							generateStreamTable(type, s, queryType, qvar, rvar, segment, theSearch, uid, gids);
+						}
+				});
+	
+		$('.daterange_lanes').daterangepicker(
+				{
+					ranges: {
+						'Today': [moment().subtract('days', 1), moment()],
+						'Yesterday': [moment().subtract('days', 2), moment().subtract('days', 1)],
+						'Last 7 Days': [moment().subtract('days', 6), moment()],
+						'Last 30 Days': [moment().subtract('days', 29), moment()],
+						'This Month': [moment().startOf('month'), moment().endOf('month')],
+						'Last Month': [moment().subtract('month', 1).startOf('month'), moment().subtract('month', 1).endOf('month')],
+						'This Year': [moment().startOf('year'), moment().endOf('year')],
+					},
+					startDate: moment().subtract('days', 29),
+					endDate: moment()
+				},
+		function(start, end) {
+				$.ajax({ type: "GET",
+						 url: BASE_PATH+"/public/ajax/ngsquerydb.php",
+						 data: { p: "getLanes", q: qvar, r: rvar, seg: segment, search: theSearch, uid: uid, gids: gids, start:start.format('YYYY-MM-DD'), end:end.format('YYYY-MM-DD') },
+						 async: false,
+						 success : function(s)
+						 {
+							var type = 'lanes';
+							var queryType = "getLanes";
+							generateStreamTable(type, s, queryType, qvar, rvar, segment, theSearch, uid, gids);
+						 }
+				});
+	
+		});
+	
+		//lanesTable.fnSort( [ [0,'asc'] ] );
+		//lanesTable.fnAdjustColumnSizing(true);
+	
+		if (phpGrab.theField == "experiment_series") {
+			reloadBasket();
+		}
+	
+		/*##### SERIES TABLE #####*/
+	
+		//var experiment_seriesTable = $('#jsontable_experiment_series').dataTable({responsive: true});
+		$.ajax({ type: "GET",
+						url: BASE_PATH+"/public/ajax/ngsquerydb.php",
+						data: { p: "getExperimentSeries", q: qvar, r: rvar, seg: segment, search: theSearch, uid: uid, gids: gids },
+						async: false,
+						success : function(s)
+						{
+							var type = 'experiments';
+							var queryType = "getExperimentSeries";
+							generateStreamTable(type, s, queryType, qvar, rvar, segment, theSearch, uid, gids);
+						}
+			   });
+	
+		$('.daterange_experiment_series').daterangepicker(
+			   {
+				   ranges: {
+					   'Today': [moment().subtract('days', 1), moment()],
+					   'Yesterday': [moment().subtract('days', 2), moment().subtract('days', 1)],
+					   'Last 7 Days': [moment().subtract('days', 6), moment()],
+					   'Last 30 Days': [moment().subtract('days', 29), moment()],
+					   'This Month': [moment().startOf('month'), moment().endOf('month')],
+					   'Last Month': [moment().subtract('month', 1).startOf('month'), moment().subtract('month', 1).endOf('month')],
+					   'This Year': [moment().startOf('year'), moment().endOf('year')],
+				   },
+				   startDate: moment().subtract('days', 29),
+				   endDate: moment()
 			   },
-			   startDate: moment().subtract('days', 29),
-			   endDate: moment()
-		   },
-   function(start, end) {
-		   $.ajax({ type: "GET",
-					url: BASE_PATH+"/public/ajax/ngsquerydb.php",
-					data: { p: "getExperimentSeries", q: qvar, r: rvar, seg: segment, search: theSearch, uid: uid, gids: gids, start:start.format('YYYY-MM-DD'), end:end.format('YYYY-MM-DD') },
-					async: false,
-					success : function(s)
-					{
-					   experiment_seriesTable.fnClearTable();
-					   for(var i = 0; i < s.length; i++) {
-					   experiment_seriesTable.fnAddData([
-		   s[i].id,
-		   "<a href="+BASE_PATH+"\"/search/details/experiment_series/"+s[i].id+'/'+theSearch+"\">"+s[i].experiment_name+"</a>",
-					   s[i].summary,
-					   s[i].design,
-					   ]);
-					   } // End For
-					}
-			});
-
-	});
-
-	//experiment_seriesTable.fnSort( [ [0,'asc'] ] );
-	//experiment_seriesTable.fnAdjustColumnSizing(true);
-
-	if (segment == 'index' || segment == 'browse' || segment == 'details') {
-		checkOffAllSamples();
-		checkOffAllLanes();
-		reloadBasket();
+	   function(start, end) {
+			   $.ajax({ type: "GET",
+						url: BASE_PATH+"/public/ajax/ngsquerydb.php",
+						data: { p: "getExperimentSeries", q: qvar, r: rvar, seg: segment, search: theSearch, uid: uid, gids: gids, start:start.format('YYYY-MM-DD'), end:end.format('YYYY-MM-DD') },
+						async: false,
+						success : function(s)
+						{
+						   experiment_seriesTable.fnClearTable();
+						   for(var i = 0; i < s.length; i++) {
+						   experiment_seriesTable.fnAddData([
+			   s[i].id,
+			   "<a href="+BASE_PATH+"\"/search/details/experiment_series/"+s[i].id+'/'+theSearch+"\">"+s[i].experiment_name+"</a>",
+						   s[i].summary,
+						   s[i].design,
+						   ]);
+						   } // End For
+						}
+				});
+	
+		});
+	
+		//experiment_seriesTable.fnSort( [ [0,'asc'] ] );
+		//experiment_seriesTable.fnAdjustColumnSizing(true);
+	
+		if (segment == 'index' || segment == 'browse' || segment == 'details') {
+			checkOffAllSamples();
+			checkOffAllLanes();
+			reloadBasket();
+		}
 	}
 });
 

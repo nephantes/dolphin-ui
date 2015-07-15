@@ -211,7 +211,8 @@ function getSingleSample(sampleID){
 		{
 			if (s[0] != undefined) {
 				sample_info.push(s[0].id);
-				sample_info.push(s[0].title);
+                sample_info.push(s[0].samplename)
+				sample_info.push(s[0].name);
 			}
 		}
 	});
