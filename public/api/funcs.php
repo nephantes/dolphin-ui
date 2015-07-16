@@ -33,8 +33,8 @@ class funcs
     function getKey()
     {
         $characters = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
-        $wkey       = '';
-        $ret        = '';
+        $wkey       = "";
+        $ret        = "";
         for ($i = 0; $i < 30; $i++) {
             $wkey .= $characters[rand(0, strlen($characters))];
         }
@@ -116,7 +116,7 @@ class funcs
             $com = "ps -ef|grep \"[[:space:]]" . $job_num . "[[:space:]]\"|awk '{print \$8\"\\t\"\$1}'";
         }
         $retval = $this->syscall($com);
-        while (eregi("is not found", $retval)) {
+        while (preg_match('/is not found/', $retval)) {
             $retval = $this->syscall($com);
         }
         if ($retval == "") {
@@ -162,7 +162,7 @@ class funcs
                     # If it doesn't turn Error and if job is working it turns wkey to che
                     $retval = $this->checkJobInCluster($wkey, $row['job_num'], $row['username']);
                     
-                    if (eregi("^EXIT", $retval)) {
+                    if (preg_match('/^EXIT/', $retval)) {
                         $sql    = "SELECT j.jobname, jo.jobout FROM jobs j, jobsout jo where j.wkey=jo.wkey and j.job_num=jo.jobnum and j.job_num=" . $row['job_num'] . " and jo.wkey='$wkey'";
                         $resout = $this->runSQL($sql);
                         $rowout = $resout->fetch_assoc();
@@ -172,7 +172,7 @@ class funcs
                         $jobout = $h2t->get_text();
                         return 'ERROR:' . $retval . "\n" . $rowout['jobname'] . " Failed\nCheck LSF output\n" . $jobout;
                     }
-                    if (eregi("DONE", $retval)) {
+                    if (preg_match('/DONE/', $retval)) {
                         $jn     = rtrim(substr($retval, 5));
                         $sql    = "select * from jobs where result=3 and job_num='" . $jn . "' and wkey='$wkey'";
                         $result = $this->runSQL($sql);
@@ -372,7 +372,7 @@ class funcs
                     }
                     $retval = $this->syscall($com);
                     
-                    if (eregi("Error", $retval)) {
+                    if (preg_match('/Error/', $retval)) {
                         return "ERROR: $retval";
                     }
                     #return $com;
@@ -398,7 +398,7 @@ class funcs
                 $username = $row[0];
                 $jobnum   = $row[1];
                 $retval   = $this->checkJobInCluster($wkey, $jobnum, $username);
-                if (eregi("^EXIT", $retval)) {
+                if (preg_match('/^EXIT/', $retval)) {
                     $ret = 0;
                 }
             }
