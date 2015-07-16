@@ -55,7 +55,8 @@ function editBox(uid, id, type, table, element){
 			input.setAttribute('type', 'text');
 			input.setAttribute('name', 'comboboxfieldname');
 			input.setAttribute('id','cb_identifier');
-			input.setAttribute('class','cb_identifier')
+			input.setAttribute('class','cb_identifier');
+			input.value = element_highlighted_value;
 			
 			var button = document.createElement('button');
 			button.setAttribute('class', 'btn btn-default btn-group pull-right')

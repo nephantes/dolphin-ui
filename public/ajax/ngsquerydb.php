@@ -64,7 +64,7 @@ $laneJoin = "LEFT JOIN ngs_facility
 $experimentSeriesJoin = "LEFT JOIN ngs_lab
                         ON ngs_experiment_series.lab_id = ngs_lab.id
                         LEFT JOIN ngs_organization
-                        ON ngs_lab.organization_id = ngs_organization.id";
+                        ON ngs_experiment_series.organization_id = ngs_organization.id";
 
 if (isset($_GET['start'])){$start = $_GET['start'];}
 if (isset($_GET['end'])){$end = $_GET['end'];}
