@@ -68,7 +68,7 @@ class Pipeline{
 		$ret=$myClass->startWorkflow($params['inputparam'], $params['defaultparam'], 
 				             $params['username'], $params['workflow'], $wkey, $status, 
                                              $params['outdir'], $params['services']);
-                if(eregi("^ERROR", $ret))
+                if(preg_match('/^ERROR/', $ret))
                 {
                     return $ret;
                 }

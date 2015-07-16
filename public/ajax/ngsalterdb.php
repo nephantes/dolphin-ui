@@ -9,8 +9,16 @@ require_once("../../includes/dbfuncs.php");
 $query = new dbfuncs();
 //header
 
-if (isset($_POST['p'])){$p = $_POST['p'];}
+function runCmd($idKey, $query)
+{
+	 $cmd = "cd ../../scripts && mkdir -p ../tmp/logs/run$idKey && python dolphin_wrapper.py -r $idKey -c ".CONFIG.">> ../tmp/logs/run$idKey/run.$idKey.wrapper.std 2>&1 & echo $! &";
+	 $PID = shell_exec( $cmd );
+	 $PID = preg_replace('/\R+/','',$PID);
+	 $sql = "UPDATE ngs_runparams SET wrapper_pid='$PID' WHERE id='$idKey'";
+	 $data=$query->runSQL($sql);
+}
 
+if (isset($_POST['p'])){$p = $_POST['p'];}
 if (isset($_POST['start'])){$start = $_POST['start'];}
 if (isset($_POST['end'])){$end = $_POST['end'];}
 
@@ -36,8 +44,7 @@ if ($p == "submitPipeline" )
         WHERE outdir = '$outdir'
         ");
         $idKey=$query->queryAVal("SELECT id FROM ngs_runparams WHERE outdir = '$outdir' limit 1");
-        $cmd = "cd ../../scripts && echo 'Re-run started($idKey)' >> ../tmp/run.log && python dolphin_wrapper.py -r $idKey -c ".CONFIG.">> ../tmp/run.log 2>&1 & echo $! &";
-        pclose(popen( $cmd, "r"));
+        runCmd($idKey, $query);
         $data=$idKey;
     }else{
         //run_group_id set to -1 as a placeholder.Cannot grab primary key as it's being made, so a placeholder is needed.
@@ -47,9 +54,8 @@ if ($p == "submitPipeline" )
         VALUES (-1, '$outdir', 0, $barcode, '$json', '$name', '$desc',
         $uid, NULL, 3, now(), now(), $uid)");
         //need to grab the id for runlist insertion
-            $idKey=$query->queryAVal("SELECT id FROM ngs_runparams WHERE run_group_id = -1 and run_name = '$name' order by id desc limit 1");
-            $cmd = "cd ../../scripts && echo 'Re-run started($idKey)' >> ../tmp/run.log && python dolphin_wrapper.py -r $idKey -c ".CONFIG.">> ../tmp/run.log 2>&1 & echo $! &";
-            pclose(popen( $cmd, "r"));
+        $idKey=$query->queryAVal("SELECT id FROM ngs_runparams WHERE run_group_id = -1 and run_name = '$name' order by id desc limit 1");
+        runCmd($idKey, $query);
         //update required to make run_group_id equal to it's primary key "id".Replace the arbitrary -1 with the id
         if (isset($_POST['runid'])){$runGroupID = $_POST['runid'];}
         if( $runGroupID == 'new'){
@@ -105,8 +111,7 @@ else if ($p == 'noAddedParamsRerun')
     FROM ngs_runparams
     WHERE id = $run_id limit 1
     ");
-    $cmd = "cd ../../scripts && echo 'Re-run started($run_id)' >> ../tmp/run.log && python dolphin_wrapper.py -r $run_id -c ".CONFIG.">> ../tmp/run.log 2>&1 & echo $! &";
-    pclose(popen( $cmd, "r"));
+    runCmd($run_id, $query);  
 }
 else if($p == 'updateProfile')
 {

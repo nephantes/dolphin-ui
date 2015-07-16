@@ -54,7 +54,11 @@ class Dolphin:
           db.commit()
           db.close()
         return results
-    
+
+    def updatePID(self, rpid, pid):
+        sql = "UPDATE ngs_runparams SET runworkflow_pid='%s' WHERE id='%s'"%(pid, rpid)
+        return self.runSQL(sql)
+ 
     def getRunParamsID(self, rpid):
         rpstr="";
         if (rpid > 0):
@@ -511,7 +515,7 @@ def main():
 
         dolphin=Dolphin(params_section)
 
-        logging.basicConfig(filename=logdir+'/'+rpid+'.log', filemode='w',format='%(asctime)s %(message)s', datefmt='%m/%d/%Y %I:%M:%S %p', level=logging.DEBUG)
+        logging.basicConfig(filename=logdir+'/run'+str(rpid)+'/run.'+str(rpid)+'.'+str(os.getpid())+'.log', filemode='w',format='%(asctime)s %(message)s', datefmt='%m/%d/%Y %I:%M:%S %p', level=logging.DEBUG)
 
         if (not rpid):
            rpid=-1
@@ -614,6 +618,7 @@ def main():
            print dolphin.cmd % locals()
            print "\n\n\n"
            p = subprocess.Popen(dolphin.cmd % locals(), shell=True, stdout=subprocess.PIPE)
+           dolphin.updatePID(runparamsid, p.pid)
 
            for line in p.stdout:
               print(str(line.rstrip()))
