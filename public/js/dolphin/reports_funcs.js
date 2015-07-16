@@ -168,6 +168,7 @@ function showTable(type){
 	var objList;
 	
 	if (type == 'initial_mapping') {
+		console.log(BASE_PATH + "/public/api/?source=" + API_PATH + '/public/pub/' + wkey + '/' + temp_currentResultSelection);
 		temp_currentResultSelection = 'counts/' + currentResultSelection + '.counts.tsv&fields=id,' + lib_checklist.toString();
 	}else if (type == 'RSEM'){
 		temp_currentResultSelection = currentResultSelection;
@@ -500,7 +501,11 @@ $(function() {
 			success : function(s)
 			{
 				for(var x  = 0; x < s.length; x++){
-					libraries.push(s[x].name);
+					if (s[x].samplename == null) {
+						libraries.push(s[x].name);
+					}else{
+						libraries.push(s[x].samplename);
+					}
 				}
 				for(var x  = 0; x < s.length; x++){
 					samplenames.push(s[x].samplename);
