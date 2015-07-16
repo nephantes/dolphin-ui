@@ -188,7 +188,7 @@ function showTable(type){
 	
 	if(currentResultSelection.split(".")[currentResultSelection.split(".").length - 1] == "tsv" || currentResultSelection.substring(currentResultSelection.length - 3, currentResultSelection.length) == "RNA" || currentResultSelection == 'ercc'){
 		var masterDiv = document.getElementById(type+'_exp_body');
-		var tableDiv = createElement('div', ['id', 'class'], [type+'_table_div', 'panel panel-default margin']);
+		var tableDiv = createElement('div', ['id', 'class', 'style'], [type+'_table_div', 'panel panel-default margin', 'overflow-x:scroll']);
 		var selectDiv = document.getElementById('select_'+type+'_div');
 		if (document.getElementById('jsontable_' + type + '_results') == null) {
 			var previous_button = false;
@@ -209,7 +209,7 @@ function showTable(type){
 			document.getElementById(type+'_table_div').remove();
 			document.getElementById('template_'+type).remove();
 			
-			tableDiv = createElement('div', ['id', 'class'], [type+'_table_div', 'panel panel-default margin']);
+			tableDiv = createElement('div', ['id', 'class', 'style'], [type+'_table_div', 'panel panel-default margin', 'overflow-x:scroll']);
 			var table = generateSelectionTable(keys, type);
 			tableDiv.appendChild(table)
 			masterDiv.appendChild(tableDiv);
@@ -573,6 +573,7 @@ $(function() {
 		//Initial Mapping Results
 		var reports_table = $('#jsontable_initial_mapping').dataTable();
 		reports_table.fnClearTable();
+		document.getElementById('jsontable_initial_mapping').setAttribute('style','overflow-x:scroll');
 		for (var x = 0; x < (table_array.length); x++) {
 			var row_array = table_array[x];
 			var reads_total = row_array[1];
