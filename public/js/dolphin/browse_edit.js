@@ -11,6 +11,9 @@ var element_highlighted_id;
 var element_highlighted_type;
 var element_highlighted_onclick;
 
+var lanePerms = [];
+var samplePerms = [];
+
 var normalized = ['facility', 'source', 'organism', 'molecule', 'lab', 'organization', 'genotype', 'library_type',
 				  'biosample_type', 'instrument_model', 'treatment_manufacturer'];
 
@@ -52,7 +55,8 @@ function editBox(uid, id, type, table, element){
 			input.setAttribute('type', 'text');
 			input.setAttribute('name', 'comboboxfieldname');
 			input.setAttribute('id','cb_identifier');
-			input.setAttribute('class','cb_identifier')
+			input.setAttribute('class','cb_identifier');
+			input.value = element_highlighted_value;
 			
 			var button = document.createElement('button');
 			button.setAttribute('class', 'btn btn-default btn-group pull-right')
@@ -130,13 +134,64 @@ function submitChanges(ele) {
 	}
 }
 
-function removeSampleOrLane(type, id){
-	if (type == 'lanes') {
-		
-	}else{
-		
-	}
+function deleteButton(){
+	$('#deleteModal').modal({
+		show: true
+	});
+	$.ajax({ type: "GET",
+			url: BASE_PATH+"/public/ajax/browse_edit.php",
+			data: { p: 'getLanePermissions', lanes: checklist_lanes.toString() },
+			async: false,
+			success : function(s)
+			{
+				for(var x = 0; x < s.length; x++){
+					lanePerms.push(s[x].id);
+				}
+			}
+	});
+	
+	$.ajax({ type: "GET",
+			url: BASE_PATH+"/public/ajax/browse_edit.php",
+			data: { p: 'getSamplePermissions', samples: checklist_samples.toString() },
+			async: false,
+			success : function(s)
+			{
+				for(var x = 0; x < s.length; x++){
+					samplePerms.push(s[x].id);
+				}
+			}
+	});
+	
+	document.getElementById('deleteLabel').innerHTML ='You have permission to delete the following:';
+	document.getElementById('deleteAreas').innerHTML = 'Imports: '+ lanePerms.toString() + '<br>Samples: ' + samplePerms.toString() + '<br><br>Data is not recoverable, please make sure you want to delete these.';
+
+}
+
+function confirmDeletePressed(){
+	console.log('confirm');
+	
+	$.ajax({ type: "GET",
+			url: BASE_PATH+"/public/ajax/browse_edit.php",
+			data: { p: 'deleteSelected', samples: samplePerms.toString(), lanes: lanePerms.toString() },
+			async: false,
+			success : function(s)
+			{
+				
+			}
+	});
+	
+	lanePerms = [];
+	samplePerms = [];
+	
+	flushBasketInfo();
+	
 	location.reload();
+}
+
+function cancelDeletePressed(){
+	console.log('cancel');
+	lanePerms = [];
+	samplePerms = [];
 }
 
 function clearElementHighlighted(){

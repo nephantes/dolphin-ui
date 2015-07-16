@@ -1,4 +1,29 @@
 		<!-- Content Header (Page header) -->
+				<div class="modal fade" id="deleteModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+					<div class="modal-dialog">
+					  <div class="modal-content">
+						<div class="modal-header">
+						  <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+						  <h4 class="modal-title" id="myModalLabel">Delete Selected</h4>
+						</div>
+						<form name="editForm" role="form" method="post">
+							<div class="modal-body">
+								<fieldset>
+									<div class="form-group">
+										<label id="deleteLabel"></label>
+										<br>
+										<p id="deleteAreas"></p>
+									</div>
+								</fieldset>   
+							</div>
+							<div class="modal-footer">
+							  <button type="button" class="btn btn-danger" data-dismiss="modal" onclick="confirmDeletePressed()">Confirm</button>
+							  <button type="button" class="btn btn-default" data-dismiss="modal" onclick="cancelDeletePressed()">Cancel</button>
+							</div>
+						</form>
+					  </div>
+					</div>
+				</div><!-- End Delete modal -->
 				<section class="content-header">
 					<h1>
 						NGS Browser
