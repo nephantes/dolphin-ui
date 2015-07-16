@@ -25,28 +25,11 @@ if($p == 'updateDatabase')
 	if(in_array($type, $normalized)){
 		$type_list = json_decode($query->queryTable("SELECT id FROM ngs_".$type." WHERE $type = '$value'"));
 		if($type_list != array()){
-			if ($type == 'organization'){
-				if(isset(json_decode($query->queryTable("SELECT lab_id FROM ngs_experiment_series WHERE id = $id"))[0]->lab_id)){
-					$lab = json_decode($query->queryTable("SELECT lab FROM ngs_experiment_series LEFT JOIN ngs_lab ON ngs_experiment_series.lab_id = ngs_lab.id WHERE ngs_experiment_series.id = $id"));
-					$query->runSQL("INSERT INTO ngs_organization ($type) VALUES ('$value')");
-					$org_id = json_decode($query->queryTable("SELECT id FROM ngs_organization WHERE $type = '$value'"));
-					$data=$query->runSQL("UPDATE ngs_lab SET lab = '".$lab[0]->lab."', organization_id = ".$org_id[0]->id);
-				}else{
-					$data=0;
-				}
-			}else{
-				$data=$query->runSQL("UPDATE $table SET ".$type."_id = ".$type_list[0]->id." WHERE id = $id"); 	
-			}
+			$data=$query->runSQL("UPDATE $table SET ".$type."_id = ".$type_list[0]->id." WHERE id = $id"); 	
 		}else{
-			if ($type == 'organization'){
-				$query->runSQL("INSERT INTO ngs_".$type." ($type) VALUES ('$value')");
-				$insert_id= json_decode($query->queryTable("SELECT id FROM ngs_".$type." WHERE $type = '$value'"));
-				$data=$query->runSQL("UPDATE $table SET ".$type."_id = '".$insert_id[0]->id."' WHERE id = $id");
-			}else{
-				$query->runSQL("INSERT INTO ngs_".$type." ($type) VALUES ('$value')");
-				$insert_id= json_decode($query->queryTable("SELECT id FROM ngs_".$type." WHERE $type = '$value'"));
-				$data=$query->runSQL("UPDATE $table SET ".$type."_id = '".$insert_id[0]->id."' WHERE id = $id");
-			}
+			$query->runSQL("INSERT INTO ngs_".$type." ($type) VALUES ('$value')");
+			$insert_id= json_decode($query->queryTable("SELECT id FROM ngs_".$type." WHERE $type = '$value'"));
+			$data=$query->runSQL("UPDATE $table SET ".$type."_id = '".$insert_id[0]->id."' WHERE id = $id");
 		}	
 	}else{
 		$data=$query->runSQL("UPDATE $table SET ".$table.".".$type." = '$value' WHERE id = $id"); 	

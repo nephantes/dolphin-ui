@@ -1039,7 +1039,6 @@ class series extends main{
 		
 		$returned_sql = $this->model->query($sql);
 		$experiment_id = $this->getId();
-		$organization_id;
 		
 		//	Organization
 		if($this->organization != NULL || $this->organization != ''){
@@ -1051,11 +1050,12 @@ class series extends main{
 				//	Empty
 				$this->model->query("INSERT INTO `ngs_organization` (`organization`) VALUES ('".$this->organization."')");
 				$id = json_decode($this->model->query("SELECT `id` FROM `ngs_organization` WHERE `organization` = '".$this->organization."'"));
+				$this->model->query("UPDATE `ngs_experiment_series` SET `organization_id` = ".$id[0]->id." WHERE `id` = $experiment_id");
 			}else{
 				//	Exists
 				$id = json_decode($this->model->query("SELECT `id` FROM `ngs_organization` WHERE `organization` = '".$this->organization."'"));
+				$this->model->query("UPDATE `ngs_experiment_series` SET `organization_id` = ".$id[0]->id." WHERE `id` = $experiment_id");
 			}
-			$organization_id = $id[0]->id;
 		}
 		
 		//	Lab
@@ -1066,7 +1066,7 @@ class series extends main{
 			$check_result = json_decode($this->model->query($check));
 			if($check_result == array()){
 				//	Empty
-				$this->model->query("INSERT INTO `ngs_lab` (`lab`, `organization_id`) VALUES ('".$this->lab."', $organization_id)");
+				$this->model->query("INSERT INTO `ngs_lab` (`lab`) VALUES ('".$this->lab."')");
 				$id = json_decode($this->model->query("SELECT `id` FROM `ngs_lab` WHERE `lab` = '".$this->lab."'"));
 				$this->model->query("UPDATE `ngs_experiment_series` SET `lab_id` = ".$id[0]->id." WHERE `id` = $experiment_id");
 			}else{
@@ -1093,7 +1093,6 @@ class series extends main{
 		
 		$returned_sql = $this->model->query($sql);
 		$experiment_id = $this->getId();
-		$organization_id;
 		
 		//	Organization
 		if($this->organization != NULL || $this->organization != ''){
@@ -1105,11 +1104,12 @@ class series extends main{
 				//	Empty
 				$this->model->query("INSERT INTO `ngs_organization` (`organization`) VALUES ('".$this->organization."')");
 				$id = json_decode($this->model->query("SELECT `id` FROM `ngs_organization` WHERE `organization` = '".$this->organization."'"));
+				$this->model->query("UPDATE `ngs_experiment_series` SET `organization_id` = ".$id[0]->id." WHERE `id` = $experiment_id");
 			}else{
 				//	Exists
 				$id = json_decode($this->model->query("SELECT `id` FROM `ngs_organization` WHERE `organization` = '".$this->organization."'"));
+				$this->model->query("UPDATE `ngs_experiment_series` SET `organization_id` = ".$id[0]->id." WHERE `id` = $experiment_id");
 			}
-			$organization_id = $id[0]->id;
 		}
 		
 		//	Lab
@@ -1120,7 +1120,7 @@ class series extends main{
 			$check_result = json_decode($this->model->query($check));
 			if($check_result == array()){
 				//	Empty
-				$this->model->query("INSERT INTO `ngs_lab` (`lab`, `organization_id`) VALUES ('".$this->lab."', $organization_id)");
+				$this->model->query("INSERT INTO `ngs_lab` (`lab`) VALUES ('".$this->lab."')");
 				$id = json_decode($this->model->query("SELECT `id` FROM `ngs_lab` WHERE `lab` = '".$this->lab."'"));
 				$this->model->query("UPDATE `ngs_experiment_series` SET `lab_id` = ".$id[0]->id." WHERE `id` = $experiment_id");
 			}else{
