@@ -56,7 +56,7 @@ class Dolphin:
         return results
 
     def updatePID(self, rpid, pid):
-        sql = "UPDATE ngs_runparams SET runworkflow_pid='%s' WHERE id='%s'"%(pid, rpid)
+        sql = "UPDATE ngs_runparams SET wrapper_pid='%s',runworkflow_pid='%s' WHERE id='%s'"%(os.getpid(), pid, rpid)
         return self.runSQL(sql)
  
     def getRunParamsID(self, rpid):
@@ -618,7 +618,7 @@ def main():
            print dolphin.cmd % locals()
            print "\n\n\n"
            p = subprocess.Popen(dolphin.cmd % locals(), shell=True, stdout=subprocess.PIPE)
-           dolphin.updatePID(runparamsid, p.pid)
+           #dolphin.updatePID(runparamsid, p.pid)
 
            for line in p.stdout:
               print(str(line.rstrip()))

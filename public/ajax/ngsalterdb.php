@@ -12,10 +12,7 @@ $query = new dbfuncs();
 function runCmd($idKey, $query)
 {
 	 $cmd = "cd ../../scripts && mkdir -p ../tmp/logs/run$idKey && python dolphin_wrapper.py -r $idKey -c ".CONFIG.">> ../tmp/logs/run$idKey/run.$idKey.wrapper.std 2>&1 & echo $! &";
-	 $PID = shell_exec( $cmd );
-	 $PID = preg_replace('/\R+/','',$PID);
-	 $sql = "UPDATE ngs_runparams SET wrapper_pid='$PID' WHERE id='$idKey'";
-	 $data=$query->runSQL($sql);
+	 $PID =pclose(popen( $cmd, "r" ) );
 }
 
 if (isset($_POST['p'])){$p = $_POST['p'];}
