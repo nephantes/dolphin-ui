@@ -70,7 +70,33 @@ else if($p == 'getDropdownValues')
 	if (isset($_GET['type'])){$type = $_GET['type'];}
 	$data=$query->queryTable("SELECT $type FROM ngs_".$type);
 }
-
+else if($p == 'getLanePermissions')
+{
+	if (isset($_GET['lanes'])){$lanes = $_GET['lanes'];}
+	$data=$query->queryTable("SELECT id FROM ngs_lanes WHERE id IN ($lanes) AND owner_id = ".$_SESSION['uid']);
+}
+else if($p == 'getSamplePermissions')
+{
+	if (isset($_GET['samples'])){$samples = $_GET['samples'];}
+	$data=$query->queryTable("SELECT id FROM ngs_samples WHERE id IN ($samples) AND owner_id = ".$_SESSION['uid']);
+}
+else if($p == 'deleteSelected')
+{
+	if (isset($_GET['samples'])){$samples = $_GET['samples'];}
+	if (isset($_GET['lanes'])){$lanes = $_GET['lanes'];}
+	
+	//	LANES
+	$query->runSQL("DELETE FROM ngs_temp_lane_files WHERE lane_id IN ($lanes)");
+	$query->runSQL("DELETE FROM ngs_lanes WHERE id IN ($lanes)");
+	$query->runSQL("DELETE FROM ngs_samples WHERE lane_id IN ($lanes)");
+	$query->runSQL("DELETE FROM ngs_fastq_files WHERE lane_id IN ($lanes)");
+	
+	//	SAMPLES
+	$query->runSQL("DELETE FROM ngs_samples WHERE id IN ($samples)");
+	$query->runSQL("DELETE FROM ngs_temp_sample_files WHERE sample_id IN ($samples)");
+	$query->runSQL("DELETE FROM ngs_sample_conds WHERE sample_id IN ($samples)");
+	$query->runSQL("DELETE FROM ngs_fastq_files WHERE sample_id IN ($samples)");
+}
 
 header('Cache-Control: no-cache, must-revalidate');
 header('Expires: Mon, 26 Jul 1997 05:00:00 GMT');
