@@ -162,10 +162,27 @@ function deleteButton(){
 			}
 	});
 	
+	var badLanes = [];
+	var badSamples = [];
+	for (var q = 0; q < checklist_lanes.length; q++) {
+		if (lanePerms.indexOf(checklist_lanes[q]) == -1) {
+			badLanes.push(checklist_lanes[q]);
+		}
+	}
+	for (var q = 0; q < checklist_samples.length; q++) {
+		if (samplePerms.indexOf(checklist_samples[q]) == -1) {
+			badSamples.push(checklist_samples[q]);
+		}
+	}
+	
+	console.log(badLanes);
+	console.log(badSamples);
+	
 	document.getElementById('myModalLabel').innerHTML = 'Delete Selected';
 	document.getElementById('deleteLabel').innerHTML ='You have permission to delete the following:';
 	document.getElementById('deleteAreas').innerHTML = 'Imports: '+ lanePerms.toString() + '<br>Samples: ' + samplePerms.toString() +
-		'<br><br>If the Import or Sample you want to delete is not listed above, you do not have the correct permissions to remove them.'+
+		'<br><br>Imports lacking permissions: ' + badLanes.toString() + '<br>Samples lacking permissions: ' + badSamples.toString() +
+		'<br><br>If the Import or Sample you want to delete is not accessible, you do not have the correct permissions to remove them.'+
 		'<br><br>Data is not recoverable, please make sure you want to delete these.';
 		
 	document.getElementById('cancelDeleteButton').innerHTML = "Cancel";
