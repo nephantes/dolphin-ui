@@ -67,6 +67,7 @@ function editBox(uid, id, type, table, element){
 			
 			var div = document.createElement('div');
 			div.setAttribute('class','dropdownlist');
+			div.setAttribute('style','z-index: 999');
 			
 			$.ajax({ type: "GET",
 				url: BASE_PATH+"/public/ajax/browse_edit.php",
