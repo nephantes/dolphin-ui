@@ -108,3 +108,17 @@ function confirmDeleteRunparams(run_id){
             }
    });
 }
+
+function killRun(run_id){
+   $.ajax({
+            type: 	'POST',
+            url: 	BASE_PATH+'/public/ajax/kill_pid.php',
+            data:  	{ p: 'killRun', run_id: run_id },
+            async:	false,
+            success: function(r)
+            {
+               console.log(r);
+               //location.reload();
+            }
+   });
+}
