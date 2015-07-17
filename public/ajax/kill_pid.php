@@ -23,9 +23,14 @@ if($p == 'killRun')
 	
 	$grep_check_workflow = "ps -ef | grep '[".substr($workflow_pid, 0, 1)."]".substr($workflow_pid,1)."'";
 	$grep_check_wrapper = "ps -ef | grep '[".substr($wrapper_pid, 0, 1)."]".substr($wrapper_pid,1)."'";
+	var_dump($grep_check_workflow);
+	var_dump($grep_check_wrapper);
 	
 	$grep_find_workflow = pclose(popen( $grep_check_workflow, "r" ) );
 	$grep_find_wrapper = pclose(popen( $grep_check_wrapper, "r" ) );
+	
+	var_dump($grep_find_workflow);
+	var_dump($grep_find_wrapper);
 	
 	if($grep_find_workflow > 0 && $grep_find_workflow != NULL){
 		pclose(popen( "kill -9 $workflow_pid", "r" ) );
@@ -36,12 +41,12 @@ if($p == 'killRun')
 		$setStatus = "killed";
 	}
 	
-	if($setStatus == "killed"){
-		//$data = $query->queryTable("UPDATE ngs_runparams
-		//					   SET run_status = 5
-		//					   WHERE id = $run_id");
-	}
 	$data = '';
+	if($setStatus == "killed"){
+		$data = $query->queryTable("UPDATE ngs_runparams
+							   SET run_status = 4
+							   WHERE id = $run_id");
+	}
 }
 
 header('Cache-Control: no-cache, must-revalidate');
