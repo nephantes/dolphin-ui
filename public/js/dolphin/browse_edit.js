@@ -163,7 +163,9 @@ function deleteButton(){
 	});
 	
 	document.getElementById('deleteLabel').innerHTML ='You have permission to delete the following:';
-	document.getElementById('deleteAreas').innerHTML = 'Imports: '+ lanePerms.toString() + '<br>Samples: ' + samplePerms.toString() + '<br><br>Data is not recoverable, please make sure you want to delete these.';
+	document.getElementById('deleteAreas').innerHTML = 'Imports: '+ lanePerms.toString() + '<br>Samples: ' + samplePerms.toString() +
+		'<br><br>If the Import or Sample you want to delete is not listed above, you do not have the correct permissions to remove them.'+
+		'<br><br>Data is not recoverable, please make sure you want to delete these.';
 
 }
 
