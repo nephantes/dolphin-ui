@@ -161,8 +161,8 @@ function generateStreamTable(type, queryData, queryType, qvar, rvar, seg, theSea
 		}
 		
 		var deleteButton = "";
-		if (record.owner_id == uid) {
-			//deleteButton = "<button id=\"delete_"+record.id+"\" class=\"btn btn-danger btn-xs\" value=\"Delete\" onclick=\"deleteButton('"+type+"', "+record.id+", this)\">Delete</button>"
+		if (record.owner_id != uid) {
+			deleteButton = "<button id=\"perms_"+record.id+"\" class=\"btn btn-default btn-xs\" value=\"perms\" onclick=\"permsButton('"+type+"', "+record.id+", this)\"><span class=\"fa fa-warning\"></span></button>"
 		}
 		if (tableToggle == 'extend') {
 			if (type == 'samples') {

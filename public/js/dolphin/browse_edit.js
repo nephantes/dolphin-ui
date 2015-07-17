@@ -162,6 +162,7 @@ function deleteButton(){
 			}
 	});
 	
+	document.getElementById('myModalLabel').innerHTML = 'Delete Selected';
 	document.getElementById('deleteLabel').innerHTML ='You have permission to delete the following:';
 	document.getElementById('deleteAreas').innerHTML = 'Imports: '+ lanePerms.toString() + '<br>Samples: ' + samplePerms.toString() +
 		'<br><br>If the Import or Sample you want to delete is not listed above, you do not have the correct permissions to remove them.'+
@@ -170,8 +171,6 @@ function deleteButton(){
 }
 
 function confirmDeletePressed(){
-	console.log('confirm');
-	
 	$.ajax({ type: "GET",
 			url: BASE_PATH+"/public/ajax/browse_edit.php",
 			data: { p: 'deleteSelected', samples: samplePerms.toString(), lanes: lanePerms.toString() },
@@ -190,10 +189,18 @@ function confirmDeletePressed(){
 	location.reload();
 }
 
-function cancelDeletePressed(){
-	console.log('cancel');
+function cancelDeletePressed(){ 
 	lanePerms = [];
 	samplePerms = [];
+}
+
+function permsButton(type, id, button){
+	$('#deleteModal').modal({
+		show: true
+	});
+	document.getElementById('myModalLabel').innerHTML = 'Information';
+	document.getElementById('deleteLabel').innerHTML ='You do not have the correct permissions to remove this Import or Sample.';
+	document.getElementById('deleteAreas').innerHTML = '';
 }
 
 function clearElementHighlighted(){
