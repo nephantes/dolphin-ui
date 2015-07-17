@@ -167,7 +167,9 @@ function deleteButton(){
 	document.getElementById('deleteAreas').innerHTML = 'Imports: '+ lanePerms.toString() + '<br>Samples: ' + samplePerms.toString() +
 		'<br><br>If the Import or Sample you want to delete is not listed above, you do not have the correct permissions to remove them.'+
 		'<br><br>Data is not recoverable, please make sure you want to delete these.';
-
+		
+	document.getElementById('cancelDeleteButton').innerHTML = "Cancel";
+	document.getElementById('confirmDeleteButton').setAttribute('style', 'display:show');
 }
 
 function confirmDeletePressed(){
@@ -201,6 +203,9 @@ function permsButton(type, id, button){
 	document.getElementById('myModalLabel').innerHTML = 'Information';
 	document.getElementById('deleteLabel').innerHTML ='You do not have the correct permissions to remove this Import or Sample.';
 	document.getElementById('deleteAreas').innerHTML = '';
+	
+	document.getElementById('cancelDeleteButton').innerHTML = "OK";
+	document.getElementById('confirmDeleteButton').setAttribute('style', 'display:none');
 }
 
 function clearElementHighlighted(){
