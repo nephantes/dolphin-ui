@@ -196,13 +196,13 @@ function cancelDeletePressed(){
 	samplePerms = [];
 }
 
-function permsButton(type, id, button){
+function initialRunButton(type, id, button){
 	$('#deleteModal').modal({
 		show: true
 	});
 	document.getElementById('myModalLabel').innerHTML = 'Information';
-	document.getElementById('deleteLabel').innerHTML ='You do not have the correct permissions to remove this Import or Sample.';
-	document.getElementById('deleteAreas').innerHTML = '';
+	document.getElementById('deleteLabel').innerHTML ='Initial run has not completed yet.';
+	document.getElementById('deleteAreas').innerHTML = 'If Import/Sample seems to be taking too long to complete, please contact an Admin at biocore@umassmed.edu';
 	
 	document.getElementById('cancelDeleteButton').innerHTML = "OK";
 	document.getElementById('confirmDeleteButton').setAttribute('style', 'display:none');
