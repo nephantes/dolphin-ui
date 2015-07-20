@@ -107,7 +107,6 @@ else if($p == 'deleteSelected')
 	
 	//	INSERT WKEY DATA REMOVAL HERE	//
 	foreach($wkeys as $w){
-		var_dump($w);
 		$cmd = "rm -r $w";
 		pclose(popen( $cmd, "r" ) );
 	}

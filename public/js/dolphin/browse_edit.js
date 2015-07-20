@@ -105,8 +105,6 @@ function editBox(uid, id, type, table, element){
 }
 
 function submitChanges(ele) {
-	console.log(ele);
-	console.log(ele.value);
 	var successBool = false;
     if(event.keyCode == 13 && ele.value != '' && ele.value != null) {
         $.ajax({ type: "GET",
@@ -115,7 +113,6 @@ function submitChanges(ele) {
 					async: false,
 					success : function(r)
 					{
-						console.log(r);
 						if (r == 1) {
 							successBool = true;
 						}
@@ -195,7 +192,6 @@ function confirmDeletePressed(){
 			async: false,
 			success : function(s)
 			{
-				console.log(s);
 			}
 	});
 	
