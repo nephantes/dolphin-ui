@@ -176,9 +176,6 @@ function deleteButton(){
 		}
 	}
 	
-	console.log(badLanes);
-	console.log(badSamples);
-	
 	document.getElementById('myModalLabel').innerHTML = 'Delete Selected';
 	document.getElementById('deleteLabel').innerHTML ='You have permission to delete the following:';
 	document.getElementById('deleteAreas').innerHTML = 'Imports: '+ lanePerms.toString() + '<br>Samples: ' + samplePerms.toString() +
@@ -198,7 +195,7 @@ function confirmDeletePressed(){
 			async: false,
 			success : function(s)
 			{
-				
+				console.log(s);
 			}
 	});
 	
@@ -207,7 +204,7 @@ function confirmDeletePressed(){
 	
 	flushBasketInfo();
 	
-	location.reload();
+	//location.reload();
 }
 
 function cancelDeletePressed(){ 

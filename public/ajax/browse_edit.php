@@ -67,7 +67,7 @@ else if($p == 'deleteSelected')
 {
 	if (isset($_GET['samples'])){$samples = $_GET['samples'];}
 	if (isset($_GET['lanes'])){$lanes = $_GET['lanes'];}
-	
+	/*
 	//	LANES
 	$query->runSQL("DELETE FROM ngs_temp_lane_files WHERE lane_id IN ($lanes)");
 	$query->runSQL("DELETE FROM ngs_fastq_files WHERE lane_id IN ($lanes)");
@@ -81,7 +81,7 @@ else if($p == 'deleteSelected')
 	$query->runSQL("DELETE FROM ngs_sample_conds WHERE sample_id IN ($samples)");
 	$query->runSQL("DELETE FROM ngs_fastq_files WHERE sample_id IN ($samples)");
 	$query->runSQL("DELETE FROM ngs_samples WHERE id IN ($samples)");
-	
+	*/
 	//	WKEY
 	$sample_run_ids=json_decode($query->queryTable("SELECT DISTINCT run_id FROM ngs_runlist WHERE sample_id IN ($samples)"));
 	$lane_run_ids=json_decode($query->queryTable("SELECT DISTINCT run_id FROM ngs_runlist WHERE sample_id IN (SELECT id from ngs_samples WHERE lane_id in ($lanes))"));
@@ -97,9 +97,8 @@ else if($p == 'deleteSelected')
 			array_push($all_run_ids, $lri->run_id);
 		}
 	}
-	
 	$wkeys = array();
-	$wkeys_json = json_decode($query->queryTable("SELECT wkey FROM ngs_runparams WHERE run_id IN (".explode(",", $all_run_ids).")"));
+	$wkeys_json = json_decode($query->queryTable("SELECT wkey FROM ngs_runparams WHERE run_id IN (".implode(",", $all_run_ids).")"));
 	foreach($wkeys_json as $wj){
 		if(!in_array($wj->wkey, $wkeys)){
 			array_push($wkeys, $wj->wkey);
@@ -107,14 +106,18 @@ else if($p == 'deleteSelected')
 	}
 	
 	//	INSERT WKEY DATA REMOVAL HERE	//
-	
+	foreach($wkeys as $w){
+		var_dump($w);
+		$cmd = "rm -r $w";
+		pclose(popen( $cmd, "r" ) );
+	}
 	
 	//	OBTAIN PID IF RUNNING AND REMOVE	//
-	
+	//	Check to make sure this is nessicary	//
 	
 	//	RUNS
-	$query->runSQL("DELETE FROM ngs_runlist WHERE run_id IN (".explode(",", $all_run_ids).")");
-	$query->runSQL("DELETE FROM ngs_runparams WHERE run_id IN (".explode(",", $all_run_ids).")");
+	$query->runSQL("DELETE FROM ngs_runlist WHERE run_id IN (".implode(",", $all_run_ids).")");
+	$query->runSQL("DELETE FROM ngs_runparams WHERE id IN (".implode(",", $all_run_ids).")");
 }
 
 header('Cache-Control: no-cache, must-revalidate');
