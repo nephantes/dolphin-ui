@@ -184,6 +184,7 @@ function deleteButton(){
 	document.getElementById('deleteAreas').innerHTML = 'Imports: '+ lanePerms.toString() + '<br>Samples: ' + samplePerms.toString() +
 		'<br><br>Imports lacking permissions: ' + badLanes.toString() + '<br>Samples lacking permissions: ' + badSamples.toString() +
 		'<br><br>If the Import or Sample you want to delete is not accessible, you do not have the correct permissions to remove them.'+
+		'<br><br>Be Warned! Deleting Imports/Samples will remove data AND runs accross the system, make sure you have a back up of any of the information you might want to save before deleting.'+
 		'<br><br>Data is not recoverable, please make sure you want to delete these.';
 		
 	document.getElementById('cancelDeleteButton').innerHTML = "Cancel";

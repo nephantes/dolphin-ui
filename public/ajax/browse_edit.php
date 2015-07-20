@@ -70,15 +70,51 @@ else if($p == 'deleteSelected')
 	
 	//	LANES
 	$query->runSQL("DELETE FROM ngs_temp_lane_files WHERE lane_id IN ($lanes)");
-	$query->runSQL("DELETE FROM ngs_lanes WHERE id IN ($lanes)");
-	$query->runSQL("DELETE FROM ngs_samples WHERE lane_id IN ($lanes)");
 	$query->runSQL("DELETE FROM ngs_fastq_files WHERE lane_id IN ($lanes)");
+	$query->runSQL("DELETE FROM ngs_temp_sample_files WHERE sample_id IN (SELECT id FROM ngs_samples WHERE lane_id IN ($lanes)");
+	$query->runSQL("DELETE FROM ngs_sample_conds WHERE sample_id IN (SELECT id FROM ngs_samples WHERE lane_id IN ($lanes))");
+	$query->runSQL("DELETE FROM ngs_samples WHERE lane_id IN ($lanes)");
+	$query->runSQL("DELETE FROM ngs_lanes WHERE id IN ($lanes)");
 	
 	//	SAMPLES
-	$query->runSQL("DELETE FROM ngs_samples WHERE id IN ($samples)");
 	$query->runSQL("DELETE FROM ngs_temp_sample_files WHERE sample_id IN ($samples)");
 	$query->runSQL("DELETE FROM ngs_sample_conds WHERE sample_id IN ($samples)");
 	$query->runSQL("DELETE FROM ngs_fastq_files WHERE sample_id IN ($samples)");
+	$query->runSQL("DELETE FROM ngs_samples WHERE id IN ($samples)");
+	
+	//	WKEY
+	$sample_run_ids=json_decode($query->queryTable("SELECT DISTINCT run_id FROM ngs_runlist WHERE sample_id IN ($samples)"));
+	$lane_run_ids=json_decode($query->queryTable("SELECT DISTINCT run_id FROM ngs_runlist WHERE sample_id IN (SELECT id from ngs_samples WHERE lane_id in ($lanes))"));
+	
+	$all_run_ids = array();
+	foreach($sample_run_ids as $sri){
+		if(!in_array($sri->run_id, $all_run_ids)){
+			array_push($all_run_ids, $sri->run_id);
+		}
+	}
+	foreach($lane_run_ids as $lri){
+		if(!in_array($lri->run_id, $all_run_ids)){
+			array_push($all_run_ids, $lri->run_id);
+		}
+	}
+	
+	$wkeys = array();
+	$wkeys_json = json_decode($query->queryTable("SELECT wkey FROM ngs_runparams WHERE run_id IN (".explode(",", $all_run_ids).")"));
+	foreach($wkeys_json as $wj){
+		if(!in_array($wj->wkey, $wkeys)){
+			array_push($wkeys, $wj->wkey);
+		}
+	}
+	
+	//	INSERT WKEY DATA REMOVAL HERE	//
+	
+	
+	//	OBTAIN PID IF RUNNING AND REMOVE	//
+	
+	
+	//	RUNS
+	$query->runSQL("DELETE FROM ngs_runlist WHERE run_id IN (".explode(",", $all_run_ids).")");
+	$query->runSQL("DELETE FROM ngs_runparams WHERE run_id IN (".explode(",", $all_run_ids).")");
 }
 
 header('Cache-Control: no-cache, must-revalidate');
