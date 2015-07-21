@@ -118,7 +118,7 @@ function killRun(run_id){
             success: function(r)
             {
                console.log(r);
-               //location.reload();
+               location.reload();
             }
    });
 }
