@@ -67,7 +67,7 @@ else if($p == 'deleteSelected')
 {
 	if (isset($_GET['samples'])){$samples = $_GET['samples'];}
 	if (isset($_GET['lanes'])){$lanes = $_GET['lanes'];}
-	/*
+	
 	//	LANES
 	$query->runSQL("DELETE FROM ngs_temp_lane_files WHERE lane_id IN ($lanes)");
 	$query->runSQL("DELETE FROM ngs_fastq_files WHERE lane_id IN ($lanes)");
@@ -81,7 +81,7 @@ else if($p == 'deleteSelected')
 	$query->runSQL("DELETE FROM ngs_sample_conds WHERE sample_id IN ($samples)");
 	$query->runSQL("DELETE FROM ngs_fastq_files WHERE sample_id IN ($samples)");
 	$query->runSQL("DELETE FROM ngs_samples WHERE id IN ($samples)");
-	*/
+	
 	//	WKEY
 	$sample_run_ids=json_decode($query->queryTable("SELECT DISTINCT run_id FROM ngs_runlist WHERE sample_id IN ($samples)"));
 	$lane_run_ids=json_decode($query->queryTable("SELECT DISTINCT run_id FROM ngs_runlist WHERE sample_id IN (SELECT id from ngs_samples WHERE lane_id in ($lanes))"));
@@ -100,23 +100,48 @@ else if($p == 'deleteSelected')
 	$wkeys = array();
 	$wkeys_json = json_decode($query->queryTable("SELECT wkey FROM ngs_runparams WHERE run_id IN (".implode(",", $all_run_ids).")"));
 	foreach($wkeys_json as $wj){
-		if(!in_array($wj->wkey, $wkeys)){
+		if(!in_array($wj->wkey, $wkeys) && $wj->wkey != NULL && $wj->wkey != ''){
 			array_push($wkeys, $wj->wkey);
 		}
 	}
 	
 	//	INSERT WKEY DATA REMOVAL HERE	//
+	/*
 	foreach($wkeys as $w){
 		$cmd = "rm -r $w";
 		pclose(popen( $cmd, "r" ) );
 	}
-	
+	*/
 	//	OBTAIN PID IF RUNNING AND REMOVE	//
 	//	Check to make sure this is nessicary	//
 	
+	$workflow_pids = json_decode($query->queryTable("SELECT runworkflow_pid FROM ngs_runparams WHERE run_id IN (".implode(",", $all_run_ids).")"));
+	$wrapper_pids = json_decode($query->queryTable("SELECT wrapper_pid FROM ngs_runparams WHERE run_id IN (".implode(",", $all_run_ids).")"));
+	
+	foreach($workflow_pids as $wp){
+		$cmd = "ps -ef | grep '[".substr($wp->runworkflow_pid, 0, 1)."]".substr($wp->runworkflow_pid, 1)."'";
+		$pid_check = pclose(popen( $cmd, "r" ) );
+		if($pid_check > 0){
+			pclose(popen( "kill -9 ".$wp->runworkflow_pid, "r" ) );
+			$query->runSQL("UPDATE ngs_runparams SET run_status = 4 WHERE runworkflow_pid = ".$wp->runworkflow_pid);
+		}
+	}
+	foreach($wrapper_pids as $wp){
+		$cmd = "ps -ef | grep '[".substr($wp->wrapper_pid, 0, 1)."]".substr($wp->wrapper_pid, 1)."'";
+		$pid_check = pclose(popen( $cmd, "r" ) );
+		if($pid_check > 0){
+			pclose(popen( "kill -9 ".$wp->wrapper_pid, "r" ) );
+			$query->runSQL("UPDATE ngs_runparams SET run_status = 4 WHERE wrapper_pid = ".$wp->wrapper_pid);
+		}
+	}
+	
 	//	RUNS
+	$query->runSQL("UPDATE ngs_runparams SET run_status = 5 WHERE id IN (".implode(",", $all_run_ids).")");
+	//	For now, status is set to 5 to hide runs that no longer have proper imports/samples
+	/*
 	$query->runSQL("DELETE FROM ngs_runlist WHERE run_id IN (".implode(",", $all_run_ids).")");
 	$query->runSQL("DELETE FROM ngs_runparams WHERE id IN (".implode(",", $all_run_ids).")");
+	*/
 }
 
 header('Cache-Control: no-cache, must-revalidate');
