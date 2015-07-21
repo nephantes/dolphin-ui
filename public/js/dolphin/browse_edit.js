@@ -200,7 +200,7 @@ function confirmDeletePressed(){
 	
 	flushBasketInfo();
 	
-	//location.reload();
+	location.reload();
 }
 
 function cancelDeletePressed(){ 
