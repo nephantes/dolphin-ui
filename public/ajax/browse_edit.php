@@ -97,6 +97,7 @@ else if($p == 'deleteSelected')
 			array_push($all_run_ids, $lri->run_id);
 		}
 	}
+	/*
 	$wkeys = array();
 	$wkeys_json = json_decode($query->queryTable("SELECT wkey FROM ngs_runparams WHERE run_id IN (".implode(",", $all_run_ids).")"));
 	foreach($wkeys_json as $wj){
@@ -106,7 +107,6 @@ else if($p == 'deleteSelected')
 	}
 	
 	//	INSERT WKEY DATA REMOVAL HERE	//
-	/*
 	foreach($wkeys as $w){
 		$cmd = "rm -r $w";
 		pclose(popen( $cmd, "r" ) );
