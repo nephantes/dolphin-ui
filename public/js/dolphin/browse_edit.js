@@ -67,6 +67,7 @@ function editBox(uid, id, type, table, element){
 			
 			var div = document.createElement('div');
 			div.setAttribute('class','dropdownlist');
+			div.setAttribute('style','z-index: 999');
 			
 			$.ajax({ type: "GET",
 				url: BASE_PATH+"/public/ajax/browse_edit.php",
@@ -104,8 +105,6 @@ function editBox(uid, id, type, table, element){
 }
 
 function submitChanges(ele) {
-	console.log(ele);
-	console.log(ele.value);
 	var successBool = false;
     if(event.keyCode == 13 && ele.value != '' && ele.value != null) {
         $.ajax({ type: "GET",
@@ -114,7 +113,6 @@ function submitChanges(ele) {
 					async: false,
 					success : function(r)
 					{
-						console.log(r);
 						if (r == 1) {
 							successBool = true;
 						}
@@ -162,21 +160,38 @@ function deleteButton(){
 			}
 	});
 	
+	var badLanes = [];
+	var badSamples = [];
+	for (var q = 0; q < checklist_lanes.length; q++) {
+		if (lanePerms.indexOf(checklist_lanes[q]) == -1) {
+			badLanes.push(checklist_lanes[q]);
+		}
+	}
+	for (var q = 0; q < checklist_samples.length; q++) {
+		if (samplePerms.indexOf(checklist_samples[q]) == -1) {
+			badSamples.push(checklist_samples[q]);
+		}
+	}
+	
+	document.getElementById('myModalLabel').innerHTML = 'Delete Selected';
 	document.getElementById('deleteLabel').innerHTML ='You have permission to delete the following:';
-	document.getElementById('deleteAreas').innerHTML = 'Imports: '+ lanePerms.toString() + '<br>Samples: ' + samplePerms.toString() + '<br><br>Data is not recoverable, please make sure you want to delete these.';
-
+	document.getElementById('deleteAreas').innerHTML = 'Imports: '+ lanePerms.toString() + '<br>Samples: ' + samplePerms.toString() +
+		'<br><br>Imports lacking permissions: ' + badLanes.toString() + '<br>Samples lacking permissions: ' + badSamples.toString() +
+		'<br><br>If the Import or Sample you want to delete is not accessible, you do not have the correct permissions to remove them.'+
+		'<br><br>Be Warned! Deleting Imports/Samples will remove data AND runs accross the system, make sure you have a back up of any of the information you might want to save before deleting.'+
+		'<br><br>Data is not recoverable, please make sure you want to delete these.';
+		
+	document.getElementById('cancelDeleteButton').innerHTML = "Cancel";
+	document.getElementById('confirmDeleteButton').setAttribute('style', 'display:show');
 }
 
 function confirmDeletePressed(){
-	console.log('confirm');
-	
 	$.ajax({ type: "GET",
 			url: BASE_PATH+"/public/ajax/browse_edit.php",
 			data: { p: 'deleteSelected', samples: samplePerms.toString(), lanes: lanePerms.toString() },
 			async: false,
 			success : function(s)
 			{
-				
 			}
 	});
 	
@@ -188,10 +203,21 @@ function confirmDeletePressed(){
 	location.reload();
 }
 
-function cancelDeletePressed(){
-	console.log('cancel');
+function cancelDeletePressed(){ 
 	lanePerms = [];
 	samplePerms = [];
+}
+
+function initialRunButton(type, id, button){
+	$('#deleteModal').modal({
+		show: true
+	});
+	document.getElementById('myModalLabel').innerHTML = 'Information';
+	document.getElementById('deleteLabel').innerHTML ='Initial run has not completed yet.';
+	document.getElementById('deleteAreas').innerHTML = 'If Import/Sample seems to be taking too long to complete, please contact an Admin at biocore@umassmed.edu';
+	
+	document.getElementById('cancelDeleteButton').innerHTML = "OK";
+	document.getElementById('confirmDeleteButton').setAttribute('style', 'display:none');
 }
 
 function clearElementHighlighted(){

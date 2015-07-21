@@ -17,8 +17,8 @@
 								</fieldset>   
 							</div>
 							<div class="modal-footer">
-							  <button type="button" class="btn btn-danger" data-dismiss="modal" onclick="confirmDeletePressed()">Confirm</button>
-							  <button type="button" class="btn btn-default" data-dismiss="modal" onclick="cancelDeletePressed()">Cancel</button>
+							  <button type="button" id="confirmDeleteButton" class="btn btn-danger" data-dismiss="modal" onclick="confirmDeletePressed()">Confirm</button>
+							  <button type="button" id="cancelDeleteButton" class="btn btn-default" data-dismiss="modal" onclick="cancelDeletePressed()">Cancel</button>
 							</div>
 						</form>
 					  </div>

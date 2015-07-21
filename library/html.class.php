@@ -227,9 +227,10 @@ class HTML {
 		$html = '';
 		$html.= '<div class="box">
 						<div class="box-header">
-								<h3 class="box-title">'.$title.'</h3>
-								<div class="pull-right">
-										<button class="btn btn-default" value="'.$table.'" onclick="expandTable(this.value)">
+								<h3 class="box-title">'.$title.'</h3>';
+		$html.= $this->getInfoBox($table);
+		$html.=					'<div class="pull-right">
+										<button class="btn btn-default margin" value="'.$table.'" onclick="expandTable(this.value)">
 										<span class="fa fa-arrows-h"></span>
 										</button>
 								</div>
