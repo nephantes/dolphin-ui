@@ -200,6 +200,8 @@ ADD COLUMN `samplename` VARCHAR(255) NULL DEFAULT NULL AFTER `name`;
 ALTER TABLE `biocore`.`ngs_samples` 
 ADD COLUMN `target_id` INT NULL DEFAULT NULL AFTER `notebook_ref`;
 
+UPDATE `biocore`.`sidebar` SET `link`='stat/status' WHERE `id`='12';
+
 CREATE TABLE `biocore`.`ngs_antibody_target` (
   `id` INT NOT NULL AUTO_INCREMENT,
   `target` VARCHAR(100) NULL DEFAULT NULL,
