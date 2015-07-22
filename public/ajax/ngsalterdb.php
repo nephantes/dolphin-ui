@@ -91,7 +91,7 @@ else if ($p == 'deleteRunparams')
     if (isset($_POST['run_id'])){$run_id = $_POST['run_id'];}
     $data=$query->runSQL("
 	UPDATE ngs_runparams
-    SET run_status=4
+    SET run_status=5
     WHERE id = $run_id
     ");
 }
