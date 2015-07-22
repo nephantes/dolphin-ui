@@ -25,6 +25,7 @@
 					<?php echo $html->getExpandingAnalysisBox('Detailed FastQC Results', "details", false); ?>
 					<?php echo $html->getExpandingAnalysisBox('RSEM Results', "RSEM", false); ?>
 					<?php echo $html->getExpandingAnalysisBox('DESeq Results', "DESEQ", false); ?>
+					<?php echo $html->getExpandingAnalysisBox('Picard Metrics', "picard_Tophat", false); ?>
 				</div>
 				<div class="input margin">
 					<button id="back_to_status" class="btn btn-primary" onclick="sendToStatus()">Return to Status</button>
