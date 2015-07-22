@@ -174,6 +174,8 @@ function showTable(type){
 		temp_currentResultSelection = currentResultSelection;
 	}else if (type == 'DESEQ') {
 		temp_currentResultSelection = currentResultSelection;
+	}else if (type == 'picard_Tophat') {
+		temp_currentResultSelection = currentResultSelection;
 	}
 	
 	$.ajax({ type: "GET",
@@ -411,6 +413,8 @@ function downloadReports(buttonType, type){
 		temp_currentResultSelection = currentResultSelection;
 	}else if (type == 'DESEQ') {
 		temp_currentResultSelection = currentResultSelection;
+	}else if (type == 'picard_Tophat') {
+		temp_currentResultSelection = currentResultSelection;
 	}
 	var URL = BASE_PATH + "/public/api/?source=" + API_PATH + '/public/pub/' + wkey + '/' + temp_currentResultSelection + '&format=' + buttonType;
 	window.open(URL);
@@ -463,6 +467,7 @@ $(function() {
 	var count_files = [];
 	var RSEM_files = [];
 	var DESEQ_files = [];
+	var picard_files = [];
 	
 	$.ajax({ type: "GET",
 			url: BASE_PATH+"/public/ajax/ngsquerydb.php",
@@ -479,6 +484,8 @@ $(function() {
 						summary_files.push(s[x]);
 					}else if (s[x].type == 'counts'){
 						count_files.push(s[x]);
+					}else if (s[x].type == 'picard.stats' || s[x].type == 'picard.hist') {
+						picard_files.push(s[x]);
 					}
 				}
 			}
@@ -627,6 +634,16 @@ $(function() {
 		createDropdown(rsem_file_paths, 'RSEM');
 	}else{
 		document.getElementById('RSEM_exp').remove();
+	}
+	
+	if (picard_files.length > 0) {
+		var picard_file_paths = [];
+		for (var z = 0; z < picard_files.length; z++){
+			picard_file_paths.push(picard_files[z].file);
+		}
+		createDropdown(picard_file_paths, 'picard_Tophat');
+	}else{
+		document.getElementById('picard_Tophat').remove();
 	}
 	//reports_table.fnAdjustColumnSizing(true);
 	}
