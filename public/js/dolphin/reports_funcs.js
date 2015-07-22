@@ -643,7 +643,7 @@ $(function() {
 		}
 		createDropdown(picard_file_paths, 'picard_Tophat');
 	}else{
-		document.getElementById('picard_Tophat').remove();
+		document.getElementById('picard_Tophat_exp').remove();
 	}
 	//reports_table.fnAdjustColumnSizing(true);
 	}
