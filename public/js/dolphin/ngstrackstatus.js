@@ -42,6 +42,7 @@ $(function() {
 					var disabled = '';
 					if (s[i].run_status == 0) {
 						runstat = '<button id="'+s[i].id+'" class="btn btn-xs disabled"><i class="fa fa-refresh">\tQueued</i></button>';
+						disabled = '<li><a href="#" id="'+s[i].id+'" name="'+s[i].run_group_id+'" onClick="killRun(this.id)">Cancel</a></li>';
 					}else if (s[i].run_status == 1) {
 						runstat = '<button id="'+s[i].id+'" class="btn btn-success btn-xs"  onclick="sendToAdvancedStatus(this.id)"><i class="fa fa-check">\tComplete!</i></button>';
 						disabled = '<li><a href="#" id="'+s[i].id+'" name="'+s[i].run_group_id+'" onClick="reportSelected(this.id, this.name)">Report Details</a></li>' +
@@ -109,6 +110,7 @@ $(function() {
 					var disabled = '';
 					if (s[i].run_status == 0) {
 						runstat = '<button id="'+s[i].id+'" class="btn btn-xs disabled"><i class="fa fa-refresh">\tQueued</i></button>';
+						disabled = '<li><a href="#" id="'+s[i].id+'" name="'+s[i].run_group_id+'" onClick="killRun(this.id)">Cancel</a></li>';
 					}else if (s[i].run_status == 1) {
 						runstat = '<button id="'+s[i].id+'" class="btn btn-success btn-xs"  onclick="sendToAdvancedStatus(this.id)"><i class="fa fa-check">\tComplete!</i></button>';
 						disabled = '<li><a href="#" id="'+s[i].id+'" name="'+s[i].run_group_id+'" onClick="reportSelected(this.id, this.name)">Report Details</a></li>' +
