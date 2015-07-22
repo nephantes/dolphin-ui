@@ -15,6 +15,7 @@ import subprocess
 from subprocess import Popen, PIPE
 import json
 import ConfigParser
+import time
 
 warnings.filterwarnings('ignore', '.*the sets module is deprecated.*',
          DeprecationWarning, 'MySQLdb')
@@ -58,23 +59,37 @@ class Dolphin:
     def updatePID(self, rpid, pid):
         sql = "UPDATE ngs_runparams SET wrapper_pid='%s',runworkflow_pid='%s' WHERE id='%s'"%(os.getpid(), pid, rpid)
         return self.runSQL(sql)
- 
     def getRunParamsID(self, rpid):
-        rpstr="";
-        if (rpid > 0):
+         rpstr="";
+         if (rpid > 0):
            rpstr=" AND nrp.id=%s"%str(rpid)
-        sql = "SELECT DISTINCT nrl.run_id, u.username, nrp.barcode from biocore.ngs_runlist nrl, biocore.ngs_runparams nrp, biocore.users u where nrp.id=nrl.run_id and u.id=nrl.owner_id and nrp.run_status=0 %s;"%rpstr
-        return self.runSQL(sql)
-    
+         sql = "SELECT DISTINCT nrl.run_id, u.username, nrp.barcode from ngs_runlist nrl, ngs_runparams nrp, users u where nrp.id=nrl.run_id and u.id=nrl.owner_id and nrp.run_status=0 %s;"%rpstr
+         return self.trySQL(sql, "getRunParamsID")
+
+    def trySQL(self, sql, func):
+        trials=0
+        while trials<5:
+           print trials
+           ret = self.runSQL(sql)
+           print "LEN:"+str(len(ret))
+
+           if (len(ret)>0):
+              return ret
+
+           time.sleep(15)
+           trials=trials+1 
+
+        return ret 
+ 
     def getRunParams(self, runparamsid):
-        sql = "SELECT json_parameters from biocore.ngs_runparams where run_status=0 and id='%d'"%runparamsid
+        sql = "SELECT json_parameters from ngs_runparams where run_status=0 and id='%d'"%runparamsid
         result = self.runSQL(sql)
         for row in result:
             #print row[0]
             return json.loads(row[0])
     
     def getAmazonCredentials(self, username):
-        sql = 'SELECT DISTINCT ac.* FROM biocore.amazon_credentials ac, biocore.group_amazon ga, biocore.users u where ac.id=ga.amazon_id and ga.group_id=u.group_id and u.username="'+username+'";'
+        sql = 'SELECT DISTINCT ac.* FROM amazon_credentials ac, group_amazon ga, users u where ac.id=ga.amazon_id and ga.group_id=u.group_id and u.username="'+username+'";'
         results = self.runSQL(sql)
     
         return results
@@ -84,7 +99,7 @@ class Dolphin:
         tablename="ngs_fastq_files"
         fields="d.backup_dir fastq_dir, d.backup_dir, d.amazon_bucket, rp.outdir"
         idmatch="s.id=tl.sample_id"
-        sql = "SELECT DISTINCT %(fields)s FROM biocore.ngs_runlist nr, biocore.ngs_samples s, biocore.%(tablename)s tl, biocore.ngs_dirs d, biocore.ngs_runparams rp where nr.sample_id=s.id and rp.run_status=0 and %(idmatch)s and d.id=tl.dir_id and rp.id=nr.run_id and nr.run_id='"+str(runparamsid)+"';"
+        sql = "SELECT DISTINCT %(fields)s FROM ngs_runlist nr, ngs_samples s, %(tablename)s tl, ngs_dirs d, ngs_runparams rp where nr.sample_id=s.id and rp.run_status=0 and %(idmatch)s and d.id=tl.dir_id and rp.id=nr.run_id and nr.run_id='"+str(runparamsid)+"';"
     
         results=self.runSQL(sql%locals())
         if (not results):
@@ -99,7 +114,7 @@ class Dolphin:
     
     def getSampleList(self, runparamsid):
         tablename="ngs_fastq_files"
-        sql = "SELECT s.samplename, ts.file_name FROM biocore.ngs_runparams nrp, biocore.ngs_runlist nr, biocore.ngs_samples s, biocore.%(tablename)s ts, biocore.ngs_dirs d where nr.run_id=nrp.id and nr.sample_id=s.id and nrp.run_status=0 and s.id=ts.sample_id and d.id=ts.dir_id and nr.run_id='"+str(runparamsid)+"';"
+        sql = "SELECT s.samplename, ts.file_name FROM ngs_runparams nrp, ngs_runlist nr, ngs_samples s, %(tablename)s ts, ngs_dirs d where nr.run_id=nrp.id and nr.sample_id=s.id and nrp.run_status=0 and s.id=ts.sample_id and d.id=ts.dir_id and nr.run_id='"+str(runparamsid)+"';"
         samplelist=self.runSQL(sql%locals())
         if (not samplelist):
             tablename="ngs_temp_sample_files"
@@ -119,7 +134,7 @@ class Dolphin:
     
     def getLaneList(self, runparamsid):
         tablename="ngs_fastq_files"
-        sql = "SELECT DISTINCT %(fields)s FROM biocore.ngs_runlist nrl, biocore.ngs_runparams nrp, biocore.ngs_samples s, biocore.%(tablename)s tl where nrl.run_id=nrp.id and nrp.run_status=0 and s.lane_id = tl.lane_id and s.id=nrl.sample_id and nrp.id='"+str(runparamsid)+"';"
+        sql = "SELECT DISTINCT %(fields)s FROM ngs_runlist nrl, ngs_runparams nrp, ngs_samples s, %(tablename)s tl where nrl.run_id=nrp.id and nrp.run_status=0 and s.lane_id = tl.lane_id and s.id=nrl.sample_id and nrp.id='"+str(runparamsid)+"';"
         fields='tl.file_name'
     
         result=self.runSQL(sql%locals())
@@ -618,7 +633,7 @@ def main():
            print dolphin.cmd % locals()
            print "\n\n\n"
            p = subprocess.Popen(dolphin.cmd % locals(), shell=True, stdout=subprocess.PIPE)
-           #dolphin.updatePID(runparamsid, p.pid)
+           dolphin.updatePID(runparamsid, p.pid)
 
            for line in p.stdout:
               print(str(line.rstrip()))
