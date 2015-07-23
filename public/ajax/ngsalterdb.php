@@ -15,7 +15,7 @@ function runCmd($idKey, $query)
 	 $PID =pclose(popen( $cmd, "r" ) );
 }
 
-function killPid($run_id)
+function killPid($run_id, $query)
 {
 	$pids = json_decode($query->queryTable("SELECT wrapper_pid, runworkflow_pid
 							   FROM ngs_runparams
@@ -23,13 +23,18 @@ function killPid($run_id)
 	
 	$workflow_pid = $pids[0]->runworkflow_pid;
 	$wrapper_pid = $pids[0]->wrapper_pid;
-	
-	$grep_check_workflow = "ps -ef | grep '[".substr($workflow_pid, 0, 1)."]".substr($workflow_pid,1)."'";
-	$grep_check_wrapper = "ps -ef | grep '[".substr($wrapper_pid, 0, 1)."]".substr($wrapper_pid,1)."'";
-	
-	$grep_find_workflow = pclose(popen( $grep_check_workflow, "r" ) );
-	$grep_find_wrapper = pclose(popen( $grep_check_wrapper, "r" ) );
-	
+
+	if($workflow_pid != NULL && $wrapper_pid != NULL){
+        $grep_check_workflow = "ps -ef | grep '[".substr($workflow_pid, 0, 1)."]".substr($workflow_pid,1)."'";
+        $grep_check_wrapper = "ps -ef | grep '[".substr($wrapper_pid, 0, 1)."]".substr($wrapper_pid,1)."'";
+        
+        $grep_find_workflow = pclose(popen( $grep_check_workflow, "r" ) );
+        $grep_find_wrapper = pclose(popen( $grep_check_wrapper, "r" ) );
+    }else{
+        $grep_find_workflow = NULL;
+        $grep_find_wrapper = NULL;
+    }
+    
 	if($grep_find_workflow > 0 && $grep_find_workflow != NULL){
 		pclose(popen( "kill -9 $workflow_pid", "r" ) );
 	}
@@ -64,7 +69,7 @@ if ($p == "submitPipeline" )
         WHERE outdir = '$outdir'
         ");
         $idKey=$query->queryAVal("SELECT id FROM ngs_runparams WHERE outdir = '$outdir' limit 1");
-        killPid($idKey);
+        killPid($idKey, $query);
         runCmd($idKey, $query);
         $data=$idKey;
     }else{
@@ -114,7 +119,7 @@ else if ($p == 'deleteRunparams')
 {
     if (isset($_POST['run_id'])){$run_id = $_POST['run_id'];}
     
-    killPid($run_id);
+    killPid($run_id, $query);
     
     $data=$query->runSQL("
 	UPDATE ngs_runparams
@@ -126,7 +131,7 @@ else if ($p == 'noAddedParamsRerun')
 {
     if (isset($_POST['run_id'])){$run_id = $_POST['run_id'];}
     
-    killPid($run_id);
+    killPid($run_id, $query);
     
     $data=$query->runSQL("
 	UPDATE ngs_runparams
