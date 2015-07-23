@@ -15,6 +15,29 @@ function runCmd($idKey, $query)
 	 $PID =pclose(popen( $cmd, "r" ) );
 }
 
+function killPid($run_id)
+{
+	$pids = json_decode($query->queryTable("SELECT wrapper_pid, runworkflow_pid
+							   FROM ngs_runparams
+							   WHERE id = $run_id"));
+	
+	$workflow_pid = $pids[0]->runworkflow_pid;
+	$wrapper_pid = $pids[0]->wrapper_pid;
+	
+	$grep_check_workflow = "ps -ef | grep '[".substr($workflow_pid, 0, 1)."]".substr($workflow_pid,1)."'";
+	$grep_check_wrapper = "ps -ef | grep '[".substr($wrapper_pid, 0, 1)."]".substr($wrapper_pid,1)."'";
+	
+	$grep_find_workflow = pclose(popen( $grep_check_workflow, "r" ) );
+	$grep_find_wrapper = pclose(popen( $grep_check_wrapper, "r" ) );
+	
+	if($grep_find_workflow > 0 && $grep_find_workflow != NULL){
+		pclose(popen( "kill -9 $workflow_pid", "r" ) );
+	}
+	if($grep_find_wrapper > 0 && $grep_find_wrapper != NULL){
+		pclose(popen( "kill -9 $wrapper_pid", "r" ) );
+	}
+}
+
 if (isset($_POST['p'])){$p = $_POST['p'];}
 if (isset($_POST['start'])){$start = $_POST['start'];}
 if (isset($_POST['end'])){$end = $_POST['end'];}
@@ -41,6 +64,7 @@ if ($p == "submitPipeline" )
         WHERE outdir = '$outdir'
         ");
         $idKey=$query->queryAVal("SELECT id FROM ngs_runparams WHERE outdir = '$outdir' limit 1");
+        killPid($idKey);
         runCmd($idKey, $query);
         $data=$idKey;
     }else{
@@ -89,6 +113,9 @@ else if ($p == 'insertRunlist')
 else if ($p == 'deleteRunparams')
 {
     if (isset($_POST['run_id'])){$run_id = $_POST['run_id'];}
+    
+    killPid($run_id);
+    
     $data=$query->runSQL("
 	UPDATE ngs_runparams
     SET run_status=5
@@ -98,16 +125,15 @@ else if ($p == 'deleteRunparams')
 else if ($p == 'noAddedParamsRerun')
 {
     if (isset($_POST['run_id'])){$run_id = $_POST['run_id'];}
+    
+    killPid($run_id);
+    
     $data=$query->runSQL("
 	UPDATE ngs_runparams
     SET run_status=0
     WHERE id = $run_id
     ");
-    $wkey = $query->queryAVal("
-    SELECT wkey
-    FROM ngs_runparams
-    WHERE id = $run_id limit 1
-    ");
+    
     runCmd($run_id, $query);  
 }
 else if($p == 'updateProfile')
