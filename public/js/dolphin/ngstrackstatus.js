@@ -1,5 +1,8 @@
 
-var page_mark;
+var page_mark_runparams = 0;
+var page_mark_services = 0;
+var page_mark_jobs = 0;
+var service_id;
 
 $(function() {
 	"use strict";
@@ -197,7 +200,17 @@ $(function() {
 	$('#jsontable_runparams').on( 'page.dt', function ( e, settings, len ) {
 		var table = $('#jsontable_runparams').DataTable();
 		var info = table.page.info();
-		page_mark = info.page;
+		page_mark_runparams = info.page;
+	} );
+	$('#jsontable_services').on( 'page.dt', function ( e, settings, len ) {
+		var table = $('#jsontable_services').DataTable();
+		var info = table.page.info();
+		page_mark_services = info.page;
+	} );
+	$('#jsontable_jobs').on( 'page.dt', function ( e, settings, len ) {
+		var table = $('#jsontable_jobs').DataTable();
+		var info = table.page.info();
+		page_mark_jobs = info.page;
 	} );
 	
 	setInterval( function () {
@@ -255,11 +268,70 @@ $(function() {
 				}
 			});
 			
-			$('#jsontable_runparams').DataTable().page(page_mark).draw(false);
-			console.log(page_mark);
-			console.log('test');
+			$('#jsontable_runparams').DataTable().page(page_mark_runparams).draw(false);
+		}else if (segment == 'advstatus') {
+			var wkey = getWKey(window.location.href.split("/")[window.location.href.split("/").length - 1]);
+			var runparams = $('#jsontable_services').dataTable();
+			console.log(wkey);
+	
+			$.ajax({ type: "GET",
+					 url: BASE_PATH + "/public/ajax/dataservice.php?wkey=" + wkey,
+					 async: false,
+					 success : function(s)
+					 {
+						runparams.fnClearTable();
+						var parsed = JSON.parse(s);
+						for(var i = 0; i < parsed.length; i++) {
+							if (parsed[i].result == 1) {
+								var bartype = 'success';
+								var colortype = 'green'
+							}else{
+								var bartype = 'danger';
+								var colortype = 'red';
+							}
+							runparams.fnAddData([
+								parsed[i].title,
+								parsed[i].duration,
+								'<span class="pull-right badge bg-'+colortype+'">'+parsed[i].percentComplete.split(".")[0]+'%</span>',
+								'<div class="progress progress-xs"><div class="progress-bar progress-bar-'+bartype+'" style="width: '+parsed[i].percentComplete+'%"></div></div>',
+								parsed[i].start,
+								parsed[i].finish,
+								'<button id="'+parsed[i].num+'" class="btn btn-primary btn-xs pull-right" onclick="selectService(this.id)">Select Service</button>'
+							]);
+						} // End For
+					}
+				});
+			runparams.fnSort( [ [4,'asc'] ] );
+			$('#jsontable_services').DataTable().page(page_mark_services).draw(false);
+			
+			if ($('jsontable_jobs') != undefined) {
+				var runjob = $('#jsontable_jobs').dataTable();
+				$.ajax({ type: "GET",
+						 url: BASE_PATH +"/ajax/datajobs.php?id=" + service_id,
+						 async: false,
+						 success : function(s)
+						 {
+							runjob.fnClearTable();
+							var parsed = JSON.parse(s);
+							for(var i = 0; i < parsed.length; i++) {
+								runjob.fnAddData([
+									parsed[i].title,
+									parsed[i].duration,
+									parsed[i].job_num,
+									parsed[i].submit,
+									parsed[i].start,
+									parsed[i].finish,
+									'<button id="'+parsed[i].num+'" class="btn btn-primary btn-xs pull-right" onclick="selectJob(this.id)">Select Job</button>'
+								]);
+							} // End For
+							document.getElementById('service_jobs').style.display = 'inline';
+						}
+					});
+				runjob.fnSort( [ [4,'asc'] ] );
+				$('#jsontable_jobs').DataTable().page(page_mark_jobs).draw(false);
+				console.log(service_id);
+			}
 		}
-		
 	}, 10000 );
 	
 	

@@ -28,6 +28,7 @@ function getWKey(run_id){
 }
 
 function selectService(id){
+	service_id = id;
 	var runparams = $('#jsontable_jobs').dataTable();
 	$.ajax({ type: "GET",
 			 url: BASE_PATH +"/ajax/datajobs.php?id=" + id,
