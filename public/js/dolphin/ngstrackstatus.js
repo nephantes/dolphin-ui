@@ -197,17 +197,17 @@ $(function() {
 		//runparams.fnAdjustColumnSizing(true);
 	}
 	
-	$('#jsontable_runparams').on( 'page.dt', function ( e, settings, len ) {
+	$('#jsontable_runparams').on( 'page.dt', function () {
 		var table = $('#jsontable_runparams').DataTable();
 		var info = table.page.info();
 		page_mark_runparams = info.page;
 	} );
-	$('#jsontable_services').on( 'page.dt', function ( e, settings, len ) {
+	$('#jsontable_services').on( 'page.dt', function () {
 		var table = $('#jsontable_services').DataTable();
 		var info = table.page.info();
 		page_mark_services = info.page;
 	} );
-	$('#jsontable_jobs').on( 'page.dt', function ( e, settings, len ) {
+	$('#jsontable_jobs').on( 'page.dt', function () {
 		var table = $('#jsontable_jobs').DataTable();
 		var info = table.page.info();
 		page_mark_jobs = info.page;
@@ -215,6 +215,7 @@ $(function() {
 	
 	setInterval( function () {
 		if (segment == 'status') {
+			var runparams = $('#jsontable_runparams').dataTable();
 			$.ajax({ type: "GET",
 				 url: BASE_PATH+"/public/ajax/ngsquerydb.php",
 				 data: { p: "getStatus", q: qvar, r: rvar, seg: segment, search: theSearch, uid: uid, gids: gids },
@@ -272,7 +273,6 @@ $(function() {
 		}else if (segment == 'advstatus') {
 			var wkey = getWKey(window.location.href.split("/")[window.location.href.split("/").length - 1]);
 			var runparams = $('#jsontable_services').dataTable();
-			console.log(wkey);
 	
 			$.ajax({ type: "GET",
 					 url: BASE_PATH + "/public/ajax/dataservice.php?wkey=" + wkey,
@@ -329,10 +329,9 @@ $(function() {
 					});
 				runjob.fnSort( [ [4,'asc'] ] );
 				$('#jsontable_jobs').DataTable().page(page_mark_jobs).draw(false);
-				console.log(service_id);
 			}
 		}
-	}, 10000 );
+	}, 5000 );
 	
 	
 });
