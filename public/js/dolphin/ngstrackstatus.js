@@ -1,4 +1,6 @@
 
+var page_mark;
+
 $(function() {
 	"use strict";
 
@@ -28,8 +30,10 @@ $(function() {
 	
 	/*##### STATUS TABLE #####*/
 	if (segment == 'status') {
-	var runparams = $('#jsontable_runparams').dataTable();
-
+	var runparams = $('#jsontable_runparams').dataTable( {
+		stateSave: true
+	});
+	
 	$.ajax({ type: "GET",
 			 url: BASE_PATH+"/public/ajax/ngsquerydb.php",
 			 data: { p: "getStatus", q: qvar, r: rvar, seg: segment, search: theSearch, uid: uid, gids: gids },
@@ -189,4 +193,74 @@ $(function() {
 		runparams.fnSort( [ [4,'asc'] ] );
 		//runparams.fnAdjustColumnSizing(true);
 	}
+	
+	$('#jsontable_runparams').on( 'page.dt', function ( e, settings, len ) {
+		var table = $('#jsontable_runparams').DataTable();
+		var info = table.page.info();
+		page_mark = info.page;
+	} );
+	
+	setInterval( function () {
+		if (segment == 'status') {
+			$.ajax({ type: "GET",
+				 url: BASE_PATH+"/public/ajax/ngsquerydb.php",
+				 data: { p: "getStatus", q: qvar, r: rvar, seg: segment, search: theSearch, uid: uid, gids: gids },
+				 async: false,
+				 success : function(s)
+				 {
+					runparams.fnClearTable();
+					for(var i = 0; i < s.length; i++) {
+						var runstat = "";
+						var disabled = '';
+						if (s[i].run_status == 0) {
+							runstat = '<button id="'+s[i].id+'" class="btn btn-xs disabled"><i class="fa fa-refresh">\tQueued</i></button>';
+							disabled = '<li><a href="#" id="'+s[i].id+'" name="'+s[i].run_group_id+'" onClick="killRun(this.id)">Cancel</a></li>';
+						}else if (s[i].run_status == 1) {
+							runstat = '<button id="'+s[i].id+'" class="btn btn-success btn-xs"  onclick="sendToAdvancedStatus(this.id)"><i class="fa fa-check">\tComplete!</i></button>';
+							disabled = '<li><a href="#" id="'+s[i].id+'" name="'+s[i].run_group_id+'" onClick="reportSelected(this.id, this.name)">Report Details</a></li>' +
+										'<li><a href="#" id="'+s[i].id+'" name="'+s[i].run_group_id+'" onClick="sendToPlot(this.id)">Generate Plots</a></li>';
+						}else if (s[i].run_status == 2){
+							runstat = '<button id="'+s[i].id+'" class="btn btn-warning btn-xs" onclick="sendToAdvancedStatus(this.id)"><i class="fa fa-refresh">\tRunning...</i></button>';
+							disabled = '<li><a href="#" id="'+s[i].id+'" name="'+s[i].run_group_id+'" onClick="killRun(this.id)">Stop</a></li>';
+						}else if (s[i].run_status == 3){
+							runstat = '<button id="'+s[i].id+'" class="btn btn-danger btn-xs" onclick="sendToAdvancedStatus(this.id)"><i class="fa fa-warning">\tError</i></button>';
+						}else if (s[i].run_status == 4){
+							runstat = '<button id="'+s[i].id+'" class="btn btn-danger btn-xs" onclick="sendToAdvancedStatus(this.id)"><i class="fa fa-warning">\tStopped</i></button>';
+						}
+						
+						if (s[i].outdir.split("/")[s[i].outdir.split("/").length - 1] != 'initial_run' || s[i].run_status == 1) {
+							disabled = disabled + '<li><a href="#" id="'+s[i].id+'" name="'+s[i].run_group_id+'" onclick="rerunSelected(this.id, this.name)">Rerun</a></li>';
+						}
+						
+						if (runstat != "") {
+							runparams.fnAddData([
+							s[i].id,
+							s[i].run_name,
+							s[i].outdir,
+							s[i].run_description,
+							runstat,
+							'<div class="btn-group pull-right">' +
+							'<button type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown" aria-expanded="true">Options <span class="fa fa-caret-down"></span></button>' +
+							'</button>' +
+							'<ul class="dropdown-menu" role="menu">' +
+								disabled +
+								'<li><a href="#" id="'+s[i].id+'" name="'+s[i].run_group_id+'" onclick="resumeSelected(this.id, this.name)">Resume</a></li>' +
+								'<li class="divider"></li>' +
+								'<li><a href="#" id="'+s[i].id+'" name="'+s[i].run_group_id+'" onClick="deleteRunparams(\''+s[i].id+'\')">Delete</a></li>' +
+							'</ul>' +
+							'</div>',
+							]);
+						}
+					} // End For
+				}
+			});
+			
+			$('#jsontable_runparams').DataTable().page(page_mark).draw(false);
+			console.log(page_mark);
+			console.log('test');
+		}
+		
+	}, 10000 );
+	
+	
 });
