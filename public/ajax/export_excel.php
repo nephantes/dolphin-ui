@@ -40,6 +40,7 @@ if($p == 'exportExcel')
 		$objPHPExcel->getActiveSheet()->setCellValue('B3', $_SESSION['user']);
 	*/
 	
+	//	Samples and data gathering
 	$sample_data = json_decode($query->queryTable(
 		"SELECT ngs_samples.id, ngs_samples.series_id, ngs_samples.protocol_id, ngs_samples.lane_id,
 		ngs_samples.name, ngs_samples.samplename, ngs_samples.barcode, ngs_samples.title, ngs_samples.batch_id,
@@ -66,7 +67,8 @@ if($p == 'exportExcel')
 		ON ngs_samples.instrument_model_id = ngs_instrument_model.id
 		LEFT JOIN ngs_treatment_manufacturer
 		ON ngs_samples.treatment_manufacturer_id = ngs_treatment_manufacturer.id
-		WHERE ngs_samples.id IN (".implode(",", $samples).")"));
+		WHERE ngs_samples.id IN (".implode(",", $samples).")
+		"));
 	
 	$experiment_series = $sample_data[0]->series_id;
 	$lane_ids = array();
@@ -104,6 +106,7 @@ if($p == 'exportExcel')
 		$objPHPExcel->getActiveSheet()->setCellValue('AB'.$col_number, $sd->notes);
 		
 		//	Push lane_ids and protocol_ids
+		
 		if(!in_array($sd->lane_id, $lane_ids)){
 			array_push($lane_ids, $sd->lane_id);
 		}
@@ -113,6 +116,90 @@ if($p == 'exportExcel')
 		
 		$col_number++;
 	}
+	
+	//	Metadata
+	$objPHPExcel->setActiveSheetIndex(0);
+	$experiment_data = json_decode($query->queryTable(
+		"SELECT ngs_experiment_series.experiment_name, ngs_experiment_series.summary,
+		ngs_experiment_series.design, ngs_experiment_series.grant,
+		organization, lab
+		FROM ngs_experiment_series
+		LEFT JOIN ngs_lab
+		ON ngs_experiment_series.lab_id = ngs_lab.id
+		LEFT JOIN ngs_organization
+		ON ngs_experiment_series.organization_id = ngs_organization.id
+		WHERE ngs_experiment_series.id = $experiment_series
+		"));
+	$objPHPExcel->getActiveSheet()->setCellValue('B3', $$experiment_data->experiment_name);
+	$objPHPExcel->getActiveSheet()->setCellValue('B4', $$experiment_data->summary);
+	$objPHPExcel->getActiveSheet()->setCellValue('B5', $$experiment_data->design);
+	$objPHPExcel->getActiveSheet()->setCellValue('B6', $$experiment_data->organization);
+	$objPHPExcel->getActiveSheet()->setCellValue('B7', $$experiment_data->lab);
+	$objPHPExcel->getActiveSheet()->setCellValue('B8', $$experiment_data->grant);
+	//$objPHPExcel->getActiveSheet()->setCellValue('B9', $$experiment_data->);		//	Contributors
+	//$objPHPExcel->getActiveSheet()->setCellValue('B10', $$experiment_data->);		//	Contributors
+	//$objPHPExcel->getActiveSheet()->setCellValue('B11', $$experiment_data->);		//	fastq dir
+	//$objPHPExcel->getActiveSheet()->setCellValue('B12', $$experiment_data->);		//	backup dir
+	//$objPHPExcel->getActiveSheet()->setCellValue('B13', $$experiment_data->);		//	amazon bucket
+	
+	
+	//	Lanes
+	$objPHPExcel->setActiveSheetIndex(1);
+	$lane_data = json_decode($query->queryTable(
+		"SELECT ngs_lanes.name, ngs_lanes.sequencing_id, ngs_lanes.cost,
+		ngs_lanes.date_submitted, ngs_lanes.date_received, ngs_lanes.phix_requested,
+		ngs_lanes.phix_in_lane, ngs_lanes.total_samples, ngs_lanes.resequenced,
+		ngs_lanes.notes, facility
+		FROM ngs_lanes
+		LEFT JOIN ngs_facility
+		ON ngs_lanes.facility_id = ngs_facility.id
+		WHERE ngs_lanes.id IN (".implode(",",$lane_ids).")
+		"));
+	
+	$col_number = 4;
+	foreach($lane_data as $ld){
+		$objPHPExcel->getActiveSheet()->setCellValue('A'.$col_number, $ld->name);
+		$objPHPExcel->getActiveSheet()->setCellValue('B'.$col_number, $ld->sequencing_id);
+		$objPHPExcel->getActiveSheet()->setCellValue('C'.$col_number, $ld->facility);
+		$objPHPExcel->getActiveSheet()->setCellValue('D'.$col_number, $ld->cost);
+		$objPHPExcel->getActiveSheet()->setCellValue('E'.$col_number, $ld->date_submitted);
+		$objPHPExcel->getActiveSheet()->setCellValue('F'.$col_number, $ld->date_received);
+		$objPHPExcel->getActiveSheet()->setCellValue('G'.$col_number, $ld->phix_requested);
+		$objPHPExcel->getActiveSheet()->setCellValue('H'.$col_number, $ld->phix_in_lane);
+		$objPHPExcel->getActiveSheet()->setCellValue('I'.$col_number, $ld->total_samples);
+		$objPHPExcel->getActiveSheet()->setCellValue('J'.$col_number, $ld->resequenced);
+		$objPHPExcel->getActiveSheet()->setCellValue('K'.$col_number, $ld->notes);
+		
+		$col_number++;
+	}
+	
+	//	Protocols
+	$objPHPExcel->setActiveSheetIndex(2);
+	$protocol_data = json_decode($query->queryTable(
+		"SELECT ngs_protocols.name, ngs_protocols.growth, ngs_protocols.treatment,
+		ngs_protocols.extraction, ngs_protocols.library_construction, ngs_protocols.crosslinking_method,
+		ngs_protocols.fragmentation_method, ngs_protocols.strand_specific, library_strategy
+		FROM ngs_protocols
+		LEFT JOIN ngs_library_strategy
+		ON ngs_protocols.library_strategy_id = ngs_library_strategy.id
+		WHERE ngs_protocols.id IN (".implode(",",$protocol_ids).")
+		"));
+	
+	$col_number = 4;
+	foreach($protocol_data as $pd){
+		$objPHPExcel->getActiveSheet()->setCellValue('A'.$col_number, $pd->name);
+		$objPHPExcel->getActiveSheet()->setCellValue('B'.$col_number, $pd->growth);
+		$objPHPExcel->getActiveSheet()->setCellValue('C'.$col_number, $pd->extract);
+		$objPHPExcel->getActiveSheet()->setCellValue('D'.$col_number, $pd->library_construction);
+		$objPHPExcel->getActiveSheet()->setCellValue('E'.$col_number, $pd->crosslinking_method);
+		$objPHPExcel->getActiveSheet()->setCellValue('F'.$col_number, $pd->fragmentation_method);
+		$objPHPExcel->getActiveSheet()->setCellValue('G'.$col_number, $pd->strand_specific);
+		$objPHPExcel->getActiveSheet()->setCellValue('H'.$col_number, $pd->library_strategy);
+		
+		$col_number++;
+	}
+	
+	
 	
 	//	Save the file to be downloaded
 	$objWriter = new PHPExcel_Writer_Excel2007($objPHPExcel);
