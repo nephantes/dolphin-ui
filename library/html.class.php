@@ -547,6 +547,7 @@ e range"><i class="fa fa-calendar"></i></button>
 	$html.= '<div id="btn-group">';
 	$html.= '	<input type="button" class="btn btn-primary" name="pipeline_button" value="Send to Pipeline" onClick="submitSelected();"/>
 				<input type="button" class="btn btn-primary" name="send_to_status_button" value="Pipeline Status" onClick="sendToStatus()"/>
+				<input type="button" class="btn btn-primary" name="export_excel_button" value="Export to Excel" onClick="exportExcel()"/>
 				<input type="button" class="btn btn-primary" name="send_to_NCBI_button" value="Send to NCBI" onClick="sendToStatus()" disabled/>
 				<input type="button" class="btn btn-primary" name="send_to_ENCODE_button" value="Send to ENCODE" onClick="sendToStatus()" disabled/>
 				<input type="button" class="btn btn-danger pull-right" name="delete_Selected" value="Delete Selected" onclick="deleteButton('.$_SESSION['uid'].')"/>';

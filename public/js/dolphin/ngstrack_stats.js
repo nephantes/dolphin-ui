@@ -302,7 +302,18 @@ function expandTable(table){
 	location.reload();
 }
 
-
+function exportExcel(){
+	console.log('test');
+	$.ajax({ type: "GET",
+			url: BASE_PATH+"/public/ajax/export_excel.php",
+			data: { p: "exportExcel", samples: checklist_samples },
+			async: false,
+			success : function(s)
+			{
+				console.log(s);
+			}
+	});
+}
 
 $(function() {
 	"use strict";
