@@ -17,8 +17,8 @@ function num2alpha($n){
 
 $query = new dbfuncs();
 
+$data;
 if (isset($_GET['p'])){$p = $_GET['p'];}
-
 
 if($p == 'exportExcel')
 {
@@ -160,7 +160,7 @@ if($p == 'exportExcel')
 		ON ngs_experiment_series.organization_id = ngs_organization.id
 		WHERE ngs_experiment_series.id = $experiment_series
 		"));
-	var_dump($experiment_data);
+	
 	$objPHPExcel->getActiveSheet()->setCellValue('B3', $experiment_data[0]->experiment_name);
 	$objPHPExcel->getActiveSheet()->setCellValue('B4', $experiment_data[0]->summary);
 	$objPHPExcel->getActiveSheet()->setCellValue('B5', $experiment_data[0]->design);
@@ -224,17 +224,32 @@ if($p == 'exportExcel')
 		$col_number++;
 	}
 	
-	
-	
 	//	Save the file to be downloaded
 	$objWriter = new PHPExcel_Writer_Excel2007($objPHPExcel);
-	$objWriter->save("/Library/WebServer/Documents/dolphin/tmp/files/test_demo.xlsx");
+	$name = "/tmp/files/".$user."_".date('Y-m-d-H-i-s').".xlsx";
+	$objWriter->save("..".$name);
+	echo $name;
+}
+else if($p == 'checkExperimentSeries')
+{
+	if (isset($_GET['samples'])){$samples = $_GET['samples'];}
+	
+	$experiment_series = $query->queryTable(
+		"SELECT distinct ngs_samples.series_id
+		FROM ngs_samples
+		WHERE ngs_samples.id in (".implode(",",$samples).")
+		");
+	
+	echo $experiment_series;
+}
+else if($p == 'deleteExcel')
+{
+	if (isset($_GET['file'])){$file = $_GET['file'];}
+	
+	sleep(2);
+	pclose(popen( "rm ..".$file, 'r'));
 }
 
 //footer
-header('Cache-Control: no-cache, must-revalidate');
-header('Expires: Mon, 26 Jul 1997 05:00:00 GMT');
-header('Content-type: application/json');
-echo $data;
 exit;
 ?>

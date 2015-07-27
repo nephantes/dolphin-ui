@@ -303,16 +303,61 @@ function expandTable(table){
 }
 
 function exportExcel(){
-	console.log('test');
-	$.ajax({ type: "GET",
-			url: BASE_PATH+"/public/ajax/export_excel.php",
-			data: { p: "exportExcel", samples: checklist_samples },
-			async: false,
-			success : function(s)
-			{
-				console.log(s);
-			}
-	});
+	if (checklist_lanes.length == 0 && checklist_samples.length == 0) {
+		$('#deleteModal').modal({
+			show: true
+		});
+		document.getElementById('myModalLabel').innerHTML = 'No Import/Sample Selection';
+		document.getElementById('deleteLabel').innerHTML ='You must select at least one Import/Sample to export.';
+		document.getElementById('deleteAreas').innerHTML = '';
+			
+		document.getElementById('cancelDeleteButton').innerHTML = "OK";
+		document.getElementById('confirmDeleteButton').setAttribute('style', 'display:none');
+	}else{
+		$.ajax({ type: "GET",
+				url: BASE_PATH+"/public/ajax/export_excel.php",
+				data: { p: "checkExperimentSeries", samples: checklist_samples },
+				async: false,
+				success : function(s)
+				{
+					var ES = JSON.parse(s);
+					if (ES.length == 1) {
+						var file_path;
+						$.ajax({ type: "GET",
+								url: BASE_PATH+"/public/ajax/export_excel.php",
+								data: { p: "exportExcel", samples: checklist_samples },
+								async: false,
+								success : function(q)
+								{
+									console.log(q);
+									window.open("public"+q, '_blank');
+									file_path = q;
+								}
+						});
+						
+						$.ajax({ type: "GET",
+								url: BASE_PATH+"/public/ajax/export_excel.php",
+								data: { p: "deleteExcel", file: file_path },
+								async: false,
+								success : function(r)
+								{
+									console.log(r);
+								}
+						});
+					}else{
+						$('#deleteModal').modal({
+							show: true
+						});
+						document.getElementById('myModalLabel').innerHTML = 'More than one Experiment Series';
+						document.getElementById('deleteLabel').innerHTML ='You must select Imports/Samples within the same experiment series.';
+						document.getElementById('deleteAreas').innerHTML = '';
+							
+						document.getElementById('cancelDeleteButton').innerHTML = "OK";
+						document.getElementById('confirmDeleteButton').setAttribute('style', 'display:none');
+					}
+				}
+		});
+	}
 }
 
 $(function() {
