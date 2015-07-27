@@ -224,6 +224,36 @@ if($p == 'exportExcel')
 		$col_number++;
 	}
 	
+	//	Files
+	$objPHPExcel->setActiveSheetIndex(4);
+	$file_sample_data = json_decode($query->queryTable(
+		"SELECT ngs_samples.name, ngs_temp_sample_files.file_name
+		FROM ngs_temp_sample_files
+		LEFT JOIN ngs_samples
+		ON ngs_samples.id = ngs_temp_sample_files.sample_id
+		WHERE ngs_temp_sample_files.sample_id IN (".implode(",", $samples).")
+		"));
+	
+	$file_lane_data = json_decode($query->queryTable(
+		"SELECT ngs_lanes.name, ngs_temp_lane_files.file_name
+		FROM ngs_temp_lane_files
+		LEFT JOIN ngs_lanes
+		ON ngs_lanes.id = ngs_temp_lane_files.lane_id
+		WHERE ngs_temp_lane_files.lane_id IN (SELECT ngs_samples.id FROM ngs_samples WHERE ngs_samples.id IN (".implode(",", $samples)."))
+		"));
+	
+	$col_number = 4;
+	foreach($file_sample_data as $fsd){
+		$objPHPExcel->getActiveSheet()->setCellValue('A'.$col_number, $fsd->name);
+		$objPHPExcel->getActiveSheet()->setCellValue('B'.$col_number, $fsd->file_name);
+		$col_number++;
+	}
+	foreach($file_lane_data as $fld){
+		$objPHPExcel->getActiveSheet()->setCellValue('A'.$col_number, $fld->name);
+		$objPHPExcel->getActiveSheet()->setCellValue('B'.$col_number, $fld->file_name);
+		$col_number++;
+	}
+	
 	//	Save the file to be downloaded
 	$objWriter = new PHPExcel_Writer_Excel2007($objPHPExcel);
 	$name = "/tmp/files/".$user."_".date('Y-m-d-H-i-s').".xlsx";
