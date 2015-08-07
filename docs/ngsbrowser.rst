@@ -11,12 +11,18 @@ First, make sure to have an instance of dolphin available (see Dolphin Docker) a
 
 Once logged in, click on the 'NGS Tracking' tab on the left, then click on 'NGS Browser'.
 
+.. image:: dolphin_pics/menu_bar.png
+	:align: center
+
 Getting to Know the Browser
 ===========================
 
 The NGS Browser can be broken down into 3 sections:
 
 **Browse Catagories:**
+
+.. image:: dolphin_pics/browse_panel.png
+	:align: center
 
 The browse catagories section is located within the top left side of the page.  It is marked at the top by the 'Browse' tag.
 
@@ -34,11 +40,17 @@ The blue rewind button at the top right of the Browse section will bring the use
 
 **Selected Samples:**
 
+.. image:: dolphin_pics/sample_basket.png
+	:align: center
+
 This section of the browser is located right under the Browse category section.  As the user selects more Imports/Samples, this box will fill up with the selected samples.
 
 As the box fills with samples, users can click the red 'X' next to a specific sample to unselect that sample.  In addition, as samples are selected the 'Clear Basket' button will become active and by clicking this button will remove all of the selected samples.
 
 **Data Tables:**
+
+.. image:: dolphin_pics/browse_table.png
+	:align: center
 
 The data tables are the main highlight of the NGS Browser.
 
@@ -58,6 +70,9 @@ For the Imports/Samples tables, selection checkboxes are located on the right si
 
 **Selection Details:**
 
+.. image:: dolphin_pics/details_table.png
+	:align: center
+
 Within each table, each entry contains a name which is a clickable link.  By clicking this link the user will be directed to a new tab with detailed information about that selection.
 
 By clicking on a specific Experiment Series, detailed information about that experiment series will be displayed as well as the Imports/Samples being displayed in the other tables will be from that specific Experiment Series.  The same applies if a user selects an Import or a Sample name.
@@ -65,6 +80,9 @@ By clicking on a specific Experiment Series, detailed information about that exp
 At the top right of each Selection Details tab will be a grey arrow button.  This will return the user back to the table portion of the NGS Browser.
 
 **Option Buttons:**
+
+.. image:: dolphin_pics/browse_buttons.png
+	:align: center
 
 At the bottom of the page there are a series of buttons that the user can click to perform specific tasks.
 
