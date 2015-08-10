@@ -25,6 +25,7 @@ var valid_samples;
 
 /*##### FILL A RERUN PIPELINE WITH PREVIOUS SELECTIONS #####*/
 function rerunLoad() {
+	document.getElementById('dolphin_basket').parentNode.setAttribute('style','overflow:scroll');
 	var hrefSplit = window.location.href.split("/");
 	var rerunLoc = $.inArray('rerun', hrefSplit)
 	var infoArray = [];
