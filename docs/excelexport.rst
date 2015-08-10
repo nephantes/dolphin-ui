@@ -13,6 +13,9 @@ Next, make sure you have Imports/Samples that are available for you to select to
 
 Once logged in, click on the 'NGS Tracking' tab on the left, then click on 'NGS Browser'.
 
+.. image:: dolphin_pics/menu_bar.png
+	:align: center
+
 From the Browser
 ================
 

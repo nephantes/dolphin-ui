@@ -11,7 +11,12 @@ First, make sure to have an instance of dolphin available (see Dolphin Docker) a
 
 Once logged in, click on the 'NGS Tracking' tab on the left, then click on 'Excel Import'.
 
+.. image:: dolphin_pics/menu_bar.png
+	:align: center
+
 From here, under the 'Excel file input' button, there is a link to download an example excel input.  Download the example file and you'll be ready to start adding your data.
+
+You can also download the example spreadsheet :download:`here. <http://biocore.umassmed.edu/downloads/example_template.xls>`.
 
 Filling Out the Excel File
 ==========================
@@ -19,6 +24,11 @@ Filling Out the Excel File
 The example spreadsheet already contains faux information to give users some context to the information they will be replacing.
 
 Certain header cells within the spreadsheet are marked with a red arrow on the top right of the cell.  Hovering over these cells with your mouse will give you more details on what each row or column that they demark should include.
+
+The spreadsheet contains multiple tabs that will help you organize your information properly.
+
+.. image:: dolphin_pics/excel_tabs.png
+	:align: center
 
 **META-DATA:**
 
@@ -198,15 +208,24 @@ If you haven't yet already, head back to the excel import page.
 
 **Excel file input:**
 
+.. image:: dolphin_pics/file_input.png
+	:align: center
+
 Click on the 'Choose File' button to select your excel spreadsheet's path and click open.  Once your file has been selected, the file name should appear to the left of the button.
 
 **Project Group:**
+
+.. image:: dolphin_pics/project_group.png
+	:align: center
 
 This section will select the group in which you would like to submit this project under.  The drop down menu should contain all of the groups that you are a member of.
 
 If you cannot select a group, contact your local administrator or 'biocore@umassmed.edu'.
 
 **Who can see?:**
+
+.. image:: dolphin_pics/import_perms.png
+	:align: center
 
 This section will determine the security credentials of your submission.  You will select from one of 3 choices:
 
@@ -231,11 +250,17 @@ If an error occurs from improper excel spreadsheet submission, red text describi
 
 **Submission fails:**
 
+.. image:: dolphin_pics/full_import_error.png
+	:align: center
+
 If your submission fails at least one of the checks in place, the data will not be submitted.
 
 You can then edit your spreadsheet based on the error output text and resubmit the spreadsheet to try again.
 
 **Submission passes:**
+
+.. image:: dolphin_pics/passed_imports.png
+	:align: center
 
 If your submission passes, each section will contain green text saying that the section passed inspection.
 
