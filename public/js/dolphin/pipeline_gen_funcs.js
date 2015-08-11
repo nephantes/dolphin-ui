@@ -25,8 +25,10 @@ var valid_samples;
 
 /*##### FILL A RERUN PIPELINE WITH PREVIOUS SELECTIONS #####*/
 function rerunLoad() {
-	document.getElementById('dolphin_basket').parentNode.setAttribute('style','overflow:scroll');
 	var hrefSplit = window.location.href.split("/");
+	if (hrefSplit[4] == 'search') {
+		document.getElementById('dolphin_basket').parentNode.setAttribute('style','overflow:scroll');
+	}
 	var rerunLoc = $.inArray('rerun', hrefSplit)
 	var infoArray = [];
 	var json_primer = '';
@@ -39,15 +41,15 @@ function rerunLoad() {
 	jsonObj = JSON.parse(json_primer);
 	//repopulate page
 	for (var x = 0; x < (jsonTypeList.length); x++) {
-		if (jsonObj.hasOwnProperty(jsonTypeList[x]) && jsonObj[jsonTypeList[x]] != 'none' && jsonObj[jsonTypeList[x]] != 'no' && jsonObj[jsonTypeList[x]] != 'NONE' && jsonObj[jsonTypeList[x]] != 'NO' && jsonTypeList[x] != 'barcodes') {
+		if (jsonObj.hasOwnProperty(jsonTypeList[x]) && jsonObj[jsonTypeList[x]] != 'none' && jsonObj[jsonTypeList[x]] != 'NONE' && jsonObj[jsonTypeList[x]] != 'NO' && jsonTypeList[x] != 'barcodes') {
 			var element = document.getElementById(jsonTypeList[x]);
 			if (element != null) {
 				if (element.id == "spaired") {
-				if ( jsonObj[jsonTypeList[x]] == 'paired') {
-					element.value = 'yes'
-				}else{
-					element.value = 'no';
-				}
+					if ( jsonObj[jsonTypeList[x]] == 'paired') {
+						element.value = 'yes'
+					}else{
+						element.value = 'no';
+					}
 				}else if (element.id == "resume"){
 					element.value = 'Resume';
 				}else{
