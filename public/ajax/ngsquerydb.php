@@ -390,8 +390,9 @@ else if ($p == "getSelectedSamples")
 	$time="";
 	if (isset($start)){$time="and `date_created`>='$start' and `date_created`<='$end'";}
 	$data=$query->queryTable("
-	SELECT ngs_samples.id, name, samplename, title, source, organism, molecule
-	FROM ngs_samples
+	SELECT ngs_samples.id, name, samplename, title, source, organism, molecule, barcode, description, avg_insert_size, read_length, concentration, time, biological_replica, technical_replica, spike_ins, adapter,
+    notebook_ref, notes, genotype, library_type, biosample_type, instrument_model, treatment_manufacturer, ngs_samples.owner_id
+    FROM ngs_samples
     $innerJoin
 	WHERE $searchQuery $andPerms $time
 	");
