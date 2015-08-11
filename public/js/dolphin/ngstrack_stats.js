@@ -440,66 +440,6 @@ $(function() {
 	}
 
 	if (phpGrab.theSegment != 'report') {
-	
-		/*##### PROTOCOLS TABLE #####*/
-		
-		var protocolsTable = $('#jsontable_protocols').dataTable();
-	
-		 $.ajax({ type: "GET",
-						 url: BASE_PATH+"/public/ajax/ngsquerydb.php",
-						 data: { p: "getProtocols", type:"Dolphin", q: qvar, r: rvar, seg: segment, search: theSearch, uid: uid, gids: gids},
-						 async: false,
-						 success : function(s)
-						 {
-							protocolsTable.fnClearTable();
-							for(var i = 0; i < s.length; i++) {
-							protocolsTable.fnAddData([
-				s[i].id,
-				"<a href="+BASE_PATH+"\"/search/details/protocols/"+s[i].id+'/'+theSearch+"\">"+s[i].name+"</a>",
-							s[i].growth,
-				s[i].treatment,
-							]);
-							} // End For
-						 }
-				});
-	
-		$('.daterange_protocols').daterangepicker(
-				{
-					ranges: {
-						'Today': [moment().subtract('days', 1), moment()],
-						'Yesterday': [moment().subtract('days', 2), moment().subtract('days', 1)],
-						'Last 7 Days': [moment().subtract('days', 6), moment()],
-						'Last 30 Days': [moment().subtract('days', 29), moment()],
-						'This Month': [moment().startOf('month'), moment().endOf('month')],
-						'Last Month': [moment().subtract('month', 1).startOf('month'), moment().subtract('month', 1).endOf('month')],
-						'This Year': [moment().startOf('year'), moment().endOf('year')],
-					},
-					startDate: moment().subtract('days', 29),
-					endDate: moment()
-				},
-		function(start, end) {
-				$.ajax({ type: "GET",
-						 url: BASE_PATH+"/public/ajax/ngsquerydb.php",
-						 data: { p: "getProtocols", q: qvar, r: rvar, seg: segment, uid: uid, gids: gids, search: theSearch, start:start.format('YYYY-MM-DD'), end:end.format('YYYY-MM-DD') },
-						 async: false,
-						 success : function(s)
-						 {
-							protocolsTable.fnClearTable();
-							for(var i = 0; i < s.length; i++) {
-							protocolsTable.fnAddData([
-				s[i].id,
-				"<a href="+BASE_PATH+"\"/search/details/protocols/"+s[i].id+'/'+theSearch+"\">"+s[i].name+"</a>",
-							s[i].growth,
-				s[i].treatment,
-							]);
-							} // End For
-						 }
-				});
-	
-		});
-		protocolsTable.fnSort( [ [0,'asc'] ] );
-		//protocolsTable.fnAdjustColumnSizing(true);
-		
 		/*##### SAMPLES TABLE #####*/
 	
 		//var samplesTable = $('#jsontable_samples').dataTable();
@@ -583,7 +523,9 @@ $(function() {
 						{
 							var type = 'lanes';
 							var queryType = "getLanes";
-							generateStreamTable(type, s, queryType, qvar, rvar, segment, theSearch, uid, gids);
+							if (window.location.href.split("/")[4] == 'search') {
+								generateStreamTable(type, s, queryType, qvar, rvar, segment, theSearch, uid, gids);
+							}
 						}
 				});
 	
@@ -610,7 +552,9 @@ $(function() {
 						 {
 							var type = 'lanes';
 							var queryType = "getLanes";
-							generateStreamTable(type, s, queryType, qvar, rvar, segment, theSearch, uid, gids);
+							if (window.location.href.split("/")[4] == 'search') {
+								generateStreamTable(type, s, queryType, qvar, rvar, segment, theSearch, uid, gids);
+							}
 						 }
 				});
 	
@@ -634,7 +578,9 @@ $(function() {
 						{
 							var type = 'experiments';
 							var queryType = "getExperimentSeries";
-							generateStreamTable(type, s, queryType, qvar, rvar, segment, theSearch, uid, gids);
+							if (window.location.href.split("/")[4] == 'search') {
+								generateStreamTable(type, s, queryType, qvar, rvar, segment, theSearch, uid, gids);
+							}
 						}
 			   });
 	
@@ -659,15 +605,11 @@ $(function() {
 						async: false,
 						success : function(s)
 						{
-						   experiment_seriesTable.fnClearTable();
-						   for(var i = 0; i < s.length; i++) {
-						   experiment_seriesTable.fnAddData([
-			   s[i].id,
-			   "<a href="+BASE_PATH+"\"/search/details/experiment_series/"+s[i].id+'/'+theSearch+"\">"+s[i].experiment_name+"</a>",
-						   s[i].summary,
-						   s[i].design,
-						   ]);
-						   } // End For
+							var type = 'experiments';
+							var queryType = "getExperimentSeries";
+							if (window.location.href.split("/")[4] == 'search') {
+								generateStreamTable(type, s, queryType, qvar, rvar, segment, theSearch, uid, gids);
+							}
 						}
 				});
 	
