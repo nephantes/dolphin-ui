@@ -62,14 +62,20 @@ if ($p == "submitPipeline" )
     $outdir_check = $query->queryAVal("SELECT outdir FROM ngs_runparams WHERE outdir = '$outdir'");
     
     if($outdir_check == $outdir){
+        
+        $idKey=$query->queryAVal("SELECT id FROM ngs_runparams WHERE outdir = '$outdir' limit 1");
+        killPid($idKey, $query);
         $data=$query->runSQL("
         UPDATE ngs_runparams
         SET run_status = 0,
-        date_modified = now()
-        WHERE outdir = '$outdir'
+        barcode = $barcode,
+        json_parameters = '$json',
+        run_name = '$name',
+        run_description = '$desc',
+        date_modified = now(),
+        last_modified_user = $uid
+        WHERE id = '$idKey'
         ");
-        $idKey=$query->queryAVal("SELECT id FROM ngs_runparams WHERE outdir = '$outdir' limit 1");
-        killPid($idKey, $query);
         runCmd($idKey, $query);
         $data=$idKey;
     }else{
