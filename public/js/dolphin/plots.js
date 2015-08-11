@@ -166,14 +166,14 @@ $("#zi_value").on("change",function(d) {
 	view();
 })
 		var panels=[{"id":"svg","title":"Scatter plot"},{"id":"svg3","title":"Barplot monitor"},{"id":"svg1","title":"Heatmap monitor"}];
-        var panel_divs=d3.select("#canvas").selectAll("div").data(panels).enter().append("div").attr("class","panel panel-primary col-md-3")
+        var panel_divs=d3.select("#canvas").selectAll("div").data(panels).enter().append("div").attr("class","panel panel-primary col-md-6")
         panel_divs.append("div").attr("class","panel-heading").append("h2").attr("class","panel-title").text(function(d) {return d.title});
         panel_divs.append("div").property("hidden",true).attr("class","loading").append("text").text("Loading Data ...");
         panel_divs.append("div").attr("class","panel-body").selectAll("svg").data(function(d){console.log(d);return [d]}).enter().append("svg").attr("id",function(d) {return d.id}).attr("height", 500).attr("width", 500);
         var svg=d3.select("#svg");
         var xi, yi, zi;
         
-		var scatter_par = document.getElementById('canvas').firstChild.setAttribute("class", "panel panel-primary col-md-6");
+		var scatter_par = document.getElementById('canvas').firstChild.setAttribute("class", "panel panel-primary col-md-12");
 		
         window.view = function () {
 			xi=$("#xi").val();

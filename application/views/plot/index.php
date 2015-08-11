@@ -11,7 +11,7 @@
 								<div class="box-body">
 								<!-- form start -->
 								<form>
-									<div id=" box-body left">
+									<div id=" box-body left" style="overflow: scroll">
 									<table id="controller" class="table table-striped">
 										<tbody>
 										<tr>
@@ -133,11 +133,9 @@
 									<div class="box-body col-md-12">
 										<div id="canvas" class="margin"></div>
 									</div><!-- /.box-body -->
-									<div class="box-body">
-										<div id="table" class="margin">
-											<h3>Table</h3>
-											<table id="output_table" class="table table-striped"></table>
-										</div>
+									<div id="table" style="overflow: scroll" class="box-body">
+										<h3>Table</h3>
+										<table id="output_table" class="table table-striped"></table>
 									</div><!-- /.box-body -->
 
 									<div class="box-footer"></div>

@@ -810,6 +810,12 @@ e range"><i class="fa fa-calendar"></i></button>
 	}
 	
 	function getInfoBox($id){
+		$left_help_boxes = ['plot_control_panel', 'run_name', 'genomebuild', 'adapter', 'split', 'custom', 'pipeline'];
+		if(in_array($id, $left_help_boxes)){
+				$width = '200px';
+		}else{
+				$width = '400px';
+		}
 		$html = '';
 		$html.= '<div class="navbar-right margin">
 						<div class="box-tools nav">
@@ -822,7 +828,7 @@ e range"><i class="fa fa-calendar"></i></button>
 										<h4 style="text-align: center" class="margin">Info</h3>
 								</li>
                                 <li>
-										<div id="'.$id.'_info" class="slimScrollDiv margin" style="position: relative; overflow: hidden; width: 400px; height: auto;">
+										<div id="'.$id.'_info" class="slimScrollDiv margin" style="position: relative; overflow: hidden; width: '.$width.'; height: auto;">
 										</div>
                                 </li>
                                 <li class="footer">
