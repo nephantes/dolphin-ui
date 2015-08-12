@@ -339,7 +339,8 @@ function exportExcel(){
 								async: false,
 								success : function(q)
 								{
-									window.open("public"+q, '_blank');
+									console.log(q);
+									window.open(BASE_PATH + "/public" + q, '_blank');
 									file_path = q;
 								}
 						});
