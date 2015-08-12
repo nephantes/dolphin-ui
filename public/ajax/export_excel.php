@@ -225,7 +225,7 @@ if($p == 'exportExcel')
 	//	Files
 	$objPHPExcel->setActiveSheetIndex(4);
 	$file_sample_data = json_decode($query->queryTable(
-		"SELECT ngs_samples.name, ngs_temp_sample_files.file_name
+		"SELECT ngs_samples.name, ngs_temp_sample_files.file_name, ngs_temp_sample_files.dir_id
 		FROM ngs_temp_sample_files
 		LEFT JOIN ngs_samples
 		ON ngs_samples.id = ngs_temp_sample_files.sample_id
@@ -233,7 +233,7 @@ if($p == 'exportExcel')
 		"));
 	
 	$file_lane_data = json_decode($query->queryTable(
-		"SELECT ngs_lanes.name, ngs_temp_lane_files.file_name
+		"SELECT ngs_lanes.name, ngs_temp_lane_files.file_name, ngs_temp_lane_files.dir_id
 		FROM ngs_temp_lane_files
 		LEFT JOIN ngs_lanes
 		ON ngs_lanes.id = ngs_temp_lane_files.lane_id
@@ -250,6 +250,70 @@ if($p == 'exportExcel')
 		$objPHPExcel->getActiveSheet()->setCellValue('A'.$col_number, $fld->name);
 		$objPHPExcel->getActiveSheet()->setCellValue('B'.$col_number, $fld->file_name);
 		$col_number++;
+	}
+	
+	//	Directories
+	$objPHPExcel->setActiveSheetIndex(4);
+	$sample_file_directories = json_decode($query->queryTable(
+		"SELECT DISTINCT fastq_dir, backup_dir, amazon_bucket
+		FROM ngs_temp_sample_files
+		LEFT JOIN ngs_dirs
+		ON ngs_dirs.id = ngs_temp_sample_files.dir_id
+		WHERE ngs_temp_sample_files.sample_id IN (".implode(",", $samples).")
+		"));
+
+    $lane_file_directories = json_decode($query->queryTable(
+		"SELECT DISTINCT fastq_dir, backup_dir, amazon_bucket
+		FROM ngs_temp_lane_files
+		LEFT JOIN ngs_dirs
+		ON ngs_dirs.id = ngs_temp_lane_files.dir_id
+		WHERE ngs_temp_lane_files.lane_id IN (SELECT ngs_samples.id FROM ngs_samples WHERE ngs_samples.id IN (".implode(",", $samples)."))
+		"));
+	
+	$directories_used = [];
+	$fastq_dir = '';
+	$backup_dir = '';
+	$amazon_bucket = '';
+	foreach($sample_file_directories as $sfd){
+		if($fastq_dir == '' && $sfd->fastq_dir != null && $sfd->fastq_dir != ''){
+				$fastq_dir = $sample_file_directories->fastq_dir;
+				array_push($directories_used, $sfd->fastq_dir);
+		}else if($fastq_dir != '' && $sfd->fastq_dir != null && $sfd->fastq_dir != ''){
+				$fastq_dir .= ",".$sfd->fastq_dir;
+				array_push($directories_used, $sfd->fastq_dir);
+		}
+		if($backup_dir == '' && $sfd->backup_dir != null && $sfd->backup_dir != ''){
+				$backup_dir = $sample_file_directories->backup_dir;
+		}else if($backup_dir != '' && $sfd->backup_dir != null && $sfd->backup_dir != ''){
+				$backup_dir .= ",".$sfd->backup_dir;
+		}
+		if($amazon_bucket == '' && $sfd->amazon_bucket != null && $sfd->amazon_bucket != ''){
+				$amazon_bucket = $sample_file_directories->amazon_bucket;
+		}else if($amazon_bucket != '' && $sfd->amazon_bucket != null && $sfd->amazon_bucket != ''){
+				$amazon_bucket .= ",".$sfd->amazon_bucket;
+				
+		}
+	}
+	foreach($lane_file_directories as $lfd){
+		if(in_array())
+		if($fastq_dir == '' && $sfd->fastq_dir != null && $sfd->fastq_dir != ''){
+				$fastq_dir = $sample_file_directories->fastq_dir;
+				array_push($directories_used, $sfd->fastq_dir);
+		}else if($fastq_dir != '' && $sfd->fastq_dir != null && $sfd->fastq_dir != ''){
+				$fastq_dir .= ",".$sfd->fastq_dir;
+				array_push($directories_used, $sfd->fastq_dir);
+		}
+		if($backup_dir == '' && $sfd->backup_dir != null && $sfd->backup_dir != ''){
+				$backup_dir = $sample_file_directories->backup_dir;
+		}else if($backup_dir != '' && $sfd->backup_dir != null && $sfd->backup_dir != ''){
+				$backup_dir .= ",".$sfd->backup_dir;
+		}
+		if($amazon_bucket == '' && $sfd->amazon_bucket != null && $sfd->amazon_bucket != ''){
+				$amazon_bucket = $sample_file_directories->amazon_bucket;
+		}else if($amazon_bucket != '' && $sfd->amazon_bucket != null && $sfd->amazon_bucket != ''){
+				$amazon_bucket .= ",".$sfd->amazon_bucket;
+				
+		}
 	}
 	
 	//	Save the file to be downloaded
