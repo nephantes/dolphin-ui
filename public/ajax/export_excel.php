@@ -23,10 +23,9 @@ if (isset($_GET['p'])){$p = $_GET['p'];}
 if($p == 'exportExcel')
 {
 	$user = $_SESSION['user'];
-	
+	echo BASE_PATH . "/tmp/files/";
 	//	Change directory and obtain empty template name
-	pclose(popen( "cd /Library/WebServer/Documents/dolphin/tmp/files/", "r" ) );
-	$inputFileName = '/Library/WebServer/Documents/dolphin/public/tmp/files/Blank_Excel_Export.xls';
+	$inputFileName = BASE_PATH . "/public/tmp/files/Blank_Excel_Export.xls";
 	
 	//	Load in the empty excel template
 	$objPHPExcel = PHPExcel_IOFactory::load($inputFileName);

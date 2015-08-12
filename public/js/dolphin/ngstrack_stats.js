@@ -339,6 +339,7 @@ function exportExcel(){
 								async: false,
 								success : function(q)
 								{
+									console.log(q);
 									window.open("public"+q, '_blank');
 									file_path = q;
 								}
