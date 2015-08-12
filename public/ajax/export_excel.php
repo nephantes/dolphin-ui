@@ -23,9 +23,8 @@ if (isset($_GET['p'])){$p = $_GET['p'];}
 if($p == 'exportExcel')
 {
 	$user = $_SESSION['user'];
-	echo BASE_PATH . "/tmp/files/";
 	//	Change directory and obtain empty template name
-	$inputFileName = BASE_PATH . "/public/tmp/files/Blank_Excel_Export.xls";
+	$inputFileName = "../tmp/files/Blank_Excel_Export.xls";
 	
 	//	Load in the empty excel template
 	$objPHPExcel = PHPExcel_IOFactory::load($inputFileName);

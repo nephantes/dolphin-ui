@@ -340,7 +340,7 @@ function exportExcel(){
 								success : function(q)
 								{
 									console.log(q);
-									window.open("public"+q, '_blank');
+									window.open(BASE_PATH + "/public" + q, '_blank');
 									file_path = q;
 								}
 						});
