@@ -164,6 +164,7 @@ class Ngsimport extends VanillaModel {
 		//$this->model->query("UPDATE `ngs_samples` SET `samplename` = '$samplename' WHERE `id` = $sample_id");
 		return $samplename;
 	}
+	
 	function parseExcel($gid, $sid, $worksheet, $sheetData, $passed_final_check) {
 		$this->worksheet=$worksheet;
 		$this->sheetData=$sheetData;
@@ -194,6 +195,9 @@ class Ngsimport extends VanillaModel {
 		elseif ( $worksheet['worksheetName']=="SAMPLES"){
 			$text.=$this->getSamples();
 		}
+		elseif ( $worksheet['worksheetName']=="DIRS"){
+			$text.=$this->getDirs();
+		}
 		elseif ( $worksheet['worksheetName']=="FILES"){
 			$text.=$this->getFiles();
 		}
@@ -218,6 +222,8 @@ class Ngsimport extends VanillaModel {
 			$text.=$this->processProtocols();
 		}elseif ( $worksheet['worksheetName']=="SAMPLES"){
 			$text.=$this->processSamples();
+		}elseif ( $worksheet['worksheetName']=="DIRS"){
+			$text.=$this->processDirs();
 		}elseif ( $worksheet['worksheetName']=="FILES"){
 			$text.=$this->processFiles();
 			$text.=$this->successText("<BR><BR>Excel import successful!<BR>");
@@ -330,27 +336,21 @@ class Ngsimport extends VanillaModel {
 		}
 		
 		//	Fastq Directory
-		if($this->fastq_dir != null){
-			//	fastq directory check to be implemented later
-		}else{
+		if($this->fastq_dir == null && $this->sheetData[$i]["A"]=="fastq directory"){
 			$text.= $this->errorText("fastq directory is required for submission");
 			$this->final_check = false;
 			$meta_check = false;
 		}
 		
 		//	Backup Directory
-		if($this->backup_dir != null){
-			//	backup directory check to be implemented
-		}else{
+		if($this->backup_dir == null && $this->sheetData[$i]["A"]=="backup directory"){
 			$text.= $this->errorText("backup directory is required for submission");
 			$this->final_check = false;
 			$meta_check = false;
 		}
 		
 		//	Amazon Bucket
-		if($this->amazon_bucket != null){
-			//	amazon bucket check to be implemented
-		}else{
+		if($this->amazon_bucket == null && $this->sheetData[$i]["A"]=="amazon bucket"){
 			$text.= $this->warningText("amazon bucket not specified, please make sure to add it later if desired");
 		}
 		
@@ -814,6 +814,14 @@ class Ngsimport extends VanillaModel {
 			array_push($this->sample_ids, $nl_id);
 		}
 		return $text;
+	}
+		
+	function getDirs(){
+		
+	}
+	
+	function processDirs(){
+		
 	}
 	
 	function getFiles(){
