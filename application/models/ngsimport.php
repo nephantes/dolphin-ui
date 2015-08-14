@@ -878,9 +878,12 @@ class Ngsimport extends VanillaModel {
 			if(!isset($dir->amazon_bucket) || $dir->amazon_bucket == ''){
 				$text.= $this->warningText("Amazon bucket information missing (row " . $i . ")");
 			}
+			
+			if($dir_check){
+				$this->dir_arr[$dir->dir_tag]=$dir;
+			}
 		}
 		if($dir_check){
-			$this->dir_arr[$dir->dir_tag]=$dir;
 			$text.= $this->successText('Formatting passed inspection!<BR>');
 		}
 		return $text;
@@ -1994,20 +1997,20 @@ class files extends main{
 		{
 			$this->tablename="ngs_temp_sample_files";
 			$this->fieldname="sample_id";
-		$this->value=$this->sample_id;
-		
-		$sql="select id from `$this->tablename` where `file_name`='$file->file_name' and `sample_id`='$this->sample_id'";
-		return $this->model->query($sql,1);
+			$this->value=$this->sample_id;
+			
+			$sql="select id from `$this->tablename` where `file_name`='$file->file_name' and `sample_id`='$this->sample_id'";
+			return $this->model->query($sql,1);
 		}
-	else
-	{
+		else
+		{
 			$this->tablename="ngs_temp_lane_files";
 			$this->fieldname="lane_id";
-		$this->value=$this->lane_id;
-		
-		$sql="select id from `$this->tablename` where `file_name`='$file->file_name' and `lane_id`='$this->lane_id'";
-		return $this->model->query($sql,1);
-	}
+			$this->value=$this->lane_id;
+			
+			$sql="select id from `$this->tablename` where `file_name`='$file->file_name' and `lane_id`='$this->lane_id'";
+			return $this->model->query($sql,1);
+		}
 		
 	}
 
@@ -2073,7 +2076,6 @@ class dirs extends main{
 
 	function insert($dir)
 	{
-
 		$sql=" INSERT INTO `ngs_dirs`(`fastq_dir`,`backup_dir`, `amazon_bucket`,
 		`owner_id`, `group_id`, `perms`,
 		`date_created`, `date_modified`, `last_modified_user`)
@@ -2081,7 +2083,7 @@ class dirs extends main{
 		 '".$this->model->uid."', '".$this->model->gid."', '".$this->model->sid."',
 		 now(), now(), '".$this->model->uid."');";
 		$this->insert++;
-	$this->sql=$sql;
+		
 		return $this->model->query($sql);
 	}
 
