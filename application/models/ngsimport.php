@@ -853,7 +853,7 @@ class Ngsimport extends VanillaModel {
 				if($this->sheetData[3][$j]=="Amazon bucket"){$dir->amazon_bucket=$this->esc($this->sheetData[$i][$j]);}
 			}
 			
-			if(!isset($dir->dir_tag)){
+			if(!isset($dir->dir_tag) || $dir->dir_tag == ''){
 				$text.= $this->errorText("Dir ID required for submission (row " . $i . ")");
 				$this->final_check = false;
 				$dir_check = false;
@@ -861,7 +861,7 @@ class Ngsimport extends VanillaModel {
 				array_push($this->dir_tags, $dir->dir_tag);
 			}
 			
-			if(!isset($dir->fastq_dir)){
+			if(!isset($dir->fastq_dir) || $dir->fastq_dir == ''){
 				$text.= $this->errorText("Fastq directory required for submission (row " . $i . ")");
 				$this->final_check = false;
 				$dir_check = false;
@@ -869,10 +869,14 @@ class Ngsimport extends VanillaModel {
 				array_push($this->dir_fastq, $dir->fastq_dir);
 			}
 			
-			if(!isset($dir->backup_dir)){
+			if(!isset($dir->backup_dir) || $dir->backup_dir == ''){
 				$text.= $this->errorText("Backup directory required for submission (row " . $i . ")");
 				$this->final_check = false;
 				$dir_check = false;
+			}
+			
+			if(!isset($dir->amazon_bucket) || $dir->amazon_bucket == ''){
+				$text.= $this->warningText("Amazon bucket information missing (row " . $i . ")");
 			}
 		}
 		if($dir_check){
@@ -929,7 +933,7 @@ class Ngsimport extends VanillaModel {
 					}
 				}
 				if($this->sheetData[3][$j]=="Directory ID"){
-					if(in_array($file->dir_tag, $this->dir_tags)){
+					if(in_array($file->dir_tag, $this->dir_tags) && isset($this->dir_fastq[array_search($file->dir_tag, $this->dir_tags)])){
 						$file->fastq_dir = $this->dir_fastq[array_search($file->dir_tag, $this->dir_tags)];
 					}
 				}
@@ -969,7 +973,7 @@ class Ngsimport extends VanillaModel {
 			
 			//	File Directory
 			if(!isset($file->fastq_dir) && isset($file->dir_tag)){
-				$text.= $this->errorText("proper directory id not given (row " . $i . ")");
+				$text.= $this->errorText("Directory information is incorrect (row " . $i . ")");
 				$this->final_check = false;
 				$file_check = false;
 			}elseif($this->fastq_dir != null){
@@ -1045,13 +1049,6 @@ class Ngsimport extends VanillaModel {
 				}
 				
 			}
-		}
-		
-		//	Checks for new names for files with same file_names
-		if($this->laneArrayCheck == 'lane'){
-			
-		}else{
-			
 		}
 		
 		return $text;
