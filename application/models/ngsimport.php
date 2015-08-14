@@ -39,6 +39,12 @@ class Ngsimport extends VanillaModel {
 	public $sample_arr = [];
 	public $char_arr=[];
 	
+	//	DIRECTORIES
+	public $dir_arr = [];
+	public $dir_tags =[];
+	public $dir_fastq = [];
+	public $dir_ids = [];
+	
 	//	FILES
 	public $file_arr = [];
 	public $file_names = [];
@@ -68,6 +74,7 @@ class Ngsimport extends VanillaModel {
         endforeach;
         return rtrim($group_str, ",");
     }
+	
 	function createSampleName($sample){
 		$samplename = '';
 		$underscore_mark = true;
@@ -280,7 +287,26 @@ class Ngsimport extends VanillaModel {
 				array_push($this->initialSubmission, $this->esc($this->sheetData[$i]["B"]));
 			}
 			if($this->sheetData[$i]["A"]=="backup directory"){
-					array_push($this->initialSubmission, $this->esc($this->sheetData[$i]["B"]));
+				array_push($this->initialSubmission, $this->esc($this->sheetData[$i]["B"]));
+			}
+			
+			//	Fastq Directory
+			if($this->fastq_dir == null && $this->sheetData[$i]["A"]=="fastq directory"){
+				$text.= $this->errorText("fastq directory is required for submission");
+				$this->final_check = false;
+				$meta_check = false;
+			}
+			
+			//	Backup Directory
+			if($this->backup_dir == null && $this->sheetData[$i]["A"]=="backup directory"){
+				$text.= $this->errorText("backup directory is required for submission");
+				$this->final_check = false;
+				$meta_check = false;
+			}
+			
+			//	Amazon Bucket
+			if($this->amazon_bucket == null && $this->sheetData[$i]["A"]=="amazon bucket"){
+				$text.= $this->warningText("amazon bucket not specified, please make sure to add it later if desired");
 			}
 		}
 		
@@ -335,25 +361,6 @@ class Ngsimport extends VanillaModel {
 			$text.= $this->warningText("No contributors specified, please make sure to add them later if desired");
 		}
 		
-		//	Fastq Directory
-		if($this->fastq_dir == null && $this->sheetData[$i]["A"]=="fastq directory"){
-			$text.= $this->errorText("fastq directory is required for submission");
-			$this->final_check = false;
-			$meta_check = false;
-		}
-		
-		//	Backup Directory
-		if($this->backup_dir == null && $this->sheetData[$i]["A"]=="backup directory"){
-			$text.= $this->errorText("backup directory is required for submission");
-			$this->final_check = false;
-			$meta_check = false;
-		}
-		
-		//	Amazon Bucket
-		if($this->amazon_bucket == null && $this->sheetData[$i]["A"]=="amazon bucket"){
-			$text.= $this->warningText("amazon bucket not specified, please make sure to add it later if desired");
-		}
-		
 		if($meta_check){
 			$text.= $this->successText('Formatting passed inspection!<BR>');
 		}
@@ -368,9 +375,19 @@ class Ngsimport extends VanillaModel {
 		$text.="SERIES:".$new_series->getStat()."<BR>";
 		$new_conts = new contributors($this, $this->conts);
 		$text.= "CONT:".$new_conts->getStat()."<BR>";
-		if (isset($this->fastq_dir)){
-			$new_dirs = new dirs($this);
-			$text.= "DIRS:".$new_dirs->getStat()."<BR>";
+		if(isset($this->fastq_dir)){
+			$dir = new dir();
+			$dir->dir_tag="old_import_template";
+			$dir->fastq_dir=$this->fastq_dir;
+			$dir->backup_dir=$this->backup_dir;
+			$dir->amazon_bucket=$this->amazon_bucket;
+			$this->dir_arr[$dir->dir_tag]=$dir;
+			
+			$new_dirs = new dirs($this, $this->dir_arr);
+			$text="DIR:".$new_dirs->getStat()."<BR>";
+			$dir_id = json_decode($this->query("SELECT id FROM ngs_dirs
+											   WHERE fastq_dir = $this->fastq_dir"));
+			array_push($this->dir_ids, $dir_id);
 		}
 		return $text;
 	}
@@ -817,11 +834,64 @@ class Ngsimport extends VanillaModel {
 	}
 		
 	function getDirs(){
-		
+		$dir_check = true;
+		$text = "";
+		/*
+		 *	For each row in the samples worksheet
+		 */
+		for ($i=4;$i<=$this->worksheet['totalRows'];$i++)
+		{
+			/*
+			 *	Read data columns
+			 */
+			$dir = new dir();
+			for ($j='A';$j<=$this->worksheet['lastColumnLetter'];$j++)
+			{
+				if($this->sheetData[3][$j]=="Directory ID"){$dir->dir_tag=$this->esc($this->sheetData[$i][$j]);}
+				if($this->sheetData[3][$j]=="Fastq directory"){$dir->fastq_dir=$this->esc($this->sheetData[$i][$j]);}
+				if($this->sheetData[3][$j]=="Backup directory"){$dir->backup_dir=$this->esc($this->sheetData[$i][$j]);}
+				if($this->sheetData[3][$j]=="Amazon bucket"){$dir->amazon_bucket=$this->esc($this->sheetData[$i][$j]);}
+			}
+			
+			if(!isset($dir->dir_tag)){
+				$text.= $this->errorText("Dir ID required for submission (row " . $i . ")");
+				$this->final_check = false;
+				$dir_check = false;
+			}else{
+				array_push($this->dir_tags, $dir->dir_tag);
+			}
+			
+			if(!isset($dir->fastq_dir)){
+				$text.= $this->errorText("Fastq directory required for submission (row " . $i . ")");
+				$this->final_check = false;
+				$dir_check = false;
+			}else{
+				array_push($this->dir_fastq, $dir->fastq_dir);
+			}
+			
+			if(!isset($dir->backup_dir)){
+				$text.= $this->errorText("Backup directory required for submission (row " . $i . ")");
+				$this->final_check = false;
+				$dir_check = false;
+			}
+		}
+		if($dir_check){
+			$this->dir_arr[$dir->dir_tag]=$dir;
+			$text.= $this->successText('Formatting passed inspection!<BR>');
+		}
+		return $text;
 	}
 	
 	function processDirs(){
-		
+		$text = "";
+		$new_dirs = new dirs($this, $this->dir_arr);
+		$text="DIR:".$new_dirs->getStat()."<BR>";
+		foreach($this->dir_fastq as $df){
+			$dir_id = json_decode($this->query("SELECT id FROM ngs_dirs
+											   WHERE fastq_dir = $df"));
+			array_push($this->dir_ids, $dir_id);
+		}
+		return $text;
 	}
 	
 	function getFiles(){
@@ -839,6 +909,7 @@ class Ngsimport extends VanillaModel {
 			for ($j='A';$j<=$this->worksheet['lastColumnLetter'];$j++)
 			{
 				if($this->sheetData[3][$j]=="Sample or Lane Name (Enter same name for multiple files)"){$file->name=$this->esc($this->sheetData[$i][$j]);}
+				if($this->sheetData[3][$j]=="Directory ID"){$file->dir_tag=$this->esc($this->sheetData[$i][$j]);}
 				if($this->sheetData[3][$j]=="file name(comma separated for paired ends)"){$file->file_name=$this->esc($this->sheetData[$i][$j]);$file->file_name=preg_replace('/\s/', '', $file->file_name);}
 				if($this->sheetData[3][$j]=="file checksum"){$file->checksum=$this->esc($this->sheetData[$i][$j]);}
 				
@@ -855,6 +926,11 @@ class Ngsimport extends VanillaModel {
 					if (strpos($file->file_name, ',') !== false){
 						array_push($this->initialSubmission, 'paired');
 						$this->pairedEndCheck = 'paired';
+					}
+				}
+				if($this->sheetData[3][$j]=="Directory ID"){
+					if(in_array($file->dir_tag, $this->dir_tags)){
+						$file->fastq_dir = $this->dir_fastq[array_search($file->dir_tag, $this->dir_tags)];
 					}
 				}
 			}
@@ -889,6 +965,16 @@ class Ngsimport extends VanillaModel {
 				$text.= $this->errorText("file name is required for submission (row " . $i . ")");
 				$this->final_check = false;
 				$file_check = false;
+			}
+			
+			//	File Directory
+			if(!isset($file->fastq_dir) && isset($file->dir_tag)){
+				$text.= $this->errorText("proper directory id not given (row " . $i . ")");
+				$this->final_check = false;
+				$file_check = false;
+			}elseif($this->fastq_dir != null){
+				$file->dir_tag="old_import_template";
+				$file->fastq_dir = $this->fastq_dir;
 			}
 		}
 		if($file_check){
@@ -1848,7 +1934,6 @@ class characteristics extends main{
 	}
 }
 
-
 /* files class */
 class file{}
 class files extends main{
@@ -1897,9 +1982,9 @@ class files extends main{
 			return 0;
 		}
 	}
-	function getDirId($model)
+	function getDirId($fastq_dir)
 	{
-		$sql="select id from ngs_dirs where `fastq_dir`='$model->fastq_dir'";
+		$sql="select id from ngs_dirs where `fastq_dir`='$fastq_dir'";
 		return $this->model->query($sql,1);
 	}
 
@@ -1907,7 +1992,7 @@ class files extends main{
 	{
 		$this->sample_id = $this->getSampleId($file->name);
 		$this->lane_id = ($this->sample_id==0 ? $this->getLaneId($file->name) : $this->getLaneIdFromSample($file->name));
-		$this->dir_id = $this->getDirId($this->model);
+		$this->dir_id = $this->getDirId($file->fastq_dir);
 		if ($this->sample_id>0)
 		{
 			$this->tablename="ngs_temp_sample_files";
@@ -1962,12 +2047,15 @@ class files extends main{
 }
 
 /* diretories for the files class */
+class dir{}
 class dirs extends main{
 
-	function __construct($model)
+	function __construct($model, $dir_arr = [])
 	{
 		$this->model=$model;
-	$this->process($this);
+		$this->dir_arr=$dir_arr;
+		
+		$this->processArr($dir_arr);
 	}
 
 	function getSQL()
@@ -1980,19 +2068,19 @@ class dirs extends main{
 		return "Update:$this->update, Insert:$this->insert";
 	}
 
-	function getId()
+	function getId($dir)
 	{
-		$sql="select id from ngs_dirs where `fastq_dir`='".$this->model->fastq_dir."'";
+		$sql="select id from ngs_dirs where `fastq_dir`='".$dir->fastq_dir."'";
 		return $this->model->query($sql,1);
 	}
 
-	function insert()
+	function insert($dir)
 	{
 
 		$sql=" INSERT INTO `ngs_dirs`(`fastq_dir`,`backup_dir`, `amazon_bucket`,
 		`owner_id`, `group_id`, `perms`,
 		`date_created`, `date_modified`, `last_modified_user`)
-				 VALUES('".$this->model->fastq_dir."', '".$this->model->backup_dir."', '".$this->model->amazon_bucket."',
+				 VALUES('".$dir->fastq_dir."', '".$dir->backup_dir."', '".$dir->amazon_bucket."',
 		 '".$this->model->uid."', '".$this->model->gid."', '".$this->model->sid."',
 		 now(), now(), '".$this->model->uid."');";
 		$this->insert++;
@@ -2000,13 +2088,13 @@ class dirs extends main{
 		return $this->model->query($sql);
 	}
 
-	function update()
+	function update($dir)
 	{
 		$sql="update `ngs_dirs` set
-		`backup_dir`='".$this->model->backup_dir."', `amazon_bucket`='".$this->model->amazon_bucket."',
+		`backup_dir`='".$dir->backup_dir."', `amazon_bucket`='".$dir->amazon_bucket."',
 		`group_id`='".$this->model->gid."', `perms`='".$this->model->sid."',
 		`date_modified`=now(), `last_modified_user`='".$this->model->uid."'
-				where `id` = ".$this->getId();
+				where `id` = ".$this->getId($dir);
 		$this->update++;
 
 		return $this->model->query($sql);
