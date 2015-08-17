@@ -189,8 +189,8 @@ function rerunLoad() {
 							
 							//MCall
 							//handle for multiple selections
-							var select_values = splt2[1].split(",");
-							var select_locations = splt2[2].split(",");
+							var select_values = splt2[3].split(",");
+							var select_locations = splt2[4].split(",");
 							var select1_values = [];
 							var select2_values = [];
 							for(var f = 0; f < select_locations.length; f++){
@@ -213,13 +213,13 @@ function rerunLoad() {
 									select2.options[h].selected = true;
 								}
 							}
-							document.getElementById('text_1_'+i).value = splt2[3];
-							document.getElementById('textarea_1_'+i).value = splt2[4];
+							document.getElementById('text_3_'+i).value = splt2[5];
+							document.getElementById('textarea_1_'+i).value = splt2[6];
 							
-							//MCall
+							//MComp
 							//handle for multiple selections
-							var select_values = splt2[1].split(",");
-							var select_locations = splt2[2].split(",");
+							var select_values = splt2[7].split(",");
+							var select_locations = splt2[8].split(",");
 							var select1_values = [];
 							var select2_values = [];
 							for(var f = 0; f < select_locations.length; f++){
@@ -230,20 +230,20 @@ function rerunLoad() {
 								}
 							}
 							
-							var select1 = document.getElementById('multi_select_1_'+i);
+							var select1 = document.getElementById('multi_select_3_'+i);
 							for(var h = 0; h < select1.options.length; h++){
 								if (select1_values.indexOf(select1.options[h].value) != -1) {
 									select1.options[h].selected = true;
 								}
 							}
-							var select2 = document.getElementById('multi_select_2_'+i);
+							var select2 = document.getElementById('multi_select_4_'+i);
 							for(var h = 0; h < select1.options.length; h++){
 								if (select2_values.indexOf(select2.options[h].value) != -1) {
 									select2.options[h].selected = true;
 								}
 							}
-							document.getElementById('text_1_'+i).value = splt2[3];
-							document.getElementById('textarea_1_'+i).value = splt2[4];
+							document.getElementById('text_4_'+i).value = splt2[9];
+							document.getElementById('textarea_2_'+i).value = splt2[10];
 						}
 					}
 					document.getElementById(jsonTypeList[x]+'_exp_body').setAttribute('style', 'display: block');
@@ -1037,7 +1037,13 @@ function findPipelineValues(){
 		
 		var conditions_array = [];
 		var conditions_type_array = [];
+		var multireset = false;
 		for (var x = 0; x < masterDiv.length; x++) {
+			if (multireset == true) {
+				conditions_array = [];
+				conditions_type_array = [];
+				multireset = false;
+			}
 			var e = masterDiv[x];
 			if (e.type != undefined) {
 				if (e.type == "select-multiple") {
@@ -1054,6 +1060,7 @@ function findPipelineValues(){
 							conditions_type_array.push('Cond2');
 						}
 						pipeJSON += ':' + conditions_array.toString() + ':' + conditions_type_array.toString();
+						multireset = true;
 					}
 				}else{
 					pipeJSON += ':' + e.value.replace(/\r\n|\r|\n/g, "__cr____cn__");
