@@ -12,8 +12,9 @@ function rerunSelected(runID, groupID){
 		async: false,
 		success : function(s)
 		{
+            console.log(s);
 			for(var i = 0; i < s.length; i++) {
-			sample_ids.push(s[i].sample_id);
+                sample_ids.push(s[i].sample_id);
 			}
 		}
 	});

@@ -413,7 +413,7 @@ else if($p == 'getRunSamples')
 	if (isset($_GET['runID'])){$runID = $_GET['runID'];}
 
 	$data=$query->queryTable("
-	SELECT sample_id
+	SELECT DISTINCT sample_id
 	FROM ngs_runlist
 	WHERE ngs_runlist.run_id = $runID $andPerms
 	");
