@@ -355,6 +355,10 @@ function pipelineSelect(num){
 				createElement('input', ['id', 'class', 'type', 'value'], ['text_2_'+num, 'form-control', 'text', ''])] ]);
 		
 		//MCALL
+		labelDiv = createElement('div', ['class'], ['col-md-12']);
+		labelDiv.appendChild( createElement('label', ['class','TEXTNODE'], ['box-title', 'Run MCall:']));
+		labelDiv.appendChild( createElement('input', ['id', 'type', 'class'], ['checkbox_2_'+num, 'radio', 'form-control']));
+		divAdj.appendChild(labelDiv);
 		divAdj = mergeTidy(divAdj, 6,
 				[ [createElement('label', ['class','TEXTNODE'], ['box-title', 'MCall Condition 1']),
 				createElement('select',['id', 'class', 'multiple', 'size', 'onchange'],['multi_select_1_'+num, 'form-control', 'multiple', '8', 'deselectCondition(1, '+num+')'])],
@@ -370,12 +374,11 @@ function pipelineSelect(num){
 		divAdj.appendChild(labelDiv);
 		
 		//MComp
-		divAdj = mergeTidy(divAdj, 6,
-				[ [createElement('label', ['class','TEXTNODE'], ['box-title', 'MComp Condition 1']),
-				createElement('select',['id', 'class', 'multiple', 'size', 'onchange'],['multi_select_3_'+num, 'form-control', 'multiple', '8', 'deselectCondition(3, '+num+')'])],
-				[createElement('label', ['class','TEXTNODE'], ['box-title', 'MComp Condition 2']),
-				createElement('select',['id', 'class', 'multiple', 'size', 'onchange'],['multi_select_4_'+num, 'form-control', 'multiple', '8', 'deselectCondition(4, '+num+')'])] ]);
-		var labelDiv = createElement('div', ['class'], ['col-md-12']);
+		labelDiv = createElement('div', ['class'], ['col-md-12']);
+		labelDiv.appendChild( createElement('label', ['class','TEXTNODE'], ['box-title', 'Run MComp:']));
+		labelDiv.appendChild( createElement('input', ['id', 'type', 'class'], ['checkbox_3_'+num, 'radio', 'form-control']));
+		divAdj.appendChild(labelDiv);
+		labelDiv = createElement('div', ['class'], ['col-md-12']);
 		labelDiv.appendChild( createElement('label', ['class','TEXTNODE'], ['box-title', 'Comparison Filename:']));
 		labelDiv.appendChild( createElement('input', ['id', 'class'], ['text_4_'+num, 'form-control']));
 		divAdj.appendChild(labelDiv);
