@@ -13,7 +13,7 @@ var checklist_lanes = [];
 var pipelineNum = 0;
 var customSeqNum = 0;
 var customSeqNumCheck = [];
-var pipelineDict = ['RNASeqRSEM', 'Tophat', 'ChipSeq', 'DESeq', 'RRBS-Map', 'RRBS-MCall', 'RRBS-MComp'];
+var pipelineDict = ['RNASeqRSEM', 'Tophat', 'ChipSeq', 'DESeq', 'RRBS'];
 var rnaList = ["ercc","rRNA","miRNA","tRNA","snRNA","rmsk","genome","change_params"];
 var qualityDict = ["window size","required quality","leading","trailing","minlen"];
 var trimmingDict = ["single or paired-end", "5 length 1", "3 length 1", "5 length 2", "3 length 2"];
@@ -186,12 +186,8 @@ function rerunLoad() {
 							pipelineSelect(i);
 							document.getElementById('text_1_'+i).value = splt2[1];
 							document.getElementById('text_2_'+i).value = splt2[2];
-						}else if (splt2[0] == pipelineDict[5]) {
-							//MCall
-							additionalPipes();
-							document.getElementById('select_'+i).value = pipelineDict[5];
-							pipelineSelect(i);
 							
+							//MCall
 							//handle for multiple selections
 							var select_values = splt2[1].split(",");
 							var select_locations = splt2[2].split(",");
@@ -219,12 +215,8 @@ function rerunLoad() {
 							}
 							document.getElementById('text_1_'+i).value = splt2[3];
 							document.getElementById('textarea_1_'+i).value = splt2[4];
-						}else if (splt2[0] == pipelineDict[6]) {
-							//MCall
-							additionalPipes();
-							document.getElementById('select_'+i).value = pipelineDict[6];
-							pipelineSelect(i);
 							
+							//MCall
 							//handle for multiple selections
 							var select_values = splt2[1].split(",");
 							var select_locations = splt2[2].split(",");
@@ -361,7 +353,7 @@ function pipelineSelect(num){
 				createElement('input', ['id', 'class', 'type', 'value'], ['text_1_'+num, 'form-control', 'text', 'C-CGG'])],
 				[createElement('label', ['class','TEXTNODE'], ['box-title', 'Reference (fasta):']),
 				createElement('input', ['id', 'class', 'type', 'value'], ['text_2_'+num, 'form-control', 'text', ''])] ]);
-	}else if (pipeType == pipelineDict[5]) {
+		
 		//MCALL
 		divAdj = mergeTidy(divAdj, 6,
 				[ [createElement('label', ['class','TEXTNODE'], ['box-title', 'MCall Condition 1']),
@@ -370,26 +362,26 @@ function pipelineSelect(num){
 				createElement('select',['id', 'class', 'multiple', 'size', 'onchange'],['multi_select_2_'+num, 'form-control', 'multiple', '8', 'deselectCondition(2, '+num+')'])] ]);
 		var labelDiv = createElement('div', ['class'], ['col-md-12']);
 		labelDiv.appendChild( createElement('label', ['class','TEXTNODE'], ['box-title', 'Sample Name:']));
-		labelDiv.appendChild( createElement('input', ['id', 'class'], ['text_1_'+num, 'form-control']));
+		labelDiv.appendChild( createElement('input', ['id', 'class'], ['text_3_'+num, 'form-control']));
 		divAdj.appendChild(labelDiv);
 		labelDiv = createElement('div', ['class'], ['col-md-12']);
 		labelDiv.appendChild( createElement('label', ['class','TEXTNODE'], ['box-title', 'Additional MCall Parameters:']));
 		labelDiv.appendChild( createElement('textarea', ['id', 'class'], ['textarea_1_'+num, 'form-control']));
 		divAdj.appendChild(labelDiv);
-	}else if (pipeType == pipelineDict[6]) {
+		
 		//MComp
 		divAdj = mergeTidy(divAdj, 6,
 				[ [createElement('label', ['class','TEXTNODE'], ['box-title', 'MComp Condition 1']),
-				createElement('select',['id', 'class', 'multiple', 'size', 'onchange'],['multi_select_1_'+num, 'form-control', 'multiple', '8', 'deselectCondition(1, '+num+')'])],
+				createElement('select',['id', 'class', 'multiple', 'size', 'onchange'],['multi_select_3_'+num, 'form-control', 'multiple', '8', 'deselectCondition(3, '+num+')'])],
 				[createElement('label', ['class','TEXTNODE'], ['box-title', 'MComp Condition 2']),
-				createElement('select',['id', 'class', 'multiple', 'size', 'onchange'],['multi_select_2_'+num, 'form-control', 'multiple', '8', 'deselectCondition(2, '+num+')'])] ]);
+				createElement('select',['id', 'class', 'multiple', 'size', 'onchange'],['multi_select_4_'+num, 'form-control', 'multiple', '8', 'deselectCondition(4, '+num+')'])] ]);
 		var labelDiv = createElement('div', ['class'], ['col-md-12']);
 		labelDiv.appendChild( createElement('label', ['class','TEXTNODE'], ['box-title', 'Comparison Filename:']));
-		labelDiv.appendChild( createElement('input', ['id', 'class'], ['text_1_'+num, 'form-control']));
+		labelDiv.appendChild( createElement('input', ['id', 'class'], ['text_4_'+num, 'form-control']));
 		divAdj.appendChild(labelDiv);
 		labelDiv = createElement('div', ['class'], ['col-md-12']);
 		labelDiv.appendChild( createElement('label', ['class','TEXTNODE'], ['box-title', 'Additional MComp Parameters:']));
-		labelDiv.appendChild( createElement('textarea', ['id', 'class'], ['textarea_1_'+num, 'form-control']));
+		labelDiv.appendChild( createElement('textarea', ['id', 'class'], ['textarea_2_'+num, 'form-control']));
 		divAdj.appendChild(labelDiv);
 	}
 	//replace div
@@ -402,7 +394,7 @@ function pipelineSelect(num){
 		}
 	}
 	
-	//if DESEQ
+	//MULTI-SELECT
 	if (document.getElementById('multi_select_1_'+num) != null) {
 		var sample_names = getSampleNames(window.location.href.split('/')[window.location.href.split('/').length - 1].replace('$', ''));
 		for(var x = 0; x < sample_names.length; x++){
@@ -410,6 +402,15 @@ function pipelineSelect(num){
 				document.getElementById(num+'_1_'+sample_names[x]).innerHTML = sample_names[x]
 				document.getElementById('multi_select_2_'+num).appendChild(createElement('option', ['id', 'value'], [num+'_2_'+sample_names[x], sample_names[x]]));
 				document.getElementById(num+'_2_'+sample_names[x]).innerHTML = sample_names[x]
+		}
+	}
+	if (document.getElementById('multi_select_3_'+num) != null) {
+		var sample_names = getSampleNames(window.location.href.split('/')[window.location.href.split('/').length - 1].replace('$', ''));
+		for(var x = 0; x < sample_names.length; x++){
+				document.getElementById('multi_select_3_'+num).appendChild(createElement('option', ['id', 'value'], [num+'_3_'+sample_names[x], sample_names[x]]));
+				document.getElementById(num+'_3_'+sample_names[x]).innerHTML = sample_names[x]
+				document.getElementById('multi_select_4_'+num).appendChild(createElement('option', ['id', 'value'], [num+'_4_'+sample_names[x], sample_names[x]]));
+				document.getElementById(num+'_4_'+sample_names[x]).innerHTML = sample_names[x]
 		}
 	}
 	
@@ -953,9 +954,9 @@ function additionalPipes(){
 	var innerDiv = document.createElement( 'div' );
 	//attach children to parent
 	innerDiv.appendChild( createElement('select',
-					['id', 'class', 'onchange', 'OPTION_DIS_SEL', 'OPTION', 'OPTION', 'OPTION', 'OPTION', 'OPTION',  'OPTION', 'OPTION'],
+					['id', 'class', 'onchange', 'OPTION_DIS_SEL', 'OPTION', 'OPTION', 'OPTION', 'OPTION', 'OPTION'],
 					['select_'+pipelineNum, 'form-control', 'pipelineSelect('+pipelineNum+')', '--- Select a Pipeline ---',
-					pipelineDict[0], pipelineDict[1], pipelineDict[2], pipelineDict[3], pipelineDict[4], pipelineDict[5], pipelineDict[6] ]));
+					pipelineDict[0], pipelineDict[1], pipelineDict[2], pipelineDict[3], pipelineDict[4]]));
 	innerDiv.appendChild( createElement('div', ['id'], ['select_child_'+pipelineNum]));
 	outerDiv.appendChild( innerDiv );
 	outerDiv.appendChild( createElement('input', ['id', 'type', 'class', 'style', 'value', 'onclick'],
@@ -970,8 +971,12 @@ function deselectCondition(condition, pipeNum){
 	var selection = document.getElementById('multi_select_'+condition+'_'+pipeNum);
 	if (condition == 1) {
 		var opposite = 2;
-	}else{
+	}else if(condition == 2){
 		var opposite = 1;
+	}else if (condition == 3) {
+		var opposite = 4;
+	}else if (condition == 4) {
+		var opposite = 3;
 	}
 	var opposite_selection = document.getElementById('multi_select_'+opposite+'_'+pipeNum);
 	for (var x = 0; x < selection.options.length; x++) {
