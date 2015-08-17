@@ -13,7 +13,7 @@ var checklist_lanes = [];
 var pipelineNum = 0;
 var customSeqNum = 0;
 var customSeqNumCheck = [];
-var pipelineDict = ['RNASeqRSEM', 'Tophat', 'ChipSeq', 'DESeq'];
+var pipelineDict = ['RNASeqRSEM', 'Tophat', 'ChipSeq', 'DESeq', 'RRBS-Map', 'RRBS-MCall', 'RRBS-MComp'];
 var rnaList = ["ercc","rRNA","miRNA","tRNA","snRNA","rmsk","genome","change_params"];
 var qualityDict = ["window size","required quality","leading","trailing","minlen"];
 var trimmingDict = ["single or paired-end", "5 length 1", "3 length 1", "5 length 2", "3 length 2"];
@@ -29,7 +29,7 @@ function rerunLoad() {
 	if (hrefSplit[4] == 'search') {
 		document.getElementById('dolphin_basket').parentNode.setAttribute('style','overflow:scroll');
 	}
-	var rerunLoc = $.inArray('rerun', hrefSplit)
+	var rerunLoc = $.inArray('rerun', hrefSplit);
 	var infoArray = [];
 	var json_primer = '';
 	var jsonObj;
@@ -179,6 +179,79 @@ function rerunLoad() {
 							document.getElementById('text_1_'+i).value = splt2[5];
 							document.getElementById('text_2_'+i).value = splt2[6];
 							document.getElementById('select_5_'+i).value = splt2[7];
+						}else if (splt2[0] == pipelineDict[4]) {
+							//MMap
+							additionalPipes();
+							document.getElementById('select_'+i).value = pipelineDict[4];
+							pipelineSelect(i);
+							document.getElementById('text_1_'+i).value = splt2[1];
+							document.getElementById('text_2_'+i).value = splt2[2];
+						}else if (splt2[0] == pipelineDict[5]) {
+							//MCall
+							additionalPipes();
+							document.getElementById('select_'+i).value = pipelineDict[5];
+							pipelineSelect(i);
+							
+							//handle for multiple selections
+							var select_values = splt2[1].split(",");
+							var select_locations = splt2[2].split(",");
+							var select1_values = [];
+							var select2_values = [];
+							for(var f = 0; f < select_locations.length; f++){
+								if (select_locations[f] == 'Cond1') {
+									select1_values.push(select_values[f]);
+								}else{
+									select2_values.push(select_values[f]);
+								}
+							}
+							
+							var select1 = document.getElementById('multi_select_1_'+i);
+							for(var h = 0; h < select1.options.length; h++){
+								if (select1_values.indexOf(select1.options[h].value) != -1) {
+									select1.options[h].selected = true;
+								}
+							}
+							var select2 = document.getElementById('multi_select_2_'+i);
+							for(var h = 0; h < select1.options.length; h++){
+								if (select2_values.indexOf(select2.options[h].value) != -1) {
+									select2.options[h].selected = true;
+								}
+							}
+							document.getElementById('text_1_'+i).value = splt2[3];
+							document.getElementById('textarea_1_'+i).value = splt2[4];
+						}else if (splt2[0] == pipelineDict[6]) {
+							//MCall
+							additionalPipes();
+							document.getElementById('select_'+i).value = pipelineDict[6];
+							pipelineSelect(i);
+							
+							//handle for multiple selections
+							var select_values = splt2[1].split(",");
+							var select_locations = splt2[2].split(",");
+							var select1_values = [];
+							var select2_values = [];
+							for(var f = 0; f < select_locations.length; f++){
+								if (select_locations[f] == 'Cond1') {
+									select1_values.push(select_values[f]);
+								}else{
+									select2_values.push(select_values[f]);
+								}
+							}
+							
+							var select1 = document.getElementById('multi_select_1_'+i);
+							for(var h = 0; h < select1.options.length; h++){
+								if (select1_values.indexOf(select1.options[h].value) != -1) {
+									select1.options[h].selected = true;
+								}
+							}
+							var select2 = document.getElementById('multi_select_2_'+i);
+							for(var h = 0; h < select1.options.length; h++){
+								if (select2_values.indexOf(select2.options[h].value) != -1) {
+									select2.options[h].selected = true;
+								}
+							}
+							document.getElementById('text_1_'+i).value = splt2[3];
+							document.getElementById('textarea_1_'+i).value = splt2[4];
 						}
 					}
 					document.getElementById(jsonTypeList[x]+'_exp_body').setAttribute('style', 'display: block');
@@ -281,6 +354,43 @@ function pipelineSelect(num){
 		divAdj = mergeTidy(divAdj, 12,
 				[ [createElement('label', ['class','TEXTNODE'], ['box-title', 'Select Sequence']),
 				createElement('select', ['id', 'class'], ['select_5_'+num, 'form-control'])] ]);
+	}else if (pipeType == pipelineDict[4]) {
+		//MMap
+		divAdj = mergeTidy(divAdj, 6,
+				[ [createElement('label', ['class','TEXTNODE'], ['box-title', 'Digestion Site:']),
+				createElement('input', ['id', 'class', 'type', 'value'], ['text_1_'+num, 'form-control', 'text', 'C-CGG'])],
+				[createElement('label', ['class','TEXTNODE'], ['box-title', 'Reference (fasta):']),
+				createElement('input', ['id', 'class', 'type', 'value'], ['text_2_'+num, 'form-control', 'text', ''])] ]);
+	}else if (pipeType == pipelineDict[5]) {
+		//MCALL
+		divAdj = mergeTidy(divAdj, 6,
+				[ [createElement('label', ['class','TEXTNODE'], ['box-title', 'MCall Condition 1']),
+				createElement('select',['id', 'class', 'multiple', 'size', 'onchange'],['multi_select_1_'+num, 'form-control', 'multiple', '8', 'deselectCondition(1, '+num+')'])],
+				[createElement('label', ['class','TEXTNODE'], ['box-title', 'MCall Condition 2']),
+				createElement('select',['id', 'class', 'multiple', 'size', 'onchange'],['multi_select_2_'+num, 'form-control', 'multiple', '8', 'deselectCondition(2, '+num+')'])] ]);
+		var labelDiv = createElement('div', ['class'], ['col-md-12']);
+		labelDiv.appendChild( createElement('label', ['class','TEXTNODE'], ['box-title', 'Sample Name:']));
+		labelDiv.appendChild( createElement('input', ['id', 'class'], ['text_1_'+num, 'form-control']));
+		divAdj.appendChild(labelDiv);
+		labelDiv = createElement('div', ['class'], ['col-md-12']);
+		labelDiv.appendChild( createElement('label', ['class','TEXTNODE'], ['box-title', 'Additional MCall Parameters:']));
+		labelDiv.appendChild( createElement('textarea', ['id', 'class'], ['textarea_1_'+num, 'form-control']));
+		divAdj.appendChild(labelDiv);
+	}else if (pipeType == pipelineDict[6]) {
+		//MComp
+		divAdj = mergeTidy(divAdj, 6,
+				[ [createElement('label', ['class','TEXTNODE'], ['box-title', 'MComp Condition 1']),
+				createElement('select',['id', 'class', 'multiple', 'size', 'onchange'],['multi_select_1_'+num, 'form-control', 'multiple', '8', 'deselectCondition(1, '+num+')'])],
+				[createElement('label', ['class','TEXTNODE'], ['box-title', 'MComp Condition 2']),
+				createElement('select',['id', 'class', 'multiple', 'size', 'onchange'],['multi_select_2_'+num, 'form-control', 'multiple', '8', 'deselectCondition(2, '+num+')'])] ]);
+		var labelDiv = createElement('div', ['class'], ['col-md-12']);
+		labelDiv.appendChild( createElement('label', ['class','TEXTNODE'], ['box-title', 'Comparison Filename:']));
+		labelDiv.appendChild( createElement('input', ['id', 'class'], ['text_1_'+num, 'form-control']));
+		divAdj.appendChild(labelDiv);
+		labelDiv = createElement('div', ['class'], ['col-md-12']);
+		labelDiv.appendChild( createElement('label', ['class','TEXTNODE'], ['box-title', 'Additional MComp Parameters:']));
+		labelDiv.appendChild( createElement('textarea', ['id', 'class'], ['textarea_1_'+num, 'form-control']));
+		divAdj.appendChild(labelDiv);
 	}
 	//replace div
 	$('#select_child_'+num).replaceWith(divAdj);
@@ -843,9 +953,9 @@ function additionalPipes(){
 	var innerDiv = document.createElement( 'div' );
 	//attach children to parent
 	innerDiv.appendChild( createElement('select',
-					['id', 'class', 'onchange', 'OPTION_DIS_SEL', 'OPTION', 'OPTION', 'OPTION', 'OPTION'],
+					['id', 'class', 'onchange', 'OPTION_DIS_SEL', 'OPTION', 'OPTION', 'OPTION', 'OPTION', 'OPTION',  'OPTION', 'OPTION'],
 					['select_'+pipelineNum, 'form-control', 'pipelineSelect('+pipelineNum+')', '--- Select a Pipeline ---',
-					pipelineDict[0], pipelineDict[1], pipelineDict[2], pipelineDict[3] ]));
+					pipelineDict[0], pipelineDict[1], pipelineDict[2], pipelineDict[3], pipelineDict[4], pipelineDict[5], pipelineDict[6] ]));
 	innerDiv.appendChild( createElement('div', ['id'], ['select_child_'+pipelineNum]));
 	outerDiv.appendChild( innerDiv );
 	outerDiv.appendChild( createElement('input', ['id', 'type', 'class', 'style', 'value', 'onclick'],
