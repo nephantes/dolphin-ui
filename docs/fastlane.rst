@@ -1,8 +1,8 @@
-******************
-NGS Fastlane Guide
-******************
+**************
+Fastlane Guide
+**************
 
-This guide will walk you through all of your options within the NGS Fastlane.
+This guide will walk you through all of your options within the Fastlane page.
 
 Getting Started
 ===============
