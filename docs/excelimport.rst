@@ -189,7 +189,7 @@ There can be multiple entries on this tab.
 
 Directory information includes:
 
-* *Directory ID:**
+* *Directory ID:* A specified ID to associate to files within the file tab.
 
 * *Fastq directory:* Location within the cluster/host machine where the fastq files for this submission are stored.
 
@@ -206,6 +206,8 @@ There can be multiple entries on this tab, as well as multiple entries per lane 
 File information includes:
 
 * *Sample or Lane Name (Enter same name for multiple files):* The sample or lane name.  These names must be within there respected tabs.
+
+* *Directory ID:* A specified ID to associate to directories within the dirs tab.
 
 * *file name(comma separated for paired ends):* The file fastq file name.  If paired end, list both files seperated by a comma.
 
