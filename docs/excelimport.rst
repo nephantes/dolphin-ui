@@ -48,12 +48,6 @@ This tab will ask for information on:
 
 * *contributor:* First name, Initial, Last name.  You may add additional contributors by creating more 'contributor' cells in the A column with the actual contributors in the B column.
 
-* *fastq directory:* Location within the cluster/host machine where the fastq files for this submission are stored.
-
-* *backup directory:* Location in which backups for the results should be stored within the cluster/host machine.
-
-* *amazon bucket:* Amazon bucket link for amazon backup storage.
-
 This is the only tab that will ask for information in a single column (column B).  The rest of the tabs will ask for information in rows.
 
 Note that to add additional Imports/Samples to an already exsisting Experiment Series, the information about the experiment must be identical to that you are adding to.
@@ -186,6 +180,22 @@ Sample information includes:
 * *characteristics: tag:* Biosource characteristic.
 
 Please note that Sample name must be present and the Lane name and Protocol name must match one provided in their respected tabs.
+
+**DIRS:**
+
+Short for directories, this tab indicated all the of directories in which your fastq data are stored.
+
+There can be multiple entries on this tab.
+
+Directory information includes:
+
+* *Directory ID:**
+
+* *Fastq directory:* Location within the cluster/host machine where the fastq files for this submission are stored.
+
+* *Backup directory:* Location in which backups for the results should be stored within the cluster/host machine.
+
+* *Amazon bucket:* Amazon bucket link for amazon backup storage.
 
 **FILES:**
 
