@@ -222,10 +222,46 @@ if($p == 'exportExcel')
 		$col_number++;
 	}
 	
-	//	Files
+	//	Directories
 	$objPHPExcel->setActiveSheetIndex(4);
+	$sample_file_directories = json_decode($query->queryTable(
+		"SELECT DISTINCT ngs_dirs.id, fastq_dir, backup_dir, amazon_bucket
+		FROM ngs_temp_sample_files
+		LEFT JOIN ngs_dirs
+		ON ngs_dirs.id = ngs_temp_sample_files.dir_id
+		WHERE ngs_temp_sample_files.sample_id IN (".implode(",", $samples).")
+		"));
+
+    $lane_file_directories = json_decode($query->queryTable(
+		"SELECT DISTINCT ngs_dirs.id, fastq_dir, backup_dir, amazon_bucket
+		FROM ngs_temp_lane_files
+		LEFT JOIN ngs_dirs
+		ON ngs_dirs.id = ngs_temp_lane_files.dir_id
+		WHERE ngs_temp_lane_files.lane_id IN (SELECT ngs_samples.id FROM ngs_samples WHERE ngs_samples.id IN (".implode(",", $samples)."))
+		"));
+	
+	$stored_dirs = [];
+	$col_number = 4;
+	foreach($sample_file_directories as $sfd){
+		$objPHPExcel->getActiveSheet()->setCellValue('A'.$col_number, $sfd->id);
+		$objPHPExcel->getActiveSheet()->setCellValue('B'.$col_number, $sfd->fastq_dir);
+		$objPHPExcel->getActiveSheet()->setCellValue('C'.$col_number, $sfd->backup_dir);
+		$objPHPExcel->getActiveSheet()->setCellValue('D'.$col_number, $sfd->amazon_bucket);
+		$col_number++;
+	}
+	foreach($lane_file_directories as $lfd){
+		$objPHPExcel->getActiveSheet()->setCellValue('A'.$col_number, $lfd->id);
+		$objPHPExcel->getActiveSheet()->setCellValue('B'.$col_number, $lfd->fastq_dir);
+		$objPHPExcel->getActiveSheet()->setCellValue('C'.$col_number, $lfd->backup_dir);
+		$objPHPExcel->getActiveSheet()->setCellValue('D'.$col_number, $lfd->amazon_bucket);
+		$col_number++;
+	}
+	
+	
+	//	Files
+	$objPHPExcel->setActiveSheetIndex(5);
 	$file_sample_data = json_decode($query->queryTable(
-		"SELECT ngs_samples.name, ngs_temp_sample_files.file_name
+		"SELECT ngs_samples.name, ngs_temp_sample_files.file_name, ngs_temp_sample_files.dir_id
 		FROM ngs_temp_sample_files
 		LEFT JOIN ngs_samples
 		ON ngs_samples.id = ngs_temp_sample_files.sample_id
@@ -233,7 +269,7 @@ if($p == 'exportExcel')
 		"));
 	
 	$file_lane_data = json_decode($query->queryTable(
-		"SELECT ngs_lanes.name, ngs_temp_lane_files.file_name
+		"SELECT ngs_lanes.name, ngs_temp_lane_files.file_name, ngs_temp_lane_files.dir_id
 		FROM ngs_temp_lane_files
 		LEFT JOIN ngs_lanes
 		ON ngs_lanes.id = ngs_temp_lane_files.lane_id
@@ -243,12 +279,14 @@ if($p == 'exportExcel')
 	$col_number = 4;
 	foreach($file_sample_data as $fsd){
 		$objPHPExcel->getActiveSheet()->setCellValue('A'.$col_number, $fsd->name);
-		$objPHPExcel->getActiveSheet()->setCellValue('B'.$col_number, $fsd->file_name);
+		$objPHPExcel->getActiveSheet()->setCellValue('B'.$col_number, $fsd->dir_id);
+		$objPHPExcel->getActiveSheet()->setCellValue('C'.$col_number, $fsd->file_name);
 		$col_number++;
 	}
 	foreach($file_lane_data as $fld){
 		$objPHPExcel->getActiveSheet()->setCellValue('A'.$col_number, $fld->name);
-		$objPHPExcel->getActiveSheet()->setCellValue('B'.$col_number, $fld->file_name);
+		$objPHPExcel->getActiveSheet()->setCellValue('B'.$col_number, $fld->dir_id);
+		$objPHPExcel->getActiveSheet()->setCellValue('C'.$col_number, $fld->file_name);
 		$col_number++;
 	}
 	
