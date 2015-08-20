@@ -13,7 +13,7 @@ var checklist_lanes = [];
 var pipelineNum = 0;
 var customSeqNum = 0;
 var customSeqNumCheck = [];
-var pipelineDict = ['RNASeqRSEM', 'Tophat', 'ChipSeq', 'DESeq', 'RRBS'];
+var pipelineDict = ['RNASeqRSEM', 'Tophat', 'ChipSeq', 'DESeq', 'Bisulphite Mapping'];
 var rnaList = ["ercc","rRNA","miRNA","tRNA","snRNA","rmsk","genome","change_params"];
 var qualityDict = ["window size","required quality","leading","trailing","minlen"];
 var trimmingDict = ["single or paired-end", "5 length 1", "3 length 1", "5 length 2", "3 length 2"];
@@ -186,7 +186,7 @@ function rerunLoad() {
 							pipelineSelect(i);
 							
 							document.getElementById('text_1_'+i).value = splt2[2];
-							document.getElementById('text_2_'+i).value = splt2[3];
+							document.getElementById('textarea_1_'+i).value = splt2[3];
 							
 							//MCall
 							//handle for multiple selections
@@ -217,15 +217,13 @@ function rerunLoad() {
 									select2.options[h].selected = true;
 								}
 							}
-							document.getElementById('text_3_'+i).value = splt2[7];
-							document.getElementById('textarea_1_'+i).value = splt2[8];
+							document.getElementById('textarea_2_'+i).value = splt2[7];
 							
 							//MComp
-							if (splt2[9] == '1') {
+							if (splt2[8] == '1') {
 								document.getElementById('checkbox_3_'+i).checked = true;
 							}
-							document.getElementById('text_4_'+i).value = splt2[10];
-							document.getElementById('textarea_2_'+i).value = splt2[11];
+							document.getElementById('textarea_3_'+i).value = splt2[9];
 						}
 					}
 					document.getElementById(jsonTypeList[x]+'_exp_body').setAttribute('style', 'display: block');
@@ -330,15 +328,24 @@ function pipelineSelect(num){
 				createElement('select', ['id', 'class'], ['select_5_'+num, 'form-control'])] ]);
 	}else if (pipeType == pipelineDict[4]) {
 		//MMap
-		labelDiv = createElement('div', ['class'], ['col-md-12 text-center']);
-		labelDiv.appendChild( createElement('label', ['class','TEXTNODE'], ['box-title margin', 'Run MMap:']));
+		var labelDiv = createElement('div', ['class'], ['col-md-12 text-center']);
+		labelDiv.appendChild( createElement('label', ['class','TEXTNODE'], ['box-title margin', 'Run BSMap:']));
 		labelDiv.appendChild( createElement('input', ['id', 'type', 'class', 'checked', 'disabled'], ['checkbox_1_'+num, 'checkbox', 'margin']));
 		divAdj.appendChild(labelDiv);
-		divAdj = mergeTidy(divAdj, 6,
-				[ [createElement('label', ['class','TEXTNODE'], ['box-title', 'Digestion Site:']),
-				createElement('input', ['id', 'class', 'type', 'value'], ['text_1_'+num, 'form-control', 'text', 'C-CGG'])],
-				[createElement('label', ['class','TEXTNODE'], ['box-title', 'Reference (fasta):']),
-				createElement('input', ['id', 'class', 'type', 'value'], ['text_2_'+num, 'form-control', 'text', ''])] ]);
+		var innerDiv = createTidyDiv(12);
+		divAdj = mergeTidy(divAdj, 12,
+				[[mergeTidy(innerDiv, 16,
+					[ [createElement('label', ['class','TEXTNODE'], ['pull-left', 'RRBS']),
+					   createElement('input', ['id', 'name', 'type', 'value', 'class', 'onClick', 'checked'], [num+'_RRBS', num, 'radio', 'RRBS', 'pull-left', 'bisulphiteSelect(this.id, '+num+')']),
+					   createElement('input', ['id', 'name', 'type', 'value', 'class', 'onClick',], [num+'_WGBS', num, 'radio', 'WGBS', 'pull-right', 'bisulphiteSelect(this.id, '+num+')']),
+					   createElement('label', ['class','TEXTNODE'], ['pull-right', 'WGBS'])] ])],
+				[createElement('label', ['class','TEXTNODE'], ['box-title', 'Digestion Site:']),
+				createElement('input', ['id', 'class', 'type', 'value'], ['text_1_'+num, 'form-control', 'text', 'C-CGG'])]
+				]);
+		labelDiv = createElement('div', ['class'], ['col-md-12']);
+		labelDiv.appendChild( createElement('label', ['class','TEXTNODE'], ['box-title', 'Additional BSMap Parameters:']));
+		labelDiv.appendChild( createElement('textarea', ['id', 'class'], ['textarea_1_'+num, 'form-control']));
+		divAdj.appendChild(labelDiv);
 		
 		//MCALL
 		labelDiv = createElement('div', ['class'], ['col-md-12 text-center']);
@@ -350,13 +357,9 @@ function pipelineSelect(num){
 				createElement('select',['id', 'class', 'multiple', 'size', 'onchange'],['multi_select_1_'+num, 'form-control', 'multiple', '8', 'deselectCondition(1, '+num+')'])],
 				[createElement('label', ['class','TEXTNODE'], ['box-title', 'MCall Condition 2']),
 				createElement('select',['id', 'class', 'multiple', 'size', 'onchange'],['multi_select_2_'+num, 'form-control', 'multiple', '8', 'deselectCondition(2, '+num+')'])] ]);
-		var labelDiv = createElement('div', ['class'], ['col-md-12']);
-		labelDiv.appendChild( createElement('label', ['class','TEXTNODE'], ['box-title', 'Sample Name:']));
-		labelDiv.appendChild( createElement('input', ['id', 'class'], ['text_3_'+num, 'form-control']));
-		divAdj.appendChild(labelDiv);
 		labelDiv = createElement('div', ['class'], ['col-md-12']);
 		labelDiv.appendChild( createElement('label', ['class','TEXTNODE'], ['box-title', 'Additional MCall Parameters:']));
-		labelDiv.appendChild( createElement('textarea', ['id', 'class'], ['textarea_1_'+num, 'form-control']));
+		labelDiv.appendChild( createElement('textarea', ['id', 'class'], ['textarea_2_'+num, 'form-control']));
 		divAdj.appendChild(labelDiv);
 		
 		//MComp
@@ -365,12 +368,8 @@ function pipelineSelect(num){
 		labelDiv.appendChild( createElement('input', ['id', 'type', 'class'], ['checkbox_3_'+num, 'checkbox', 'margin']));
 		divAdj.appendChild(labelDiv);
 		labelDiv = createElement('div', ['class'], ['col-md-12']);
-		labelDiv.appendChild( createElement('label', ['class','TEXTNODE'], ['box-title', 'Comparison Filename:']));
-		labelDiv.appendChild( createElement('input', ['id', 'class'], ['text_4_'+num, 'form-control']));
-		divAdj.appendChild(labelDiv);
-		labelDiv = createElement('div', ['class'], ['col-md-12']);
 		labelDiv.appendChild( createElement('label', ['class','TEXTNODE'], ['box-title', 'Additional MComp Parameters:']));
-		labelDiv.appendChild( createElement('textarea', ['id', 'class'], ['textarea_2_'+num, 'form-control']));
+		labelDiv.appendChild( createElement('textarea', ['id', 'class'], ['textarea_3_'+num, 'form-control']));
 		divAdj.appendChild(labelDiv);
 	}
 	//replace div
@@ -1048,9 +1047,9 @@ function findPipelineValues(){
 						if (e.checked) {
 							pipeJSON += ':1';
 						}else{
-							pipeJSON += ':0'
+							pipeJSON += ':0';
 						}
-					}else{
+					}else if(e.type != 'radio'){
 						pipeJSON += ':' + e.value.replace(/\r\n|\r|\n/g, "__cr____cn__");
 					}
 				}
@@ -1195,5 +1194,17 @@ function selectTrimming(select_id, five_num, three_num) {
 	}else{
 	trim_parent_parent.removeChild(trim_parent_parent.childNodes[5]);
 	trim_parent_parent.removeChild(trim_parent_parent.childNodes[4]);
+	}
+}
+
+function bisulphiteSelect(id, num){
+	if (id == num+'_RRBS') {
+		var dig_site = document.getElementById('text_1_'+num);
+		dig_site.disabled = false;
+		dig_site.value = 'C-CGG';
+	}else{
+		var dig_site = document.getElementById('text_1_'+num);
+		dig_site.disabled = true;
+		dig_site.value = '';
 	}
 }
