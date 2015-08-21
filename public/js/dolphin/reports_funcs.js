@@ -36,7 +36,6 @@ function parseMoreTSV(jsonNameArray, url_path){
 			async: false,
 			success : function(s)
 			{
-				console.log(s);
 				for( var j = 0; j < s.length; j++){
 					var parsed = [];
 					for(var k = 0; k < jsonNameArray.length; k++){
@@ -485,7 +484,7 @@ $(function() {
 						summary_files.push(s[x]);
 					}else if (s[x].type == 'counts'){
 						count_files.push(s[x]);
-					}else if (s[x].type == 'picard_Tophat') {
+					}else if (s[x].type.split('_')[0] == 'picard') {
 						picard_files.push(s[x]);
 					}
 				}
