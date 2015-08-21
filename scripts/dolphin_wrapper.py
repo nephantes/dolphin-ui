@@ -418,6 +418,10 @@ class Dolphin:
                  if (bam2bw.lower()=="yes"):
                     stepline=stepBam2BW % locals()
                     print >>fp, '%s'%stepline
+                 metric="CollectRnaSeqMetrics"
+                 stepline=stepPicard % locals()
+                 print >>fp, '%s'%stepline
+                 metric="CollectMultipleMetrics"
                  stepline=stepPicard % locals()
                  print >>fp, '%s'%stepline
                  stepline=stepMergePicard % locals()
@@ -454,11 +458,14 @@ class Dolphin:
                  if (bam2bw.lower()=="yes"):
                      stepline=stepBam2BW % locals()
                      print >>fp, '%s'%stepline
+                 metric="CollectRnaSeqMetrics"
+                 stepline=stepPicard % locals()
+                 print >>fp, '%s'%stepline
+                 metric="CollectMultipleMetrics"
                  stepline=stepPicard % locals()
                  print >>fp, '%s'%stepline
                  stepline=stepMergePicard % locals()
                  print >>fp, '%s'%stepline
-     
         
         level=0
         if (clean):
