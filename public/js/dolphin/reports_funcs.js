@@ -484,7 +484,7 @@ $(function() {
 						summary_files.push(s[x]);
 					}else if (s[x].type == 'counts'){
 						count_files.push(s[x]);
-					}else if (s[x].type == 'picard.stats' || s[x].type == 'picard.hist') {
+					}else if (s[x].type.split('_')[0] == 'picard') {
 						picard_files.push(s[x]);
 					}
 				}
@@ -559,7 +559,6 @@ $(function() {
 			}else if (z == summary_files.length - 1) {
 				console.log(summary_files[z]['file']);
 				var parsed_add = parseMoreTSV(['Reads 1','Reads >1','Unmapped Reads'], summary_files[z]['file']);
-				console.log(parsed_add);
 				for(var x = 0; x < table_array.length; x ++){
 					var concat_array = table_array[x];
 					table_array[x] = concat_array.concat([parseInt(parsed_add[x][0].split(" ")[0]) + parseInt(parsed_add[x][1].split(" ")[0]), parsed_add[x][2].split(" ")[0]]);
