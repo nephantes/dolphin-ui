@@ -139,5 +139,57 @@ Bowtie2 map your reads sequentially to common RNAs below. To change the default 
 Additional Pipelines
 ====================
 
+If you would like to add additional features to your current run, you can expand the Additional Pipelines tab and hit the 'Add Pipeline' button.
 
+You can add more than one selection of additional pipelines by clicking the 'Add Pipeline' button again.  You can also remove your current pipeline selection by clicking the 'Remove Pipeline' button.
 
+A new box will appear with a dropdown menu that includes:
+
+**RNASeqRSEM:**
+
+Selecting the RNASeqRSEM additional pipeline will run RSEM in addition to the current run.
+
+RSEM is an additional pipeline that will estimate gene and isoform expression levels for RNA-Seq data.
+
+Upon selection of RNASeqRSEM, you have the option of selecting additional RSEM command line parameters as well as IGC/TDF or BigWig conversions.
+
+**Tophat:**
+
+Selection the Tophat additional pipeline will allow you to run Tophat in addition to the current run.
+
+Tophat is a popular RNA-seq alignment tool used for mapping and splice junction detection.
+
+Upon selecting the Tophat pipeline addition, you have the option of adding additional tophat command line parameters as well as IGC/TDF or BigWig conversions.
+
+**ChipSeq:**
+
+If your samples of interest include ChipSeq data, then the ChipSeq additional pipeline should be selected.
+
+After selection of ChipSeq, some additional parameters are required.
+
+Chip Input Definitions are the names of the files of your chipseq input.  Multimappers determines the maximum number of locations reads are allowed to map to.
+
+Tag size, in base pairs, for MACS determines the size of the tags while the Band Width, in base pairs, for MACS determines the size of the sequenced regions.
+
+The Effective genome size, in base pairs, is the size of the mappable part of the genome.
+
+IGV/TDF and BigWig conversion is also selectable.
+
+**DESeq:**
+
+First, in order to select the DESeq additional pipeline option, you must have already selected the RNASeqRSEM option first.
+
+The DESeq pipeline allows for differential expression analysis to be conducted amongst your samples.
+
+Using the selection boxes labeled 'Condition 1' and 'Condition 2' you can select which samples you wish to check against.
+
+Once you've selected your conditions, you then can determine your Fit Type, and p-adjustment cutoff value as well as whether or not you want the Heatmap and the Fold Change cutoff.
+
+Based on your previous selection from the Common RNAs tab, you can also select which given sequences you want to analyze.
+
+Note that you can select DESeq multiple times, incase you want to run multiple pairwise comparisons on a single run.
+
+Submission
+==========
+
+Once all of your parameters are squared away and you've selected all of the additional options/pipelines that you desire for your run, you may hit the 'Submit' button at the bottom left of the page to submit the run.
