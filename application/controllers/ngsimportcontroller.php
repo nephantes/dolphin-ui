@@ -27,7 +27,8 @@ class NgsimportController extends VanillaController {
 			{
 
 				//$target_file='tmp/files/'.$_FILES["excelFile"]["tmp_name"].'.xlsx';
-				$target_file='../tmp/files/a.xlsx';
+				//$target_file='../tmp/files/a.xlsx';
+                $target_file ='../tmp/files/'.$_SESSION['user']."_".date('Y-m-d-H-i-s').".xlsx";
 				move_uploaded_file($_FILES["excelFile"]["tmp_name"], $target_file);
 				/** Include path **/
 				set_include_path('../includes/excel/Classes/');
