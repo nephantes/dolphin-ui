@@ -424,6 +424,9 @@ class Dolphin:
                  metric="CollectMultipleMetrics"
                  stepline=stepPicard % locals()
                  print >>fp, '%s'%stepline
+                 metric="MarkDuplicates"
+                 stepline=stepPicard % locals()
+                 print >>fp, '%s'%stepline
                  stepline=stepMergePicard % locals()
                  print >>fp, '%s'%stepline
      
@@ -462,6 +465,9 @@ class Dolphin:
                  stepline=stepPicard % locals()
                  print >>fp, '%s'%stepline
                  metric="CollectMultipleMetrics"
+                 stepline=stepPicard % locals()
+                 print >>fp, '%s'%stepline
+                 metric="MarkDuplicates"
                  stepline=stepPicard % locals()
                  print >>fp, '%s'%stepline
                  stepline=stepMergePicard % locals()
