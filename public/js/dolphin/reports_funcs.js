@@ -174,7 +174,7 @@ function showTable(type){
 		temp_currentResultSelection = currentResultSelection;
 	}else if (type == 'DESEQ') {
 		temp_currentResultSelection = currentResultSelection;
-	}else if (type == 'picard_Tophat') {
+	}else if (type == 'picard') {
 		temp_currentResultSelection = currentResultSelection;
 	}
 	
@@ -413,7 +413,7 @@ function downloadReports(buttonType, type){
 		temp_currentResultSelection = currentResultSelection;
 	}else if (type == 'DESEQ') {
 		temp_currentResultSelection = currentResultSelection;
-	}else if (type == 'picard_Tophat') {
+	}else if (type == 'picard') {
 		temp_currentResultSelection = currentResultSelection;
 	}
 	var URL = BASE_PATH + "/public/api/?source=" + API_PATH + '/public/pub/' + wkey + '/' + temp_currentResultSelection + '&format=' + buttonType;
@@ -640,9 +640,9 @@ $(function() {
 		for (var z = 0; z < picard_files.length; z++){
 			picard_file_paths.push(picard_files[z].file);
 		}
-		createDropdown(picard_file_paths, 'picard_Tophat');
+		createDropdown(picard_file_paths, 'picard');
 	}else{
-		document.getElementById('picard_Tophat_exp').remove();
+		document.getElementById('picard_exp').remove();
 	}
 	//reports_table.fnAdjustColumnSizing(true);
 	}
