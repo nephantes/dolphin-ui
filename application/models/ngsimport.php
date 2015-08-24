@@ -694,6 +694,10 @@ class Ngsimport extends VanillaModel {
 						$text.= $this->errorText("Sample name already exists in that lane (row " . $i . ")");
 						$this->final_check = false;
 						$samp_check = false;
+					}elseif(ctype_digit($samp->name[0])){
+						$text.= $this->errorText("Sample name cannot not start with a number (row " . $i . ")");
+						$this->final_check = false;
+						$samp_check = false;
 					}else{
 						$this->sample_arr[$samp->name]=$samp;
 					}
