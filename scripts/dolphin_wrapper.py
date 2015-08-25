@@ -630,6 +630,8 @@ def main():
            content = dolphin.parse_content( inputparams )
            if commonind:
               commonind = re.sub('test', '', commonind)
+              gb=genomebuild.split(',')
+              commonind = re.sub('genome', str(gb[1]), commonind)
 
            dolphin.write_input(input_fn, inputdir, content, genomebuild, spaired, barcodes, adapter, quality, trim, trimpaired, split, commonind, advparams, customind, pipeline )
 
