@@ -47,6 +47,7 @@ class funcs
     }
     function runSQL($sql)
     {
+        sleep(2);
         $this->readINI();
         $link = new mysqli($this->dbhost, $this->dbuser, $this->dbpass, $this->db);
         // check connection
