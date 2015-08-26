@@ -795,7 +795,11 @@ function returnToIndex(){
 
 /*##### SEND TO PIPELINE WITH SELECTION #####*/
 function submitSelected(){
-	window.location.href = BASE_PATH+"/pipeline/selected/" + checklist_samples + "$";
+	var selection_test = SelectionTest();
+	
+	if (selection_test) {
+		window.location.href = BASE_PATH+"/pipeline/selected/" + checklist_samples + "$";
+	}
 }
 
 /*##### CHECK RADIO SELECTED FUNCTION #####*/
