@@ -297,6 +297,15 @@ class Dolphin:
                print >>fp, '@TSIZE=%s'%(self.remove_space(str(arr[3])));
                print >>fp, '@BWIDTH=%s'%(self.remove_space(str(arr[4])));
                print >>fp, '@GSIZE=%s'%(self.remove_space(str(arr[5])));
+
+             if (pipename=="BisulphiteMapping"):
+               if (arr[1] == "1"):
+                 print >>fp, '@BSMAPPARAM=%s'%(self.remove_space(arr[3]));
+               if (arr[4] == "1"):
+                 print >>fp, '@MCALLPARAM=%s'%(self.remove_space(arr[7]));
+               if (arr[8] == "1"):
+                 print >>fp, '@MCOMPCOND=%s'%(self.remove_space(arr[5]+":"+arr[6]));
+                 print >>fp, '@MCOMPPARAM=%s'%(self.remove_space(arr[9]));
     
     
        print >>fp, '@MAPNAMES=%s'%(mapnames)
@@ -472,6 +481,19 @@ class Dolphin:
                  print >>fp, '%s'%stepline
                  stepline=stepMergePicard % locals()
                  print >>fp, '%s'%stepline
+
+              if (pipename == "BisulphiteMapping"):
+                 if (arr[1] == "1"):
+                    digestion=arr[2]
+                    stepline=stepBSMap % locals()
+                    print >>fp, '%s'%stepline
+                 if (arr[4] == "1"):
+                    stepline=stepMCall % locals()
+                    print >>fp, '%s'%stepline
+                 if (arr[8] == "1"):
+                    stepline=stepMComp % locals()
+                    print >>fp, '%s'%stepline
+                 #Set running macs step
         
         level=0
         if (clean):
