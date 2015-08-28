@@ -334,11 +334,9 @@ function pipelineSelect(num){
 		divAdj.appendChild(labelDiv);
 		var innerDiv = createTidyDiv(12);
 		divAdj = mergeTidy(divAdj, 12,
-				[[mergeTidy(innerDiv, 16,
-					[ [createElement('label', ['class','TEXTNODE'], ['pull-left', 'RRBS']),
-					   createElement('input', ['id', 'name', 'type', 'value', 'class', 'onClick', 'checked'], [num+'_RRBS', num, 'radio', 'RRBS', 'pull-left', 'bisulphiteSelect(this.id, '+num+')']),
-					   createElement('input', ['id', 'name', 'type', 'value', 'class', 'onClick',], [num+'_WGBS', num, 'radio', 'WGBS', 'pull-right', 'bisulphiteSelect(this.id, '+num+')']),
-					   createElement('label', ['class','TEXTNODE'], ['pull-right', 'WGBS'])] ])],
+				[[createLabeledDiv(12, 'RRBS&nbsp;&nbsp;', '&nbsp;&nbsp;WGBS', createElement('input', ['id', 'name', 'type', 'value', 'onClick', 'checked'], [num+'_RRBS', num, 'radio', 'RRBS', 'bisulphiteSelect(this.id, '+num+')']),
+					   createElement('input', ['id', 'name', 'type', 'value', 'onClick',], [num+'_WGBS', num, 'radio', 'WGBS', 'bisulphiteSelect(this.id, '+num+')']))
+					],
 				[createElement('label', ['class','TEXTNODE'], ['box-title', 'Digestion Site:']),
 				createElement('input', ['id', 'class', 'type', 'value'], ['text_1_'+num, 'form-control', 'text', 'C-CGG'])]
 				]);
