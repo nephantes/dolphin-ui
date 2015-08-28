@@ -658,8 +658,12 @@ e range"><i class="fa fa-calendar"></i></button>
 	{
 		$html.= 	'<div id="'.$id.'_exp_body" class="box-body" style="display: none;" onchange="">
 				<form role="form">
-					<input id="'.$id.'_yes" type="radio" name="'.$id.'" value="yes"> yes</input>
-					<input id="'.$id.'_no" type="radio" name="'.$id.'" value="no" checked> no</input>';
+				<div class="margin">
+						yes
+					<input id="'.$id.'_yes" type="radio" name="'.$id.'" value="yes"></input>
+					<input id="'.$id.'_no" type="radio" name="'.$id.'" value="no" checked></input>
+						no
+				</div>';
 		$html.= 		'<div class="input-group margin col-md-11">
 					';
 		for($y = 0; $y < $numFields; $y++){
