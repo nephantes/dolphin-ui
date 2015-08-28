@@ -13,7 +13,7 @@ var checklist_lanes = [];
 var pipelineNum = 0;
 var customSeqNum = 0;
 var customSeqNumCheck = [];
-var pipelineDict = ['RNASeqRSEM', 'Tophat', 'ChipSeq', 'DESeq'];
+var pipelineDict = ['RNASeqRSEM', 'Tophat', 'ChipSeq', 'DESeq', 'BisulphiteMapping'];
 var rnaList = ["ercc","rRNA","miRNA","tRNA","snRNA","rmsk","genome","change_params"];
 var qualityDict = ["window size","required quality","leading","trailing","minlen"];
 var trimmingDict = ["single or paired-end", "5 length 1", "3 length 1", "5 length 2", "3 length 2"];
@@ -29,7 +29,7 @@ function rerunLoad() {
 	if (hrefSplit[4] == 'search') {
 		document.getElementById('dolphin_basket').parentNode.setAttribute('style','overflow:scroll');
 	}
-	var rerunLoc = $.inArray('rerun', hrefSplit)
+	var rerunLoc = $.inArray('rerun', hrefSplit);
 	var infoArray = [];
 	var json_primer = '';
 	var jsonObj;
@@ -179,6 +179,51 @@ function rerunLoad() {
 							document.getElementById('text_1_'+i).value = splt2[5];
 							document.getElementById('text_2_'+i).value = splt2[6];
 							document.getElementById('select_5_'+i).value = splt2[7];
+						}else if (splt2[0] == pipelineDict[4]) {
+							//MMap
+							additionalPipes();
+							document.getElementById('select_'+i).value = pipelineDict[4];
+							pipelineSelect(i);
+							
+							document.getElementById('text_1_'+i).value = splt2[2];
+							document.getElementById('textarea_1_'+i).value = splt2[3];
+							
+							//MCall
+							//handle for multiple selections
+							if (splt2[4] == 1) {
+								document.getElementById('checkbox_2_'+i).checked = true;
+							}
+							var select_values = splt2[5].split(",");
+							var select_locations = splt2[6].split(",");
+							var select1_values = [];
+							var select2_values = [];
+							for(var f = 0; f < select_locations.length; f++){
+								if (select_locations[f] == 'Cond1') {
+									select1_values.push(select_values[f]);
+								}else{
+									select2_values.push(select_values[f]);
+								}
+							}
+							
+							var select1 = document.getElementById('multi_select_1_'+i);
+							for(var h = 0; h < select1.options.length; h++){
+								if (select1_values.indexOf(select1.options[h].value) != -1) {
+									select1.options[h].selected = true;
+								}
+							}
+							var select2 = document.getElementById('multi_select_2_'+i);
+							for(var h = 0; h < select1.options.length; h++){
+								if (select2_values.indexOf(select2.options[h].value) != -1) {
+									select2.options[h].selected = true;
+								}
+							}
+							document.getElementById('textarea_2_'+i).value = splt2[7];
+							
+							//MComp
+							if (splt2[8] == '1') {
+								document.getElementById('checkbox_3_'+i).checked = true;
+							}
+							document.getElementById('textarea_3_'+i).value = splt2[9];
 						}
 					}
 					document.getElementById(jsonTypeList[x]+'_exp_body').setAttribute('style', 'display: block');
@@ -281,6 +326,51 @@ function pipelineSelect(num){
 		divAdj = mergeTidy(divAdj, 12,
 				[ [createElement('label', ['class','TEXTNODE'], ['box-title', 'Select Sequence']),
 				createElement('select', ['id', 'class'], ['select_5_'+num, 'form-control'])] ]);
+	}else if (pipeType == pipelineDict[4]) {
+		//MMap
+		var labelDiv = createElement('div', ['class'], ['col-md-12 text-center']);
+		labelDiv.appendChild( createElement('label', ['class','TEXTNODE'], ['box-title margin', 'Run BSMap:']));
+		labelDiv.appendChild( createElement('input', ['id', 'type', 'class', 'checked', 'disabled'], ['checkbox_1_'+num, 'checkbox', 'margin']));
+		divAdj.appendChild(labelDiv);
+		var innerDiv = createTidyDiv(12);
+		divAdj = mergeTidy(divAdj, 12,
+				[[mergeTidy(innerDiv, 16,
+					[ [createElement('label', ['class','TEXTNODE'], ['pull-left', 'RRBS']),
+					   createElement('input', ['id', 'name', 'type', 'value', 'class', 'onClick', 'checked'], [num+'_RRBS', num, 'radio', 'RRBS', 'pull-left', 'bisulphiteSelect(this.id, '+num+')']),
+					   createElement('input', ['id', 'name', 'type', 'value', 'class', 'onClick',], [num+'_WGBS', num, 'radio', 'WGBS', 'pull-right', 'bisulphiteSelect(this.id, '+num+')']),
+					   createElement('label', ['class','TEXTNODE'], ['pull-right', 'WGBS'])] ])],
+				[createElement('label', ['class','TEXTNODE'], ['box-title', 'Digestion Site:']),
+				createElement('input', ['id', 'class', 'type', 'value'], ['text_1_'+num, 'form-control', 'text', 'C-CGG'])]
+				]);
+		labelDiv = createElement('div', ['class'], ['col-md-12']);
+		labelDiv.appendChild( createElement('label', ['class','TEXTNODE'], ['box-title', 'Additional BSMap Parameters:']));
+		labelDiv.appendChild( createElement('textarea', ['id', 'class'], ['textarea_1_'+num, 'form-control']));
+		divAdj.appendChild(labelDiv);
+		
+		//MCALL
+		labelDiv = createElement('div', ['class'], ['col-md-12 text-center']);
+		labelDiv.appendChild( createElement('label', ['class','TEXTNODE'], ['box-title margin', 'Run MCall:']));
+		labelDiv.appendChild( createElement('input', ['id', 'type', 'class'], ['checkbox_2_'+num, 'checkbox', 'margin']));
+		divAdj.appendChild(labelDiv);
+		divAdj = mergeTidy(divAdj, 6,
+				[ [createElement('label', ['class','TEXTNODE'], ['box-title', 'MCall Condition 1']),
+				createElement('select',['id', 'class', 'multiple', 'size', 'onchange'],['multi_select_1_'+num, 'form-control', 'multiple', '8', 'deselectCondition(1, '+num+')'])],
+				[createElement('label', ['class','TEXTNODE'], ['box-title', 'MCall Condition 2']),
+				createElement('select',['id', 'class', 'multiple', 'size', 'onchange'],['multi_select_2_'+num, 'form-control', 'multiple', '8', 'deselectCondition(2, '+num+')'])] ]);
+		labelDiv = createElement('div', ['class'], ['col-md-12']);
+		labelDiv.appendChild( createElement('label', ['class','TEXTNODE'], ['box-title', 'Additional MCall Parameters:']));
+		labelDiv.appendChild( createElement('textarea', ['id', 'class'], ['textarea_2_'+num, 'form-control']));
+		divAdj.appendChild(labelDiv);
+		
+		//MComp
+		labelDiv = createElement('div', ['class'], ['col-md-12 text-center']);
+		labelDiv.appendChild( createElement('label', ['class','TEXTNODE'], ['box-title margin', 'Run MComp:']));
+		labelDiv.appendChild( createElement('input', ['id', 'type', 'class'], ['checkbox_3_'+num, 'checkbox', 'margin']));
+		divAdj.appendChild(labelDiv);
+		labelDiv = createElement('div', ['class'], ['col-md-12']);
+		labelDiv.appendChild( createElement('label', ['class','TEXTNODE'], ['box-title', 'Additional MComp Parameters:']));
+		labelDiv.appendChild( createElement('textarea', ['id', 'class'], ['textarea_3_'+num, 'form-control']));
+		divAdj.appendChild(labelDiv);
 	}
 	//replace div
 	$('#select_child_'+num).replaceWith(divAdj);
@@ -292,9 +382,10 @@ function pipelineSelect(num){
 		}
 	}
 	
-	//if DESEQ
+	//MULTI-SELECT
 	if (document.getElementById('multi_select_1_'+num) != null) {
 		var sample_names = getSampleNames(window.location.href.split('/')[window.location.href.split('/').length - 1].replace('$', ''));
+		console.log(sample_names);
 		for(var x = 0; x < sample_names.length; x++){
 				document.getElementById('multi_select_1_'+num).appendChild(createElement('option', ['id', 'value'], [num+'_1_'+sample_names[x], sample_names[x]]));
 				document.getElementById(num+'_1_'+sample_names[x]).innerHTML = sample_names[x]
@@ -847,9 +938,9 @@ function additionalPipes(){
 	var innerDiv = document.createElement( 'div' );
 	//attach children to parent
 	innerDiv.appendChild( createElement('select',
-					['id', 'class', 'onchange', 'OPTION_DIS_SEL', 'OPTION', 'OPTION', 'OPTION', 'OPTION'],
+					['id', 'class', 'onchange', 'OPTION_DIS_SEL', 'OPTION', 'OPTION', 'OPTION', 'OPTION', 'OPTION'],
 					['select_'+pipelineNum, 'form-control', 'pipelineSelect('+pipelineNum+')', '--- Select a Pipeline ---',
-					pipelineDict[0], pipelineDict[1], pipelineDict[2], pipelineDict[3] ]));
+					pipelineDict[0], pipelineDict[1], pipelineDict[2], pipelineDict[3], pipelineDict[4]]));
 	innerDiv.appendChild( createElement('div', ['id'], ['select_child_'+pipelineNum]));
 	outerDiv.appendChild( innerDiv );
 	outerDiv.appendChild( createElement('input', ['id', 'type', 'class', 'style', 'value', 'onclick'],
@@ -864,8 +955,12 @@ function deselectCondition(condition, pipeNum){
 	var selection = document.getElementById('multi_select_'+condition+'_'+pipeNum);
 	if (condition == 1) {
 		var opposite = 2;
-	}else{
+	}else if(condition == 2){
 		var opposite = 1;
+	}else if (condition == 3) {
+		var opposite = 4;
+	}else if (condition == 4) {
+		var opposite = 3;
 	}
 	var opposite_selection = document.getElementById('multi_select_'+opposite+'_'+pipeNum);
 	for (var x = 0; x < selection.options.length; x++) {
@@ -926,7 +1021,13 @@ function findPipelineValues(){
 		
 		var conditions_array = [];
 		var conditions_type_array = [];
+		var multireset = false;
 		for (var x = 0; x < masterDiv.length; x++) {
+			if (multireset == true) {
+				conditions_array = [];
+				conditions_type_array = [];
+				multireset = false;
+			}
 			var e = masterDiv[x];
 			if (e.type != undefined) {
 				if (e.type == "select-multiple") {
@@ -943,9 +1044,18 @@ function findPipelineValues(){
 							conditions_type_array.push('Cond2');
 						}
 						pipeJSON += ':' + conditions_array.toString() + ':' + conditions_type_array.toString();
+						multireset = true;
 					}
 				}else{
-					pipeJSON += ':' + e.value.replace(/\r\n|\r|\n/g, "__cr____cn__");
+					if (e.type == 'checkbox') {
+						if (e.checked) {
+							pipeJSON += ':1';
+						}else{
+							pipeJSON += ':0';
+						}
+					}else if(e.type != 'radio'){
+						pipeJSON += ':' + e.value.replace(/\r\n|\r|\n/g, "__cr____cn__");
+					}
 				}
 			}
 		}
@@ -1088,5 +1198,17 @@ function selectTrimming(select_id, five_num, three_num) {
 	}else{
 	trim_parent_parent.removeChild(trim_parent_parent.childNodes[5]);
 	trim_parent_parent.removeChild(trim_parent_parent.childNodes[4]);
+	}
+}
+
+function bisulphiteSelect(id, num){
+	if (id == num+'_RRBS') {
+		var dig_site = document.getElementById('text_1_'+num);
+		dig_site.disabled = false;
+		dig_site.value = 'C-CGG';
+	}else{
+		var dig_site = document.getElementById('text_1_'+num);
+		dig_site.disabled = true;
+		dig_site.value = '';
 	}
 }
