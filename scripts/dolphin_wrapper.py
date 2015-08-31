@@ -302,9 +302,9 @@ class Dolphin:
                if (arr[1] == "1"):
                  print >>fp, '@BSMAPPARAM=%s'%(self.remove_space(arr[3]));
                if (arr[4] == "1"):
+                 print >>fp, '@MCONDS=%s'%(self.remove_space(arr[5]+":"+arr[6]));
                  print >>fp, '@MCALLPARAM=%s'%(self.remove_space(arr[7]));
                if (arr[8] == "1"):
-                 print >>fp, '@MCOMPCOND=%s'%(self.remove_space(arr[5]+":"+arr[6]));
                  print >>fp, '@MCOMPPARAM=%s'%(self.remove_space(arr[9]));
     
     
