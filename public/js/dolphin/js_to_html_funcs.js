@@ -34,6 +34,17 @@ function createTidyDiv(size){
 	return div;
 }
 
+function createLabeledDiv(size, label1, label2, element1, element2){
+    var div = document.createElement( 'div' );
+		div.setAttribute('class', 'text-center col-md-'+size);
+        div.innerHTML = label1;
+        div.appendChild(element1);
+        div.innerHTML += '&nbsp;&nbsp;';
+        div.appendChild(element2);
+        div.innerHTML += label2;
+	return div;
+}
+
 function mergeTidy(headDiv, size, elementList){
 	for (var x = 0; x < elementList.length; x++) {
 		var tidyDiv = createTidyDiv(size);
