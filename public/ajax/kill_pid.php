@@ -8,12 +8,12 @@ require_once("../../includes/dbfuncs.php");
 if (!isset($_SESSION) || !is_array($_SESSION)) session_start();
 $query = new dbfuncs();
 
-if (isset($_POST['p'])){$p = $_POST['p'];}
+if (isset($_GET['p'])){$p = $_GET['p'];}
 
 if($p == 'killRun')
 {
 	$setStatus = '';
-	if (isset($_POST['run_id'])){$run_id = $_POST['run_id'];}
+	if (isset($_GET['run_id'])){$run_id = $_GET['run_id'];}
 	$pids = json_decode($query->queryTable("SELECT wrapper_pid, runworkflow_pid
 							   FROM ngs_runparams
 							   WHERE id = $run_id"));
