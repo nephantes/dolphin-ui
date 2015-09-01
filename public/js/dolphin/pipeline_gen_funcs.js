@@ -746,16 +746,9 @@ function manageChecklists(name, type){
 			var lane_samples = getLanesToSamples(name);
 			
 			for (var x = 0; x < lane_samples.length; x++) {
-				if ( document.getElementById('sample_checkbox_' + lane_samples[x]) != null ) {
-					var check = document.getElementById('sample_checkbox_' + lane_samples[x]);
-					check.checked = !check.checked;
-				}
 				if ( checklist_samples.indexOf( lane_samples[x] ) > -1 ){
 					manageChecklists(lane_samples[x], 'sample_checkbox');
 				}
-			}
-			if (checklist_samples.length == 0) {
-				document.getElementById('clear_basket').disabled = 'true';
 			}
 		}
 		else
@@ -765,14 +758,8 @@ function manageChecklists(name, type){
 			var lane_samples = getLanesToSamples(name);
 			
 			for (var x = 0; x < lane_samples.length; x++) {
-				if (lane_samples.indexOf(lane_samples[x]) > -1) {
+				if (checklist_samples.indexOf(lane_samples[x]) < 0) {
 					manageChecklists(lane_samples[x], 'sample_checkbox');
-				}
-			}
-			for(var y = 0; y < lane_samples.length; y++){
-				if ( document.getElementById('sample_checkbox_' + lane_samples[y]) != null) {
-					var check = document.getElementById('sample_checkbox_' + lane_samples[y]);
-					check.checked = !check.checked;
 				}
 			}
 		}
