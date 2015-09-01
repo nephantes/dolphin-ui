@@ -190,7 +190,6 @@ function getExperimentIdFromSample(sample){
 		async: false,
 		success : function(s)
 		{
-            console.log(s[0].id);
 			if (s[0] != undefined) {
 				experiment_id_returned = s[0].id;
 			}

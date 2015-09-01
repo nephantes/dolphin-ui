@@ -137,9 +137,10 @@ function deleteButton(){
 	if (checklist_experiment_series.length > 0) {
 		document.getElementById('myModalLabel').innerHTML = 'Delete Experiment Series';
 		document.getElementById('deleteLabel').innerHTML = 'Warning!  You have selected to remove an experiment series!';
-		document.getElementById('deleteAreas').innerHTML = 'Are you sure you wish to remove this entire experiment series?';
+		document.getElementById('deleteAreas').innerHTML = 'Are you sure you want to continue?<br>'+'Experiment series: '+checklist_experiment_series.toString();
 		
 		document.getElementById('confirmDeleteButton').setAttribute('onclick', 'deletePermsModal()');
+		document.getElementById('confirmDeleteButton').setAttribute('data-dismiss', '');
 		document.getElementById('confirmDeleteButton').setAttribute('style', 'display:show');
 	}else{
 		deletePermsModal();
