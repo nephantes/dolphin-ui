@@ -121,6 +121,7 @@ else if($p == 'deleteSelected')
 	//	USE WKEY FOR REPORT_LIST REMOVAL	//
 	foreach($wkeys as $w){
 		$query->runSQL("DELETE FROM report_list WHERE wkey = '$w'");
+		$query->runSQL("DELETE FROM ngs_wkeylist WHERE wkey = '$w'");
 	}
 	
 	//	OBTAIN PID IF RUNNING AND REMOVE	//
