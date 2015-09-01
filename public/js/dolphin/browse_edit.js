@@ -11,9 +11,6 @@ var element_highlighted_id;
 var element_highlighted_type;
 var element_highlighted_onclick;
 
-var lanePerms = [];
-var samplePerms = [];
-
 var normalized = ['facility', 'source', 'organism', 'molecule', 'lab', 'organization', 'genotype', 'library_type',
 				  'biosample_type', 'instrument_model', 'treatment_manufacturer'];
 
@@ -136,6 +133,23 @@ function deleteButton(){
 	$('#deleteModal').modal({
 		show: true
 	});
+	
+	if (checklist_experiment_series.length > 0) {
+		document.getElementById('myModalLabel').innerHTML = 'Delete Experiment Series';
+		document.getElementById('deleteLabel').innerHTML = 'Warning!  You have selected to remove an experiment series!';
+		document.getElementById('deleteAreas').innerHTML = 'Are you sure you wish to remove this entire experiment series?';
+		
+		document.getElementById('confirmDeleteButton').setAttribute('onclick', 'deletePermsModal()');
+		document.getElementById('confirmDeleteButton').setAttribute('style', 'display:show');
+	}else{
+		deletePermsModal();
+	}
+}
+
+function deletePermsModal(){
+	var lanePerms = [];
+	var samplePerms = [];
+
 	$.ajax({ type: "GET",
 			url: BASE_PATH+"/public/ajax/browse_edit.php",
 			data: { p: 'getLanePermissions', lanes: checklist_lanes.toString() },
@@ -183,25 +197,26 @@ function deleteButton(){
 		
 	document.getElementById('cancelDeleteButton').innerHTML = "Cancel";
 	document.getElementById('confirmDeleteButton').setAttribute('style', 'display:show');
+	//document.getElementById('confirmDeleteButton').setAttribute('onclick', 'confirmDeletePressed()');
 }
 
 function confirmDeletePressed(){
-	$.ajax({ type: "GET",
-			url: BASE_PATH+"/public/ajax/browse_edit.php",
-			data: { p: 'deleteSelected', samples: samplePerms.toString(), lanes: lanePerms.toString() },
-			async: false,
-			success : function(s)
-			{
-			}
-	});
-	
-	lanePerms = [];
-	samplePerms = [];
-	
-	flushBasketInfo();
-	
-	location.reload();
-}
+		$.ajax({ type: "GET",
+				url: BASE_PATH+"/public/ajax/browse_edit.php",
+				data: { p: 'deleteSelected', samples: samplePerms.toString(), lanes: lanePerms.toString() },
+				async: false,
+				success : function(s)
+				{
+				}
+		});
+		
+		lanePerms = [];
+		samplePerms = [];
+		
+		flushBasketInfo();
+		
+		location.reload();
+	}
 
 function cancelDeletePressed(){ 
 	lanePerms = [];
