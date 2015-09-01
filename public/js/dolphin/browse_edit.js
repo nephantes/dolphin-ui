@@ -11,6 +11,10 @@ var element_highlighted_id;
 var element_highlighted_type;
 var element_highlighted_onclick;
 
+var experimentPerms = [];
+var lanePerms = [];
+var samplePerms = [];
+
 var normalized = ['facility', 'source', 'organism', 'molecule', 'lab', 'organization', 'genotype', 'library_type',
 				  'biosample_type', 'instrument_model', 'treatment_manufacturer'];
 
@@ -148,9 +152,22 @@ function deleteButton(){
 }
 
 function deletePermsModal(){
-	var lanePerms = [];
-	var samplePerms = [];
+	experimentPerms = [];
+	lanePerms = [];
+	samplePerms = [];	
 
+	$.ajax({ type: "GET",
+			url: BASE_PATH+"/public/ajax/browse_edit.php",
+			data: { p: 'getExperimentPermissions', experiments: checklist_experiment_series.toString() },
+			async: false,
+			success : function(s)
+			{
+				for(var x = 0; x < s.length; x++){
+					experimentPerms.push(s[x].id);
+				}
+			}
+	});
+	
 	$.ajax({ type: "GET",
 			url: BASE_PATH+"/public/ajax/browse_edit.php",
 			data: { p: 'getLanePermissions', lanes: checklist_lanes.toString() },
@@ -175,8 +192,14 @@ function deletePermsModal(){
 			}
 	});
 	
+	var badExperiments = [];
 	var badLanes = [];
 	var badSamples = [];
+	for (var q = 0; q < checklist_experiment_series.length; q++) {
+		if (experimentPerms.indexOf(checklist_experiment_series[q]) == -1) {
+			badExperiments.push(checklist_experiment_series[q]);
+		}
+	}
 	for (var q = 0; q < checklist_lanes.length; q++) {
 		if (lanePerms.indexOf(checklist_lanes[q]) == -1) {
 			badLanes.push(checklist_lanes[q]);
@@ -190,8 +213,8 @@ function deletePermsModal(){
 	
 	document.getElementById('myModalLabel').innerHTML = 'Delete Selected';
 	document.getElementById('deleteLabel').innerHTML ='You have permission to delete the following:';
-	document.getElementById('deleteAreas').innerHTML = 'Imports: '+ lanePerms.join(", ") + '<br>Samples: ' + samplePerms.join(", ") +
-		'<br><br>Imports lacking permissions: ' + badLanes.join(", ") + '<br>Samples lacking permissions: ' + badSamples.join(", ") +
+	document.getElementById('deleteAreas').innerHTML = 'Experiment Series: ' + experimentPerms.join(", ") + '<br>Imports: '+ lanePerms.join(", ") + '<br>Samples: ' + samplePerms.join(", ") +
+		'<br><br>Experiment Series lacking permissions: ' + badExperiments.join(", ") + '<br>Imports lacking permissions: ' + badLanes.join(", ") + '<br>Samples lacking permissions: ' + badSamples.join(", ") +
 		'<br><br>If the Import or Sample you want to delete is not accessible, you do not have the correct permissions to remove them.'+
 		'<br><br>Be Warned! Deleting Imports/Samples will remove data AND runs accross the system, make sure you have a back up of any of the information you might want to save before deleting.'+
 		'<br><br>Data is not recoverable, please make sure you want to delete these.';
@@ -204,15 +227,12 @@ function deletePermsModal(){
 function confirmDeletePressed(){
 		$.ajax({ type: "GET",
 				url: BASE_PATH+"/public/ajax/browse_edit.php",
-				data: { p: 'deleteSelected', samples: samplePerms.toString(), lanes: lanePerms.toString() },
+				data: { p: 'deleteSelected', samples: samplePerms.toString(), lanes: lanePerms.toString(), experiments: experimentPerms.toString() },
 				async: false,
 				success : function(s)
 				{
 				}
 		});
-		
-		lanePerms = [];
-		samplePerms = [];
 		
 		flushBasketInfo();
 		
