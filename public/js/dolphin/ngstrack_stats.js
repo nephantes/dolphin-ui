@@ -141,7 +141,6 @@ function generateStreamTable(type, queryData, queryType, qvar, rvar, seg, theSea
 			record.notes = '';
 		}
 		
-		var disabled = 'disabled';
 		var initialRunWarning = "<button id=\"perms_"+record.id+"\" class=\"btn btn-default btn-xs\" value=\"initialRunWarning\" onclick=\"initialRunButton('"+type+"', "+record.id+", this)\"><span class=\"fa fa-warning\"></span></button>";
 		var sample_name = '';
 		
@@ -149,20 +148,17 @@ function generateStreamTable(type, queryData, queryType, qvar, rvar, seg, theSea
 			for(var y = 0; y < lanes_with_good_samples.length; y++){
 				if (lanes_with_good_samples[y].id == record.id) {
 					initialRunWarning = '';
-					disabled = '';
 				}
 			}
 		}
 		if (record.total_reads != '' && type == 'samples'){
 			initialRunWarning = '';
-			disabled = '';
 		}
 		if (record.samplename == 'null' || record.samplename == 'NULL' || record.samplename == '' || record.samplename == null || record.samplename == undefined) {
 			sample_name = record.name;
 		}else{
 			sample_name = record.samplename;
 		}
-		
 		
 		if (tableToggle == 'extend') {
 			if (type == 'samples') {
@@ -178,7 +174,7 @@ function generateStreamTable(type, queryData, queryType, qvar, rvar, seg, theSea
 						"<td onclick=\"editBox("+uid+", "+record.id+", 'notes', 'ngs_samples', this)\">"+record.notes+"</td><td onclick=\"editBox("+uid+", "+record.id+", 'genotype', 'ngs_samples', this)\">"+record.genotype+"</td>"+
 						"<td onclick=\"editBox("+uid+", "+record.id+", 'library_type', 'ngs_samples', this)\">"+record.library_type+"</td><td onclick=\"editBox("+uid+", "+record.id+", 'biosample_type', 'ngs_samples', this)\">"+record.biosample_type+"</td>"+
 						"<td onclick=\"editBox("+uid+", "+record.id+", 'instrument_model', 'ngs_samples', this)\">"+record.instrument_model+"</td><td onclick=\"editBox("+uid+", "+record.id+", 'treatment_manufacturer', 'ngs_samples', this)\">"+record.treatment_manufacturer+"</td>"+
-						"<td>"+initialRunWarning+"<input type=\"checkbox\" class=\"ngs_checkbox\" name=\""+record.id+"\" id=\"sample_checkbox_"+record.id+"\" onClick=\"manageChecklists(this.name, 'sample_checkbox');\" "+disabled+">"+"</td></tr>";
+						"<td>"+initialRunWarning+"<input type=\"checkbox\" class=\"ngs_checkbox\" name=\""+record.id+"\" id=\"sample_checkbox_"+record.id+"\" onClick=\"manageChecklists(this.name, 'sample_checkbox')\">"+"</td></tr>";
 				}else{
 					return "<tr><td>"+record.id+"</td><td>"+"<a href=\""+BASE_PATH+"/search/details/samples/"+record.id+'/'+theSearch+"\">"+sample_name+"</a>"+"</td><td onclick=\"editBox("+uid+", "+record.id+", 'title', 'ngs_samples', this)\">"+record.title+
 						"</td><td onclick=\"editBox("+uid+", "+record.id+", 'source', 'ngs_samples', this)\">"+record.source+"</td><td onclick=\"editBox("+uid+", "+record.id+", 'organism', 'ngs_samples', this)\">"+record.organism+"</td>"+
@@ -198,12 +194,13 @@ function generateStreamTable(type, queryData, queryType, qvar, rvar, seg, theSea
 					"</td><td onclick=\"editBox("+uid+", "+record.id+", 'total_reads', 'ngs_lanes', this)\">"+record.total_reads+"</td><td onclick=\"editBox("+uid+", "+record.id+", 'total_samples', 'ngs_lanes', this)\">"+record.total_samples+"</td>"+
 					"<td onclick=\"editBox("+uid+", "+record.id+", 'cost', 'ngs_lanes', this)\">"+record.cost+"</td><td onclick=\"editBox("+uid+", "+record.id+", 'phix_requested', 'ngs_lanes', this)\">"+record.phix_requested+"</td>"+
 					"<td onclick=\"editBox("+uid+", "+record.id+", 'phix_in_lane', 'ngs_lanes', this)\">"+record.phix_in_lane+"</td><td onclick=\"editBox("+uid+", "+record.id+", 'notes', 'ngs_lanes', this)\">"+record.notes+"</td>"+
-					"<td>"+initialRunWarning+"<input type=\"checkbox\" class=\"ngs_checkbox\" name=\""+record.id+"\" id=\"lane_checkbox_"+record.id+"\" onClick=\"manageChecklists(this.name, 'lane_checkbox');\" "+disabled+">"+"</td></tr>";
+					"<td>"+initialRunWarning+"<input type=\"checkbox\" class=\"ngs_checkbox\" name=\""+record.id+"\" id=\"lane_checkbox_"+record.id+"\" onClick=\"manageChecklists(this.name, 'lane_checkbox')\">"+"</td></tr>";
 					
 			}else if(type == 'experiments'){
 				return "<tr><td>"+record.id+"</td><td>"+"<a href=\""+BASE_PATH+"/search/details/experiment_series/"+record.id+'/'+theSearch+"\">"+record.experiment_name+"</a>"+"</td><td onclick=\"editBox("+uid+", "+record.id+", 'summary', 'ngs_experiment_series', this)\">"+record.summary+
 					"</td><td onclick=\"editBox("+uid+", "+record.id+", 'design', 'ngs_experiment_series', this)\">"+record.design+"</td><td onclick=\"editBox("+uid+", "+record.id+", 'lab', 'ngs_experiment_series', this)\">"+record.lab+"</td>"+
-					"<td onclick=\"editBox("+uid+", "+record.id+", 'organization', 'ngs_experiment_series', this)\">"+record.organization+"</td><td onclick=\"editBox("+uid+", "+record.id+", 'grant', 'ngs_experiment_series', this)\">"+record.grant+"</td><tr>";
+					"<td onclick=\"editBox("+uid+", "+record.id+", 'organization', 'ngs_experiment_series', this)\">"+record.organization+"</td><td onclick=\"editBox("+uid+", "+record.id+", 'grant', 'ngs_experiment_series', this)\">"+record.grant+"</td>"+
+					"<td><input type=\"checkbox\" class=\"ngs_checkbox\" name=\""+record.id+"\" id=\"experiment_checkbox_"+record.id+"\" onClick=\"manageChecklists(this.name, 'experiment_checkbox')\">"+"</td><tr>";
 			}else{
 				return null;
 			}
@@ -212,7 +209,7 @@ function generateStreamTable(type, queryData, queryType, qvar, rvar, seg, theSea
 				if (queryType == 'getSamples') {
 					return "<tr><td>"+record.id+"</td><td>"+"<a href=\""+BASE_PATH+"/search/details/samples/"+record.id+'/'+theSearch+"\">"+sample_name+"</a>"+"</td><td onclick=\"editBox("+uid+", "+record.id+", 'title', 'ngs_samples', this)\">"+record.title+
 						"</td><td onclick=\"editBox("+uid+", "+record.id+", 'source', 'ngs_samples', this)\">"+record.source+"</td><td onclick=\"editBox("+uid+", "+record.id+", 'organism', 'ngs_samples', this)\">"+record.organism+"</td><td onclick=\"editBox("+uid+", "+record.id+", 'molecule', 'ngs_samples', this)\">"+record.molecule+"</td><td>"+
-						""+initialRunWarning+"<input type=\"checkbox\" class=\"ngs_checkbox\" name=\""+record.id+"\" id=\"sample_checkbox_"+record.id+"\" onClick=\"manageChecklists(this.name, 'sample_checkbox');\" "+disabled+">"+"</td></tr>";
+						""+initialRunWarning+"<input type=\"checkbox\" class=\"ngs_checkbox\" name=\""+record.id+"\" id=\"sample_checkbox_"+record.id+"\" onClick=\"manageChecklists(this.name, 'sample_checkbox')\">"+"</td></tr>";
 				}else{
 					return "<tr><td>"+record.id+"</td><td>"+"<a href=\""+BASE_PATH+"/search/details/samples/"+record.id+'/'+theSearch+"\">"+sample_name+"</a>"+"</td><td onclick=\"editBox("+uid+", "+record.id+", 'title', 'ngs_samples', this)\">"+record.title+
 					"</td><td onclick=\"editBox("+uid+", "+record.id+", 'source', 'ngs_samples', this)\">"+record.source+"</td><td onclick=\"editBox("+uid+", "+record.id+", 'organism', 'ngs_samples', this)\">"+record.organism+"</td><td onclick=\"editBox("+uid+", "+record.id+", 'molecule', 'ngs_samples', this)\">"+record.molecule+"</td><tr>";
@@ -220,11 +217,12 @@ function generateStreamTable(type, queryData, queryType, qvar, rvar, seg, theSea
 			}else if (type == 'lanes') {
 				return "<tr><td>"+record.id+"</td><td>"+"<a href=\""+BASE_PATH+"/search/details/experiments/"+record.id+'/'+theSearch+"\">"+record.name+"</a>"+"</td><td onclick=\"editBox("+uid+", "+record.id+", 'facility', 'ngs_lanes', this)\">"+record.facility+
 					"</td><td onclick=\"editBox("+uid+", "+record.id+", 'total_reads', 'ngs_lanes', this)\">"+record.total_reads+"</td><td onclick=\"editBox("+uid+", "+record.id+", 'total_samples', 'ngs_lanes', this)\">"+record.total_samples+"</td><td>"+
-					""+initialRunWarning+"<input type=\"checkbox\" class=\"ngs_checkbox\" name=\""+record.id+"\" id=\"lane_checkbox_"+record.id+"\" onClick=\"manageChecklists(this.name, 'lane_checkbox');\" "+disabled+">"+"</td></tr>";
+					""+initialRunWarning+"<input type=\"checkbox\" class=\"ngs_checkbox\" name=\""+record.id+"\" id=\"lane_checkbox_"+record.id+"\" onClick=\"manageChecklists(this.name, 'lane_checkbox')\">"+"</td></tr>";
 					
 			}else if(type == 'experiments'){
 				return "<tr><td>"+record.id+"</td><td>"+"<a href=\""+BASE_PATH+"/search/details/experiment_series/"+record.id+'/'+theSearch+"\">"+record.experiment_name+"</a>"+"</td><td onclick=\"editBox("+uid+", "+record.id+", 'summary', 'ngs_experiment_series', this)\">"+record.summary+
-					"</td><td onclick=\"editBox("+uid+", "+record.id+", 'design', 'ngs_experiment_series', this)\">"+record.design+"</td><tr>";
+					"</td><td onclick=\"editBox("+uid+", "+record.id+", 'design', 'ngs_experiment_series', this)\">"+record.design+"</td>"+
+					"<td><input type=\"checkbox\" class=\"ngs_checkbox\" name=\""+record.id+"\" id=\"experiment_checkbox_"+record.id+"\" onClick=\"manageChecklists(this.name, 'experiment_checkbox')\">"+"</td><tr>";
 			}else{
 				return null;
 			}

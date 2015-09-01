@@ -182,6 +182,39 @@ function getLaneIdFromSample(sample){
 	return lane_id_returned;
 }
 
+function getExperimentIdFromSample(sample){
+    experiment_id_returned = -1;
+	$.ajax({ type: "GET",
+		url: BASE_PATH+"/public/ajax/ngsquerydb.php",
+		data: { p: "getExperimentIdFromSample", sample: sample },
+		async: false,
+		success : function(s)
+		{
+            console.log(s[0].id);
+			if (s[0] != undefined) {
+				experiment_id_returned = s[0].id;
+			}
+		}
+	});
+	return experiment_id_returned;
+}
+
+function getSamplesFromExperimentSeries(experiment){
+	sample_ids_returned = [];
+	$.ajax({ type: "GET",
+		url: BASE_PATH+"/public/ajax/ngsquerydb.php",
+		data: { p: "getSamplesfromExperimentSeries", experiment: experiment },
+		async: false,
+		success : function(s)
+		{
+			for(var x = 0; x < s.length; x++){
+                sample_ids_returned.push(s[x].id);
+            }
+		}
+	});
+	return sample_ids_returned;
+}
+
 function getFastQCBool(id){
     var bool = false;
     $.ajax({ type: "GET",
