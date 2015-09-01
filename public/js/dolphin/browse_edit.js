@@ -190,15 +190,15 @@ function deletePermsModal(){
 	
 	document.getElementById('myModalLabel').innerHTML = 'Delete Selected';
 	document.getElementById('deleteLabel').innerHTML ='You have permission to delete the following:';
-	document.getElementById('deleteAreas').innerHTML = 'Imports: '+ lanePerms.toString() + '<br>Samples: ' + samplePerms.toString() +
-		'<br><br>Imports lacking permissions: ' + badLanes.toString() + '<br>Samples lacking permissions: ' + badSamples.toString() +
+	document.getElementById('deleteAreas').innerHTML = 'Imports: '+ lanePerms.join(", ") + '<br>Samples: ' + samplePerms.join(", ") +
+		'<br><br>Imports lacking permissions: ' + badLanes.join(", ") + '<br>Samples lacking permissions: ' + badSamples.join(", ") +
 		'<br><br>If the Import or Sample you want to delete is not accessible, you do not have the correct permissions to remove them.'+
 		'<br><br>Be Warned! Deleting Imports/Samples will remove data AND runs accross the system, make sure you have a back up of any of the information you might want to save before deleting.'+
 		'<br><br>Data is not recoverable, please make sure you want to delete these.';
 		
 	document.getElementById('cancelDeleteButton').innerHTML = "Cancel";
 	document.getElementById('confirmDeleteButton').setAttribute('style', 'display:show');
-	//document.getElementById('confirmDeleteButton').setAttribute('onclick', 'confirmDeletePressed()');
+	document.getElementById('confirmDeleteButton').setAttribute('onclick', 'confirmDeletePressed()');
 }
 
 function confirmDeletePressed(){
