@@ -36,6 +36,7 @@ function postInsertRunparams(json, outputdir, name, description){
            async:	false,
            success: function(r)
            {
+               console.log(r);
                successCheck = true;
                if (runGroupID == 'new') {
                    runlistCheck = 'insertRunlist';
@@ -111,7 +112,7 @@ function confirmDeleteRunparams(run_id){
 
 function killRun(run_id){
    $.ajax({
-            type: 	'POST',
+            type: 	'GET',
             url: 	BASE_PATH+'/public/ajax/kill_pid.php',
             data:  	{ p: 'killRun', run_id: run_id },
             async:	false,
