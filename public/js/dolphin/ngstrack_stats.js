@@ -367,23 +367,6 @@ function exportExcel(){
 	}
 }
 
-function SelectionTest(){
-	if (checklist_samples.length > 0) {
-		return true;
-	}else{
-		$('#deleteModal').modal({
-			show: true
-		});
-		document.getElementById('myModalLabel').innerHTML = 'Selection error';
-		document.getElementById('deleteLabel').innerHTML ='No samples/imports selected.  Please select samples/imports in order to send them to the pipeline';
-		document.getElementById('deleteAreas').innerHTML = '';
-			
-		document.getElementById('cancelDeleteButton').innerHTML = "OK";
-		document.getElementById('confirmDeleteButton').setAttribute('style', 'display:none');
-		return false;
-	}
-}
-
 $(function() {
 	"use strict";
 

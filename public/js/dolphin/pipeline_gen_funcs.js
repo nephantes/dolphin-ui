@@ -624,7 +624,7 @@ function manageChecklists(name, type){
 			//remove
 			checklist_samples.splice(checklist_samples.indexOf(name), 1);
 			removeFromDolphinBasket(name);
-			removeBasketInfo();
+			removeBasketInfo(name);
 	
 			var lane_check = getLaneIdFromSample(name);
 			var experiment_check = getExperimentIdFromSample(name);
@@ -654,7 +654,6 @@ function manageChecklists(name, type){
 			if (checklist_samples.length == 0) {
 				document.getElementById('clear_basket').disabled = 'true';
 			}
-			checkCheckedLanes();
 		}else{
 			//add
 			checklist_samples.push(name);
@@ -769,12 +768,13 @@ function manageChecklists(name, type){
 function reloadBasket(){
 	var lastBasket = getBasketInfo();
 	if (lastBasket != undefined) {
-	var basketArray = lastBasket.split(",");
-	for (var x = 0; x < basketArray.length; x++) {
-		if (basketArray != '0') {
-		manageChecklists(basketArray[x], 'sample_checkbox');
+		var basketArray = lastBasket.split(",");
+		console.log(basketArray);
+		for (var x = 0; x < basketArray.length; x++) {
+			if (basketArray != '0') {
+				manageChecklists(basketArray[x], 'sample_checkbox');
+			}
 		}
-	}
 	}
 }
 
@@ -855,14 +855,14 @@ function checkOffAllLanes(){
 function getValidSamples(lane_samples){
 	var valid_samples;
 	$.ajax({ type: "GET",
-					url: BASE_PATH+"/public/ajax/initialmappingdb.php",
-					data: { p: 'laneToSampleChecking', sample_ids: lane_samples.toString()},
-					async: false,
-					success : function(r)
-					{
-						valid_samples = r;
-					}
-				});
+				url: BASE_PATH+"/public/ajax/initialmappingdb.php",
+				data: { p: 'laneToSampleChecking', sample_ids: lane_samples.toString()},
+				async: false,
+				success : function(r)
+				{
+					valid_samples = r;
+				}
+			});
 	return valid_samples;
 }
 
@@ -913,10 +913,65 @@ function returnToIndex(){
 
 /*##### SEND TO PIPELINE WITH SELECTION #####*/
 function submitSelected(){
-	var selection_test = SelectionTest();
-	
-	if (selection_test) {
-		window.location.href = BASE_PATH+"/pipeline/selected/" + checklist_samples + "$";
+	if (selectionTest()) {
+		if (initialRunTest()) {
+			window.location.href = BASE_PATH+"/pipeline/selected/" + checklist_samples + "$";
+		}
+	}
+}
+
+function selectionTest(){
+	if (checklist_samples.length > 0) {
+		return true;
+	}else{
+		$('#deleteModal').modal({
+			show: true
+		});
+		document.getElementById('myModalLabel').innerHTML = 'Selection error';
+		document.getElementById('deleteLabel').innerHTML ='No samples/imports selected.  Please select samples/imports in order to send them to the pipeline';
+		document.getElementById('deleteAreas').innerHTML = '';
+			
+		document.getElementById('cancelDeleteButton').innerHTML = "OK";
+		document.getElementById('confirmDeleteButton').setAttribute('style', 'display:none');
+		return false;
+	}
+}
+
+function initialRunTest(){
+	var valid_samples = [];
+	$.ajax({ type: "GET",
+				url: BASE_PATH+"/public/ajax/browse_edit.php",
+				data: { p: 'intialRunCheck', samples: checklist_samples.toString()},
+				async: false,
+				success : function(r)
+				{
+					console.log(r);
+					for (var x = 0; x < r.length; x++) {
+						valid_samples.push(r[x].sample_id);
+					}
+				}
+			});
+	if (valid_samples.length == checklist_samples.length) {
+		return true;
+	}else{
+		$('#deleteModal').modal({
+			show: true
+		});
+		
+		var spliced_samples = checklist_samples;
+		for(var x = 0; x < valid_samples.length; x++){
+			var loc = spliced_samples.indexOf(valid_samples[x]);
+			spliced_samples.splice(loc, 1);
+		}
+		
+		document.getElementById('myModalLabel').innerHTML = 'Selection error';
+		document.getElementById('deleteLabel').innerHTML ='Some samples/imports selected have not finished their initial processing.';
+		document.getElementById('deleteAreas').innerHTML = 'You cannot use these samples/imports within the pipeline until they finish their initial processing:' +
+			'<br><br>Samples: ' + spliced_samples.join(", ");
+			
+		document.getElementById('cancelDeleteButton').innerHTML = "OK";
+		document.getElementById('confirmDeleteButton').setAttribute('style', 'display:none');
+		return false;
 	}
 }
 

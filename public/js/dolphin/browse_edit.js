@@ -138,7 +138,13 @@ function deleteButton(){
 		show: true
 	});
 	
-	if (checklist_experiment_series.length > 0) {
+	if (checklist_samples.length == 0){
+		document.getElementById('myModalLabel').innerHTML = 'Delete Error';
+		document.getElementById('deleteLabel').innerHTML = 'You must select samples to delete to continue.';
+		
+		document.getElementById('cancelDeleteButton').innerHTML = "OK";
+		document.getElementById('confirmDeleteButton').setAttribute('style', 'display:none');
+	}else if (checklist_experiment_series.length > 0) {
 		document.getElementById('myModalLabel').innerHTML = 'Delete Experiment Series';
 		document.getElementById('deleteLabel').innerHTML = 'Warning!  You have selected to remove an experiment series!';
 		document.getElementById('deleteAreas').innerHTML = 'Are you sure you want to continue?<br>'+'Experiment series: '+checklist_experiment_series.toString();
@@ -234,12 +240,17 @@ function confirmDeletePressed(){
 				}
 		});
 		
+		experimentPerms = [];
+		lanePerms = [];
+		samplePerms = [];
+		
 		flushBasketInfo();
 		
 		location.reload();
 	}
 
 function cancelDeletePressed(){ 
+	experimentPerms = [];
 	lanePerms = [];
 	samplePerms = [];
 }
