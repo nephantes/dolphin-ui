@@ -966,8 +966,8 @@ function initialRunTest(){
 		
 		document.getElementById('myModalLabel').innerHTML = 'Selection error';
 		document.getElementById('deleteLabel').innerHTML ='Some samples/imports selected have not finished their initial processing.';
-		document.getElementById('deleteAreas').innerHTML = 'You cannot use these samples/imports within the pipeline until they finish their initial processing:' +
-			'<br><br>Samples: ' + spliced_samples.join(", ");
+		document.getElementById('deleteAreas').innerHTML = 'You cannot use these sample(s) within the pipeline until they finish their initial processing:' +
+			'<br><br>Sample id(s): ' + spliced_samples.join(", ");
 			
 		document.getElementById('cancelDeleteButton').innerHTML = "OK";
 		document.getElementById('confirmDeleteButton').setAttribute('style', 'display:none');

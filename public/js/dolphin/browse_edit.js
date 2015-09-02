@@ -138,16 +138,16 @@ function deleteButton(){
 		show: true
 	});
 	
-	if (checklist_samples.length == 0){
+	if (checklist_samples.length == 0 && checklist_lanes.length == 0){
 		document.getElementById('myModalLabel').innerHTML = 'Delete Error';
-		document.getElementById('deleteLabel').innerHTML = 'You must select samples to delete to continue.';
+		document.getElementById('deleteLabel').innerHTML = 'You must select sample(s)/import(s) to delete to continue.';
 		
 		document.getElementById('cancelDeleteButton').innerHTML = "OK";
 		document.getElementById('confirmDeleteButton').setAttribute('style', 'display:none');
 	}else if (checklist_experiment_series.length > 0) {
 		document.getElementById('myModalLabel').innerHTML = 'Delete Experiment Series';
 		document.getElementById('deleteLabel').innerHTML = 'Warning!  You have selected to remove an experiment series!';
-		document.getElementById('deleteAreas').innerHTML = 'Are you sure you want to continue?<br>'+'Experiment series: '+checklist_experiment_series.toString();
+		document.getElementById('deleteAreas').innerHTML = 'Are you sure you want to continue?<br>'+'Experiment series id(s): '+checklist_experiment_series.toString();
 		
 		document.getElementById('confirmDeleteButton').setAttribute('onclick', 'deletePermsModal()');
 		document.getElementById('confirmDeleteButton').setAttribute('data-dismiss', '');
@@ -219,8 +219,8 @@ function deletePermsModal(){
 	
 	document.getElementById('myModalLabel').innerHTML = 'Delete Selected';
 	document.getElementById('deleteLabel').innerHTML ='You have permission to delete the following:';
-	document.getElementById('deleteAreas').innerHTML = 'Experiment Series: ' + experimentPerms.join(", ") + '<br>Imports: '+ lanePerms.join(", ") + '<br>Samples: ' + samplePerms.join(", ") +
-		'<br><br>Experiment Series lacking permissions: ' + badExperiments.join(", ") + '<br>Imports lacking permissions: ' + badLanes.join(", ") + '<br>Samples lacking permissions: ' + badSamples.join(", ") +
+	document.getElementById('deleteAreas').innerHTML = 'Experiment Series id(s): ' + experimentPerms.join(", ") + '<br>Imports id(s): '+ lanePerms.join(", ") + '<br>Samples id(s): ' + samplePerms.join(", ") +
+		'<br><br>Experiment Series id(s) lacking permissions: ' + badExperiments.join(", ") + '<br>Import id(s) lacking permissions: ' + badLanes.join(", ") + '<br>Sample id(s) lacking permissions: ' + badSamples.join(", ") +
 		'<br><br>If the Import or Sample you want to delete is not accessible, you do not have the correct permissions to remove them.'+
 		'<br><br>Be Warned! Deleting Imports/Samples will remove data AND runs accross the system, make sure you have a back up of any of the information you might want to save before deleting.'+
 		'<br><br>Data is not recoverable, please make sure you want to delete these.';
@@ -246,7 +246,7 @@ function confirmDeletePressed(){
 		
 		flushBasketInfo();
 		
-		location.reload();
+		location.href = BASE_PATH + '/search';
 	}
 
 function cancelDeletePressed(){ 
