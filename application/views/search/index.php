@@ -68,11 +68,11 @@
 			</div><!-- /.col (LEFT) -->
 						<div class="col-md-9">
 							<?php if(!isset($_SESSION['ngs_experiments'])){
-								echo $html->getRespBoxTableStream("Experiments", "experiments", ["id","Series Name","Summary","Design"], ["id","name","summary","design"]);
+								echo $html->getRespBoxTableStream("Experiments", "experiments", ["id","Series Name","Summary","Design", "Selected"], ["id","name","summary","design", ""]);
 							}else if($_SESSION['ngs_experiments'] == ''){
-								echo $html->getRespBoxTableStream("Experiments", "experiments", ["id","Series Name","Summary","Design"], ["id","name","summary","design"]);
+								echo $html->getRespBoxTableStream("Experiments", "experiments", ["id","Series Name","Summary","Design", "Selected"], ["id","name","summary","design", ""]);
 							}else{
-								echo $html->getRespBoxTableStream("Experiments", "experiments", ["id","Series Name","Summary","Design", "Lab","Organization","Grant"], ["id","name","summary","design", "lab","organization","grant"]);
+								echo $html->getRespBoxTableStream("Experiments", "experiments", ["id","Series Name","Summary","Design", "Lab","Organization","Grant", "Selected"], ["id","name","summary","design", "lab","organization","grant", ""]);
 							}?>
 							<?php if(!isset($_SESSION['ngs_lanes'])){
 								echo $html->getRespBoxTableStream("Imports", "lanes", ["id","Import Name","Facility","Total Reads","Total Samples","Selected"], ["id","experiment_name","facility", "total_reads", "total_samples",""]);

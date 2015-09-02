@@ -53,6 +53,11 @@ else if($p == 'getDropdownValues')
 	if (isset($_GET['type'])){$type = $_GET['type'];}
 	$data=$query->queryTable("SELECT $type FROM ngs_".$type);
 }
+else if ($p == 'getExperimentPermissions')
+{
+	if (isset($_GET['experiments'])){$experiments = $_GET['experiments'];}
+	$data=$query->queryTable("SELECT id FROM ngs_experiment_series WHERE id IN ($experiments) AND owner_id = ".$_SESSION['uid']);
+}
 else if($p == 'getLanePermissions')
 {
 	if (isset($_GET['lanes'])){$lanes = $_GET['lanes'];}
@@ -67,6 +72,12 @@ else if($p == 'deleteSelected')
 {
 	if (isset($_GET['samples'])){$samples = $_GET['samples'];}
 	if (isset($_GET['lanes'])){$lanes = $_GET['lanes'];}
+	if (isset($_GET['experiments'])){$experiments = $_GET['experiments'];}
+	
+	//	EXPERIMENT SERIES
+	if ($experiments != ""){
+		$query->runSQL("DELETE FROM ngs_experiment_series WHERE id IN ($experiments)");
+	}
 	
 	//	LANES
 	$query->runSQL("DELETE FROM ngs_temp_lane_files WHERE lane_id IN ($lanes)");
@@ -97,21 +108,22 @@ else if($p == 'deleteSelected')
 			array_push($all_run_ids, $lri->run_id);
 		}
 	}
-	/*
+	//	OBTAIN WKEY INFORMATION FOR REPORT_LIST REMOVAL //
+	
 	$wkeys = array();
-	$wkeys_json = json_decode($query->queryTable("SELECT wkey FROM ngs_runparams WHERE run_id IN (".implode(",", $all_run_ids).")"));
+	$wkeys_json = json_decode($query->queryTable("SELECT wkey FROM ngs_runparams WHERE id IN (".implode(",", $all_run_ids).")"));
 	foreach($wkeys_json as $wj){
 		if(!in_array($wj->wkey, $wkeys) && $wj->wkey != NULL && $wj->wkey != ''){
 			array_push($wkeys, $wj->wkey);
 		}
 	}
 	
-	//	INSERT WKEY DATA REMOVAL HERE	//
+	//	USE WKEY FOR REPORT_LIST REMOVAL	//
 	foreach($wkeys as $w){
-		$cmd = "rm -r $w";
-		pclose(popen( $cmd, "r" ) );
+		$query->runSQL("DELETE FROM report_list WHERE wkey = '$w'");
+		$query->runSQL("DELETE FROM ngs_wkeylist WHERE wkey = '$w'");
 	}
-	*/
+	
 	//	OBTAIN PID IF RUNNING AND REMOVE	//
 	//	Check to make sure this is nessicary	//
 	
@@ -142,6 +154,11 @@ else if($p == 'deleteSelected')
 	$query->runSQL("DELETE FROM ngs_runlist WHERE run_id IN (".implode(",", $all_run_ids).")");
 	$query->runSQL("DELETE FROM ngs_runparams WHERE id IN (".implode(",", $all_run_ids).")");
 	*/
+}
+else if ($p == 'intialRunCheck')
+{
+	if (isset($_GET['samples'])){$samples = $_GET['samples'];}
+	$data=$query->queryTable("SELECT sample_id FROM ngs_fastq_files WHERE sample_id IN ($samples) AND total_reads > 0");
 }
 
 header('Cache-Control: no-cache, must-revalidate');

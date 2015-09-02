@@ -12,7 +12,7 @@ $pDictionary = ['getSelectedSamples', 'submitPipeline', 'getStatus', 'getRunSamp
 				'checkMatePaired', 'getAllSampleIds', 'getLaneIdFromSample', 'getSingleSample', 'getSeriesIdFromLane', 'getAllLaneIds',
                 'getGIDs', 'getSampleNames', 'getWKey', 'getFastQCBool', 'getReportList', 'getTSVFileList', 'profileLoad',
                 'obtainAmazonKeys', 'checkAmazonPermissions', 'getInfoBoxData', 'getSamplesFromName', 'getLanesWithSamples',
-                'getLanesFromName'];
+                'getLanesFromName', 'getSamplesfromExperimentSeries', 'getExperimentIdFromSample'];
 
 $data = "";
                 
@@ -489,6 +489,18 @@ else if ($p == 'getLaneIdFromSample')
         $andPerms;
 	");
 }
+else if ($p == 'getExperimentIdFromSample')
+{
+    if (isset($_GET['sample'])){$sample = $_GET['sample'];}
+    $data=$query->queryTable("
+		SELECT id
+		FROM ngs_experiment_series
+		where id =
+				(select series_id
+				from ngs_samples
+				where ngs_samples.id = $sample);
+	");
+}
 else if($p == 'getSingleSample')
 {
 	if (isset($_GET['sample'])){$sample = $_GET['sample'];}
@@ -642,6 +654,15 @@ else if ($p == 'getLanesWithSamples')
             WHERE total_reads > 0
         )
     )
+    ");
+}
+else if ($p == 'getSamplesfromExperimentSeries')
+{
+    if (isset($_GET['experiment'])){$experiment = $_GET['experiment'];}
+    $data=$query->queryTable("
+    SELECT id
+    FROM ngs_samples
+    where series_id = $experiment
     ");
 }
 

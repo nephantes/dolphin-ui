@@ -166,12 +166,9 @@ $(function() {
 								{
 								}
 							});
-							var runparamsInsert = postInsertRunparams(json, outdir, runname, rundesc);
-							console.log(runparamsInsert)
-						}else{
+						}
 							var runparamsInsert = postInsertRunparams(json, outdir, runname, rundesc);
 							console.log(runparamsInsert);
-						}
 					}
 				}
 			}else{

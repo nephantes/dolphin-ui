@@ -21,7 +21,8 @@ else if ($p == "sendBasketInfo")
 	$basket_array = explode(",", $current_basket);
 
 	if (isset($_SESSION['basket']) && !(array_search($id, $basket_array) > -1)){
-		$_SESSION['basket'] .= ',' . $id;
+		array_push($basket_array, $id);
+		$_SESSION['basket'] = implode(",", $basket_array);
 	}else if(!(array_search($id, $basket_array) > -1)){
 		$_SESSION['basket'] = $id;
 	}
@@ -42,7 +43,7 @@ else if ($p == "removeBasketInfo")
 		$basket_array = explode(",", $current_basket);
 		$key = array_search($id, $basket_array);
 		array_splice($basket_array, $key, 1);
-		if(empty($basket_array)){
+		if(!empty($basket_array)){
 			$_SESSION['basket'] = implode(",", $basket_array);
 		}else{
 			unset($_SESSION['basket']);

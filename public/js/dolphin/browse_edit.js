@@ -11,6 +11,7 @@ var element_highlighted_id;
 var element_highlighted_type;
 var element_highlighted_onclick;
 
+var experimentPerms = [];
 var lanePerms = [];
 var samplePerms = [];
 
@@ -136,6 +137,43 @@ function deleteButton(){
 	$('#deleteModal').modal({
 		show: true
 	});
+	
+	if (checklist_samples.length == 0 && checklist_lanes.length == 0){
+		document.getElementById('myModalLabel').innerHTML = 'Delete Error';
+		document.getElementById('deleteLabel').innerHTML = 'You must select sample(s)/import(s) to delete to continue.';
+		
+		document.getElementById('cancelDeleteButton').innerHTML = "OK";
+		document.getElementById('confirmDeleteButton').setAttribute('style', 'display:none');
+	}else if (checklist_experiment_series.length > 0) {
+		document.getElementById('myModalLabel').innerHTML = 'Delete Experiment Series';
+		document.getElementById('deleteLabel').innerHTML = 'Warning!  You have selected to remove an experiment series!';
+		document.getElementById('deleteAreas').innerHTML = 'Are you sure you want to continue?<br>'+'Experiment series id(s): '+checklist_experiment_series.toString();
+		
+		document.getElementById('confirmDeleteButton').setAttribute('onclick', 'deletePermsModal()');
+		document.getElementById('confirmDeleteButton').setAttribute('data-dismiss', '');
+		document.getElementById('confirmDeleteButton').setAttribute('style', 'display:show');
+	}else{
+		deletePermsModal();
+	}
+}
+
+function deletePermsModal(){
+	experimentPerms = [];
+	lanePerms = [];
+	samplePerms = [];	
+
+	$.ajax({ type: "GET",
+			url: BASE_PATH+"/public/ajax/browse_edit.php",
+			data: { p: 'getExperimentPermissions', experiments: checklist_experiment_series.toString() },
+			async: false,
+			success : function(s)
+			{
+				for(var x = 0; x < s.length; x++){
+					experimentPerms.push(s[x].id);
+				}
+			}
+	});
+	
 	$.ajax({ type: "GET",
 			url: BASE_PATH+"/public/ajax/browse_edit.php",
 			data: { p: 'getLanePermissions', lanes: checklist_lanes.toString() },
@@ -160,8 +198,14 @@ function deleteButton(){
 			}
 	});
 	
+	var badExperiments = [];
 	var badLanes = [];
 	var badSamples = [];
+	for (var q = 0; q < checklist_experiment_series.length; q++) {
+		if (experimentPerms.indexOf(checklist_experiment_series[q]) == -1) {
+			badExperiments.push(checklist_experiment_series[q]);
+		}
+	}
 	for (var q = 0; q < checklist_lanes.length; q++) {
 		if (lanePerms.indexOf(checklist_lanes[q]) == -1) {
 			badLanes.push(checklist_lanes[q]);
@@ -175,35 +219,38 @@ function deleteButton(){
 	
 	document.getElementById('myModalLabel').innerHTML = 'Delete Selected';
 	document.getElementById('deleteLabel').innerHTML ='You have permission to delete the following:';
-	document.getElementById('deleteAreas').innerHTML = 'Imports: '+ lanePerms.toString() + '<br>Samples: ' + samplePerms.toString() +
-		'<br><br>Imports lacking permissions: ' + badLanes.toString() + '<br>Samples lacking permissions: ' + badSamples.toString() +
+	document.getElementById('deleteAreas').innerHTML = 'Experiment Series id(s): ' + experimentPerms.join(", ") + '<br>Imports id(s): '+ lanePerms.join(", ") + '<br>Samples id(s): ' + samplePerms.join(", ") +
+		'<br><br>Experiment Series id(s) lacking permissions: ' + badExperiments.join(", ") + '<br>Import id(s) lacking permissions: ' + badLanes.join(", ") + '<br>Sample id(s) lacking permissions: ' + badSamples.join(", ") +
 		'<br><br>If the Import or Sample you want to delete is not accessible, you do not have the correct permissions to remove them.'+
 		'<br><br>Be Warned! Deleting Imports/Samples will remove data AND runs accross the system, make sure you have a back up of any of the information you might want to save before deleting.'+
 		'<br><br>Data is not recoverable, please make sure you want to delete these.';
 		
 	document.getElementById('cancelDeleteButton').innerHTML = "Cancel";
 	document.getElementById('confirmDeleteButton').setAttribute('style', 'display:show');
+	document.getElementById('confirmDeleteButton').setAttribute('onclick', 'confirmDeletePressed()');
 }
 
 function confirmDeletePressed(){
-	$.ajax({ type: "GET",
-			url: BASE_PATH+"/public/ajax/browse_edit.php",
-			data: { p: 'deleteSelected', samples: samplePerms.toString(), lanes: lanePerms.toString() },
-			async: false,
-			success : function(s)
-			{
-			}
-	});
-	
-	lanePerms = [];
-	samplePerms = [];
-	
-	flushBasketInfo();
-	
-	location.reload();
-}
+		$.ajax({ type: "GET",
+				url: BASE_PATH+"/public/ajax/browse_edit.php",
+				data: { p: 'deleteSelected', samples: samplePerms.toString(), lanes: lanePerms.toString(), experiments: experimentPerms.toString() },
+				async: false,
+				success : function(s)
+				{
+				}
+		});
+		
+		experimentPerms = [];
+		lanePerms = [];
+		samplePerms = [];
+		
+		flushBasketInfo();
+		
+		location.href = BASE_PATH + '/search';
+	}
 
 function cancelDeletePressed(){ 
+	experimentPerms = [];
 	lanePerms = [];
 	samplePerms = [];
 }
