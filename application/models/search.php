@@ -111,9 +111,9 @@ class Search extends VanillaModel {
         return rtrim($group_str, ",");
     }
     function getSampleFileLocation($value){
-        $result = $this->query("select file_name from ngs_fastq_files where sample_id = $value");
+        $result = $this->query("select file_name, fastq_dir from ngs_fastq_files left join ngs_dirs on ngs_fastq_files.dir_id = ngs_dirs.id where sample_id = $value");
         if($result == null or $result == []){
-            $result = $this->query("select file_name from ngs_temp_sample_files where sample_id = $value");
+            $result = $this->query("select file_name, fastq_dir from ngs_temp_sample_files left join ngs_dirs on ngs_temp_sample_files.dir_id = ngs_dirs.id where sample_id = $value");
         }
 		return json_decode($result, true);
     }
