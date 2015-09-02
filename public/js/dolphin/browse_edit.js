@@ -138,9 +138,9 @@ function deleteButton(){
 		show: true
 	});
 	
-	if (checklist_samples.length == 0 && checklist_lanes.length == 0){
+	if (checklist_samples.length == 0 && checklist_lanes.length == 0 && checklist_experiment_series.length == 0){
 		document.getElementById('myModalLabel').innerHTML = 'Delete Error';
-		document.getElementById('deleteLabel').innerHTML = 'You must select sample(s)/import(s) to delete to continue.';
+		document.getElementById('deleteLabel').innerHTML = 'You must make a selection to delete to continue.';
 		
 		document.getElementById('cancelDeleteButton').innerHTML = "OK";
 		document.getElementById('confirmDeleteButton').setAttribute('style', 'display:none');
