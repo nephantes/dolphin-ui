@@ -23,7 +23,6 @@ warnings.filterwarnings('ignore', '.*the sets module is deprecated.*',
 from workflowdefs import *
 
 class Dolphin:
-    bin_dir = dirname(argv[0])
     cmd = 'python %(dolphin_tools_dir)s/runWorkflow.py -f %(params_section)s -i %(input_fn)s -w %(workflow)s -p %(dolphin_default_params)s -u %(username)s -o %(outdir)s %(wkeystr)s'
     config = ConfigParser.ConfigParser()
     params_section = ''
@@ -114,9 +113,11 @@ class Dolphin:
     
     def getSampleList(self, runparamsid):
         tablename="ngs_fastq_files"
-        sql = "SELECT s.samplename, ts.file_name FROM ngs_runparams nrp, ngs_runlist nr, ngs_samples s, %(tablename)s ts, ngs_dirs d where nr.run_id=nrp.id and nr.sample_id=s.id and nrp.run_status=0 and s.id=ts.sample_id and d.id=ts.dir_id and nr.run_id='"+str(runparamsid)+"';"
+        dirfield="d.backup_dir"
+        sql = "SELECT s.samplename, %(dirfield)s dir, ts.file_name FROM ngs_runparams nrp, ngs_runlist nr, ngs_samples s, %(tablename)s ts, ngs_dirs d where nr.run_id=nrp.id and nr.sample_id=s.id and nrp.run_status=0 and s.id=ts.sample_id and d.id=ts.dir_id and nr.run_id='"+str(runparamsid)+"';"
         samplelist=self.runSQL(sql%locals())
         if (not samplelist):
+            dirfield="d.fastq_dir"
             tablename="ngs_temp_sample_files"
             samplelist=self.runSQL(sql%locals())
         return self.getInputParams(samplelist)
@@ -126,29 +127,34 @@ class Dolphin:
         for row in samplelist:
             if (inputparams):
                inputparams=inputparams+":"
-            inputparams=inputparams+row[0]+","+row[1]
+            content = row[2]
+            content = content.replace( ',', ","+row[1]+"/" )
+            inputparams=inputparams+row[0]+","+row[1]+"/"+content
         spaired=None
-        if (',' in row[1]):
+        if (',' in row[2]):
             spaired="paired"
         return (spaired, inputparams)
     
     def getLaneList(self, runparamsid):
         tablename="ngs_fastq_files"
+        fields='d.backup_dir dir, tl.file_name'
         sql = "SELECT DISTINCT %(fields)s FROM ngs_runlist nrl, ngs_runparams nrp, ngs_samples s, %(tablename)s tl where nrl.run_id=nrp.id and nrp.run_status=0 and s.lane_id = tl.lane_id and s.id=nrl.sample_id and nrp.id='"+str(runparamsid)+"';"
-        fields='tl.file_name'
     
         result=self.runSQL(sql%locals())
         if (not result):
             tablename="ngs_temp_lane_files"
+            fields='d.fastq_dir dir, tl.file_name'
             result=self.runSQL(sql%locals())
     
         inputparams=""
         for row in result:
             if (inputparams):
                 inputparams=inputparams+":"
-            inputparams=inputparams+row[0]
+            content = row[1]
+            content = content.replace( ',', ","+row[1]+"/" )
+            inputparams=inputparams+row[0]+"/"+content
         spaired=None
-        if (',' in row[0]):
+        if (',' in row[1]):
             spaired="paired"
     
         fields='s.samplename, s.barcode'
@@ -163,14 +169,6 @@ class Dolphin:
         return (spaired, inputparams, barcode)
 
     def write_input(self,  input_fn, data_dir, content,genomebuild,spaired,barcodes,adapter, quality, trim,trimpaired, split, commonind, advparams, customind, pipeline) :
-       if ('DIR' in content):
-           content = content.replace( 'DIR', data_dir )
-       else:
-           if (str(barcodes) != "None"):
-               content = data_dir+"/"+content
-               content = content.replace( ':', ":"+data_dir+"/" )
-           content = content.replace( ',', ","+data_dir+"/" )
-       content = re.sub(r'/+','/',content)
     
        gb=genomebuild.split(',')
        previous="NONE"
@@ -609,7 +607,7 @@ def main():
            runparams = dolphin.getRunParams(runparamsid)
            logging.info(runparams)
 
-           input_fn      = "../tmp/files/input.txt"
+           input_fn      = logdir+'/run'+str(rpid)+'/input.'+str(rpid)+'.'+str(os.getpid())+'.txt'
 
            fastqc      = runparams.get('fastqc')
            adapter     = runparams.get('adapter')
@@ -657,7 +655,7 @@ def main():
 
            dolphin.write_input(input_fn, inputdir, content, genomebuild, spaired, barcodes, adapter, quality, trim, trimpaired, split, commonind, advparams, customind, pipeline )
 
-           workflow = join( dolphin.bin_dir, '../tmp/files/seqmapping_workflow.txt' )
+           workflow = logdir+'/run'+str(rpid)+'/seqmapping_workflow.'+str(rpid)+'.'+str(os.getpid())+'.txt'
 
            dolphin.write_workflow(resume, gettotalreads, amazonupload, backupS3, runparamsid, customind, commonind, pipeline, barcodes, fastqc, adapter, quality, trim, split, workflow, clean)
 
