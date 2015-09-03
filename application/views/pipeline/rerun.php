@@ -55,7 +55,7 @@
 					</div><!-- /.row -->
 					<div class="row">
 						<?php echo $html->getStaticSelectionBox("Name the Run", "run_name", "TEXT", 4)?>
-						<?php echo $html->getStaticSelectionBox("Description", "description", "TEXT", 8)?>
+						<?php echo $html->getStaticSelectionBox("Run Description", "run_description", "TEXT", 8)?>
 						<?php echo $html->getStaticSelectionBox("Genome Build", "genomebuild", "<option>human,hg19</option>
 																				<option>hamster,cho-k1</option>
 																				<option>rat,rn5</option>

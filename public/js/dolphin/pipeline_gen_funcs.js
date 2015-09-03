@@ -234,7 +234,7 @@ function rerunLoad() {
 	}
 	document.getElementById('outdir').value = infoArray[1];
 	document.getElementById('run_name').value = infoArray[2];
-	document.getElementById('description').value = infoArray[3];
+	document.getElementById('run_description').value = infoArray[3];
 	}
 }
 
@@ -417,7 +417,7 @@ function submitPipeline(type) {
 	var outputdir = document.getElementById("outdir").value;
 	var fastqc = document.getElementById("fastqc").value;
 	var run_name = document.getElementById("run_name").value;
-	var description = document.getElementById("description").value;
+	var description = document.getElementById("run_description").value;
 
 	var empty_values = []
 	if (run_name == "") {
