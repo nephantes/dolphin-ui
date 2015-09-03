@@ -466,7 +466,7 @@ e range"><i class="fa fa-calendar"></i></button>
 			'.$obj[$name].'
 		</h4>
 		</div>
-		<div class="box-body">
+		<div class="box-body" style="overflow:scroll">
 		<dl class="dl-horizontal">
 		';
 		foreach ($fields as $field):
@@ -477,7 +477,15 @@ e range"><i class="fa fa-calendar"></i></button>
 		endforeach;
 		if($files != null){
 				$html.='<dt>File(s)</dt>';
-				$html.='<dd>'.$files[0]['file_name'].'</dd>';
+				foreach ($files as $f){
+						$parallel = explode(",",$f['file_name']);
+						if(count($parallel) > 1){
+								$html.='<dd>'.$f['fastq_dir']."/".$parallel[0].'</dd>';
+								$html.='<dd>'.$f['fastq_dir']."/".$parallel[1].'</dd>';
+						}else{
+								$html.='<dd>'.$f['fastq_dir']."/".$f['file_name'].'</dd>';
+						}
+				}
 		}
 	$html.=	'</dl>
 		</div> 
