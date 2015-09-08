@@ -30,8 +30,7 @@
 							<script>
 								document.getElementById('barcode_sep').setAttribute('onchange', 'expandBarcodeSep()');
 							</script>
-							<?php echo $html->getStaticSelectionBox("Mate-paired", "spaired", "<option>yes</option>
-																				<option>no</option>", 4)?>
+							<?php echo $html->getStaticSelectionBox("Group Selection", "groups", $html->groupSelectionOptions($groups), 4)?>
 						</div>
 						<div id="barcode_div" class="col-md-12" style="display: none">
 							<?php echo $html->getStaticSelectionBox("Barcode Definitions", "Barcode Definitions", "TEXTBOX", 12)?>

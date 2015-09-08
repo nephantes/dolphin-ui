@@ -13,6 +13,7 @@ class FastlaneController extends VanillaController {
 		$this->set('title','NGS Fastlane');
 		
 		$this->set('uid', $_SESSION['uid']);
+		$this->set('groups',$this->Fastlane->getGroups($this->username));
         $gids = $this->Fastlane->getGroup($_SESSION['user']);
         $this->set('gids', $gids);
 	}

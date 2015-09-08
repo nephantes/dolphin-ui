@@ -820,7 +820,13 @@ e range"><i class="fa fa-calendar"></i></button>
 		$html.="</script>\n";
 		return $html;
 	}
-	
+	function groupSelectionOptions($groups){
+		$html = "";
+		foreach($groups as $g){
+				$html.="<option>".$g['name']."</option>";
+		}
+		return $html;
+	}
 	function getInfoBox($id){
 		$left_help_boxes = ['plot_control_panel', 'run_name', 'genomebuild', 'adapter', 'split', 'custom', 'pipeline'];
 		if(in_array($id, $left_help_boxes)){
