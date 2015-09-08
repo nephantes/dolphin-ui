@@ -231,10 +231,15 @@ function checkFastlaneInput(info_array){
 }
 
 function insertExperimentSeries(experiment_name){
+	if (phpGrab.gids == "") {
+		phpGrab.gids = "1";
+	}else{
+		phpGrab.gids = phpGrab.gids.split(",")[0];
+	}
 	$.ajax({
 			type: 	'POST',
 			url: 	BASE_PATH+'/public/ajax/ngsfastlanedb.php',
-			data:  	{ p: 'insertExperimentSeries', name: experiment_name, gids: phpGrab.gids },
+			data:  	{ p: 'insertExperimentSeries', name: experiment_name, gids: phpGrab.gids.split(",")[0] },
 			async:	false,
 			success: function(s)
 			{
@@ -243,10 +248,15 @@ function insertExperimentSeries(experiment_name){
 }
 
 function insertLane(experiment_id, lane_name){
+	if (phpGrab.gids == "") {
+		phpGrab.gids = "1";
+	}else{
+		phpGrab.gids = phpGrab.gids.split(",")[0];
+	}
 	$.ajax({
 			type: 	'POST',
 			url: 	BASE_PATH+'/public/ajax/ngsfastlanedb.php',
-			data:  	{ p: 'insertLane', experiment: experiment_id, lane: lane_name, gids: phpGrab.gids },
+			data:  	{ p: 'insertLane', experiment: experiment_id, lane: lane_name, gids: phpGrab.gids.split(",")[0] },
 			async:	false,
 			success: function(s)
 			{
@@ -256,11 +266,16 @@ function insertLane(experiment_id, lane_name){
 
 function insertSample(experiment_id, lane_id, sample_name, organism, barcode){
 	var id;
+	if (phpGrab.gids == "") {
+		phpGrab.gids = "1";
+	}else{
+		phpGrab.gids = phpGrab.gids.split(",")[0];
+	}
 	$.ajax({
 			type: 	'GET',
 			url: 	BASE_PATH+'/public/ajax/ngsfastlanedb.php',
 			data:  	{ p: 'insertSample', experiment: experiment_id, lane: lane_id, sample: sample_name,
-					organism: organism, barcode: barcode, gids: phpGrab.gids },
+					organism: organism, barcode: barcode, gids: phpGrab.gids.split(",")[0] },
 			async:	false,
 			success: function(s)
 			{
@@ -271,6 +286,11 @@ function insertSample(experiment_id, lane_id, sample_name, organism, barcode){
 }
 
 function insertDirectories(input, backup, amazon){
+	if (phpGrab.gids == "") {
+		phpGrab.gids = "1";
+	}else{
+		phpGrab.gids = phpGrab.gids.split(",")[0];
+	}
 	$.ajax({
 			type: 	'POST',
 			url: 	BASE_PATH+'/public/ajax/ngsfastlanedb.php',
@@ -283,6 +303,11 @@ function insertDirectories(input, backup, amazon){
 }
 
 function insertTempSampleFiles(filename, sample_id, input_directory_id){
+	if (phpGrab.gids == "") {
+		phpGrab.gids = "1";
+	}else{
+		phpGrab.gids = phpGrab.gids.split(",")[0];
+	}
 	$.ajax({
 			type: 	'POST',
 			url: 	BASE_PATH+'/public/ajax/ngsfastlanedb.php',
@@ -295,6 +320,11 @@ function insertTempSampleFiles(filename, sample_id, input_directory_id){
 }
 
 function insertTempLaneFiles(file_name, lane_id, dir_id){
+	if (phpGrab.gids == "") {
+		phpGrab.gids = "1";
+	}else{
+		phpGrab.gids = phpGrab.gids.split(",")[0];
+	}
 	$.ajax({
 			type: 	'POST',
 			url: 	BASE_PATH+'/public/ajax/ngsfastlanedb.php',

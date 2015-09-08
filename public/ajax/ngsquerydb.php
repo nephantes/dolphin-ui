@@ -635,7 +635,7 @@ else if($p == 'getSamplesFromName')
         SELECT DISTINCT ns.id
         FROM ngs_samples ns, ngs_lanes nl, ngs_experiment_series ne 
         WHERE ns.name in ($sqlnames)
-        AND nl.id = ns.lane_id and nl.name = $lane
+        AND nl.id = ns.lane_id and nl.name = '$lane'
         AND ns.series_id = ne.id and ne.experiment_name = '$experiment';
         ");
     }
