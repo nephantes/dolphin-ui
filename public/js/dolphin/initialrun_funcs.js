@@ -33,7 +33,7 @@ $(function() {
 				json = json + ',"barcodes":"distance,' + barcode_array.split(',')[0] + ':format,'+ barcode_array.split(",")[1];
 				json = json + '","adapters":"' + initial_split[initial_split.length - 1].split(" ")[1].replace(/\:/g, "__cr____cn__") + '"';
 			}
-			json = json + ',"quality":"none","quality":"none",';
+			json = json + ',"quality":"none",';
 			json = json + '"trim":"none","split":"none","commonind":"none"}'
 			
 			var names_list = [];
@@ -85,7 +85,7 @@ $(function() {
 			}
 		}
 		
-		if (json != undefined & outdir != undefined && runname != undefined && rundesc != undefined) {
+		if (json != undefined && outdir != undefined && runname != undefined && rundesc != undefined) {
 			//	Check to see if runparams has already launched
 			var run_ids = [];
 			var initial_run_ids = [];
