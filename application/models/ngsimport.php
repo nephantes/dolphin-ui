@@ -853,8 +853,6 @@ class Ngsimport extends VanillaModel {
 			{
 				if($this->sheetData[3][$j]=="Directory ID"){$dir->dir_tag=$this->esc($this->sheetData[$i][$j]);}
 				if($this->sheetData[3][$j]=="Fastq directory"){$dir->fastq_dir=$this->esc($this->sheetData[$i][$j]);}
-				if($this->sheetData[3][$j]=="Backup directory"){$dir->backup_dir=$this->esc($this->sheetData[$i][$j]);}
-				if($this->sheetData[3][$j]=="Amazon bucket"){$dir->amazon_bucket=$this->esc($this->sheetData[$i][$j]);}
 			}
 			
 			if(!isset($dir->dir_tag) || $dir->dir_tag == ''){
@@ -873,16 +871,6 @@ class Ngsimport extends VanillaModel {
 				array_push($this->dir_fastq, $dir->fastq_dir);
 			}
 			
-			if(!isset($dir->backup_dir) || $dir->backup_dir == ''){
-				$text.= $this->errorText("Backup directory required for submission (row " . $i . ")");
-				$this->final_check = false;
-				$dir_check = false;
-			}
-			
-			if(!isset($dir->amazon_bucket) || $dir->amazon_bucket == ''){
-				$text.= $this->warningText("Amazon bucket information missing (row " . $i . ")");
-			}
-			
 			if($dir_check){
 				$this->dir_arr[$dir->dir_tag]=$dir;
 			}
@@ -895,7 +883,7 @@ class Ngsimport extends VanillaModel {
 	
 	function processDirs(){
 		$text = "";
-		$new_dirs = new dirs($this, $this->dir_arr);
+		$new_dirs = new dirs($this, $this->dir_arr, $this->backup_dir, $this->amazon_bucket);
 		$text="DIR:".$new_dirs->getStat()."<BR>";
 		foreach($this->dir_fastq as $df){
 			$dir_id = json_decode($this->query("SELECT id FROM ngs_dirs
@@ -2053,12 +2041,15 @@ class files extends main{
 /* diretories for the files class */
 class dir{}
 class dirs extends main{
+	private $backup_dir;
+	private $amazon_bucket;
 
-	function __construct($model, $dir_arr = [])
+	function __construct($model, $dir_arr = [], $backup_dir, $amazon_bucket)
 	{
 		$this->model=$model;
 		$this->dir_arr=$dir_arr;
-		
+		$this->backup_dir = $backup_dir;
+		$this->amazon_bucket = $amazon_bucket;
 		$this->processArr($dir_arr);
 	}
 
@@ -2083,7 +2074,7 @@ class dirs extends main{
 		$sql=" INSERT INTO `ngs_dirs`(`fastq_dir`,`backup_dir`, `amazon_bucket`,
 		`owner_id`, `group_id`, `perms`,
 		`date_created`, `date_modified`, `last_modified_user`)
-				 VALUES('".$dir->fastq_dir."', '".$dir->backup_dir."', '".$dir->amazon_bucket."',
+				 VALUES('".$dir->fastq_dir."', '".$this->backup_dir."', '".$this->amazon_bucket."',
 		 '".$this->model->uid."', '".$this->model->gid."', '".$this->model->sid."',
 		 now(), now(), '".$this->model->uid."');";
 		$this->insert++;
@@ -2094,12 +2085,11 @@ class dirs extends main{
 	function update($dir)
 	{
 		$sql="update `ngs_dirs` set
-		`backup_dir`='".$dir->backup_dir."', `amazon_bucket`='".$dir->amazon_bucket."',
+		`backup_dir`='".$this->backup_dir."', `amazon_bucket`='".$this->amazon_bucket."',
 		`group_id`='".$this->model->gid."', `perms`='".$this->model->sid."',
 		`date_modified`=now(), `last_modified_user`='".$this->model->uid."'
 				where `id` = ".$this->getId($dir);
 		$this->update++;
-
 		return $this->model->query($sql);
 	}
 }
