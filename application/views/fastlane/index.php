@@ -30,7 +30,7 @@
 							<script>
 								document.getElementById('barcode_sep').setAttribute('onchange', 'expandBarcodeSep()');
 							</script>
-							<?php echo $html->getStaticSelectionBox("Group Selection", "groups", $html->groupSelectionOptions($groups), 4)?>
+							<?php echo $html->getStaticSelectionBox("Mate-paired", "spaired", "<option>yes</option><option>no</option>", 4)?>
 						</div>
 						<div id="barcode_div" class="col-md-12" style="display: none">
 							<?php echo $html->getStaticSelectionBox("Barcode Definitions", "Barcode Definitions", "TEXTBOX", 12)?>
@@ -60,6 +60,14 @@
 							<?php echo $html->getStaticSelectionBox("Amazon Bucket", "amazon_bucket", "TEXT", 12)?>
 						</div>
 					</div><!-- /.row -->
+					<div>
+						<hr>
+					</div>
+					<div>
+						<?php
+						echo $html->getStaticSelectionBox("Group Selection", "groups", $html->groupSelectionOptions($groups), 6);
+						?>
+					</div>
 					<div class="row">
 						<div class="col-md-12">
 							<input type="submit" name="submitted_fastlane" id="submit_fastlane" class="btn btn-primary" onclick="submitFastlaneButton()" innerHTML="Submit Fastlane"/>

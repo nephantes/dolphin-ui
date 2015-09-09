@@ -30,6 +30,7 @@ class FastlaneController extends VanillaController {
 		if(isset($_SESSION['barcode_array'])){$barcode_array = $_SESSION['barcode_array'];}
 		if(isset($_SESSION['pass_fail_values'])){$pass_fail_values = $_SESSION['pass_fail_values'];}
 		if(isset($_SESSION['bad_samples'])){$bad_samples = $_SESSION['bad_samples'];}
+		if(isset($_SESSION['group_selected'])){$group_selected = $_SESSION['group_selected'];}
 		
 		if(isset($_SESSION['fastlane_values'])){
 			$fastlane_array = explode(",",$fastlane_values);

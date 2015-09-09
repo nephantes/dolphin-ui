@@ -141,6 +141,10 @@ if ($p == 'experimentSeriesCheck'){
 	if (isset($_GET['post'])){$post = $_GET['post'];}
 	
 	$_SESSION[$post] = implode(",",$info_array);
+}else if ($p == 'obtainGroupFromName'){
+	if (isset($_GET['name'])){$name = $_GET['name'];}
+	
+	$data = $query->queryAVal("SELECT `id` FROM `groups` WHERE name = '".$name."'");
 }
 
 //footer
