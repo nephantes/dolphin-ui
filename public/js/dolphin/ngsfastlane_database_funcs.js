@@ -144,6 +144,10 @@ function checkFastlaneInput(info_array){
 		//	May submit into database
 		var organism = info_array[0];
 
+		//	Obtain group id
+		var gid = obtainGroupFromName(document.getElementById('groups').value);
+		var perms = obtainPermsFromRadio();
+		
 		if (experiment_series_id > 0) {
 			//	If adding to a experiment series
 			if (lane_id > 0) {
@@ -152,58 +156,58 @@ function checkFastlaneInput(info_array){
 					//	If seperating barcodes
 					for (var a = 0; a < barcode_array.length; a++) {
 						sample_ids.push(insertSample(experiment_series_id, lane_id, barcode_array[a][0],
-										organism, barcode_array[a][1]));
+										organism, barcode_array[a][1], gid, perms));
 					}
 				}else{
 					//	If not separating barcodes
 					for (var a = 0; a < input_array.length; a++) {
 						sample_ids.push(insertSample(experiment_series_id, lane_id, input_array[a][0],
-										organism, 'nobarcode'));
+										organism, 'nobarcode', gid, perms));
 					}
 				}
 			}else{
 				//	If creating a lane
-				insertLane(experiment_series_id, info_array[4]);
+				insertLane(experiment_series_id, info_array[4], gid, perms);
 				var lane_id = laneCheck(experiment_series_id, info_array[4]);
 				if (info_array[1] == 'yes') {
 					//	If separating barcodes
 					for (var a = 0; a < barcode_array.length; a++) {
 						sample_ids.push(insertSample(experiment_series_id, lane_id, barcode_array[a][0],
-										organism, barcode_array[a][1]));
+										organism, barcode_array[a][1], gid, perms));
 					}
 				}else{
 					//	If not separating barcodes
 					for (var a = 0; a < input_array.length; a++) {
 						sample_ids.push(insertSample(experiment_series_id, lane_id, input_array[a][0],
-										organism, 'nobarcode'));
+										organism, 'nobarcode', gid, perms));
 					}
 				}
 			}
 		}else{
 			//	If creating an experiment series
-			insertExperimentSeries(info_array[3]);
+			insertExperimentSeries(info_array[3], gid, perms);
 			experiment_series_id = experimentSeriesCheck(info_array[3]);
 			
-			insertLane(experiment_series_id, info_array[4]);
+			insertLane(experiment_series_id, info_array[4], gid, perms);
 			var lane_id = laneCheck(experiment_series_id, info_array[4]);
 			
 			if (info_array[1] == 'yes') {
 				//	If separating barcodes
 				for (var a = 0; a < barcode_array.length; a++) {
 					sample_ids.push(insertSample(experiment_series_id, lane_id, barcode_array[a][0],
-									organism, barcode_array[a][1]));
+									organism, barcode_array[a][1], gid, perms));
 				}
 			}else{
 				//	If not separating barcodes
 				for (var a = 0; a < input_array.length; a++) {
 					sample_ids.push(insertSample(experiment_series_id, lane_id, input_array[a][0],
-									organism, 'nobarcode'));
+									organism, 'nobarcode', gid, perms));
 				}
 			}
 		}
 		
 		//	Insert directory information
-		insertDirectories(info_array[5], info_array[7], info_array[8]);
+		insertDirectories(info_array[5], info_array[7], info_array[8], gid, perms);
 		input_directory_id = directoryCheck(info_array[5], info_array[7], info_array[8]);
 		
 		//	Insert temp files
@@ -211,35 +215,67 @@ function checkFastlaneInput(info_array){
 			if (info_array[1] == 'yes') {
 				//	If Barcode sep
 				if (input_array[g].length == 2) {
-					insertTempLaneFiles(input_array[g][1], lane_id, input_directory_id);
+					insertTempLaneFiles(input_array[g][1], lane_id, input_directory_id, gid, perms);
 				}else{
 					var combined_files = input_array[g][1] + "," + input_array[g][2];
-					insertTempLaneFiles(combined_files, lane_id, input_directory_id);
+					insertTempLaneFiles(combined_files, lane_id, input_directory_id, gid, perms);
 				}
 			}else{
 				//	If no Barcode sep
 				if (input_array[g].length == 2) {
-					insertTempSampleFiles(input_array[g][1], sample_ids[g], input_directory_id);
+					insertTempSampleFiles(input_array[g][1], sample_ids[g], input_directory_id, gid, perms);
 				}else{
 					var combined_files = input_array[g][1] + "," + input_array[g][2];
-					insertTempSampleFiles(combined_files, sample_ids[g], input_directory_id);
+					insertTempSampleFiles(combined_files, sample_ids[g], input_directory_id, gid, perms);
 				}
 			}
 		}
+		console.log(experiment_series_id);
+		console.log(lane_id);
+		console.log(barcode_array);
+		console.log(input_array);
+		console.log(organism);
+		console.log(gid);
+		console.log(perms);
+		
+		alert(sample_ids);
 		return sample_ids;
 	}
 }
 
-function insertExperimentSeries(experiment_name){
-	if (phpGrab.gids == "") {
-		phpGrab.gids = "1";
-	}else{
-		phpGrab.gids = phpGrab.gids.split(",")[0];
+function obtainGroupFromName(name){
+	var group_id;
+	$.ajax({
+			type: 	'GET',
+			url: 	BASE_PATH+'/public/ajax/ngsfastlanedb.php',
+			data:  	{ p: 'obtainGroupFromName', name: name },
+			async:	false,
+			success: function(s)
+			{
+				group_id = s;
+			}
+	});
+	return group_id;
+}
+
+function obtainPermsFromRadio(){
+	for(var x = 0; x <  document.getElementsByTagName('input').length; x++){
+		var option = document.getElementsByTagName('input')[x];
+		if(option.checked == true){
+			return option.value;
+		}
+	}
+	return "32";
+}
+
+function insertExperimentSeries(experiment_name, gid, perms){
+	if (gid == "" || gid == "0") {
+		gid = "1";
 	}
 	$.ajax({
 			type: 	'POST',
 			url: 	BASE_PATH+'/public/ajax/ngsfastlanedb.php',
-			data:  	{ p: 'insertExperimentSeries', name: experiment_name, gids: phpGrab.gids.split(",")[0] },
+			data:  	{ p: 'insertExperimentSeries', name: experiment_name, gids: gid, perms: perms },
 			async:	false,
 			success: function(s)
 			{
@@ -247,16 +283,14 @@ function insertExperimentSeries(experiment_name){
 	});
 }
 
-function insertLane(experiment_id, lane_name){
-	if (phpGrab.gids == "") {
-		phpGrab.gids = "1";
-	}else{
-		phpGrab.gids = phpGrab.gids.split(",")[0];
+function insertLane(experiment_id, lane_name, gid, perms){
+	if (gid == "" || gid == "0") {
+		gid = "1";
 	}
 	$.ajax({
 			type: 	'POST',
 			url: 	BASE_PATH+'/public/ajax/ngsfastlanedb.php',
-			data:  	{ p: 'insertLane', experiment: experiment_id, lane: lane_name, gids: phpGrab.gids.split(",")[0] },
+			data:  	{ p: 'insertLane', experiment: experiment_id, lane: lane_name, gids: gid, perms: perms },
 			async:	false,
 			success: function(s)
 			{
@@ -264,18 +298,16 @@ function insertLane(experiment_id, lane_name){
 	});
 }
 
-function insertSample(experiment_id, lane_id, sample_name, organism, barcode){
+function insertSample(experiment_id, lane_id, sample_name, organism, barcode, gid, perms){
 	var id;
-	if (phpGrab.gids == "") {
-		phpGrab.gids = "1";
-	}else{
-		phpGrab.gids = phpGrab.gids.split(",")[0];
+	if (gid == "" || gid == "0") {
+		gid = "1";
 	}
 	$.ajax({
 			type: 	'GET',
 			url: 	BASE_PATH+'/public/ajax/ngsfastlanedb.php',
 			data:  	{ p: 'insertSample', experiment: experiment_id, lane: lane_id, sample: sample_name,
-					organism: organism, barcode: barcode, gids: phpGrab.gids.split(",")[0] },
+					organism: organism, barcode: barcode, gids: gid, perms: perms },
 			async:	false,
 			success: function(s)
 			{
@@ -285,16 +317,14 @@ function insertSample(experiment_id, lane_id, sample_name, organism, barcode){
 	return id;
 }
 
-function insertDirectories(input, backup, amazon){
-	if (phpGrab.gids == "") {
-		phpGrab.gids = "1";
-	}else{
-		phpGrab.gids = phpGrab.gids.split(",")[0];
+function insertDirectories(input, backup, amazon, gid, perms){
+	if (gid == "" || gid == "0") {
+		gid = "1";
 	}
 	$.ajax({
 			type: 	'POST',
 			url: 	BASE_PATH+'/public/ajax/ngsfastlanedb.php',
-			data:  	{ p: 'insertDirectories', input: input, backup: backup, amazon: amazon, gids: phpGrab.gids },
+			data:  	{ p: 'insertDirectories', input: input, backup: backup, amazon: amazon, gids: gid, perms: perms },
 			async:	false,
 			success: function(s)
 			{
@@ -302,16 +332,14 @@ function insertDirectories(input, backup, amazon){
 	});
 }
 
-function insertTempSampleFiles(filename, sample_id, input_directory_id){
-	if (phpGrab.gids == "") {
-		phpGrab.gids = "1";
-	}else{
-		phpGrab.gids = phpGrab.gids.split(",")[0];
+function insertTempSampleFiles(filename, sample_id, input_directory_id, gid, perms){
+	if (gid == "" || gid == "0") {
+		gid = "1";
 	}
 	$.ajax({
 			type: 	'POST',
 			url: 	BASE_PATH+'/public/ajax/ngsfastlanedb.php',
-			data:  	{ p: 'insertTempSample', filename: filename, sample_id: sample_id, input: input_directory_id, gids: phpGrab.gids },
+			data:  	{ p: 'insertTempSample', filename: filename, sample_id: sample_id, input: input_directory_id, gids: gid, perms: perms },
 			async:	false,
 			success: function(s)
 			{
@@ -319,16 +347,14 @@ function insertTempSampleFiles(filename, sample_id, input_directory_id){
 	});
 }
 
-function insertTempLaneFiles(file_name, lane_id, dir_id){
-	if (phpGrab.gids == "") {
-		phpGrab.gids = "1";
-	}else{
-		phpGrab.gids = phpGrab.gids.split(",")[0];
+function insertTempLaneFiles(file_name, lane_id, dir_id, gid, perms){
+	if (gid == "" || gid == "0") {
+		gid = "1";
 	}
 	$.ajax({
 			type: 	'POST',
 			url: 	BASE_PATH+'/public/ajax/ngsfastlanedb.php',
-			data:  	{ p: 'insertTempLane', file_name: file_name, lane_id: lane_id, dir_id: dir_id, gids: phpGrab.gids },
+			data:  	{ p: 'insertTempLane', file_name: file_name, lane_id: lane_id, dir_id: dir_id, gids: gid, perms: perms },
 			async:	false,
 			success: function(s)
 			{

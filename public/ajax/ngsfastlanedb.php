@@ -51,19 +51,21 @@ if ($p == 'experimentSeriesCheck'){
 }else if ($p == 'insertExperimentSeries'){
 	if (isset($_POST['name'])){$name = $_POST['name'];}
 	if (isset($_POST['gids'])){$gids = $_POST['gids'];}
+	if (isset($_POST['perms'])){$perms = $_POST['perms'];}
 	$data=$query->runSQL("
 	INSERT INTO ngs_experiment_series
 		(experiment_name, summary, owner_id, group_id, perms, date_created, date_modified, last_modified_user)
-		VALUES ('$name', 'please create an experiment summary', ".$_SESSION['uid'].", $gids, 15, now(), now(), ".$_SESSION['uid'].");
+		VALUES ('$name', 'please create an experiment summary', ".$_SESSION['uid'].", $gids, $perms, now(), now(), ".$_SESSION['uid'].");
 	");
 }else if ($p == 'insertLane'){
 	if (isset($_POST['experiment'])){$experiment = $_POST['experiment'];}
 	if (isset($_POST['lane'])){$lane = $_POST['lane'];}
 	if (isset($_POST['gids'])){$gids = $_POST['gids'];}
+	if (isset($_POST['perms'])){$perms = $_POST['perms'];}
 	$data=$query->runSQL("
 	INSERT INTO ngs_lanes
 		(series_id, name, owner_id, group_id, perms, date_created, date_modified, last_modified_user)
-		VALUES ('$experiment', '$lane', ".$_SESSION['uid'].", $gids, 15, now(), now(), ".$_SESSION['uid'].");
+		VALUES ('$experiment', '$lane', ".$_SESSION['uid'].", $gids, $perms, now(), now(), ".$_SESSION['uid'].");
 	");
 }else if ($p == 'insertSample'){
 	if (isset($_GET['experiment'])){$experiment = $_GET['experiment'];}
@@ -72,22 +74,21 @@ if ($p == 'experimentSeriesCheck'){
 	if (isset($_GET['organism'])){$organism = $_GET['organism'];}
 	if (isset($_GET['barcode'])){$barcode = $_GET['barcode'];}
 	if (isset($_GET['gids'])){$gids = $_GET['gids'];}
+	if (isset($_GET['perms'])){$perms = $_GET['perms'];}
 
 	$data=$query->runSQL("
 	INSERT INTO ngs_samples
 		(series_id, lane_id, name, samplename, title, barcode,
 		owner_id, group_id, perms, date_created, date_modified, last_modified_user)
 		VALUES ($experiment, $lane, '$sample', '$sample', '$sample', '$barcode',
-		".$_SESSION['uid'].", $gids, 15, now(), now(), ".$_SESSION['uid'].");
+		".$_SESSION['uid'].", $gids, $perms, now(), now(), ".$_SESSION['uid'].");
 	");
 	
 	$sample_id = $query->queryAVal("SELECT `id` FROM ngs_samples WHERE series_id = $experiment AND lane_id = $lane and name = '$sample'");
 	$org_array = explode(",", $organism);
-	var_dump($org_array);
 	//	Organism
 	$org_check = "SELECT `id` FROM ngs_organism WHERE `organism` = '".$org_array[0]."'";
 	$org_check_result = $query->queryAVal($org_check);
-	var_dump($org_check_result);
 	
 	if($org_check_result == NULL || $org_check_result == '' || $org_check_result == '0'){
 		//	Empty
@@ -105,42 +106,49 @@ if ($p == 'experimentSeriesCheck'){
 	if (isset($_POST['backup'])){$backup = $_POST['backup'];}
 	if (isset($_POST['amazon'])){$amazon = $_POST['amazon'];}
 	if (isset($_POST['gids'])){$gids = $_POST['gids'];}
+	if (isset($_POST['perms'])){$perms = $_POST['perms'];}
 	$data=$query->runSQL("
 	INSERT INTO ngs_dirs
 		(fastq_dir, backup_dir, amazon_bucket,
 		owner_id, group_id, perms, date_created, date_modified, last_modified_user)
 		VALUES ('$input', '$backup', '$amazon',
-		".$_SESSION['uid'].", $gids, 15, now(), now(), ".$_SESSION['uid'].");
+		".$_SESSION['uid'].", $gids, $perms, now(), now(), ".$_SESSION['uid'].");
 	");
 }else if ($p == 'insertTempSample'){
 	if (isset($_POST['filename'])){$filename = $_POST['filename'];}
 	if (isset($_POST['sample_id'])){$sample_id = $_POST['sample_id'];}
 	if (isset($_POST['input'])){$input = $_POST['input'];}
 	if (isset($_POST['gids'])){$gids = $_POST['gids'];}
+	if (isset($_POST['perms'])){$perms = $_POST['perms'];}
 	$data=$query->runSQL("
 	INSERT INTO ngs_temp_sample_files
 		(file_name, sample_id, dir_id,
 		owner_id, group_id, perms, date_created, date_modified, last_modified_user)
 		VALUES ('$filename', $sample_id, $input,
-		".$_SESSION['uid'].", $gids, 15, now(), now(), ".$_SESSION['uid'].");
+		".$_SESSION['uid'].", $gids, $perms, now(), now(), ".$_SESSION['uid'].");
 	");
 }else if ($p == 'insertTempLane'){
 	if (isset($_POST['file_name'])){$file_name = $_POST['file_name'];}
 	if (isset($_POST['lane_id'])){$lane_id = $_POST['lane_id'];}
 	if (isset($_POST['dir_id'])){$dir_id = $_POST['dir_id'];}
 	if (isset($_POST['gids'])){$gids = $_POST['gids'];}
+	if (isset($_POST['perms'])){$perms = $_POST['perms'];}
 	$data=$query->runSQL("
 	INSERT INTO ngs_temp_lane_files
 		(file_name, lane_id, dir_id,
 		owner_id, group_id, perms, date_created, date_modified, last_modified_user)
 		VALUES ('$file_name', $lane_id, $dir_id,
-		".$_SESSION['uid'].", $gids, 15, now(), now(), ".$_SESSION['uid'].");
+		".$_SESSION['uid'].", $gids, $perms, now(), now(), ".$_SESSION['uid'].");
 	");
 }else if ($p == 'sendProcessData'){
 	if (isset($_GET['info_array'])){$info_array = $_GET['info_array'];}
 	if (isset($_GET['post'])){$post = $_GET['post'];}
 	
 	$_SESSION[$post] = implode(",",$info_array);
+}else if ($p == 'obtainGroupFromName'){
+	if (isset($_GET['name'])){$name = $_GET['name'];}
+	
+	$data = $query->queryAVal("SELECT `id` FROM `groups` WHERE name = '".$name."'");
 }
 
 //footer
