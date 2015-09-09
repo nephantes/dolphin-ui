@@ -383,7 +383,7 @@ class Ngsimport extends VanillaModel {
 			$dir->amazon_bucket=$this->amazon_bucket;
 			$this->dir_arr[$dir->dir_tag]=$dir;
 			
-			$new_dirs = new dirs($this, $this->dir_arr);
+			$new_dirs = new dirs($this, $this->dir_arr,  $dir->backup_dir, $dir->amazon_bucket);
 			$text="DIR:".$new_dirs->getStat()."<BR>";
 			$dir_id = json_decode($this->query("SELECT id FROM ngs_dirs
 											   WHERE fastq_dir = $this->fastq_dir"));
