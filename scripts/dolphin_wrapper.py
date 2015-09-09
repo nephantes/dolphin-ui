@@ -99,7 +99,6 @@ class Dolphin:
         fields="d.backup_dir fastq_dir, d.backup_dir, d.amazon_bucket, rp.outdir"
         idmatch="s.id=tl.sample_id"
         sql = "SELECT DISTINCT %(fields)s FROM ngs_runlist nr, ngs_samples s, %(tablename)s tl, ngs_dirs d, ngs_runparams rp where nr.sample_id=s.id and rp.run_status=0 and %(idmatch)s and d.id=tl.dir_id and rp.id=nr.run_id and nr.run_id='"+str(runparamsid)+"';"
-    
         results=self.runSQL(sql%locals())
         if (not results):
            fields="d.fastq_dir, d.backup_dir, d.amazon_bucket, rp.outdir"
@@ -108,6 +107,7 @@ class Dolphin:
                tablename="ngs_temp_lane_files"
            else:
                tablename="ngs_temp_sample_files"
+           print sql%locals() 
            results=self.runSQL(sql%locals())
         return results[0]
     
@@ -242,7 +242,7 @@ class Dolphin:
           mapnames="";
        if (customind):
           for i in customind:
-            arr=re.split(r'[,:]+', self.parse_content(customind))
+            arr=re.split(r'[:]', self.parse_content(i))
             index=self.parse_content(arr[0])
             name=self.parse_content(self.replace_space(arr[1]))
             mapnames=str(mapnames)+name+":"+index+","
@@ -363,7 +363,7 @@ class Dolphin:
         if (customind):
            for i in customind:
               countstep = True
-              arr=i.split(',')
+              arr=i.split(':')
               indexname=arr[1]
               stepline=stepSeqMapping % locals()
               print >>fp, '%s'%stepline
@@ -619,7 +619,7 @@ def main():
            commonind   = runparams.get('commonind')
            advparams   = runparams.get('advparams')
            resume      = runparams.get('resume')
-           customind   = runparams.get('customind')
+           customind   = runparams.get('custom')
            pipeline    = runparams.get('pipeline')
            genomebuild = runparams.get('genomebuild')
 
@@ -642,7 +642,6 @@ def main():
            if pipeline:
               pipeline     = [i for i in pipeline]
            #print pipeline
-
            if not outdir :
               print >>stderr, 'Error: Output dir is NULL.'
               exit( 128 )
