@@ -64,9 +64,12 @@
 						<hr>
 					</div>
 					<div>
-						<?php
-						echo $html->getStaticSelectionBox("Group Selection", "groups", $html->groupSelectionOptions($groups), 6);
-						?>
+						<?php echo $html->getStaticSelectionBox("Group Selection", "groups", $html->groupSelectionOptions($groups), 7); ?>
+						<?php $radiofields=array(
+								array('name' => 'only me', 'value' => '3', 'selected' => ''),
+								array('name' => 'only my group', 'value' => '15', 'selected' => 'checked'),
+								array('name' => 'everyone', 'value' => '32', 'selected' => '')); ?>
+						<?php echo $html->getStaticPermissionsBox("Who has permissions to view?", "permissions", $html->getRadioBox($radiofields, 'security_id', 'name'), 7); ?>
 					</div>
 					<div class="row">
 						<div class="col-md-12">

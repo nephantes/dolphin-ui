@@ -827,6 +827,25 @@ e range"><i class="fa fa-calendar"></i></button>
 		}
 		return $html;
 	}
+	function getStaticPermissionsBox($title, $id, $selection, $width){
+		$html = "";
+		$html = '<div class="col-md-'.$width.'">
+				<div class="box box-default">
+					<div class="box-header with-border">
+					<h3 class="box-title">'.$title.'</h3>';
+		$html.= $this->getInfoBox($id);
+		$html.= '</div><!-- /.box-header -->
+				<div class="box-body">
+					<div class="input-group margin col-md-11">
+						<form role="form">';
+		$html.= $selection;
+		$html.= 		'</form>
+						</div>
+					</div><!-- /.box-body -->
+				</div><!-- /.box -->
+			</div><!-- /.col -->';
+		return $html;
+	}
 	function getInfoBox($id){
 		$left_help_boxes = ['plot_control_panel', 'run_name', 'genomebuild', 'adapter', 'split', 'custom', 'pipeline'];
 		if(in_array($id, $left_help_boxes)){
