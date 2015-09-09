@@ -22,6 +22,6 @@ stepMergePicard='stepMergePicard%(type)s%(sep)s@PERL @RUNMERGEPICARD -o @OUTDIR 
 stepBSMap='stepBSMap%(sep)s@RUNBSMAP -binpath @BIN/bsmap -digestion %(digestion)s -dspaired @SPAIRED -outdir @OUTDIR -params @BSMAPPARAM -previous @PREVIOUSPIPE -ref @GENOMEFASTA -samtools @SAMTOOLS -servicename stepBSMap -j @JBSMAP%(sep)s30'
 stepMCall='stepMCall%(sep)s@RUNMCALL -binpath @BIN/mcall -previous bsmap -sampleconditions @MCONDS -params @MCALLPARAM -ref @GENOMEFASTA -o @OUTDIR -servicename stepMCall -j @JMCALL%(sep)s30'
 stepMComp='stepMComp%(sep)s@RUNMCOMP -binpath @BIN/mcomp -previous mcall -params @MCOMPPARAM -ref @GENOMEFASTA -o @OUTDIR -servicename stepMComp -j @JMCOMP%(sep)s30'
-stepCounts = 'stepCounts%(sep)s@RUNCOUNTS -m @MAPNAMES -o @OUTDIR -g @GCOMMONDB -p @PUBDIR -w @WKEY -b @MAKEBED -c @BEDTOOLSCMD -s stepCounts -j @JGEN%(sep)s10'
+stepCounts = 'stepCounts%(sep)s@RUNCOUNTS -m @MAPNAMES -i @INDEXCMD -o @OUTDIR -g @GCOMMONDB -p @PUBDIR -w @WKEY -b @MAKEBED -c @BEDTOOLSCMD -s stepCounts -j @JGEN%(sep)s10'
 stepDESeq2 = 'stepDESeq2p%(deseq_count)s%(sep)s@RUNDESEQ2 -c @COLS%(deseq_count)s -pu @PUBDIR -da @DATASET%(deseq_count)s -w @WKEY -dc @CONDS%(deseq_count)s -r @RSCRIPT -o @OUTDIR -n %(deseq_count)s -e @HEATMAP%(deseq_count)s -t @FITTYPE%(deseq_count)s -pa @PADJ%(deseq_count)s -f @FOLDCHANGE%(deseq_count)s -s stepDESeq2p%(deseq_count)s -j @JGEN%(sep)s10'
 stepClean      = 'stepClean%(sep)s@RUNCLEAN -c @CONFIG -l %(level)s -u @USERNAME -p @PUBDIR -w @WKEY -d @DBCOMMCMD  -o @OUTDIR%(sep)s10'
