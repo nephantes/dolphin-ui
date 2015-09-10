@@ -622,23 +622,13 @@ else if($p == 'getSamplesFromName')
             $sqlnames.= "'".$n."'";    
         }
     }
-    if(strpos($lane, ',') !== false){
-        $data=$query->queryTable("
-        SELECT DISTINCT ns.id
-        FROM ngs_samples ns, ngs_lanes nl, ngs_experiment_series ne 
-        WHERE ns.name in ($sqlnames)
-        AND nl.id = ns.lane_id and nl.name in ($lane)
-        AND ns.series_id = ne.id and ne.experiment_name = '$experiment';
-        ");
-    }else{
-        $data=$query->queryTable("
-        SELECT DISTINCT ns.id
-        FROM ngs_samples ns, ngs_lanes nl, ngs_experiment_series ne 
-        WHERE ns.name in ($sqlnames)
-        AND nl.id = ns.lane_id and nl.name = '$lane'
-        AND ns.series_id = ne.id and ne.experiment_name = '$experiment';
-        ");
-    }
+    $data=$query->queryTable("
+    SELECT DISTINCT ns.id
+    FROM ngs_samples ns, ngs_lanes nl, ngs_experiment_series ne 
+    WHERE ns.name in ($sqlnames)
+    AND nl.id = ns.lane_id and nl.name in ($lane)
+    AND ns.series_id = ne.id and ne.experiment_name = '$experiment';
+    ");
 }
 else if ($p == 'getLanesWithSamples')
 {
