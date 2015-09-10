@@ -238,7 +238,6 @@ function checkFastlaneInput(info_array){
 		console.log(gid);
 		console.log(perms);
 		
-		alert(sample_ids);
 		return sample_ids;
 	}
 }

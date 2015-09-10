@@ -49,7 +49,7 @@ $(function() {
 				}
 			}
 			
-			sample_lane = initial_split[5];
+			sample_lane = "'" + initial_split[5] + "'";
 			experiment_series = initial_split[4];
 			
 		}else{
@@ -70,8 +70,8 @@ $(function() {
 			}else{
 				json = json + '"barcodes":"none",';
 			}
-			json = json + '"adapters":"none"';
-			json = json + ',"quality":"none","quality":"none",';
+			json = json + '"adapters":"none",';
+			json = json + '"quality":"none",';
 			json = json + '"trim":"none","split":"none","commonind":"none"}'
 			
 			var names_list = initialNameList.split(",");
@@ -91,6 +91,8 @@ $(function() {
 			var initial_run_ids = [];
 			var names_to_ids = [];
 			console.log(names_list);
+			console.log(sample_lane);
+			console.log(experiment_series);
 			$.ajax({
 				type: 	'GET',
 				url: 	BASE_PATH+'/public/ajax/ngsquerydb.php',
@@ -175,6 +177,7 @@ $(function() {
 				//insert new values into ngs_runparams
 				var runparamsInsert = postInsertRunparams(json, outdir, runname, rundesc);
 				console.log(runparamsInsert);
+				console.log(names_to_ids);
 				$.ajax({
 					type: 	'GET',
 					url: 	BASE_PATH+'/public/ajax/initialmappingdb.php',

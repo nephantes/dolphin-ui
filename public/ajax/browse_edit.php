@@ -150,10 +150,11 @@ else if($p == 'deleteSelected')
 	//	RUNS
 	$query->runSQL("UPDATE ngs_runparams SET run_status = 5 WHERE id IN (".implode(",", $all_run_ids).")");
 	//	For now, status is set to 5 to hide runs that no longer have proper imports/samples
-	/*
-	$query->runSQL("DELETE FROM ngs_runlist WHERE run_id IN (".implode(",", $all_run_ids).")");
-	$query->runSQL("DELETE FROM ngs_runparams WHERE id IN (".implode(",", $all_run_ids).")");
-	*/
+	//	If experiment series is deleted, delete all run information
+	if ($experiments != ""){
+		$query->runSQL("DELETE FROM ngs_runlist WHERE run_id IN (".implode(",", $all_run_ids).")");
+		$query->runSQL("DELETE FROM ngs_runparams WHERE id IN (".implode(",", $all_run_ids).")");
+	}
 }
 else if ($p == 'intialRunCheck')
 {
