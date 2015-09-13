@@ -100,7 +100,7 @@ class Dolphin:
         idmatch="s.id=tl.sample_id"
         sql = "SELECT DISTINCT %(fields)s FROM ngs_runlist nr, ngs_samples s, %(tablename)s tl, ngs_dirs d, ngs_runparams rp where nr.sample_id=s.id and rp.run_status=0 and %(idmatch)s and d.id=tl.dir_id and rp.id=nr.run_id and nr.run_id='"+str(runparamsid)+"';"
         results=self.runSQL(sql%locals())
-        if (not results):
+        if (results==() or self.checkIfAnewSampleAdded(runparamsid)):
            fields="d.fastq_dir, d.backup_dir, d.amazon_bucket, rp.outdir"
            if (isbarcode):
                idmatch="s.lane_id=tl.lane_id"
@@ -110,15 +110,25 @@ class Dolphin:
            print sql%locals() 
            results=self.runSQL(sql%locals())
         return results[0]
-    
+   
+    def checkIfAnewSampleAdded(self, runparamsid):
+        sql = "SELECT a.sample_id FROM (SELECT nr.sample_id FROM ngs_runlist nr, ngs_temp_sample_files ts where nr.sample_id=ts.sample_id and run_id="+str(runparamsid)+") a where sample_id NOT IN(SELECT nr.sample_id FROM ngs_runlist nr, ngs_fastq_files ts where nr.sample_id=ts.sample_id and run_id="+str(runparamsid)+")"
+        sampleids=self.runSQL(sql%locals())
+        print sampleids
+        if (sampleids != ()):
+            return 1
+        return 0
+ 
     def getSampleList(self, runparamsid):
         tablename="ngs_fastq_files"
         dirfield="d.backup_dir"
         sql = "SELECT s.samplename, %(dirfield)s dir, ts.file_name FROM ngs_runparams nrp, ngs_runlist nr, ngs_samples s, %(tablename)s ts, ngs_dirs d where nr.run_id=nrp.id and nr.sample_id=s.id and nrp.run_status=0 and s.id=ts.sample_id and d.id=ts.dir_id and nr.run_id='"+str(runparamsid)+"';"
         samplelist=self.runSQL(sql%locals())
-        if (not samplelist):
+        print str(self.checkIfAnewSampleAdded(runparamsid)) + " +==="
+        if (samplelist==() or self.checkIfAnewSampleAdded(runparamsid)):
             dirfield="d.fastq_dir"
             tablename="ngs_temp_sample_files"
+            print "HERE-11"
             samplelist=self.runSQL(sql%locals())
         return self.getInputParams(samplelist)
     
