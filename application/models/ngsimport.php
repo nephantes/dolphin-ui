@@ -461,8 +461,7 @@ class Ngsimport extends VanillaModel {
 			
 			//	Other Values
 			if($lane->facility == null || $lane->cost == null ||
-				$lane->date_submitted ==  null || $lane->date_received == null ||
-				$lane->total_reads == null || $lane->phix_requested == null ||
+				$lane->date_submitted ==  null || $lane->date_received == null || $lane->phix_requested == null ||
 				$lane->phix_in_lane == null || $lane->total_samples == null ||
 				$lane->resequenced == null || $lane->notes == null){
 				$lane_warning_check = true;

@@ -67,6 +67,54 @@ function selectJob(id){
 		});
 }
 
+function errorOutModal(run_id, wkey){
+	var obtained_log;
+	$.ajax({ type: "GET",
+			url: BASE_PATH +"/public/ajax/dataerrorlogs.php",
+			data: { run_id: run_id },
+			async: false,
+			success : function(s)
+			{
+				if (s.length > 20) {
+					obtained_log = "...<br>"
+					for(var i = s.length - 20; i < s.length; i++){
+						obtained_log += s[i];
+					}
+				}else{
+					for(var i = 0; i < s.length; i++){
+						obtained_log += s[i];
+					}
+				}
+			}
+	});
+	$('#logModal').modal({
+      show: true
+	});
+	document.getElementById('logRunId').innerHTML = "run." + run_id + ".wrapper.std:";
+	document.getElementById('logDetails').innerHTML = obtained_log;
+	
+	if (wkey == null || wkey == "null") {
+		document.getElementById('modal_adv_status').style.display = "none";
+	}else{
+		var adv_stat_check = [];
+		$.ajax({ type: "GET",
+				url: BASE_PATH + "/public/ajax/dataservice.php?wkey=" + wkey,
+				async: false,
+				success : function(s)
+				{
+					adv_stat_check = s;
+				}
+		});
+		
+		if (adv_stat_check.length > 0) {
+			document.getElementById('modal_adv_status').style.display = "show";
+		}else{
+			document.getElementById('modal_adv_status').style.display = "none";
+		}
+	}
+   
+}
+
 function joboutDataModal(jobname, jobout) {
    $('#joboutData').modal({
       show: true

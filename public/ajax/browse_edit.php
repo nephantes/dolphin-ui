@@ -32,7 +32,7 @@ if($p == 'updateDatabase')
 			$data=$query->runSQL("UPDATE $table SET ".$type."_id = '".$insert_id[0]->id."' WHERE id = $id");
 		}	
 	}else{
-		$data=$query->runSQL("UPDATE $table SET ".$table.".".$type." = '$value' WHERE id = $id"); 	
+		$data=$query->runSQL("UPDATE $table SET ".$table.".".$type." = '$value' WHERE id = $id");
 	}
 }
 else if($p == 'checkPerms')

@@ -402,7 +402,7 @@ else if ($p =='getStatus')
 	$time="";
 	if (isset($start)){$time="and `date_created`>='$start' and `date_created`<='$end'";}
 	$data=$query->queryTable("
-	SELECT id, run_group_id, run_name, outdir, run_description, run_status
+	SELECT id, run_group_id, run_name, wkey, outdir, run_description, run_status
 	FROM ngs_runparams
 	$perms $time
 	");
@@ -626,8 +626,8 @@ else if($p == 'getSamplesFromName')
     SELECT DISTINCT ns.id
     FROM ngs_samples ns, ngs_lanes nl, ngs_experiment_series ne 
     WHERE ns.name in ($sqlnames)
-    AND nl.id = ns.lane_id and nl.name in ($lane)
-    AND ns.series_id = ne.id and ne.experiment_name = '$experiment';
+    AND ns.lane_id IN (SELECT id from ngs_lanes where name in ($lane))
+    AND ns.series_id IN (SELECT id from ngs_experiment_series where experiment_name = '$experiment');
     ");
 }
 else if ($p == 'getLanesWithSamples')
