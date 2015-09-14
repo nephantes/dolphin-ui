@@ -8,7 +8,7 @@ require_once("../../includes/dbfuncs.php");
 $id = $_GET['run_id'];
 $query = new dbfuncs();
 
-$data = str_replace("\n", "<br>", file_get_contents('../../tmp/logs/run'.$id.'/run.'.$id.'.wrapper.std', true));
+$data = array_slice(str_replace("\n", "<br>", file('../../tmp/logs/run'.$id.'/run.'.$id.'.wrapper.std')), -20);
 
 header('Cache-Control: no-cache, must-revalidate');
 header('Expires: Mon, 26 Jul 1997 05:00:00 GMT');

@@ -70,13 +70,22 @@ function selectJob(id){
 function errorOutModal(run_id, wkey){
 	var obtained_log;
 	$.ajax({ type: "GET",
-			 url: BASE_PATH +"/public/ajax/dataerrorlogs.php",
-			 data: { run_id: run_id },
-			 async: false,
-			 success : function(s)
-			 {
-				obtained_log  = s
-			 }
+			url: BASE_PATH +"/public/ajax/dataerrorlogs.php",
+			data: { run_id: run_id },
+			async: false,
+			success : function(s)
+			{
+				if (s.length > 20) {
+					obtained_log = "...<br>"
+					for(var i = s.length - 20; i < s.length; i++){
+						obtained_log += s[i];
+					}
+				}else{
+					for(var i = 0; i < s.length; i++){
+						obtained_log += s[i];
+					}
+				}
+			}
 	});
 	$('#logModal').modal({
       show: true
