@@ -402,7 +402,7 @@ else if ($p =='getStatus')
 	$time="";
 	if (isset($start)){$time="and `date_created`>='$start' and `date_created`<='$end'";}
 	$data=$query->queryTable("
-	SELECT id, run_group_id, run_name, outdir, run_description, run_status
+	SELECT id, run_group_id, run_name, wkey, outdir, run_description, run_status
 	FROM ngs_runparams
 	$perms $time
 	");

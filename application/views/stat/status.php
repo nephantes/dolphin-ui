@@ -24,8 +24,32 @@
 					</form>
 				  </div>
 				</div>
-			</div><!-- End Delete modal -->	
-			
+			</div><!-- End Delete modal -->
+			<div class="modal fade" id="logModal" tabindex="-1" role="dialog" aria-labelledby="myModalLog" aria-hidden="true">
+				<div class="modal-dialog" style="width:75%">
+				  <div class="modal-content">
+					<div class="modal-header">
+					  <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+					  <h4 class="modal-title" id="myModalLog">Error Log:</h4>
+					</div>
+					<form name="logForm" role="form" method="post">
+						<div class="modal-body" style="overflow:scroll">
+							<fieldset>
+								<div class="form-group">
+									<label id="logRunId"></label>
+									<br>
+									<p id="logDetails"></p>
+								</div>
+							</fieldset>   
+						</div>
+						<div class="modal-footer">
+							<button type="button" id="modal_adv_status" class="btn btn-primary" data-dismiss="modal">Adv. Status</button>
+							<button type="button" class="btn btn-default" data-dismiss="modal">OK</button>
+						</div>
+					</form>
+				  </div>
+				</div>
+			</div><!-- End logging modal -->	
 				<section class="content-header">
 					<h1>
 						NGS Run Status
