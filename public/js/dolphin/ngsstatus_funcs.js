@@ -71,7 +71,7 @@ function errorOutModal(run_id, wkey){
 	var obtained_log;
 	$.ajax({ type: "GET",
 			url: BASE_PATH +"/public/ajax/dataerrorlogs.php",
-			data: { run_id: run_id },
+			data: { p: 'getStdOut', run_id: run_id },
 			async: false,
 			success : function(s)
 			{
@@ -108,11 +108,34 @@ function errorOutModal(run_id, wkey){
 		
 		if (adv_stat_check.length > 0) {
 			document.getElementById('modal_adv_status').style.display = "show";
+			document.getElementById('modal_adv_status').setAttribute("onclick", "sendToAdvancedStatus("+run_id+")");
 		}else{
 			document.getElementById('modal_adv_status').style.display = "none";
 		}
 	}
    
+}
+
+function queueCheck(run_id){
+	var run_status = [];
+	$.ajax({ type: "GET",
+			url: BASE_PATH +"/public/ajax/dataerrorlogs.php",
+			data: { p: 'checkQueued', run_id: run_id },
+			async: false,
+			success : function(s)
+			{
+				run_status = s;
+			}
+	});
+	
+	if (run_status.length == 3) {
+		if (run_status[2] == null && run_status[0] == '0' && run_status[1] == '0') {
+			console.log(run_status);
+		}else{
+			errorOutModal(run_id, run_status[2]);
+		}
+	}
+	
 }
 
 function joboutDataModal(jobname, jobout) {
