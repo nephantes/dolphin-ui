@@ -88,6 +88,7 @@
 																	[["ONCHANGE", "single-end", "paired-end"],["TEXT","0"],["TEXT","0"]])?>
 						<?php echo $html->getExpandingCommonRNABox("Common RNAs", "commonind", 8, 12, ["ercc","rRNA","miRNA","tRNA","piRNA","snRNA","rmsk","genome"],
 																	[["no","yes"],["no","yes"],["no","yes"],["no","yes"],["no","yes"],["no","yes"],["no","yes"],["no","yes"]])?>
+																	
 			<?php echo $html->endExpandingSelectionBox()?>
 
 			<div class="col-md-12">
