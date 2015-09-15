@@ -113,7 +113,6 @@ function errorOutModal(run_id, wkey){
 			document.getElementById('modal_adv_status').style.display = "none";
 		}
 	}
-   
 }
 
 function queueCheck(run_id){
@@ -136,6 +135,20 @@ function queueCheck(run_id){
 		}
 	}
 	
+}
+
+function runningErrorCheck(run_id){
+	var run_status;
+	$.ajax({ type: "GET",
+			url: BASE_PATH +"/public/ajax/dataerrorlogs.php",
+			data: { p: 'errorCheck', run_id: run_id },
+			async: false,
+			success : function(s)
+			{
+				run_status = s;
+			}
+	});
+	return run_status
 }
 
 function joboutDataModal(jobname, jobout) {

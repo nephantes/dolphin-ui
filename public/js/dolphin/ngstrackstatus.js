@@ -47,8 +47,13 @@ $(function() {
 				for(var i = 0; i < s.length; i++) {
 					var runstat = "";
 					var disabled = '';
+					
+					if (s[i].run_status == 0 || s[i].run_status == 2) {
+						s[i].run_status = runningErrorCheck(s[i].id);
+					}
+						
 					if (s[i].run_status == 0) {
-						runstat = '<button id="'+s[i].id+'" class="btn btn-xs" onclick="queueCheck(this.id)"><i class="fa fa-refresh">\tQueued</i></button>';
+						runstat = '<button id="'+s[i].id+'" class="btn btn-xs disabled" onclick="queueCheck(this.id)"><i class="fa fa-refresh">\tQueued</i></button>';
 						disabled = '<li><a href="#" id="'+s[i].id+'" name="'+s[i].run_group_id+'" onClick="killRun(this.id)">Cancel</a></li>';
 					}else if (s[i].run_status == 1) {
 						runstat = '<button id="'+s[i].id+'" class="btn btn-success btn-xs"  onclick="sendToAdvancedStatus(this.id)"><i class="fa fa-check">\tComplete!</i></button>';
@@ -58,7 +63,7 @@ $(function() {
 						runstat = '<button id="'+s[i].id+'" class="btn btn-warning btn-xs" onclick="sendToAdvancedStatus(this.id)"><i class="fa fa-refresh">\tRunning...</i></button>';
 						disabled = '<li><a href="#" id="'+s[i].id+'" name="'+s[i].run_group_id+'" onClick="killRun(this.id)">Stop</a></li>';
 					}else if (s[i].run_status == 3){
-						runstat = '<button id="'+s[i].id+'" class="btn btn-danger btn-xs" onclick="errorOutModal(this.id, '+ s[i].wkey + ')"><i class="fa fa-warning">\tError</i></button>';
+						runstat = '<button id="'+s[i].id+'" class="btn btn-danger btn-xs" onclick="errorOutModal(this.id, \''+ s[i].wkey + '\')"><i class="fa fa-warning">\tError</i></button>';
 					}else if (s[i].run_status == 4){
 						runstat = '<button id="'+s[i].id+'" class="btn btn-danger btn-xs" onclick="sendToAdvancedStatus(this.id)"><i class="fa fa-warning">\tStopped</i></button>';
 					}
@@ -115,8 +120,13 @@ $(function() {
 				for(var i = 0; i < s.length; i++) {
 					var runstat = "";
 					var disabled = '';
+					
+					if (s[i].run_status == 0 || s[i].run_status == 2) {
+						s[i].run_status = runningErrorCheck(s[i].id);
+					}
+					
 					if (s[i].run_status == 0) {
-						runstat = '<button id="'+s[i].id+'" class="btn btn-xs" onclick="queueCheck(this.id)"><i class="fa fa-refresh">\tQueued</i></button>';
+						runstat = '<button id="'+s[i].id+'" class="btn btn-xs disabled" onclick="queueCheck(this.id)"><i class="fa fa-refresh">\tQueued</i></button>';
 						disabled = '<li><a href="#" id="'+s[i].id+'" name="'+s[i].run_group_id+'" onClick="killRun(this.id)">Cancel</a></li>';
 					}else if (s[i].run_status == 1) {
 						runstat = '<button id="'+s[i].id+'" class="btn btn-success btn-xs"  onclick="sendToAdvancedStatus(this.id)"><i class="fa fa-check">\tComplete!</i></button>';
@@ -126,7 +136,7 @@ $(function() {
 						runstat = '<button id="'+s[i].id+'" class="btn btn-warning btn-xs" onclick="sendToAdvancedStatus(this.id)"><i class="fa fa-refresh">\tRunning...</i></button>';
 						disabled = '<li><a href="#" id="'+s[i].id+'" name="'+s[i].run_group_id+'" onClick="killRun(this.id)">Stop</a></li>';
 					}else if (s[i].run_status == 3){
-						runstat = '<button id="'+s[i].id+'" class="btn btn-danger btn-xs" onclick="errorOutModal(this.id, '+ s[i].wkey + ')"><i class="fa fa-warning">\tError</i></button>';
+						runstat = '<button id="'+s[i].id+'" class="btn btn-danger btn-xs" onclick="errorOutModal(this.id, \''+ s[i].wkey + '\')"><i class="fa fa-warning">\tError</i></button>';
 					}else if (s[i].run_status == 4){
 						runstat = '<button id="'+s[i].id+'" class="btn btn-danger btn-xs" onclick="sendToAdvancedStatus(this.id)"><i class="fa fa-warning">\tStopped</i></button>';
 					}
@@ -226,8 +236,13 @@ $(function() {
 					for(var i = 0; i < s.length; i++) {
 						var runstat = "";
 						var disabled = '';
+						
+						if (s[i].run_status == 0 || s[i].run_status == 2) {
+							s[i].run_status = runningErrorCheck(s[i].id);
+						}
+						
 						if (s[i].run_status == 0) {
-							runstat = '<button id="'+s[i].id+'" class="btn btn-xs" onclick="queueCheck(this.id)"><i class="fa fa-refresh">\tQueued</i></button>';
+							runstat = '<button id="'+s[i].id+'" class="btn btn-xs disabled" onclick="queueCheck(this.id)"><i class="fa fa-refresh">\tQueued</i></button>';
 							disabled = '<li><a href="#" id="'+s[i].id+'" name="'+s[i].run_group_id+'" onClick="killRun(this.id)">Cancel</a></li>';
 						}else if (s[i].run_status == 1) {
 							runstat = '<button id="'+s[i].id+'" class="btn btn-success btn-xs"  onclick="sendToAdvancedStatus(this.id)"><i class="fa fa-check">\tComplete!</i></button>';
@@ -237,7 +252,7 @@ $(function() {
 							runstat = '<button id="'+s[i].id+'" class="btn btn-warning btn-xs" onclick="sendToAdvancedStatus(this.id)"><i class="fa fa-refresh">\tRunning...</i></button>';
 							disabled = '<li><a href="#" id="'+s[i].id+'" name="'+s[i].run_group_id+'" onClick="killRun(this.id)">Stop</a></li>';
 						}else if (s[i].run_status == 3){
-							runstat = '<button id="'+s[i].id+'" class="btn btn-danger btn-xs" onclick="errorOutModal(this.id, '+ s[i].wkey + ')"><i class="fa fa-warning">\tError</i></button>';
+							runstat = '<button id="'+s[i].id+'" class="btn btn-danger btn-xs" onclick="errorOutModal(this.id, \''+ s[i].wkey + '\')"><i class="fa fa-warning">\tError</i></button>';
 						}else if (s[i].run_status == 4){
 							runstat = '<button id="'+s[i].id+'" class="btn btn-danger btn-xs" onclick="sendToAdvancedStatus(this.id)"><i class="fa fa-warning">\tStopped</i></button>';
 						}

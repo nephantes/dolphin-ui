@@ -23,14 +23,22 @@ if($p == 'getStdOut'){
 	$workflow_pid = $pids[0]->runworkflow_pid;
 	$wrapper_pid = $pids[0]->wrapper_pid;
 	
-	$grep_find_workflow = popen( "ps -ef | grep '[".substr($workflow_pid, 0, 1)."]".substr($workflow_pid,1)."'", "r" );
-	$grep_find_wrapper = popen( "ps -ef | grep '[".substr($wrapper_pid, 0, 1)."]".substr($wrapper_pid,1)."'", "r" );
-
-	$workflow = fread($grep_find_workflow, 2096);
-	$wrapper = fread($grep_find_wrapper, 2096);
-	
-	pclose($grep_find_workflow);
-	pclose($grep_find_wrapper);
+	if($workflow_pid != null){
+		$grep_find_workflow = popen( "ps -ef | grep '[".substr($workflow_pid, 0, 1)."]".substr($workflow_pid,1)."'", "r" );
+		$workflow = fread($grep_find_workflow, 2096);
+		pclose($grep_find_workflow);
+		$workflow = fread($grep_find_workflow, 2096);
+	}else{
+		$workflow = null;
+	}
+	if($wrapper_pid != null){
+		$grep_find_wrapper = popen( "ps -ef | grep '[".substr($wrapper_pid, 0, 1)."]".substr($wrapper_pid,1)."'", "r" );
+		$wrapper = fread($grep_find_wrapper, 2096);
+		pclose($grep_find_wrapper);
+		$wrapper = fread($grep_find_wrapper, 2096);
+	}else{
+		$wrapper = null;
+	}
 	
 	if($workflow != ""){
 		array_push($data, '1');
@@ -45,6 +53,41 @@ if($p == 'getStdOut'){
 	}
 
 	array_push($data, $pids[0]->wkey);
+}else if ($p == 'errorCheck'){
+	$pids = json_decode($query->queryTable("
+	SELECT wrapper_pid, runworkflow_pid, wkey, run_status
+	FROM ngs_runparams
+	WHERE id = $id
+	"));
+	
+	$workflow_pid = $pids[0]->runworkflow_pid;
+	$wrapper_pid = $pids[0]->wrapper_pid;
+	
+	if($workflow_pid != null){
+		$grep_find_workflow = popen( "ps -ef | grep '[".substr($workflow_pid, 0, 1)."]".substr($workflow_pid,1)."'", "r" );
+		$workflow = fread($grep_find_workflow, 2096);
+		pclose($grep_find_workflow);
+	}else{
+		$workflow = "null";
+	}
+	if($wrapper_pid != null){
+		$grep_find_wrapper = popen( "ps -ef | grep '[".substr($wrapper_pid, 0, 1)."]".substr($wrapper_pid,1)."'", "r" );
+		$wrapper = fread($grep_find_wrapper, 2096);
+		pclose($grep_find_wrapper);
+	}else{
+		$wrapper = "null";
+	}
+	
+	if(($workflow == "") || ($wrapper == "")){
+		$query->runSQL("
+		update ngs_runparams
+		set run_status = 3
+		where id = $id
+		");
+		$data = '3';
+	}else{
+		$data = $pids[0]->run_status;
+	}
 }
 
 
