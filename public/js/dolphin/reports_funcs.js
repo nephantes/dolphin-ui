@@ -10,6 +10,7 @@ var libraries = [];
 var table_array = [];
 var currentResultSelection = '--- Select a Result ---';
 var tableDirectionNum = 0;
+var type_dictionary = ['rRNA', 'miRNA', 'piRNA', 'tRNA', 'snRNA', 'rmsk', 'ercc'];
 
 function parseTSV(jsonName, url_path){
 	var parsedArray = [];
@@ -188,7 +189,7 @@ function showTable(type){
 	});
 	var keys = obtainObjectKeys(objList[0]);
 	
-	if(currentResultSelection.split(".")[currentResultSelection.split(".").length - 1] == "tsv" || currentResultSelection.substring(currentResultSelection.length - 3, currentResultSelection.length) == "RNA" || currentResultSelection == 'ercc'){
+	if(currentResultSelection.split(".")[currentResultSelection.split(".").length - 1] == "tsv" || type_dictionary.indexOf(currentResultSelection) > -1){
 		var masterDiv = document.getElementById(type+'_exp_body');
 		var tableDiv = createElement('div', ['id', 'class', 'style'], [type+'_table_div', 'panel panel-default margin', 'overflow-x:scroll']);
 		var selectDiv = document.getElementById('select_'+type+'_div');
