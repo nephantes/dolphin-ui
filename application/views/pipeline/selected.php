@@ -86,8 +86,9 @@
 																	[["TEXT","10"],["TEXT","15"],["TEXT","5"],["TEXT","5"],["TEXT","36"]])?>
 						<?php echo $html->getExpandingSelectionBox("Trimming", "trim", 3, 12, ["single or paired-end", "5 length 1", "3 length 1"],
 																	[["ONCHANGE", "single-end", "paired-end"],["TEXT","0"],["TEXT","0"]])?>
-						<?php echo $html->getExpandingCommonRNABox("Common RNAs", "commonind", 7, 12, ["ercc","rRNA","miRNA","tRNA","snRNA","rmsk","genome"],
-																	[["no","yes"],["no","yes"],["no","yes"],["no","yes"],["no","yes"],["no","yes"],["no","yes"]])?>
+						<?php echo $html->getExpandingCommonRNABox("Common RNAs", "commonind", 8, 12, ["ercc","rRNA","miRNA","tRNA","piRNA","snRNA","rmsk","genome"],
+																	[["no","yes"],["no","yes"],["no","yes"],["no","yes"],["no","yes"],["no","yes"],["no","yes"],["no","yes"]])?>
+																	
 			<?php echo $html->endExpandingSelectionBox()?>
 
 			<div class="col-md-12">
