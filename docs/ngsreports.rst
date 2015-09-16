@@ -18,3 +18,11 @@ After navigating to the status page, the next step is to make sure the run whose
 
 Once you have a completed run, you can select the options button on the far right and select the 'Report Details' option.
 
+.. image:: dolphin_pics/completed.png
+	:align: center
+	
+Selection this option will bring you to the Report Details page.
+
+Report Details
+==============
+
