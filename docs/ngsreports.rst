@@ -16,3 +16,5 @@ Once logged in, click on the 'NGS Tracking' tab on the left, then click on 'Run 
 	
 After navigating to the status page, the next step is to make sure the run whose results you are interested in has completed without errors.
 
+Once you have a completed run, you can select the options button on the far right and select the 'Report Details' option.
+
