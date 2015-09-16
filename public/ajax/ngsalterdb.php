@@ -11,8 +11,15 @@ $query = new dbfuncs();
 
 function runCmd($idKey, $query)
 {
-	 $cmd = "cd ../../scripts && mkdir -p ../tmp/logs/run$idKey && python dolphin_wrapper.py -r $idKey -c ".CONFIG.">> ../tmp/logs/run$idKey/run.$idKey.wrapper.std 2>&1 & echo $! &";
-	 $PID =pclose(popen( $cmd, "r" ) );
+    $cmd = "cd ../../scripts && mkdir -p ../tmp/logs/run$idKey && python dolphin_wrapper.py -r $idKey -c ".CONFIG.">> ../tmp/logs/run$idKey/run.$idKey.wrapper.std 2>&1 & echo $! &";
+    $PID_COMMAND = popen( $cmd, "r" );
+    $PID =fread($PID_COMMAND, 2096);
+    $data=$query->runSQL("
+        UPDATE ngs_runparams
+        SET wrapper_pid = $PID
+        WHERE id = '$idKey'
+        ");
+    pclose($PID_COMMAND);
 }
 
 function killPid($run_id, $query)
