@@ -23,7 +23,7 @@ Once you have a completed run, you can select the options button on the far righ
 	
 Selection this option will bring you to the Plots page.
 
-Alternatively, You can visit the Reports page for the run and click on the 'Go To Plots' button to go to the plots page.
+Alternatively, You can visit the Reports page for the run and click on the 'Go To Plots' button at the bottom of the page to go to the plots page.
 
 Plots Navigation
 ================
