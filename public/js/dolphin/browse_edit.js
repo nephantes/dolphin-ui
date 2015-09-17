@@ -11,6 +11,8 @@ var element_highlighted_id;
 var element_highlighted_type;
 var element_highlighted_onclick;
 
+var dir_element;
+
 var experimentPerms = [];
 var lanePerms = [];
 var samplePerms = [];
@@ -95,7 +97,11 @@ function editBox(uid, id, type, table, element){
 			textarea.setAttribute('type', 'text');
 			textarea.setAttribute('class', 'form-control');
 			textarea.setAttribute('rows', '5');
-			textarea.setAttribute('onkeydown', 'submitChanges(this)');
+			if (table == 'ngs_dirs' || table == 'ngs_fastq_files' || table == 'ngs_temp_sample_files' || table == 'ngs_temp_lane_files') {
+				textarea.setAttribute('onkeydown', 'submitChangesFiles(this)');
+			}else{
+				textarea.setAttribute('onkeydown', 'submitChanges(this)');
+			}
 			
 			element.setAttribute('value', element_highlighted_value);
 			element.appendChild(textarea);
@@ -105,9 +111,28 @@ function editBox(uid, id, type, table, element){
 	}
 }
 
+function submitChangesFiles(ele){
+	if(event.keyCode == 13 && ele.value != '' && ele.value != null) {
+		$('#fileModal').modal({
+			show: true
+		});
+		dir_element = ele;
+		document.getElementById('confirmFileButton').setAttribute('onclick', 'submitChanges("dir_element")');
+	}else if(event.keyCode == 27) {
+		element_highlighted.innerHTML = element_highlighted_value;
+		element_highlighted.onclick = element_highlighted_onclick;
+		
+		clearElementHighlighted();
+	}
+}
+
 function submitChanges(ele) {
 	var successBool = false;
-    if(event.keyCode == 13 && ele.value != '' && ele.value != null) {
+    if(event.keyCode == 13 && ele.value != '' && ele.value != null || ele == 'dir_element') {
+		if (ele == "dir_element") {
+		ele = dir_element;
+		dir_element = null;
+	}
         $.ajax({ type: "GET",
 					url: BASE_PATH+"/public/ajax/browse_edit.php",
 					data: { p: 'updateDatabase', id: element_highlighted_id, type: element_highlighted_type, table: element_highlighted_table, value: ele.value},

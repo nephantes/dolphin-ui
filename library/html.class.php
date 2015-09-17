@@ -479,7 +479,6 @@ e range"><i class="fa fa-calendar"></i></button>
 				</div>
 				<div class="box-body col-md-8">';
 		if($files != null){
-				//editBox();
 				$html .= '<div class="box-body col-md-12" style="overflow:scroll">
 				<table class="table table-hover table-striped table-condensed">';
 				$html.='<thead><tr><th>Temporary File(s) Directory:</th></tr></thead>
@@ -495,7 +494,6 @@ e range"><i class="fa fa-calendar"></i></button>
 						</div>';
 		}
 		if($fastq_files != null){
-				//editBox();
 				$html .= '<div class="box-body col-md-12" style="overflow:scroll">
 				<table class="table table-hover table-striped table-condensed">';
 				$html.='<thead><tr><th>Fastq File(s) Directory:</th></tr></thead>
