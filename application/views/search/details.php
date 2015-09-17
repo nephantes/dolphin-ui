@@ -81,7 +81,7 @@
 					}
 				}
 				if ($table=="experiments" || $table=="samples"){
-								echo $html->getBrowserPanelMore($experiments, $experiment_fields, "Import", 'name', $lane_file);
+					echo $html->getBrowserPanelMore($experiments, $experiment_fields, "Import", 'name', $lane_file, null);
 				}
 				else{
 					if(!isset($_SESSION['ngs_lanes'])){
@@ -94,7 +94,7 @@
 					}
 				}
 				if ($table=="samples"){
-					echo $html->getBrowserPanelMore($samples, $sample_fields, "Sample",'name', $sample_file);
+					echo $html->getBrowserPanelMore($samples, $sample_fields, "Sample",'name', $sample_file, $sample_fastq_file);
 				//echo $html->getQCPanel();
 				//echo $html->getRSEMPanel();
 				//echo $html->getDESeqPanel();
