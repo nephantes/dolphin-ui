@@ -24,6 +24,32 @@
 					  </div>
 					</div>
 				</div><!-- End Delete modal -->
+				<div class="modal fade" id="fileModal" tabindex="-1" role="dialog" aria-labelledby="myFileModal" aria-hidden="true">
+					<div class="modal-dialog">
+					  <div class="modal-content">
+						<div class="modal-header">
+						  <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+						  <h4 class="modal-title" id="myFileModal">Save Editted Changes</h4>
+						</div>
+						<form name="editFileForm" role="form" method="post">
+							<div class="modal-body">
+								<fieldset>
+									<div class="form-group">
+										<label id="fileLabel">Saving these changes will overwrite current directory/file information</label>
+										<br>
+										<p id="fileAreas">Please make sure that the changes being made to either the directory location or the file names are accurate before submission.</p>
+										<p id="fileAreas2">Once completed, please visit the NGS Run Status page and resubmit the initial run to make sure that all file information is correct and secure.</p>
+									</div>
+								</fieldset>   
+							</div>
+							<div class="modal-footer">
+							  <button type="button" id="confirmFileButton" class="btn btn-danger" data-dismiss="modal" onclick="">Confirm</button>
+							  <button type="button" id="cancelFileButton" class="btn btn-default" data-dismiss="modal" onclick="">Cancel</button>
+							</div>
+						</form>
+					  </div>
+					</div>
+				</div><!-- End File modal -->
 				<section class="content-header">
 					<h1>
 						NGS Browser
@@ -81,7 +107,7 @@
 					}
 				}
 				if ($table=="experiments" || $table=="samples"){
-								echo $html->getBrowserPanelMore($experiments, $experiment_fields, "Import", 'name', $lane_file);
+					echo $html->getBrowserPanelMore($experiments, $experiment_fields, "Import", 'name', $lane_file, 'lanes');
 				}
 				else{
 					if(!isset($_SESSION['ngs_lanes'])){
@@ -94,7 +120,7 @@
 					}
 				}
 				if ($table=="samples"){
-					echo $html->getBrowserPanelMore($samples, $sample_fields, "Sample",'name', $sample_file);
+					echo $html->getBrowserPanelMore($samples, $sample_fields, "Sample",'name', $sample_file, $sample_fastq_file);
 				//echo $html->getQCPanel();
 				//echo $html->getRSEMPanel();
 				//echo $html->getDESeqPanel();

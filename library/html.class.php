@@ -449,7 +449,7 @@ e range"><i class="fa fa-calendar"></i></button>
 	return $html;
 	}
 	
-	function getBrowserPanelMore($objects, $fields, $header ,$name, $files)
+	function getBrowserPanelMore($objects, $fields, $header ,$name, $files, $fastq_files)
 	{
 	foreach ($objects as $obj):
 	$html='<div class="panel panel-default">
@@ -465,8 +465,8 @@ e range"><i class="fa fa-calendar"></i></button>
 		<h4>
 			'.$obj[$name].'
 		</h4>
-		</div>
-		<div class="box-body" style="overflow:scroll">
+		
+		<div class="box-body col-md-4" style="overflow:scroll">
 		<dl class="dl-horizontal">
 		';
 		foreach ($fields as $field):
@@ -475,21 +475,46 @@ e range"><i class="fa fa-calendar"></i></button>
 			 $html.='<dd>'.$obj[$field['fieldname']].'</dd>';
 		}
 		endforeach;
+		$html.= '</dl>
+				</div>
+				<div class="box-body col-md-8">';
 		if($files != null){
-				$html.='<dt>File(s)</dt>';
+				$html .= '<div class="box-body col-md-12" style="overflow:scroll">
+				<table class="table table-hover table-striped table-condensed">';
+				$html.='<thead><tr><th>Input File(s) Directory:</th></tr></thead>
+						<tbody>';
+				$html.='<tr><td onclick="editBox( '.$_SESSION['uid'].', '. $files[0]['dir_id'].', \'fastq_dir\', \'ngs_dirs\', this)">'.$files[0]['fastq_dir'].'</td></tr>
+						</tbody>';
+				$html.='<thead><tr><th>Input File(s):</th></tr></thead>
+						<tbody>';
 				foreach ($files as $f){
-						$parallel = explode(",",$f['file_name']);
-						if(count($parallel) > 1){
-								$html.='<dd>'.$f['fastq_dir']."/".$parallel[0].'</dd>';
-								$html.='<dd>'.$f['fastq_dir']."/".$parallel[1].'</dd>';
+						if($fastq_files == 'lanes'){
+								$html.='<tr><td onclick="editBox( '.$_SESSION['uid'].', '. $f['id'].', \'file_name\', \'ngs_temp_lane_files\', this)">'.$f['file_name'].'</td></tr>';
 						}else{
-								$html.='<dd>'.$f['fastq_dir']."/".$f['file_name'].'</dd>';
+								$html.='<tr><td onclick="editBox( '.$_SESSION['uid'].', '. $f['id'].', \'file_name\', \'ngs_temp_sample_files\', this)">'.$f['file_name'].'</td></tr>';	
 						}
 				}
+				$html .= '</tbody></table>
+						</div>';
 		}
-	$html.=	'</dl>
-		</div> 
-		</div>';
+		if($fastq_files != null && $fastq_files != 'lanes'){
+				$html .= '<div class="box-body col-md-12" style="overflow:scroll">
+				<table class="table table-hover table-striped table-condensed">';
+				$html.='<thead><tr><th>Processed File(s) Directory:</th></tr></thead>
+						<tbody>';
+				$html.='<tr><td onclick="editBox( '.$_SESSION['uid'].', '. $fastq_files[0]['dir_id'].', \'fastq_dir\', \'ngs_dirs\', this)">'.$fastq_files[0]['fastq_dir'].'</td></tr>
+						</tbody>';
+				$html.='<thead><tr><th>Processed File(s):</th></tr></thead>
+						<tbody>';
+				foreach ($fastq_files as $ff){
+						$html.='<tr><td onclick="editBox( '.$_SESSION['uid'].', '. $ff['id'].', \'file_name\', \'ngs_fastq_files\', this)">'.$ff['file_name'].'</td></tr>';
+				}
+				$html .= '</tbody></table>
+						</div>';
+		}
+		$html.=	'</div>
+			</div>
+			</div>';
 	endforeach;
 	return $html;
 	}
