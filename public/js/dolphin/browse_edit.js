@@ -7,11 +7,10 @@
 var element_highlighted;
 var element_highlighted_table;
 var element_highlighted_value;
+var element_highlighted_uid;
 var element_highlighted_id;
 var element_highlighted_type;
 var element_highlighted_onclick;
-
-var dir_element;
 
 var experimentPerms = [];
 var lanePerms = [];
@@ -19,9 +18,9 @@ var samplePerms = [];
 
 var normalized = ['facility', 'source', 'organism', 'molecule', 'lab', 'organization', 'genotype', 'library_type',
 				  'biosample_type', 'instrument_model', 'treatment_manufacturer'];
+var fileDatabaseDict = ['ngs_dirs', 'ngs_temp_sample_files', 'ngs_temp_lane_files', 'ngs_fastq_files'];
 
 function editBox(uid, id, type, table, element){
-	
 	var havePermission = 0;
 	
 	$.ajax({ type: "GET",
@@ -38,14 +37,23 @@ function editBox(uid, id, type, table, element){
 		if (element_highlighted != null) {
 			element_highlighted.innerHTML = element_highlighted_value;
 			element_highlighted.onclick = element_highlighted_onclick;
+			if (fileDatabaseDict.indexOf(table) > -1) {
+				document.getElementById('submit_file_changes').remove();
+				document.getElementById('cancel_file_changes').remove();
+			}
 		}
 		element_highlighted = element;
 		element_highlighted_value = element.innerHTML;
+		element_highlighted_uid = uid;
 		element_highlighted_id = id;
 		element_highlighted_type = type;
 		element_highlighted_table = table;
 		element_highlighted_onclick = element.onclick;
 		element.innerHTML = '';
+		
+		if (element_highlighted_value == element_highlighted.innerHTML) {
+			//code
+		}
 		
 		if (normalized.indexOf(type) > -1) {
 			
@@ -93,46 +101,57 @@ function editBox(uid, id, type, table, element){
 			var no = new ComboBox('cb_identifier');
 			
 		}else{
+			var submitButton;
+			var cancelButton;
 			var textarea = document.createElement('textarea');
+			
+			textarea.setAttribute('id', 'inputTextBox');
 			textarea.setAttribute('type', 'text');
 			textarea.setAttribute('class', 'form-control');
 			textarea.setAttribute('rows', '5');
+			element.setAttribute('value', element_highlighted_value);
 			if (table == 'ngs_dirs' || table == 'ngs_fastq_files' || table == 'ngs_temp_sample_files' || table == 'ngs_temp_lane_files') {
-				textarea.setAttribute('onkeydown', 'submitChangesFiles(this)');
+				submitButton = createElement('input', ['id','class','onclick','value','type'],['submit_file_changes','btn btn-primary pull-right margin', 'submitChangesFiles()', 'Submit','button']);
+				cancelButton = createElement('input', ['id','class','onclick','value','type'],['cancel_file_changes','btn btn-default pull-right margin', 'cancelChangesFiles()', 'Cancel','button']);
 			}else{
 				textarea.setAttribute('onkeydown', 'submitChanges(this)');
 			}
-			
-			element.setAttribute('value', element_highlighted_value);
 			element.appendChild(textarea);
+			if (submitButton != undefined) {
+				element.parentNode.parentNode.parentNode.appendChild(cancelButton);
+				element.parentNode.parentNode.parentNode.appendChild(submitButton);
+			}
 			textarea.innerHTML = element_highlighted_value;
-			element.onclick = '';
+			element.removeAttribute('onclick');
+			element_highlighted.removeAttribute('onclick');
 		}
 	}
 }
 
-function submitChangesFiles(ele){
-	if(event.keyCode == 13 && ele.value != '' && ele.value != null) {
-		$('#fileModal').modal({
-			show: true
-		});
-		dir_element = ele;
-		document.getElementById('confirmFileButton').setAttribute('onclick', 'submitChanges("dir_element")');
-	}else if(event.keyCode == 27) {
-		element_highlighted.innerHTML = element_highlighted_value;
-		element_highlighted.onclick = element_highlighted_onclick;
-		
-		clearElementHighlighted();
-	}
+function cancelChangesFiles(){
+	submitChanges('details_cancel');
+}
+
+function submitChangesFiles(){
+	$('#fileModal').modal({
+		show: true
+	});
+	document.getElementById('confirmFileButton').setAttribute('onclick', 'submitChanges("dir_element")');
 }
 
 function submitChanges(ele) {
 	var successBool = false;
-    if(event.keyCode == 13 && ele.value != '' && ele.value != null || ele == 'dir_element') {
+    if (ele == 'details_cancel') {
+		element_highlighted.innerHTML = element_highlighted_value;
+		element_highlighted.onclick = element_highlighted_onclick;
+		document.getElementById('submit_file_changes').remove();
+		document.getElementById('cancel_file_changes').remove();
+		clearElementHighlighted();
+	}else if(event.keyCode == 13 && ele.value != '' && ele.value != null || ele == 'dir_element') {
 		if (ele == "dir_element") {
-		ele = dir_element;
-		dir_element = null;
-	}
+			ele = document.getElementById('inputTextBox');
+			console.log(ele.value);
+		}
         $.ajax({ type: "GET",
 					url: BASE_PATH+"/public/ajax/browse_edit.php",
 					data: { p: 'updateDatabase', id: element_highlighted_id, type: element_highlighted_type, table: element_highlighted_table, value: ele.value},
@@ -147,7 +166,8 @@ function submitChanges(ele) {
 		if (successBool) {
 			element_highlighted.innerHTML = ele.value;
 			element_highlighted.onclick = element_highlighted_onclick;
-			
+			document.getElementById('submit_file_changes').remove();
+			document.getElementById('cancel_file_changes').remove();
 			clearElementHighlighted();
 		}
     }else if(event.keyCode == 27) {

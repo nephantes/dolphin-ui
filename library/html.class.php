@@ -481,26 +481,30 @@ e range"><i class="fa fa-calendar"></i></button>
 		if($files != null){
 				$html .= '<div class="box-body col-md-12" style="overflow:scroll">
 				<table class="table table-hover table-striped table-condensed">';
-				$html.='<thead><tr><th>Temporary File(s) Directory:</th></tr></thead>
+				$html.='<thead><tr><th>Input File(s) Directory:</th></tr></thead>
 						<tbody>';
 				$html.='<tr><td onclick="editBox( '.$_SESSION['uid'].', '. $files[0]['dir_id'].', \'fastq_dir\', \'ngs_dirs\', this)">'.$files[0]['fastq_dir'].'</td></tr>
 						</tbody>';
-				$html.='<thead><tr><th>Temporary File(s):</th></tr></thead>
+				$html.='<thead><tr><th>Input File(s):</th></tr></thead>
 						<tbody>';
 				foreach ($files as $f){
-						$html.='<tr><td onclick="editBox( '.$_SESSION['uid'].', '. $f['id'].', \'file_name\', \'ngs_temp_sample_files\', this)">'.$f['file_name'].'</td></tr>';
+						if($fastq_files == 'lanes'){
+								$html.='<tr><td onclick="editBox( '.$_SESSION['uid'].', '. $f['id'].', \'file_name\', \'ngs_temp_lane_files\', this)">'.$f['file_name'].'</td></tr>';
+						}else{
+								$html.='<tr><td onclick="editBox( '.$_SESSION['uid'].', '. $f['id'].', \'file_name\', \'ngs_temp_sample_files\', this)">'.$f['file_name'].'</td></tr>';	
+						}
 				}
 				$html .= '</tbody></table>
 						</div>';
 		}
-		if($fastq_files != null){
+		if($fastq_files != null && $fastq_files != 'lanes'){
 				$html .= '<div class="box-body col-md-12" style="overflow:scroll">
 				<table class="table table-hover table-striped table-condensed">';
-				$html.='<thead><tr><th>Fastq File(s) Directory:</th></tr></thead>
+				$html.='<thead><tr><th>Processed File(s) Directory:</th></tr></thead>
 						<tbody>';
 				$html.='<tr><td onclick="editBox( '.$_SESSION['uid'].', '. $fastq_files[0]['dir_id'].', \'fastq_dir\', \'ngs_dirs\', this)">'.$fastq_files[0]['fastq_dir'].'</td></tr>
 						</tbody>';
-				$html.='<thead><tr><th>Fastq File(s):</th></tr></thead>
+				$html.='<thead><tr><th>Processed File(s):</th></tr></thead>
 						<tbody>';
 				foreach ($fastq_files as $ff){
 						$html.='<tr><td onclick="editBox( '.$_SESSION['uid'].', '. $ff['id'].', \'file_name\', \'ngs_fastq_files\', this)">'.$ff['file_name'].'</td></tr>';

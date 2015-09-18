@@ -107,7 +107,7 @@
 					}
 				}
 				if ($table=="experiments" || $table=="samples"){
-					echo $html->getBrowserPanelMore($experiments, $experiment_fields, "Import", 'name', $lane_file, null);
+					echo $html->getBrowserPanelMore($experiments, $experiment_fields, "Import", 'name', $lane_file, 'lanes');
 				}
 				else{
 					if(!isset($_SESSION['ngs_lanes'])){
