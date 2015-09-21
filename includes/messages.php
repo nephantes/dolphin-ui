@@ -1,4 +1,4 @@
-<!-- Messages: style can be found in dropdown.less-->
+<!-- Messages: style can be found in dropdown.less
                         <li class="dropdown messages-menu">
                             <a href="#" class="dropdown-toggle" data-toggle="dropdown">
                                 <i class="fa fa-envelope"></i>
@@ -7,9 +7,8 @@
                             <ul class="dropdown-menu">
                                 <li class="header">You have 4 messages</li>
                                 <li>
-                                    <!-- inner menu: contains the actual data -->
                                     <ul class="menu">
-                                        <li><!-- start message -->
+                                        <li>
                                             <a href="#">
                                                 <div class="pull-left">
                                                     <img src="<?php echo BASE_PATH?>/img/avatar3.png" class="img-circle" alt="User Image"/>
@@ -20,7 +19,7 @@
                                                 </h4>
                                                 <p>Why not running your pipelines with dolphin?</p>
                                             </a>
-                                        </li><!-- end message -->
+                                        </li>
                                         <li>
                                             <a href="#">
                                                 <div class="pull-left">
@@ -73,4 +72,4 @@
                                 </li>
                                 <li class="footer"><a href="#">See All Messages</a></li>
                             </ul>
-                        </li>
+                        </li> -->
