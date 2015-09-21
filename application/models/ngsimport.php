@@ -196,6 +196,9 @@ class Ngsimport extends VanillaModel {
 		elseif ( $worksheet['worksheetName']=="LANES"){
 			$text.=$this->getLanes();
 		}
+		elseif ( $worksheet['worksheetName']=="IMPORTS"){
+			$text.=$this->getLanes();
+		}
 		elseif ( $worksheet['worksheetName']=="PROTOCOLS"){
 			$text.=$this->getProtocols();
 		}
@@ -224,6 +227,8 @@ class Ngsimport extends VanillaModel {
 		if ( $this->worksheet['worksheetName']=="METADATA"){
 			$text.=$this->processMeta();
 		}elseif ( $worksheet['worksheetName']=="LANES"){
+			$text.=$this->processLanes();
+		}elseif ( $worksheet['worksheetName']=="IMPORTS"){
 			$text.=$this->processLanes();
 		}elseif ( $worksheet['worksheetName']=="PROTOCOLS"){
 			$text.=$this->processProtocols();
@@ -407,7 +412,11 @@ class Ngsimport extends VanillaModel {
 			$lane = new lane();
 			for ($j='A';$j<=$this->worksheet['lastColumnLetter'];$j++)
 			{
-				if($this->sheetData[3][$j]=="Lane name"){$lane->name=$this->esc($this->sheetData[$i][$j]);}
+				if($this->sheetData[3][$j]=="Import name"){
+					$lane->name=$this->esc($this->sheetData[$i][$j]);
+				}elseif($this->sheetData[3][$j]=="Lane name"){
+					$lane->name=$this->esc($this->sheetData[$i][$j]);
+				}
 				if($this->sheetData[3][$j]=="Sequencing id"){
 					$lane->lane_id=$this->esc($this->sheetData[$i][$j]);
 				}elseif($this->sheetData[3][$j]=="Lane id"){
@@ -441,26 +450,14 @@ class Ngsimport extends VanillaModel {
 					if($this->checkAlphaNumWithAddChars('_-', $lane->name)){
 						$this->lane_arr[$lane->name]=$lane;
 					}else{
-						$text.= $this->errorText("Lane name does not contain proper characters, please use alpha-numeric characters and underscores (row " . $i . ")");
+						$text.= $this->errorText("Import name does not contain proper characters, please use alpha-numeric characters and underscores (row " . $i . ")");
 						$this->final_check = false;
 						$lane_check = false;
 					}
 				}else{
-					$text.= $this->errorText("Lane name is required for submission (row " . $i . ")");
+					$text.= $this->errorText("Import name is required for submission (row " . $i . ")");
 					$this->final_check = false;
 					$lane_check = false;
-				}
-				
-				//	Lane id
-				if(isset($lane->lane_id)){
-					if(!$this->checkAlphaNumWithAddChars('_-', $lane->lane_id)){
-						$text.= $this->errorText("Lane id does not contain proper characters, please use alpha-numeric characters and underscores (row " . $i . ")");
-						$this->final_check = false;
-						$lane_check = false;
-					}
-				}else{
-					$text.= $this->warningText("Lane id not specified.  Specific lane id set to 0, please change (row " . $i . ")");
-					$lane->lane_id=0;
 				}
 				
 				if(!isset($lane->total_reads)){
@@ -468,7 +465,7 @@ class Ngsimport extends VanillaModel {
 				}
 				
 				//	Other Values
-				if($lane->facility == null || $lane->cost == null ||
+				if($lane->lane_id == null || $lane->facility == null || $lane->cost == null ||
 					$lane->date_submitted ==  null || $lane->date_received == null || $lane->phix_requested == null ||
 					$lane->phix_in_lane == null || $lane->total_samples == null ||
 					$lane->resequenced == null || $lane->notes == null){
@@ -602,7 +599,11 @@ class Ngsimport extends VanillaModel {
 			{
 				$j = $this->num2alpha($k);
 				if($this->sheetData[3][$j]=="Sample name"){$samp->name=$this->esc($this->sheetData[$i][$j]);}
-				if($this->sheetData[3][$j]=="Lane name"){$samp->lane_name=$this->esc($this->sheetData[$i][$j]);}
+				if($this->sheetData[3][$j]=="Lane name"){
+					$samp->lane_name=$this->esc($this->sheetData[$i][$j]);
+				}elseif($this->sheetData[3][$j]=="Import name"){
+					$samp->lane_name=$this->esc($this->sheetData[$i][$j]);
+				}
 				if($this->sheetData[3][$j]=="Protocol name"){$samp->protocol_name=$this->esc($this->sheetData[$i][$j]);}
 				if($this->sheetData[3][$j]=="barcode"){$samp->barcode=$this->esc($this->sheetData[$i][$j]);}
 				if($this->sheetData[3][$j]=="title"){$samp->title=$this->esc($this->sheetData[$i][$j]);}
@@ -639,7 +640,7 @@ class Ngsimport extends VanillaModel {
 						$this->namesList .= "," . $samp->name;
 					}
 				}
-				if($this->sheetData[3][$j]=="Lane name" && $samp->lane_name != NULL){
+				if(($this->sheetData[3][$j]=="Lane name" || $this->sheetData[3][$j]=="Import name") && $samp->lane_name != NULL){
 					if ($this->laneList == null){
 						$this->laneList = $samp->lane_name;
 					}else if(strpos($this->laneList, $samp->lane_name) === false){
@@ -713,7 +714,7 @@ class Ngsimport extends VanillaModel {
 					if($this->checkAlphaNumWithAddChars('_-', $samp->name)){
 						//	Need to check the database for similar names as well at a later date
 						if(isset($this->sample_arr[$samp->name])){
-							$text.= $this->errorText("Sample name already exists in that lane (row " . $i . ")");
+							$text.= $this->errorText("Sample name already exists in that Import (row " . $i . ")");
 							$this->final_check = false;
 							$samp_check = false;
 						}elseif(ctype_digit($samp->name[0])){
@@ -738,12 +739,12 @@ class Ngsimport extends VanillaModel {
 				//	For now, it's just checking the Lane given in the excel file, possible to check the database later
 				if(isset($samp->lane_name)){
 					if(!isset($this->lane_arr[$samp->lane_name])){
-						$text.= $this->errorText("Lane name does not match any lane given in the excel file (row " . $i . ")");
+						$text.= $this->errorText("Import name does not match any import given in the excel file (row " . $i . ")");
 						$this->final_check = false;
 						$samp_check = false;
 					}
 				}else{
-					$text.= $this->errorText("Lane name is required for submission (row " . $i . ")");
+					$text.= $this->errorText("Import name is required for submission (row " . $i . ")");
 					$this->final_check = false;
 					$samp_check = false;
 				}
@@ -937,12 +938,16 @@ class Ngsimport extends VanillaModel {
 			$file = new file();
 			for ($j='A';$j<=$this->worksheet['lastColumnLetter'];$j++)
 			{
-				if($this->sheetData[3][$j]=="Sample or Lane Name (Enter same name for multiple files)"){$file->name=$this->esc($this->sheetData[$i][$j]);}
+				if($this->sheetData[3][$j]=="Sample or Lane Name (Enter same name for multiple files)"){
+					$file->name=$this->esc($this->sheetData[$i][$j]);
+				}elseif($this->sheetData[3][$j]=="Sample or Import Name (Enter same name for multiple files)"){
+					$file->name=$this->esc($this->sheetData[$i][$j]);
+				}
 				if($this->sheetData[3][$j]=="Directory ID"){$file->dir_tag=$this->esc($this->sheetData[$i][$j]);}
 				if($this->sheetData[3][$j]=="file name(comma separated for paired ends)"){$file->file_name=$this->esc($this->sheetData[$i][$j]);$file->file_name=preg_replace('/\s/', '', $file->file_name);}
 				if($this->sheetData[3][$j]=="file checksum"){$file->checksum=$this->esc($this->sheetData[$i][$j]);}
 				
-				if($this->sheetData[3][$j]=="Sample or Lane Name (Enter same name for multiple files)"){
+				if($this->sheetData[3][$j]=="Sample or Lane Name (Enter same name for multiple files)" || $this->sheetData[3][$j]=="Sample or Import Name (Enter same name for multiple files)"){
 					if(isset($this->lane_arr[$file->name]) && $this->laneArrayCheck == null){
 						array_push($this->initialSubmission, 'lane');
 						$this->laneArrayCheck = 'lane';
@@ -978,17 +983,17 @@ class Ngsimport extends VanillaModel {
 				if(isset($file->name)){
 					if($this->checkAlphaNumWithAddChars('_-', $file->name)){
 						if(!(isset($this->sample_arr[$file->name])) & !(isset($this->lane_arr[$file->name]))){
-							$text.= $this->errorText("sample/lane name does not match the samples/lanes given (row " . $i . ")");
+							$text.= $this->errorText("sample/import name does not match the samples/imports given (row " . $i . ")");
 							$this->final_check = false;
 							$file_check = false;
 						}
 					}else{
-						$text.= $this->errorText("sample/lane name does not contain proper characters, please use alpha-numeric characters and underscores (row " . $i . ")");
+						$text.= $this->errorText("sample/import name does not contain proper characters, please use alpha-numeric characters and underscores (row " . $i . ")");
 						$this->final_check = false;
 						$file_check = false;
 					}
 				}else{
-					$text.= $this->errorText("sample/lane name is required for submission (row " . $i . ")");
+					$text.= $this->errorText("sample/import name is required for submission (row " . $i . ")");
 					$this->final_check = false;
 					$file_check = false;
 				}
