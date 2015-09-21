@@ -93,3 +93,6 @@ The plots table fills once a selection has been made within the scatterplot and 
 This plots table displays the selection made by the user as well as the values that differ between the samples.
 
 Selections of many points can be expanded by clicking on the 'Show entire table' button at the very bottom of the table list.
+
+
+Most of the files displayed in the graphs can be obtained from the 'NGS Reports page' for download.  For more information on how to navigate the Reports page, please check out the 'NGS Reports Guide'.
