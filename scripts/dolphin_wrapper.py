@@ -114,7 +114,6 @@ class Dolphin:
     def checkIfAnewSampleAdded(self, runparamsid):
         sql = "SELECT a.sample_id FROM (SELECT nr.sample_id FROM ngs_runlist nr, ngs_temp_sample_files ts where nr.sample_id=ts.sample_id and run_id="+str(runparamsid)+") a where sample_id NOT IN(SELECT nr.sample_id FROM ngs_runlist nr, ngs_fastq_files ts where nr.sample_id=ts.sample_id and run_id="+str(runparamsid)+")"
         sampleids=self.runSQL(sql%locals())
-        print sampleids
         if (sampleids != ()):
             return 1
         return 0
@@ -124,11 +123,9 @@ class Dolphin:
         dirfield="d.backup_dir"
         sql = "SELECT s.samplename, %(dirfield)s dir, ts.file_name FROM ngs_runparams nrp, ngs_runlist nr, ngs_samples s, %(tablename)s ts, ngs_dirs d where nr.run_id=nrp.id and nr.sample_id=s.id and nrp.run_status=0 and s.id=ts.sample_id and d.id=ts.dir_id and nr.run_id='"+str(runparamsid)+"';"
         samplelist=self.runSQL(sql%locals())
-        print str(self.checkIfAnewSampleAdded(runparamsid)) + " +==="
         if (samplelist==() or self.checkIfAnewSampleAdded(runparamsid)):
             dirfield="d.fastq_dir"
             tablename="ngs_temp_sample_files"
-            print "HERE-11"
             samplelist=self.runSQL(sql%locals())
         return self.getInputParams(samplelist)
     
@@ -599,7 +596,7 @@ def main():
               amazonupload     = "Yes"
 
            (inputdir, backup_dir, amazon_bucket, outdir) = dolphin.getDirs(runparamsid, isbarcode)
-           if(inputdir == backup_dir):
+           if(inputdir == backup_dir and outdir.find("/initial_run")==-1 ):
               backupS3 = None
               gettotalreads = None
            else:
