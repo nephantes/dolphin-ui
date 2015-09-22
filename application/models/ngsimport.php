@@ -284,14 +284,23 @@ class Ngsimport extends VanillaModel {
 			if($this->sheetData[$i]["A"]=="lab"){$this->lab=$this->esc($this->sheetData[$i]["B"]);}
 			if($this->sheetData[$i]["A"]=="grant"){$this->grant=$this->esc($this->sheetData[$i]["B"]);}
 			if($this->sheetData[$i]["A"]=="contributor"){array_push($this->conts, $this->esc($this->sheetData[$i]["B"]));}
-			if($this->sheetData[$i]["A"]=="fastq directory"){$this->fastq_dir=$this->esc($this->sheetData[$i]["B"]);}
-			if($this->sheetData[$i]["A"]=="backup directory"){$this->backup_dir=$this->esc($this->sheetData[$i]["B"]);}
+			if($this->sheetData[$i]["A"]=="fastq directory"){
+				$this->fastq_dir=$this->esc($this->sheetData[$i]["B"]);
+			}elseif($this->sheetData[$i]["A"]=="processed directory"){
+				$this->fastq_dir=$this->esc($this->sheetData[$i]["B"]);
+			}
+			if($this->sheetData[$i]["A"]=="backup directory"){
+				$this->backup_dir=$this->esc($this->sheetData[$i]["B"]);
+			}elseif($this->sheetData[$i]["A"]=="temporary directory"){
+				$this->backup_dir=$this->esc($this->sheetData[$i]["B"]);
+				
+			}
 			if($this->sheetData[$i]["A"]=="amazon bucket"){$this->amazon_bucket=$this->esc($this->sheetData[$i]["B"]);}
 			
 			if($this->sheetData[$i]["A"]=="title"){
 				array_push($this->initialSubmission, $this->esc($this->sheetData[$i]["B"]));
 			}
-			if($this->sheetData[$i]["A"]=="backup directory"){
+			if($this->sheetData[$i]["A"]=="backup directory" || $this->sheetData[$i]["A"]=="temporary directory"){
 				array_push($this->initialSubmission, $this->esc($this->sheetData[$i]["B"]));
 			}
 			
@@ -303,7 +312,7 @@ class Ngsimport extends VanillaModel {
 			}
 			
 			//	Backup Directory
-			if($this->backup_dir == null && $this->sheetData[$i]["A"]=="backup directory"){
+			if($this->backup_dir == null && ($this->sheetData[$i]["A"]=="backup directory" || $this->sheetData[$i]["A"]=="temporary directory")){
 				$text.= $this->errorText("backup directory is required for submission");
 				$this->final_check = false;
 				$meta_check = false;
@@ -876,7 +885,11 @@ class Ngsimport extends VanillaModel {
 			for ($j='A';$j<=$this->worksheet['lastColumnLetter'];$j++)
 			{
 				if($this->sheetData[3][$j]=="Directory ID"){$dir->dir_tag=$this->esc($this->sheetData[$i][$j]);}
-				if($this->sheetData[3][$j]=="Fastq directory"){$dir->fastq_dir=$this->esc($this->sheetData[$i][$j]);}
+				if($this->sheetData[3][$j]=="Fastq directory"){
+					$dir->fastq_dir=$this->esc($this->sheetData[$i][$j]);
+				}elseif($this->sheetData[3][$j]=="Processed directory"){
+					$dir->fastq_dir=$this->esc($this->sheetData[$i][$j]);
+				}
 			}
 			$blank = 'true';
 			foreach($dir as $d){

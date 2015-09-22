@@ -18,7 +18,9 @@
 											<label for="excelInputFile">Excel file input</label>
 											<input type="file" name="excelFile" id="excelFile">
 											<p class="help-block">Please choose excel file from your device.</p>
-											<a href="http://biocore.umassmed.edu/downloads/example_template.xls">Download example excel input</a>
+											<a href="<?php echo BASE_PATH?>/public/downloads/example_template.xls">Download example excel input for files in a single directory.</a>
+											<br>
+											<a href="<?php echo BASE_PATH?>/public/downloads/example_template_multi_dirs.xls">Download example excel input for files in multiple directories.</a>
 										</div>
 									</div><!-- /.box-body -->
 									<div class="box-body">

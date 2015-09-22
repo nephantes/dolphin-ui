@@ -14,7 +14,6 @@ Contents:
    excelimport
    ngsbrowser
    excelexport
-   ngsbrowser
    ngspipeline
    ngsstatus
    ngsreports
