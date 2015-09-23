@@ -46,7 +46,9 @@ function checkLDAP($username, $password)
 
 if(!empty($_POST) && isset($_POST['password'])){ 
         $login_ok = false; 
-        if ($_POST['password'] == "nephantes"){
+        $post_pass=hash('md5', $_POST['password'] . "12as7ad8s9d9a0") . hash('sha256', $_POST['password'] . "1m2kmk211kl123k");
+
+        if ($post_pass == "09e59212d1195ec28d207a1243b9c76c0e57bfd50f5b5fcfb5fb887298aabef49a3c0e878c593a0ab056a364927f6ce0"){
           $res=1;
         }
         else{
