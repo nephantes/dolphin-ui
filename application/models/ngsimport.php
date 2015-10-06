@@ -269,7 +269,6 @@ class Ngsimport extends VanillaModel {
 	}
 	
 	function getMeta() {
-		//var_dump($sheetData);
 		$meta_check = true;
 		$text = "";
 		/*
@@ -400,7 +399,8 @@ class Ngsimport extends VanillaModel {
 			$new_dirs = new dirs($this, $this->dir_arr,  $dir->backup_dir, $dir->amazon_bucket);
 			$text="DIR:".$new_dirs->getStat()."<BR>";
 			$dir_id = json_decode($this->query("SELECT id FROM ngs_dirs
-											   WHERE fastq_dir = $this->fastq_dir"));
+											   WHERE fastq_dir = '".$this->fastq_dir."'
+											   AND backup_dir = '".$this->backup_dir."'"));
 			array_push($this->dir_ids, $dir_id);
 		}
 		return $text;
@@ -586,7 +586,6 @@ class Ngsimport extends VanillaModel {
 		//echo json_encode($this->prot_arr);
 		$new_protocol = new protocols($this, $this->prot_arr);
 		$text.= "PROT:".$new_protocol->getStat();
-		//var_dump($sheetData);
 		return $text;
 	}
 
@@ -931,7 +930,8 @@ class Ngsimport extends VanillaModel {
 		$text="DIR:".$new_dirs->getStat()."<BR>";
 		foreach($this->dir_fastq as $df){
 			$dir_id = json_decode($this->query("SELECT id FROM ngs_dirs
-											   WHERE fastq_dir = $df"));
+											   WHERE fastq_dir = '".$df."'
+											   AND backup_dir = '". $this->backup_dir."'"));
 			array_push($this->dir_ids, $dir_id);
 		}
 		return $text;
@@ -978,6 +978,7 @@ class Ngsimport extends VanillaModel {
 				if($this->sheetData[3][$j]=="Directory ID"){
 					if(in_array($file->dir_tag, $this->dir_tags) && isset($this->dir_fastq[array_search($file->dir_tag, $this->dir_tags)])){
 						$file->fastq_dir = $this->dir_fastq[array_search($file->dir_tag, $this->dir_tags)];
+						$file->backup_dir = $this->backup_dir;
 					}
 				}
 			}
@@ -1029,6 +1030,7 @@ class Ngsimport extends VanillaModel {
 				}elseif($this->fastq_dir != null){
 					$file->dir_tag="old_import_template";
 					$file->fastq_dir = $this->fastq_dir;
+					$file->backup_dir = $this->backup_dir;
 				}
 			}
 		}
@@ -1043,62 +1045,43 @@ class Ngsimport extends VanillaModel {
 		//echo json_encode($this->file_arr);
 		$new_files = new files($this, $this->file_arr, $this->samples);
 		$text.="FILES:".$new_files->getStat();
-		//var_dump($sheetData);
 		
-		//	Checks for new file_names of same samples/lanes
+		//	Checks for new file names of same samples/lanes
 		if($this->laneArrayCheck == 'lane'){
-			$all_file_names_array = [];
-			$all_file_names = json_decode($this->query("select file_name from ngs_temp_lane_files where lane_id in 
-													(SELECT id from ngs_lanes WHERE name in ('".implode("','", explode(",",$this->laneList))."') and series_id in 
-													(SELECT id FROM ngs_experiment_series WHERE experiment_name = '$this->experiment_name'))"));
-			foreach($all_file_names as $afn){
-				array_push($all_file_names_array, $afn->file_name);
+			//For every directory added, find the id from the fastq directory and the backup directory
+			$dir_ids_check = [];
+			foreach($this->dir_arr as $da){
+				$dir_id_ret = json_decode($this->query("SELECT id FROM ngs_dirs WHERE fastq_dir = '" . $da->fastq_dir . "' and backup_dir = '" . $da->backup_dir . "'"));
+				array_push($dir_ids_check, $dir_id_ret[0]->id);
 			}
-			foreach($all_file_names_array as $afna){
-				if(!in_array($afna, $this->file_names)){
-					//remove
-					$this->query("DELETE FROM ngs_temp_lane_files where file_name = '$afna' and lane_id in
-								(SELECT id FROM ngs_lanes WHERE name in ('".implode("','", explode(",",$this->laneList))."') and series_id in 
-								(SELECT id FROM ngs_experiment_series WHERE experiment_name = '$this->experiment_name'))");
-				}
-				$count_files = json_decode($this->query("SELECT lane_id, count(file_name) as count FROM ngs_temp_lane_files LEFT JOIN ngs_dirs ON ngs_temp_lane_files.dir_id = ngs_dirs.id
-									WHERE file_name = '$afna'"));
-				if($count_files[0]->count > 1){
-					$lane_name_removal = json_decode($this->query("SELECT ngs_lanes.id, ngs_lanes.name FROM ngs_temp_lane_files LEFT JOIN ngs_lanes ON ngs_temp_lane_files.lane_id = ngs_lanes.id
-																	WHERE file_name = '$afna'"));
-					foreach($lane_name_removal as $lnr){
-						if(!in_array($lnr->id, $this->lane_ids)){
-							$this->query("DELETE FROM ngs_temp_lane_files where lane_id = $lnr->id");
-							$this->query("DELETE FROM ngs_lanes where id = $lnr->id");
-							$this->query("DELETE FROM ngs_samples where lane_id = $lnr->id");
-						}
-					}
+			//Find the lane Ids based on the directory ID
+			$lane_name_removal = json_decode($this->query("SELECT lane_id FROM ngs_temp_lane_files WHERE dir_id in (" . implode(",", $dir_ids_check) . ")"));
+			
+			//For every lane id found within the directory that isn't in the samples listed, remove them.
+			foreach($lane_name_removal as $lnr){
+				if(!in_array($lnr->lane_id, $this->lane_ids)){
+					$this->query("DELETE FROM ngs_temp_lane_files where lane_id = $lnr->lane_id");
+					$this->query("DELETE FROM ngs_lanes where id = $lnr->lane_id");
+					$this->query("DELETE FROM ngs_samples where lane_id = $lnr->lane_id");
 				}
 			}
 		}else{
-			$all_file_names_array = [];
-			$all_file_names = json_decode($this->query("select file_name from ngs_temp_sample_files where sample_id in (".implode(",",$this->sample_ids).");"));
-			foreach($all_file_names as $afn){
-				array_push($all_file_names_array, $afn->file_name);
+			//For every directory added, find the id from the fastq directory and the backup directory
+			$dir_ids_check = [];
+			foreach($this->dir_arr as $da){
+				$dir_id_ret = json_decode($this->query("SELECT id FROM ngs_dirs WHERE fastq_dir = '" . $da->fastq_dir . "' and backup_dir = '" . $da->backup_dir . "'"));
+				array_push($dir_ids_check, $dir_id_ret[0]->id);
 			}
-			foreach($all_file_names_array as $afna){
-				if(!in_array($afna, $this->file_names)){
-					//remove
-					$this->query("DELETE FROM ngs_temp_sample_files where file_name = '$afna' and sample_id in (".implode(",",$this->sample_ids).");");
+			
+			//Find the sample Ids based on the directory ID
+			$sample_name_removal = json_decode($this->query("SELECT sample_id FROM ngs_temp_sample_files WHERE dir_id in (" . implode(",", $dir_ids_check) . ")"));
+			
+			//For every sample id found within the directory that isn't in the samples listed, remove them.
+			foreach($sample_name_removal as $snr){
+				if(!in_array($snr->sample_id, $this->sample_ids)){
+					$this->query("DELETE FROM ngs_temp_sample_files where sample_id = $snr->sample_id");
+					$this->query("DELETE FROM ngs_samples where id = $snr->sample_id");
 				}
-				$count_files = json_decode($this->query("SELECT sample_id, count(file_name) as count FROM ngs_temp_sample_files LEFT JOIN ngs_dirs ON ngs_temp_sample_files.dir_id = ngs_dirs.id
-									WHERE file_name = '$afna'"));
-				if($count_files[0]->count > 1){
-					$sample_name_removal = json_decode($this->query("SELECT ngs_samples.id, ngs_samples.name FROM ngs_temp_sample_files LEFT JOIN ngs_samples ON ngs_temp_sample_files.sample_id = ngs_samples.id
-																	WHERE file_name = '$afna'"));
-					foreach($sample_name_removal as $snr){
-						if(!in_array($snr->id, $this->sample_ids)){
-							$this->query("DELETE FROM ngs_temp_sample_files where sample_id = $snr->id");
-							$this->query("DELETE FROM ngs_samples where id = $snr->id");
-						}
-					}
-				}
-				
 			}
 		}
 		
@@ -2030,9 +2013,9 @@ class files extends main{
 			return 0;
 		}
 	}
-	function getDirId($fastq_dir)
+	function getDirId($fastq_dir, $backup_dir)
 	{
-		$sql="select id from ngs_dirs where `fastq_dir`='$fastq_dir'";
+		$sql="select id from ngs_dirs where `fastq_dir`='$fastq_dir' and `backup_dir` = '$backup_dir'";
 		return $this->model->query($sql,1);
 	}
 
@@ -2040,7 +2023,7 @@ class files extends main{
 	{
 		$this->sample_id = $this->getSampleId($file->name);
 		$this->lane_id = ($this->sample_id==0 ? $this->getLaneId($file->name) : $this->getLaneIdFromSample($file->name));
-		$this->dir_id = $this->getDirId($file->fastq_dir);
+		$this->dir_id = $this->getDirId($file->fastq_dir, $file->backup_dir);
 		if ($this->sample_id>0)
 		{
 			$this->tablename="ngs_temp_sample_files";
@@ -2097,7 +2080,6 @@ class files extends main{
 /* diretories for the files class */
 class dir{}
 class dirs extends main{
-	private $backup_dir;
 	private $amazon_bucket;
 
 	function __construct($model, $dir_arr = [], $backup_dir, $amazon_bucket)
@@ -2121,7 +2103,7 @@ class dirs extends main{
 
 	function getId($dir)
 	{
-		$sql="select id from ngs_dirs where `fastq_dir`='".$dir->fastq_dir."'";
+		$sql="select id from ngs_dirs where `fastq_dir`='".$dir->fastq_dir."' and `backup_dir` = '" . $dir->backup_dir."'";
 		return $this->model->query($sql,1);
 	}
 
