@@ -32,7 +32,7 @@
 										<tr>
 											<td>X axis<br>(Log)<input type="checkbox" id="xi_scale" value="log scale" disabled checked> </td>
 											<td>
-												<select type="text" id="xi" class="form-control"></select>
+												<select type="text" id="xi" class="form-control" multiple="multiple" size="3"></select>
 											</td>
 										</tr>
 										<tr>
@@ -40,7 +40,7 @@
 											(Log)<input type="checkbox" id="yi_scale" value="log scale" disabled checked> 
 											</td>
 											<td>
-												<select type="text" id="yi" class="form-control"></select>
+												<select type="text" id="yi" class="form-control" multiple="multiple" size="3"></select>
 											</td>
 										</tr>
 										<tr>
@@ -92,6 +92,15 @@
 											</td>
 											<td>
 												<select id="selected_cols" class="form-control" size="8" multiple="multiple" tabindex="1"></select>
+											</td>
+										</tr>
+										<tr>
+											<td> <label>Heatmap Mode</label></td>
+											<td>
+											      <select id="heatmap_mode">
+													<option value="proportion">Proportion</option>
+													<option value="foldchange">FoldChange</option>
+												</select>
 											</td>
 										</tr>
 										</tbody>

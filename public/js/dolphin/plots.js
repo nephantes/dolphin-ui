@@ -219,8 +219,11 @@ $("#zi_value").on("change",function(d) {
             window.json.modules[0].dots.filter(function (d0, i) {
                 return i in m
             }).attr("r", 3.0)
-          
+           if($("#heatmap_mode").val()=="proportion"){ 
             heatmap(samples,"#heatmap",n,colnames,rawdata);
+           } else if($("#heatmap_mode").val()=="foldchange"){
+            heatmapFoldChange(samples,"#heatmap",n,colnames,rawdata);
+	  } 
             d3.select("#svg1").attr("height",n.length*5+100);
             
             if( $("#cmp_with").is(":checked")) {
@@ -244,7 +247,12 @@ $("#zi_value").on("change",function(d) {
                 samples2.push(norm(l2));
                 rawdata2.push(l2);
             })
-            heatmap(samples2,"#heatmap2",n2,colnames2,rawdata2);
+ 	if($("#heatmap_mode").val()=="proportion"){ 
+            heatmap(samples2,"#heatmap",n2,colnames2,rawdata2);
+           } else if($("#heatmap_mode").val()=="foldchange"){
+            heatmapFoldChange(samples2,"#heatmap",n2,colnames2,rawdata2);
+	  } 
+            
             })(d)
         }
 
@@ -358,6 +366,11 @@ $("#zi_value").on("change",function(d) {
         window.plotHandler = function () {
             //window.data = data;
             svg.selectAll("*").remove();
+	    var xlabel,ylabel;
+	    if (xi.length==1) {xlabel=data.table.cols[xi[0]].label}
+		else { xlabel="average of selected X axis"}
+	    if (yi.length==1) {ylabel=data.table.cols[yi[0]].label}
+		else { ylabel="average of selected Y axis"}
             window.json = {
                 "type": "panel",
                 "el": svg,
@@ -374,8 +387,8 @@ $("#zi_value").on("change",function(d) {
                     "width": 400,
                     "scale": 0.9,
                     "data": [],
-                    "xlabel":data.table.cols[xi].label,
-                    "ylabel":data.table.cols[yi].label,
+                    "xlabel":xlabel,
+                    "ylabel":ylabel,    
                     "zi_type":$("#zi_type").val(),
 
                     "brushCb": iBrushHandler,
@@ -396,18 +409,36 @@ $("#zi_value").on("change",function(d) {
             }
             data.table.rows.forEach(function (d) {
                 var x,y;
+		var pseudo= parseFloat($("#pseudocount").val() || document.getElementById("pseudocount").placeholder)
                 if($("#xi_scale").is(":checked")) {
-                    x=Math.log(d.c[xi].v + parseFloat($("#pseudocount").val() || document.getElementById("pseudocount").placeholder));
-                }
+		    x=0.0
+		    xi.forEach(function(i0) {
+                    x+=Math.log( parseFloat(d.c[i0].v) + pseudo);
+        	   } ) 
+		   x=x/xi.length      
+		}
                 else
                 {
-                    x=d.c[xi].v
+		   x=0.0
+		   xi.forEach(function(i0){
+			x+=parseFloat(d.c[i0].v)
+			})
+                    x=x/xi.length
                 }
                 if($("#yi_scale").is(":checked")) {
-                    y=Math.log(d.c[yi].v + parseFloat($("#pseudocount").val() || document.getElementById("pseudocount").placeholder))
-                }
+		    y=0.0
+		    yi.forEach(function(i0) {
+                    y+=Math.log( parseFloat(d.c[i0].v) + pseudo)
+                   })
+		   y=y/yi.length
+		}
                 else
                 {
+		    y=0.0
+	   	    yi.forEach(function(i0){
+			y+=parseFloat(d.c[i0].v)
+			})
+                    y=y/yi.length
                     y=d.c[yi].v
                 }
 
@@ -812,6 +843,47 @@ d3.select("#"+d.id+"_options").append("tr").append("td").append("input").attr("c
         var text2=d3.select(el).append("g").attr("class","txt").attr("transform","translate(5,255)")
         text2.selectAll(".marker").data(cols)
         .enter().append("g").attr("transform",function(d, i) { return "translate("+(i * (barwidth+gap)+barwidth/2) +",0)"}).attr("class","marker").append("text").attr("transform","rotate(75)").text(function(d){return d});
+    }
+ function heatmapFoldChange(ldata,el,names,colnames,raw)
+    {
+	var psuedo=1.0
+        var colorscale=d3.scale.linear().range(["white", "red"]).domain([0,20]);
+        var g=d3.select(el).selectAll("g").data(ldata)
+        g.selectAll(".tile").data(function(d,i){
+                    var a=[]
+                    d.forEach(function(d0,i0) {a.push([i,d0])})
+                    return a;
+                   })
+                .style("fill", function(d,i0) { return colorscale((raw[d[0]][i0]+psuedo)/(raw[d[0]][0]+psuedo)); })
+                 .on("mouseover",function(d,i0){
+                     bar(raw[d[0]],"#barplot1",colnames,names[d[0]]);
+                })
+                .select("title").text(function(d,i0){console.log("change",names[d[0]]);return names[d[0]]+" "+colnames[i0]+" "+raw[d[0]][i0];})
+               ;
+      
+        g.enter().append("g")
+                .attr("transform",function(d,i) {return "translate(0,"+i*5+")"})
+                .selectAll(".tile")
+                .data(function(d,i){
+                    var a=[]
+                    d.forEach(function(d0,i0) {a.push([i,d0])})
+                    return a;
+                   })
+                .enter()
+                .append("rect")
+                .attr("class", "tile")
+                .attr("x",function(d,i) {return i*10;})
+                .attr("y",0)
+                .attr("width", 10)
+                .attr("height",5)
+                .style("fill", function(d,i0) { return colorscale((raw[d[0]][i0]+psuedo)/(raw[d[0]][0]+psuedo)); })
+                .on("mouseover",function(d,i0){
+                     bar(raw[d[0]],"#barplot1",colnames,names[d[0]]);
+                })
+                .append("title").text(function(d,i0){console.log("init",names[d[0]]);return names[d[0]]+" "+colnames[i0]+" "+raw[d[0]][i0];})
+
+         ;
+        g.exit().remove()
     }
 
     function heatmap(ldata,el,names,colnames,raw)
