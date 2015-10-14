@@ -157,6 +157,33 @@ class dbfuncs {
       
       return $this->queryTableArr($sql); 
    }
+   function getSampleQuery($samples)
+   {
+     $sql="select nr.wkey, nl.sample_id, ns.samplename from ngs_runparams nr, ngs_runlist nl, ngs_samples ns where ns.id=nl.sample_id and nr.id=nl.run_id and ";
+     $wkey_array =  explode( ':', $samples);
+     $runsql="";
+     for ($i=0; $i<sizeof($wkey_array); $i++)
+     {
+       $runs =  explode( ';', $wkey_array[$i]);
+       $runid=$runs[1];
+       $sampleids =  explode( ',', $runs[0]);
+       $samplesql="";
+       for ($j=0; $j<sizeof($sampleids); $j++)
+       {
+         $samplesql.="sample_id=".$sampleids[$j];
+         if ($j < (sizeof($sampleids)-1)){
+           $samplesql.=" or ";
+         }
+       }
+       $runsql.=" (($samplesql) and run_id=$runid) ";
+       if ($i < (sizeof($wkey_array)-1)){
+           $runsql.=" or ";
+       }
+     }
+     $sql .= "($runsql)";
+
+     return $this->queryTable($sql);
+   }
    
 }
 
