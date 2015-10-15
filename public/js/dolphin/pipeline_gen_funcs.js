@@ -577,6 +577,10 @@ function sendToStatus(){
 	window.location.href = BASE_PATH+"/stat/status/";
 }
 
+function generateTableLink(){
+	window.location.href = BASE_PATH+"/tablecreator";
+}
+
 function backFromDetails(back_type){
 	var changeHTML = '';
 	var hrefSplit = window.location.href.split("/");

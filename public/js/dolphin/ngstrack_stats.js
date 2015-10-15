@@ -7,15 +7,45 @@
 
 function generateStreamTable(type, queryData, queryType, qvar, rvar, seg, theSearch, uid, gids){
 	var keys = [];
-	for (var key in queryData[0]) {
-		if (queryData[0].hasOwnProperty(key)) {
-			keys.push(key)
+	var obj_conversion = [];
+	if (type == 'generated') {
+		keys = queryData.title;
+		delete queryData.title;
+		var new_header = '<tr>';
+		for (var y = 0; y < keys.length; y++) {
+			keys[y] = keys[y].replace(/ /g,"_").replace(/>/g,"_");
+			new_header += '<th data-sort="'+y+'::string" onclick="shiftColumns(this)">'+
+						keys[y]+'<i id="'+y+'" class="pull-right fa fa-unsorted"></i></th>';
+		}
+		for(var key in queryData){
+			if (Array.isArray(queryData[key])) {
+				obj = {};
+				for(var title in keys){
+					obj[keys[title]] = queryData[key][title];
+				}
+				obj_conversion.push(obj);
+			}else{
+				obj = {};
+				for (var title in queryData[key]) {
+					obj[title.replace(/ /g,"_").replace(/>/g,"_")] = queryData[key][title];
+				}
+				obj_conversion.push(obj);
+			}
+		}
+		queryData = obj_conversion;
+		new_header += '</tr>';
+		$('#jsontable_generated')[0].tHead.innerHTML = new_header; 
+	}else{
+		for (var key in queryData[0]) {
+			if (queryData[0].hasOwnProperty(key)) {
+				keys.push(key)
+			}
 		}
 	}
-	
 	var masterScript = createElement('script', ['id', 'type'], ['template_'+type, 'text/html']);
 	var tr = createElement('tr', [], []);
 	
+	console.log(keys);
 	for(var x = 0; x < keys.length; x++){
 		var td = createElement('td', [], []);
 		td.innerHTML = "{{record."+keys[x]+"}}";
@@ -39,9 +69,9 @@ function generateStreamTable(type, queryData, queryType, qvar, rvar, seg, theSea
 	}
 	
 	var tableToggle = getTableToggle(type);
-	console.log(tableToggle);
 	
 	var data = queryData, html = $.trim($("#template_"+type).html()), template = Mustache.compile(html);
+	console.log(data);
 	var view = function(record, index){
 		//	Samples
 		if (record.source == null) {
@@ -141,6 +171,13 @@ function generateStreamTable(type, queryData, queryType, qvar, rvar, seg, theSea
 			record.notes = '';
 		}
 		
+		//	Generated
+		for(var x = 0; x < keys.length; x++){
+			if (record[keys[x]] == undefined) {
+				record[keys[x]] = '';
+			}
+		}
+		
 		var initialRunWarning = "<button id=\"perms_"+record.id+"\" class=\"btn btn-default btn-xs\" value=\"initialRunWarning\" onclick=\"initialRunButton('"+type+"', "+record.id+", this)\"><span class=\"fa fa-warning\"></span></button>";
 		var sample_name = '';
 		
@@ -160,7 +197,21 @@ function generateStreamTable(type, queryData, queryType, qvar, rvar, seg, theSea
 			sample_name = record.samplename;
 		}
 		
-		if (tableToggle == 'extend') {
+		var basketSamples = getBasketInfo().split(",");
+		var checked = '';
+		if (queryType == 'table_create') {
+			if (basketSamples.indexOf(record.id) > -1) {
+				checked = 'checked';
+			}
+		}
+		
+		if (type == 'generated') {
+			var row = '<tr>';
+			for(var key in keys){
+				row += '<td>'+record[keys[key]]+'</td>';
+			}
+			return row + '</tr>';
+		}else if (tableToggle == 'extend') {
 			if (type == 'samples') {
 				if (queryType == 'getSamples') {
 					return "<tr><td>"+record.id+"</td><td>"+"<a href=\""+BASE_PATH+"/search/details/samples/"+record.id+'/'+theSearch+"\">"+sample_name+"</a>"+"</td><td onclick=\"editBox("+uid+", "+record.id+", 'title', 'ngs_samples', this)\">"+record.title+
@@ -175,6 +226,19 @@ function generateStreamTable(type, queryData, queryType, qvar, rvar, seg, theSea
 						"<td onclick=\"editBox("+uid+", "+record.id+", 'library_type', 'ngs_samples', this)\">"+record.library_type+"</td><td onclick=\"editBox("+uid+", "+record.id+", 'biosample_type', 'ngs_samples', this)\">"+record.biosample_type+"</td>"+
 						"<td onclick=\"editBox("+uid+", "+record.id+", 'instrument_model', 'ngs_samples', this)\">"+record.instrument_model+"</td><td onclick=\"editBox("+uid+", "+record.id+", 'treatment_manufacturer', 'ngs_samples', this)\">"+record.treatment_manufacturer+"</td>"+
 						"<td>"+initialRunWarning+"<input type=\"checkbox\" class=\"ngs_checkbox\" name=\""+record.id+"\" id=\"sample_checkbox_"+record.id+"\" onClick=\"manageChecklists(this.name, 'sample_checkbox')\">"+"</td></tr>";
+				}else if (queryType == 'table_create') {
+					return "<tr><td>"+record.id+"</td><td>"+"<a href=\""+BASE_PATH+"/search/details/samples/"+record.id+'/'+theSearch+"\">"+sample_name+"</a>"+"</td><td onclick=\"editBox("+uid+", "+record.id+", 'title', 'ngs_samples', this)\">"+record.title+
+						"</td><td onclick=\"editBox("+uid+", "+record.id+", 'source', 'ngs_samples', this)\">"+record.source+"</td><td onclick=\"editBox("+uid+", "+record.id+", 'organism', 'ngs_samples', this)\">"+record.organism+"</td>"+
+						"<td onclick=\"editBox("+uid+", "+record.id+", 'molecule', 'ngs_samples', this)\">"+record.molecule+"</td><td onclick=\"editBox("+uid+", "+record.id+", 'barcode', 'ngs_samples', this)\">"+record.barcode+"</td>"+
+						"<td onclick=\"editBox("+uid+", "+record.id+", 'description', 'ngs_samples', this)\">"+record.description+"</td><td onclick=\"editBox("+uid+", "+record.id+", 'avg_insert_size', 'ngs_samples', this)\">"+record.avg_insert_size+"</td>"+
+						"<td onclick=\"editBox("+uid+", "+record.id+", 'read_length', 'ngs_samples', this)\">"+record.read_length+"</td><td onclick=\"editBox("+uid+", "+record.id+", 'concentration', 'ngs_samples', this)\">"+record.concentration+"</td>"+
+						"<td onclick=\"editBox("+uid+", "+record.id+", 'time', 'ngs_samples', this)\">"+record.time+"</td><td onclick=\"editBox("+uid+", "+record.id+", 'biological_replica', 'ngs_samples', this)\">"+record.biological_replica+"</td>"+
+						"<td onclick=\"editBox("+uid+", "+record.id+", 'technical_replica', 'ngs_samples', this)\">"+record.technical_replica+"</td><td onclick=\"editBox("+uid+", "+record.id+", 'spike_ins', 'ngs_samples', this)\">"+record.spike_ins+"</td>"+
+						"<td onclick=\"editBox("+uid+", "+record.id+", 'adapter', 'ngs_samples', this)\">"+record.adapter+"</td><td onclick=\"editBox("+uid+", "+record.id+", 'notebook_ref', 'ngs_samples', this)\">"+record.notebook_ref+"</td>"+
+						"<td onclick=\"editBox("+uid+", "+record.id+", 'notes', 'ngs_samples', this)\">"+record.notes+"</td><td onclick=\"editBox("+uid+", "+record.id+", 'genotype', 'ngs_samples', this)\">"+record.genotype+"</td>"+
+						"<td onclick=\"editBox("+uid+", "+record.id+", 'library_type', 'ngs_samples', this)\">"+record.library_type+"</td><td onclick=\"editBox("+uid+", "+record.id+", 'biosample_type', 'ngs_samples', this)\">"+record.biosample_type+"</td>"+
+						"<td onclick=\"editBox("+uid+", "+record.id+", 'instrument_model', 'ngs_samples', this)\">"+record.instrument_model+"</td><td onclick=\"editBox("+uid+", "+record.id+", 'treatment_manufacturer', 'ngs_samples', this)\">"+record.treatment_manufacturer+"</td>"+
+						"<td>"+initialRunWarning+"<input type=\"checkbox\" class=\"ngs_checkbox\" name=\""+record.id+"\" id=\"sample_checkbox_"+record.id+"\" onClick=\"manageCreateChecklists(this.name, 'sample_checkbox')\" "+ checked + ">"+"</td></tr>";
 				}else{
 					return "<tr><td>"+record.id+"</td><td>"+"<a href=\""+BASE_PATH+"/search/details/samples/"+record.id+'/'+theSearch+"\">"+sample_name+"</a>"+"</td><td onclick=\"editBox("+uid+", "+record.id+", 'title', 'ngs_samples', this)\">"+record.title+
 						"</td><td onclick=\"editBox("+uid+", "+record.id+", 'source', 'ngs_samples', this)\">"+record.source+"</td><td onclick=\"editBox("+uid+", "+record.id+", 'organism', 'ngs_samples', this)\">"+record.organism+"</td>"+
@@ -210,6 +274,10 @@ function generateStreamTable(type, queryData, queryType, qvar, rvar, seg, theSea
 					return "<tr><td>"+record.id+"</td><td>"+"<a href=\""+BASE_PATH+"/search/details/samples/"+record.id+'/'+theSearch+"\">"+sample_name+"</a>"+"</td><td onclick=\"editBox("+uid+", "+record.id+", 'title', 'ngs_samples', this)\">"+record.title+
 						"</td><td onclick=\"editBox("+uid+", "+record.id+", 'source', 'ngs_samples', this)\">"+record.source+"</td><td onclick=\"editBox("+uid+", "+record.id+", 'organism', 'ngs_samples', this)\">"+record.organism+"</td><td onclick=\"editBox("+uid+", "+record.id+", 'molecule', 'ngs_samples', this)\">"+record.molecule+"</td><td>"+
 						""+initialRunWarning+"<input type=\"checkbox\" class=\"ngs_checkbox\" name=\""+record.id+"\" id=\"sample_checkbox_"+record.id+"\" onClick=\"manageChecklists(this.name, 'sample_checkbox')\">"+"</td></tr>";
+				}else if (queryType == 'table_create') {
+					return "<tr><td>"+record.id+"</td><td>"+"<a href=\""+BASE_PATH+"/search/details/samples/"+record.id+'/'+theSearch+"\">"+sample_name+"</a>"+"</td><td onclick=\"editBox("+uid+", "+record.id+", 'title', 'ngs_samples', this)\">"+record.title+
+						"</td><td onclick=\"editBox("+uid+", "+record.id+", 'source', 'ngs_samples', this)\">"+record.source+"</td><td onclick=\"editBox("+uid+", "+record.id+", 'organism', 'ngs_samples', this)\">"+record.organism+"</td><td onclick=\"editBox("+uid+", "+record.id+", 'molecule', 'ngs_samples', this)\">"+record.molecule+"</td><td>"+
+						""+initialRunWarning+"<input type=\"checkbox\" class=\"ngs_checkbox\" name=\""+record.id+"\" id=\"sample_checkbox_"+record.id+"\" onClick=\"manageCreateChecklists(this.name, 'sample_checkbox')\" " + checked + ">"+"</td></tr>";
 				}else{
 					return "<tr><td>"+record.id+"</td><td>"+"<a href=\""+BASE_PATH+"/search/details/samples/"+record.id+'/'+theSearch+"\">"+sample_name+"</a>"+"</td><td onclick=\"editBox("+uid+", "+record.id+", 'title', 'ngs_samples', this)\">"+record.title+
 					"</td><td onclick=\"editBox("+uid+", "+record.id+", 'source', 'ngs_samples', this)\">"+record.source+"</td><td onclick=\"editBox("+uid+", "+record.id+", 'organism', 'ngs_samples', this)\">"+record.organism+"</td><td onclick=\"editBox("+uid+", "+record.id+", 'molecule', 'ngs_samples', this)\">"+record.molecule+"</td><tr>";
@@ -369,7 +437,7 @@ function exportExcel(){
 
 $(function() {
 	"use strict";
-
+	
 	//Rerun Check
 	rerunLoad();
 	
@@ -408,7 +476,7 @@ $(function() {
 	});
 
 	/*##### PAGE DETERMINER #####*/
-
+	
 	var qvar = "";
 	var rvar = "";
 	var segment = "";
@@ -447,8 +515,19 @@ $(function() {
 	if (phpGrab.theField == "samples") {
 		reloadBasket();
 	}
-
-	if (phpGrab.theSegment != 'report') {
+	if (phpGrab.theSegment == 'generated') {
+		var json_obj;
+		$.ajax({ type: "GET",
+				url: "http://dolphin.umassmed.edu:8080/dolphin/public/api/getsamplevals.php?" + window.location.href.split("/table/")[1],
+				async: false,
+				success : function(s)
+				{
+					json_obj = JSON.parse(s);
+					console.log(json_obj);
+					generateStreamTable('generated', json_obj, phpGrab.theSegment, qvar, rvar, segment, theSearch, uid, gids);
+				}
+		});
+	}else if (phpGrab.theSegment != 'report') {
 		/*##### SAMPLES TABLE #####*/
 	
 		//var samplesTable = $('#jsontable_samples').dataTable();
@@ -456,8 +535,11 @@ $(function() {
 		var samplesType = "";
 		if (segment == 'selected') {
 			samplesType = "getSelectedSamples";
-		}
-		else{
+			if (window.location.href.split("/")[4] == 'tablecreator') {
+				theSearch = getBasketInfo();
+				qvar = "getTableSamples";
+			}
+		}else{
 			samplesType = "getSamples";
 		}
 		$.ajax({ type: "GET",
@@ -466,6 +548,7 @@ $(function() {
 					async: false,
 					success : function(s)
 					{
+						console.log(s);
 						var changeHTML = '';
 						var hrefSplit = window.location.href.split("/");
 						var typeLocSelected = $.inArray('selected', hrefSplit);
@@ -473,48 +556,34 @@ $(function() {
 						if (typeLocSelected > 0 || typeLocRerun > 0) {
 							theSearch = '';
 						}
-						
 						var type = 'samples';
-						var queryType = samplesType;
+						if (samplesType == 'getSamples' && segment == 'table_create') {
+							var samples_with_runs = [];
+							var objects_with_runs = [];
+							$.ajax({ type: "GET",
+									url: BASE_PATH+"/public/ajax/ngsquerydb.php",
+									data: { p: "samplesWithRuns" },
+									async: false,
+									success : function(k)
+									{
+										for(var x = 0; x < k.length; x++){
+											samples_with_runs.push(k[x].sample_id);
+										}
+									}
+							});
+							for(var z = 0; z < s.length; z++){
+								if (samples_with_runs.indexOf(s[z].id) > -1) {
+									objects_with_runs.push(s[z]);
+								}
+							}
+							s = objects_with_runs;
+							queryType = 'table_create';
+						}else{
+							var queryType = samplesType;
+						}
 						generateStreamTable(type, s, queryType, qvar, rvar, segment, theSearch, uid, gids);
 					}
 			});
-	
-		$('.daterange_samples').daterangepicker(
-				{
-					ranges: {
-						'Today': [moment().subtract('days', 1), moment()],
-						'Yesterday': [moment().subtract('days', 2), moment().subtract('days', 1)],
-						'Last 7 Days': [moment().subtract('days', 6), moment()],
-						'Last 30 Days': [moment().subtract('days', 29), moment()],
-						'This Month': [moment().startOf('month'), moment().endOf('month')],
-						'Last Month': [moment().subtract('month', 1).startOf('month'), moment().subtract('month', 1).endOf('month')],
-						'This Year': [moment().startOf('year'), moment().endOf('year')],
-					},
-					startDate: moment().subtract('days', 29),
-					endDate: moment()
-				},
-		function(start, end) {
-				$.ajax({ type: "GET",
-						url: BASE_PATH+"/public/ajax/ngsquerydb.php",
-						data: { p: samplesType, q: qvar, r: rvar, seg: segment, search: theSearch, uid: uid, gids: gids, start:start.format('YYYY-MM-DD'), end:end.format('YYYY-MM-DD') },
-						async: false,
-						success : function(s)
-						{
-							var changeHTML = '';
-							var hrefSplit = window.location.href.split("/");
-							var typeLocSelected = $.inArray('selected', hrefSplit);
-							var typeLocRerun = $.inArray('rerun', hrefSplit);
-							if (typeLocSelected > 0 || typeLocRerun > 0) {
-								theSearch = '';
-							}
-							
-							var type = 'samples';
-							var queryType = samplesType;
-							generateStreamTable(type, s, queryType, qvar, rvar, segment, theSearch, uid, gids);
-						}
-					});
-		});
 	
 		if (phpGrab.theField == "experiments") {
 			reloadBasket();
@@ -537,37 +606,6 @@ $(function() {
 							}
 						}
 				});
-	
-		$('.daterange_lanes').daterangepicker(
-				{
-					ranges: {
-						'Today': [moment().subtract('days', 1), moment()],
-						'Yesterday': [moment().subtract('days', 2), moment().subtract('days', 1)],
-						'Last 7 Days': [moment().subtract('days', 6), moment()],
-						'Last 30 Days': [moment().subtract('days', 29), moment()],
-						'This Month': [moment().startOf('month'), moment().endOf('month')],
-						'Last Month': [moment().subtract('month', 1).startOf('month'), moment().subtract('month', 1).endOf('month')],
-						'This Year': [moment().startOf('year'), moment().endOf('year')],
-					},
-					startDate: moment().subtract('days', 29),
-					endDate: moment()
-				},
-		function(start, end) {
-				$.ajax({ type: "GET",
-						 url: BASE_PATH+"/public/ajax/ngsquerydb.php",
-						 data: { p: "getLanes", q: qvar, r: rvar, seg: segment, search: theSearch, uid: uid, gids: gids, start:start.format('YYYY-MM-DD'), end:end.format('YYYY-MM-DD') },
-						 async: false,
-						 success : function(s)
-						 {
-							var type = 'lanes';
-							var queryType = "getLanes";
-							if (window.location.href.split("/")[4] == 'search') {
-								generateStreamTable(type, s, queryType, qvar, rvar, segment, theSearch, uid, gids);
-							}
-						 }
-				});
-	
-		});
 	
 		//lanesTable.fnSort( [ [0,'asc'] ] );
 		//lanesTable.fnAdjustColumnSizing(true);
@@ -593,37 +631,6 @@ $(function() {
 						}
 			   });
 	
-		$('.daterange_experiment_series').daterangepicker(
-			   {
-				   ranges: {
-					   'Today': [moment().subtract('days', 1), moment()],
-					   'Yesterday': [moment().subtract('days', 2), moment().subtract('days', 1)],
-					   'Last 7 Days': [moment().subtract('days', 6), moment()],
-					   'Last 30 Days': [moment().subtract('days', 29), moment()],
-					   'This Month': [moment().startOf('month'), moment().endOf('month')],
-					   'Last Month': [moment().subtract('month', 1).startOf('month'), moment().subtract('month', 1).endOf('month')],
-					   'This Year': [moment().startOf('year'), moment().endOf('year')],
-				   },
-				   startDate: moment().subtract('days', 29),
-				   endDate: moment()
-			   },
-	   function(start, end) {
-			   $.ajax({ type: "GET",
-						url: BASE_PATH+"/public/ajax/ngsquerydb.php",
-						data: { p: "getExperimentSeries", q: qvar, r: rvar, seg: segment, search: theSearch, uid: uid, gids: gids, start:start.format('YYYY-MM-DD'), end:end.format('YYYY-MM-DD') },
-						async: false,
-						success : function(s)
-						{
-							var type = 'experiments';
-							var queryType = "getExperimentSeries";
-							if (window.location.href.split("/")[4] == 'search') {
-								generateStreamTable(type, s, queryType, qvar, rvar, segment, theSearch, uid, gids);
-							}
-						}
-				});
-	
-		});
-	
 		//experiment_seriesTable.fnSort( [ [0,'asc'] ] );
 		//experiment_seriesTable.fnAdjustColumnSizing(true);
 	
@@ -634,7 +641,3 @@ $(function() {
 		}
 	}
 });
-
-
-
-
