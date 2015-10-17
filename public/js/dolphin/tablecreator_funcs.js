@@ -200,7 +200,7 @@ function changeTableType(format, query){
 	var json_obj;
 	var beforeFormat = window.location.href.split("/table/")[1].split('format=')[0];
 	$.ajax({ type: "GET",
-			url: "http://dolphin.umassmed.edu:8080/dolphin/public/api/getsamplevals.php?" + beforeFormat + 'format=' + format,
+			url: BASE_PATH+"/public/api/getsamplevals.php?" + beforeFormat + 'format=' + format,
 			async: false,
 			success : function(s)
 			{
@@ -212,6 +212,10 @@ function changeTableType(format, query){
 
 function backToTableIndex(){
 	window.location.href = BASE_PATH+"/tablecreator";
+}
+
+function toBrowserPage(){
+	window.location.href = BASE_PATH+'/search'
 }
 
 function toTableListing(){
@@ -246,7 +250,7 @@ function saveTable() {
 }
 
 function sendTableToPlot(parameters){
-	
+	//to be finished
 }
 
 function deleteTable(id){
@@ -336,7 +340,11 @@ $(function() {
 		});
 		var export_table = document.getElementById('table_export_exp_body');
 		
-		var dropdown = createElement('button',['id','type','class','data-toggle','aria-expanded'],['generated_button','button','margin btn btn-primary dropdown-toggle','dropdown','true']);
+		export_table.appendChild(createElement('textarea',['id','class','rows'],['generated_box','form-control','25']));
+		document.getElementById('generated_box').innerHTML = json_obj;
+		
+		var div = createElement('div',[],[]);
+		var dropdown = createElement('button',['id','type','class','data-toggle','aria-expanded'],['generated_button','button','margin btn btn-primary dropdown-toggle','dropdown','false']);
 		dropdown.innerHTML = 'Download Type  <span class="fa fa-caret-down"></span>';
 		export_table.appendChild(dropdown);
 		
@@ -347,10 +355,9 @@ $(function() {
 		li += '<li><a onclick="changeTableType(\'XML\', \''+beforeFormat+'\')" style="cursor:pointer">XML link</a></li>';
 		
 		ul.innerHTML = li;
-		export_table.appendChild(ul);
-		
-		export_table.appendChild(createElement('textarea',['id','class','rows'],['generated_box','form-control','25']));
-		document.getElementById('generated_box').innerHTML = json_obj;
+		div.appendChild(dropdown);
+		div.appendChild(ul);
+		export_table.appendChild(div);
 	}else{
 		var runparams = $('#jsontable_table_viewer').dataTable({
 			"scrollX": true

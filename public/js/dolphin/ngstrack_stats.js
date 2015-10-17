@@ -518,10 +518,11 @@ $(function() {
 	if (phpGrab.theSegment == 'generated') {
 		var json_obj;
 		$.ajax({ type: "GET",
-				url: "http://dolphin.umassmed.edu:8080/dolphin/public/api/getsamplevals.php?" + window.location.href.split("/table/")[1],
+				url: BASE_PATH +"/public/api/getsamplevals.php?" + window.location.href.split("/table/")[1],
 				async: false,
 				success : function(s)
 				{
+					console.log(s);
 					json_obj = JSON.parse(s);
 					console.log(json_obj);
 					generateStreamTable('generated', json_obj, phpGrab.theSegment, qvar, rvar, segment, theSearch, uid, gids);

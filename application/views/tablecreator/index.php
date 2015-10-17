@@ -48,6 +48,7 @@
 								<?php echo $html->getExpandingAnalysisBox('Additional Sample Selection', "table_create", false); ?>
 							</div>
 							<div class="margin col-md-9">
+								<button class="btn btn-box-tool btn-primary margin pull-right" onclick="toBrowserPage()">Back to Browser</button>
 								<button class="btn btn-box-tool btn-primary margin pull-right" onclick="tableCreatorPage()">Generate Table</button>
 								<button class="btn btn-box-tool btn-primary margin pull-right" onclick="toTableListing()">To Created Tables</button>
 							</div>
