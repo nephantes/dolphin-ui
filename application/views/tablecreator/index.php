@@ -28,8 +28,18 @@
 											</h3>
 										</div>
 										<div class= "box-body">
-											<select id="report_multi_box" class="form-control" size="16" multiple>
+											<select id="report_multi_box" class="form-control" size="20" multiple>
 											</select>
+										</div>
+										<div class="box-footer">
+											<div>
+												<h4>Table saved as:
+												</h4>
+												<input type="text" id="input_table_name" class="form-control">
+											</div>
+											<div>
+												<button class="btn btn-primary margin" onclick="saveTable()">Save Table</button>
+											</div>
 										</div>
 									</div>
 								</div>
@@ -38,7 +48,8 @@
 								<?php echo $html->getExpandingAnalysisBox('Additional Sample Selection', "table_create", false); ?>
 							</div>
 							<div class="margin col-md-9">
-								<button class="btn btn-box-tool btn-primary margin pull-right" onclick="sendToTableGen()">Generate Table</button>
+								<button class="btn btn-box-tool btn-primary margin pull-right" onclick="tableCreatorPage()">Generate Table</button>
+								<button class="btn btn-box-tool btn-primary margin pull-right" onclick="toTableListing()">To Created Tables</button>
 							</div>
 						</div><!-- /.col (LEFT) -->
 					</div><!-- /.row -->

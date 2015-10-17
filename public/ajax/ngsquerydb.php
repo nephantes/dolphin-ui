@@ -12,8 +12,7 @@ $pDictionary = ['getSelectedSamples', 'submitPipeline', 'getStatus', 'getRunSamp
 				'checkMatePaired', 'getAllSampleIds', 'getLaneIdFromSample', 'getSingleSample', 'getSeriesIdFromLane', 'getAllLaneIds',
                 'getGIDs', 'getSampleNames', 'getWKey', 'getFastQCBool', 'getReportList', 'getTSVFileList', 'profileLoad',
                 'obtainAmazonKeys', 'checkAmazonPermissions', 'getInfoBoxData', 'getSamplesFromName', 'getLanesWithSamples',
-                'getLanesFromName', 'getSamplesfromExperimentSeries', 'getExperimentIdFromSample', 'getTableSamples', 'getTableRuns',
-				'getTableReportsList', 'samplesWithRuns'];
+                'getLanesFromName', 'getSamplesfromExperimentSeries', 'getExperimentIdFromSample',];
 
 $data = "";
                 
@@ -655,63 +654,6 @@ else if ($p == 'getSamplesfromExperimentSeries')
     FROM ngs_samples
     where series_id = $experiment
     ");
-}
-else if ($p == 'getTableSamples')
-{
-	$data=$query->queryTable("
-    SELECT id, samplename
-	FROM ngs_samples
-	WHERE id IN ( $search )
-    ");
-}
-else if ($p == 'getTableRuns')
-{
-	$data=$query->queryTable("
-    SELECT run_id, sample_id, run_name, wkey
-	FROM ngs_runlist
-	LEFT JOIN ngs_runparams
-	ON ngs_runlist.run_id = ngs_runparams.id
-	WHERE sample_id IN ( $search )
-	AND run_name NOT LIKE '%Initial Run%'
-    ");
-}
-else if ($p == 'getTableReportsList')
-{
-	if (isset($_GET['wkey'])){$wkey = $_GET['wkey'];}
-	$key_count = count(explode(",",$wkey));
-	if($key_count == 1){
-		$data=$query->queryTable("
-		SELECT file
-		FROM report_list
-		WHERE wkey = '". $wkey ."'
-		");
-	}else{
-		$data=$query->queryTable("
-		SELECT file
-		FROM report_list
-		WHERE wkey IN ( '". implode("','", explode(",",$wkey))."' )
-		");
-	}
-}
-else if ($p == 'samplesWithRuns')
-{
-	$run_ids_json=json_decode($query->queryTable("
-		SELECT distinct ngs_runparams.`id`, ngs_runparams.`run_name` NOT LIKE '%Initial Run%' as `irc`
-		FROM biocore.ngs_runparams
-		LEFT JOIN report_list
-		ON ngs_runparams.wkey = report_list.wkey
-		"));
-	$run_ids = array();
-	foreach($run_ids_json as $rij){
-		if($rij->irc == '1'){
-			array_push($run_ids, $rij->id);
-		}
-	}
-	$data=$query->queryTable("
-		SELECT distinct sample_id
-		FROM ngs_runlist
-		WHERE run_id in ( " . implode(",",$run_ids) . " )
-		");
 }
 
 header('Cache-Control: no-cache, must-revalidate');

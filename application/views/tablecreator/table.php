@@ -21,9 +21,13 @@
 						</div>
 						<div class="col-md-12">
 							<div id="text_table" class="margin col-md-9">
-								<?php echo $html->getExpandingAnalysisBox('Export Table', "table_export", true); ?>
+								<?php echo $html->getExpandingAnalysisBox('Export Table', "table_export", false); ?>
+							</div>
+							<div id="name_run_box" class="margin col-md-9">
+								<?php echo $html->getStaticSelectionBox("Save Table As:", "input_table_name", "TEXT", 12)?>
 							</div>
 							<div class="margin col-md-9">
+								<button class="btn btn-box-tool btn-primary margin pull-right" onclick="saveTable()">Save Table</button>
 								<button class="btn btn-box-tool btn-primary margin pull-right" onclick="backToTableIndex()">Back</button>
 							</div>
 						</div><!-- /.col (LEFT) -->

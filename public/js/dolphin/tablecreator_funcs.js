@@ -17,7 +17,7 @@ function manageCreateChecklists(id, samplename){
 	if (ids.indexOf(id) < 0) {
 		//add
 		$.ajax({ type: "GET",
-				url: BASE_PATH+"/public/ajax/ngsquerydb.php",
+				url: BASE_PATH+"/public/ajax/tablegenerator.php",
 				data: { p: "getTableRuns", search: id },
 				async: false,
 				success : function(s)
@@ -38,7 +38,7 @@ function manageCreateChecklists(id, samplename){
 					}
 				}});
 		$.ajax({ type: "GET",
-				url: BASE_PATH+"/public/ajax/ngsquerydb.php",
+				url: BASE_PATH+"/public/ajax/tablegenerator.php",
 				data: { p: "getTableSamples", search: id },
 				async: false,
 				success : function(s)
@@ -88,7 +88,7 @@ function reportSelection(){
 	var wkey_count = wkeys.length;
 	
 	$.ajax({ type: "GET",
-			url: BASE_PATH+"/public/ajax/ngsquerydb.php",
+			url: BASE_PATH+"/public/ajax/tablegenerator.php",
 			data: { p: "getTableReportsList", wkey: wkeys.toString() },
 			async: false,
 			success : function(s)
@@ -188,8 +188,12 @@ function sendToTableGen(){
 	
 	var filter_send = '';
 	
-	window.location.href = BASE_PATH + '/tablecreator/table/' + samples_send + file_send +
+	return samples_send + file_send +
 		common_send + keepcols_send + key_send + type_send + format_send + filter_send;
+}
+
+function tableCreatorPage(){
+	window.location.href = BASE_PATH + '/tablecreator/table/' + sendToTableGen();
 }
 
 function changeTableType(format, query){
@@ -210,10 +214,58 @@ function backToTableIndex(){
 	window.location.href = BASE_PATH+"/tablecreator";
 }
 
+function toTableListing(){
+	window.location.href = BASE_PATH+"/tablecreator/tablereports";
+}
+
+function rerunSelected(link) {
+	window.location.href = BASE_PATH + '/tablecreator/table/' + link;
+}
+
+function saveTable() {
+	var name = document.getElementById('input_table_name').value;
+	var parameters;
+	if (window.location.href.split("/").indexOf('table') > -1) {
+		parameters = window.location.href.split("/table/")[1];
+	}else{
+		parameters = sendToTableGen();
+	}
+	var pass = false;
+	$.ajax({ type: "GET",
+				url: BASE_PATH+"/public/ajax/tablegenerator.php",
+				data: { p: "createNewTable", search: parameters, name: name },
+				async: false,
+				success : function(s)
+				{
+					pass = true;
+				}
+		});
+	if (pass == true) {
+		toTableListing();
+	}
+}
+
+function sendTableToPlot(parameters){
+	
+}
+
+function deleteTable(id){
+	$.ajax({ type: "GET",
+				url: BASE_PATH+"/public/ajax/tablegenerator.php",
+				data: { p: "deleteTable", id: id },
+				async: false,
+				success : function(s)
+				{
+				}
+		});
+	location.reload();
+}
+
 $(function() {
 	"use strict";
 	
-	if(window.location.href.split("/")[5] != 'table'){
+	if(window.location.href.split("/").indexOf('table') < 0 && window.location.href.split("/").indexOf('tablereports') < 0){
+		console.log('test');
 		var sample_ids = getBasketInfo();
 		checklist_samples =  sample_ids.split(',');
 		var runparams = $('#jsontable_selected_samples').dataTable();
@@ -221,7 +273,7 @@ $(function() {
 		var samples_with_runs =[];
 		
 		$.ajax({ type: "GET",
-				url: BASE_PATH+"/public/ajax/ngsquerydb.php",
+				url: BASE_PATH+"/public/ajax/tablegenerator.php",
 				data: { p: "getTableRuns", search: sample_ids },
 				async: false,
 				success : function(s)
@@ -242,7 +294,7 @@ $(function() {
 				}});
 		
 		$.ajax({ type: "GET",
-				url: BASE_PATH+"/public/ajax/ngsquerydb.php",
+				url: BASE_PATH+"/public/ajax/tablegenerator.php",
 				data: { p: "getTableSamples", search: sample_ids },
 				async: false,
 				success : function(s)
@@ -271,11 +323,11 @@ $(function() {
 					}
 				}});
 		reportSelection();
-	}else{
+	}else if (window.location.href.split("/").indexOf('table') > -1){
 		var json_obj;
 		var beforeFormat = window.location.href.split("/table/")[1].split('format=')[0];
 		$.ajax({ type: "GET",
-				url: "http://dolphin.umassmed.edu:8080/dolphin/public/api/getsamplevals.php?" + beforeFormat + 'format=html',
+				url: BASE_PATH +"/public/api/getsamplevals.php?" + beforeFormat + 'format=html',
 				async: false,
 				success : function(s)
 				{
@@ -299,5 +351,45 @@ $(function() {
 		
 		export_table.appendChild(createElement('textarea',['id','class','rows'],['generated_box','form-control','25']));
 		document.getElementById('generated_box').innerHTML = json_obj;
+	}else{
+		var runparams = $('#jsontable_table_viewer').dataTable({
+			"scrollX": true
+		});
+		$.ajax({ type: "GET",
+				url: BASE_PATH+"/public/ajax/tablegenerator.php",
+				data: { p: "getCreatedTables" },
+				async: false,
+				success : function(s)
+				{
+					runparams.fnClearTable();
+					for(var x = 0; x < s.length; x++){
+						var splitParameters = s[x].parameters.split('&');
+						var splitSampleRuns = splitParameters[0].split('samples=')[1].split(":");
+						var stringSampleRuns = '';
+						console.log(splitSampleRuns);
+						for(var run in splitSampleRuns){
+							if (run == splitSampleRuns.length - 1) {
+								stringSampleRuns += 'Run: ' + splitSampleRuns[run].split(';')[1] + ' Samples: ' + splitSampleRuns[run].split(';')[0];
+							}else{
+								stringSampleRuns += 'Run: ' + splitSampleRuns[run].split(';')[1] + ' Samples: ' + splitSampleRuns[run].split(';')[0] + ' | ';
+							}
+						}
+						runparams.fnAddData([
+							s[x].id,
+							s[x].name,
+							stringSampleRuns,
+							splitParameters[1].split('file=')[1],
+							'<div class="btn-group pull-right">' +
+								'<button type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown" aria-expanded="true">Options <span class="fa fa-caret-down"></span></button>' +
+								'<ul class="dropdown-menu" role="menu">' + 
+									'<li><a href="" id="' + s[x].id+'" onclick="rerunSelected(\''+s[x].parameters+'\')">View</a></li>' +
+									//'<li><a href="" id="' + s[x].id+'" onclick="sendTableToPlot(\''+s[x].parameters+'\')">Plot</a></li>' +
+									'<li><a href="" id="' + s[x].id+'" onclick="deleteTable(this.id)">Delete</a></li>' +
+								'</ul>'+
+							'</div>'
+						]);
+					}
+				}
+		});
 	}
 });

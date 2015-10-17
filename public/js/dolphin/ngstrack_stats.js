@@ -13,9 +13,9 @@ function generateStreamTable(type, queryData, queryType, qvar, rvar, seg, theSea
 		delete queryData.title;
 		var new_header = '<tr>';
 		for (var y = 0; y < keys.length; y++) {
-			keys[y] = keys[y].replace(/ /g,"_").replace(/>/g,"_");
 			new_header += '<th data-sort="'+y+'::string" onclick="shiftColumns(this)">'+
 						keys[y]+'<i id="'+y+'" class="pull-right fa fa-unsorted"></i></th>';
+			keys[y] = keys[y].replace(/ /g,"_").replace(/>/g,"_");
 		}
 		for(var key in queryData){
 			if (Array.isArray(queryData[key])) {
@@ -527,7 +527,7 @@ $(function() {
 					generateStreamTable('generated', json_obj, phpGrab.theSegment, qvar, rvar, segment, theSearch, uid, gids);
 				}
 		});
-	}else if (phpGrab.theSegment != 'report') {
+	}else if (phpGrab.theSegment != 'report' && phpGrab.theSegment != 'table_viewer') {
 		/*##### SAMPLES TABLE #####*/
 	
 		//var samplesTable = $('#jsontable_samples').dataTable();
@@ -561,7 +561,7 @@ $(function() {
 							var samples_with_runs = [];
 							var objects_with_runs = [];
 							$.ajax({ type: "GET",
-									url: BASE_PATH+"/public/ajax/ngsquerydb.php",
+									url: BASE_PATH+"/public/ajax/tablegenerator.php",
 									data: { p: "samplesWithRuns" },
 									async: false,
 									success : function(k)
