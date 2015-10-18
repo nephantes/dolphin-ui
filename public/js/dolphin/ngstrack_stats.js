@@ -196,8 +196,10 @@ function generateStreamTable(type, queryData, queryType, qvar, rvar, seg, theSea
 		}else{
 			sample_name = record.samplename;
 		}
-		
-		var basketSamples = getBasketInfo().split(",");
+		var basketSamples = [];
+		if (getBasketInfo() != undefined) {
+			basketSamples = getBasketInfo().split(",");
+		}
 		var checked = '';
 		if (queryType == 'table_create') {
 			if (basketSamples.indexOf(record.id) > -1) {
