@@ -1,16 +1,21 @@
+var selectionHelper = [];
+var runHelper = [];
 
 function removeTableSamples(id, button){
 	var table = $('#jsontable_selected_samples').dataTable();
 	var row = $(button).closest('tr');
 	table.fnDeleteRow(row);
 	table.fnDraw();
-	console.log(checklist_samples.indexOf(id));
 	checklist_samples.splice(checklist_samples.indexOf(id), 1);
+	selectionHelper.splice(runHelper.indexOf(id), 1);
+	runHelper.splice(runHelper.indexOf(id), 1);
+	checkCheckedList();
 	removeBasketInfo(id);
 	reportSelection();
+	document.getElementById('sample_checkbox_'+id).checked = false;
 }
 
-function manageCreateChecklists(id, samplename){
+function manageCreateChecklists(id, tablerow){
 	var table = $('#jsontable_selected_samples').dataTable();
 	
 	var run_ids = [];
@@ -26,7 +31,6 @@ function manageCreateChecklists(id, samplename){
 				async: false,
 				success : function(s)
 				{
-					console.log(s);
 					for(var i = 0; i < s.length; i ++){
 						if (run_ids[s[i].sample_id] == undefined) {
 							if (s[i].run_name != null) {
@@ -62,6 +66,8 @@ function manageCreateChecklists(id, samplename){
 							run_select,
 							'<button id="sample_removal_'+s[i].id+'" class="btn btn-danger btn-xs pull-right" onclick="removeTableSamples(\''+s[i].id+'\', this)"><i class=\"fa fa-times\"></i></button>'
 							]);
+						runHelper.push(s[i].id);
+						selectionHelper.push(0);
 					}
 				}});
 		checklist_samples.push(id);
@@ -70,6 +76,7 @@ function manageCreateChecklists(id, samplename){
 	}else{
 		//remove
 		removeTableSamples(id, document.getElementById('sample_removal_'+id));
+		console.log(document.getElementById('sample_checkbox_'+id).checked);
 	}
 }
 
@@ -81,15 +88,16 @@ function reportSelection(){
 		ids = getBasketInfo().split(",");
 	}
 	for(var y = 0; y < ids.length; y++){
-		var option_get = $('#jsontable_selected_samples').dataTable().fnGetData();
+		var table = $('#jsontable_selected_samples').dataTable();
+		var option_get = table.fnGetData();
 		for(var r = 0; r < option_get.length; r++){
 			var option_selected = $(option_get[r][2])[0];
-			if (wkeys.indexOf(option_selected.options[option_selected.selectedIndex].value) < 0) {
-				wkeys.push(option_selected.options[option_selected.selectedIndex].value);
+			option_selected.click();
+			if (wkeys.indexOf(option_selected.options[selectionHelper[y]].value) < 0) {
+				wkeys.push(option_selected.options[selectionHelper[y]].value);
 			}
 		}
 	}
-	console.log(wkeys);
 	var wkey_count = wkeys.length;
 	
 	$.ajax({ type: "GET",
@@ -142,7 +150,7 @@ function sendToTableGen(){
 	var run_array = [];
 	for(var r = 0; r < option_get.length; r++){
 		var option_selected = $(option_get[r][2])[0];
-		var run_id = option_selected.options[option_selected.selectedIndex].id.split("_")[0]
+		var run_id = option_selected.options[selectionHelper[r]].id.split("_")[0]
 		if (run_array[run_id] == undefined) {
 			run_array[run_id] = option_get[r][0];
 		}else{
@@ -254,6 +262,10 @@ function saveTable() {
 	}
 }
 
+function optionSelection(args) {
+	console.log(args);
+}
+
 function sendTableToPlot(parameters){
 	//to be finished
 }
@@ -270,17 +282,24 @@ function deleteTable(id){
 	location.reload();
 }
 
+function optionChange(selector){
+	selectionHelper[runHelper.indexOf(selector.id.split('_')[0])] = selector.selectedIndex;
+	
+	reportSelection();
+}
+
 $(function() {
 	"use strict";
 	
 	if(window.location.href.split("/").indexOf('table') < 0 && window.location.href.split("/").indexOf('tablereports') < 0){
 		//	If within tablecreator page, get basket info
 		var sample_ids = getBasketInfo();
-		var checklist_samples = [];
+		checklist_samples = [];
 		if (sample_ids != undefined) {
 			checklist_samples =  sample_ids.split(',');
 		}
-		var runparams = $('#jsontable_selected_samples').dataTable();
+		console.log(checklist_samples);
+		var runparams = $('#jsontable_selected_samples').dataTable({ autoFill: true });
 		var run_ids = [];
 		var samples_with_runs =[];
 		
@@ -304,7 +323,7 @@ $(function() {
 						}
 					}
 				}});
-		
+		console.log(run_ids);
 		$.ajax({ type: "GET",
 				url: BASE_PATH+"/public/ajax/tablegenerator.php",
 				data: { p: "getTableSamples", search: sample_ids },
@@ -319,18 +338,23 @@ $(function() {
 						checkbox.checked = true;
 						*/
 						var run_info = [];
-						var run_select = '<select id="'+ s[i].id + '_run_select" class="form-control" onchange="reportSelection()">';
+						var wkey_passer = [];
+						var run_select = '<select id="'+ s[i].id + '_run_select" class="form-control" onchange="optionChange(this)"><form>';
 						for(var x = 0; x < run_ids[s[i].id].length; x = x+3){
-							//Sample id _ Run id _ Run name
+							//	Add wkey's to runID
+							wkey_passer.push(run_ids[s[i].id][x+2]);
+							//	Sample id _ Run id _ Run name
 							run_select += '<option id="' + run_ids[s[i].id][x]+ '_' + run_ids[s[i].id][x+1] + '" value="'+ run_ids[s[i].id][x+2] + '">Run ' + run_ids[s[i].id][x] + ': ' + run_ids[s[i].id][x+1] + '</option>'
 						}
-						run_select += '</select>';
+						run_select += '</form></select>';
+						runHelper.push(s[i].id);
+						selectionHelper.push(0);
 						
 						runparams.fnAddData([
 							s[i].id,
 							s[i].samplename,
 							run_select,
-							'<button id="sample_removal_'+s[i].id+'" class="btn btn-danger btn-xs pull-right" onclick="removeTableSamples(\''+s[i].id+'\', this)"><i class=\"fa fa-times\"></i></button>'
+							'<button id="sample_removal_'+s[i].id+'" class="btn btn-danger btn-xs pull-right" onclick="manageCreateChecklists(\''+s[i].id+'\', this)"><i class=\"fa fa-times\"></i></button>'
 							]);
 					}
 				}});
@@ -343,6 +367,7 @@ $(function() {
 				async: false,
 				success : function(s)
 				{
+					console.log(s);
 					json_obj = s;
 				}
 		});
@@ -381,7 +406,6 @@ $(function() {
 						var splitParameters = s[x].parameters.split('&');
 						var splitSampleRuns = splitParameters[0].split('samples=')[1].split(":");
 						var stringSampleRuns = '';
-						console.log(splitSampleRuns);
 						for(var run in splitSampleRuns){
 							if (run == splitSampleRuns.length - 1) {
 								stringSampleRuns += 'Run: ' + splitSampleRuns[run].split(';')[1] + ' Samples: ' + splitSampleRuns[run].split(';')[0];
@@ -397,7 +421,7 @@ $(function() {
 							'<div class="btn-group pull-right">' +
 								'<button type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown" aria-expanded="true">Options <span class="fa fa-caret-down"></span></button>' +
 								'<ul class="dropdown-menu" role="menu">' + 
-									'<li><a href="" id="' + s[x].id+'" onclick="rerunSelected(\''+s[x].parameters+'\')">View</a></li>' +
+									'<li><a href="'+BASE_PATH+'/public/tablecreator/table/'+s[x].parameters+'" id="' + s[x].id+'">View</a></li>' +
 									//'<li><a href="" id="' + s[x].id+'" onclick="sendTableToPlot(\''+s[x].parameters+'\')">Plot</a></li>' +
 									'<li><a href="" id="' + s[x].id+'" onclick="deleteTable(this.id)">Delete</a></li>' +
 								'</ul>'+
