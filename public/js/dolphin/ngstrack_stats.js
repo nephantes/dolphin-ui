@@ -303,11 +303,12 @@ function generateStreamTable(type, queryData, queryType, qvar, rvar, seg, theSea
 		pagination: function(summary){
 			$('#'+type+'_summary').text( summary.from + ' to '+ summary.to +' of '+ summary.total +' entries');
 			if (type == "samples") {
-				checkCheckedList();
+				if (queryType != 'table_create') {
+					checkCheckedList();
+				}
 			}else if (type == 'lanes') {
 				checkCheckedLanes();
 			}
-			
 		},
 		after_add: function(){
 			//Only for example: Stop ajax streaming beacause from localfile data size never going to empty.

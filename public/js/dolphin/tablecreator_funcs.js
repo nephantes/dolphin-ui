@@ -7,13 +7,17 @@ function removeTableSamples(id, button){
 	console.log(checklist_samples.indexOf(id));
 	checklist_samples.splice(checklist_samples.indexOf(id), 1);
 	removeBasketInfo(id);
+	reportSelection();
 }
 
 function manageCreateChecklists(id, samplename){
 	var table = $('#jsontable_selected_samples').dataTable();
 	
 	var run_ids = [];
-	var ids = getBasketInfo().split(",");
+	var ids = [];
+	if (getBasketInfo() != undefined) {
+		ids = getBasketInfo().split(",");
+	}
 	if (ids.indexOf(id) < 0) {
 		//add
 		$.ajax({ type: "GET",
@@ -62,19 +66,20 @@ function manageCreateChecklists(id, samplename){
 				}});
 		checklist_samples.push(id);
 		sendBasketInfo(id);
+		reportSelection();
 	}else{
 		//remove
 		removeTableSamples(id, document.getElementById('sample_removal_'+id));
 	}
-	
-	reportSelection();
-	
 }
 
 function reportSelection(){
 	wkeys = [];
 	reports = [];
-	var ids = getBasketInfo().split(",");
+	var ids = [];
+	if (getBasketInfo() != undefined) {
+		ids = getBasketInfo().split(",");
+	}
 	for(var y = 0; y < ids.length; y++){
 		var option_get = $('#jsontable_selected_samples').dataTable().fnGetData();
 		for(var r = 0; r < option_get.length; r++){
@@ -269,9 +274,12 @@ $(function() {
 	"use strict";
 	
 	if(window.location.href.split("/").indexOf('table') < 0 && window.location.href.split("/").indexOf('tablereports') < 0){
-		console.log('test');
+		//	If within tablecreator page, get basket info
 		var sample_ids = getBasketInfo();
-		checklist_samples =  sample_ids.split(',');
+		var checklist_samples = [];
+		if (sample_ids != undefined) {
+			checklist_samples =  sample_ids.split(',');
+		}
 		var runparams = $('#jsontable_selected_samples').dataTable();
 		var run_ids = [];
 		var samples_with_runs =[];
