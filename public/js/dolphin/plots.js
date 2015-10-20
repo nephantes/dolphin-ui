@@ -94,18 +94,19 @@ var getSrc=function(){
     
     if($("#source_1").val()=="input"){
 		src= document.getElementById("source").value || document.getElementById("source").placeholder;
-	   
+		console.log(src);
 		var re=/^http/;
 		var OK=re.exec(src);
 		if(!OK){
 			S.gsheet.query("select *", src, "window.handle_sheet_index")   
 		}else{
-			d3.json(BASE_PATH + "/public/api/?format=json2&source="+src,function(error,data){
+			d3.json(src,function(error,data){
 				window.handle_sheet_index(data);})
 		}
 	}else{
 		src= document.getElementById("source_1").value || document.getElementById("source").placeholder;
 		src = API_PATH+'/public/pub/'+wkey+'/'+src;
+		console.log(BASE_PATH + "/public/api/?format=json2&source="+src);
 		var re=/^http/;
 		var OK=re.exec(src);
 		if(!OK){

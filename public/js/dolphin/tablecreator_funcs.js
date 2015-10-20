@@ -363,7 +363,7 @@ $(function() {
 		var json_obj;
 		var beforeFormat = window.location.href.split("/table/")[1].split('format=')[0];
 		$.ajax({ type: "GET",
-				url: BASE_PATH +"/public/api/getsamplevals.php?" + beforeFormat + 'format=html',
+				url: BASE_PATH +"/public/api/getsamplevals.php?" + beforeFormat + 'format=json2',
 				async: false,
 				success : function(s)
 				{
