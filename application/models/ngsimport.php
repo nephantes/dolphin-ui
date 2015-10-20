@@ -451,8 +451,7 @@ class Ngsimport extends VanillaModel {
 					$lane_check = false;
 				}
 			}else{
-				$text.= $this->warningText("Lane id not specified.  Specific lane id set to 0, please change (row " . $i . ")");
-				$lane->lane_id=0;
+				$lane->lane_id = NULL;
 			}
 			
 			if(!isset($lane->total_reads)){
