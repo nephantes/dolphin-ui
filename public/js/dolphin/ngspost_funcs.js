@@ -105,9 +105,9 @@ function confirmDeleteRunparams(run_id){
             async:	false,
             success: function(r)
             {
-               location.reload();
             }
    });
+   location.reload();
 }
 
 function killRun(run_id){

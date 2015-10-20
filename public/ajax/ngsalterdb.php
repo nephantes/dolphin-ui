@@ -147,11 +147,8 @@ else if ($p == 'deleteRunparams')
     
     killPid($run_id, $query);
     
-    $data=$query->runSQL("
-	UPDATE ngs_runparams
-    SET run_status=5
-    WHERE id = $run_id
-    ");
+	$query->runSQL("DELETE FROM ngs_runlist WHERE run_id = $run_id");
+	$query->runSQL("DELETE FROM ngs_runparams WHERE id = $run_id");
 }
 else if ($p == 'noAddedParamsRerun')
 {
