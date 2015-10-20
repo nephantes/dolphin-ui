@@ -468,7 +468,9 @@ class Ngsimport extends VanillaModel {
 					$this->final_check = false;
 					$lane_check = false;
 				}
-				
+				if(!isset($lane->lane_id)){
+					$lane->lane_id = NULL;
+				}
 				if(!isset($lane->total_reads)){
 					$lane->total_reads = NULL;
 				}
@@ -480,24 +482,6 @@ class Ngsimport extends VanillaModel {
 					$lane->resequenced == null || $lane->notes == null){
 					$lane_warning_check = true;
 				}
-<<<<<<< HEAD
-			}else{
-				$lane->lane_id = NULL;
-			}
-			
-			if(!isset($lane->total_reads)){
-				$lane->total_reads = NULL;
-			}
-			
-			//	Other Values
-			if($lane->facility == null || $lane->cost == null ||
-				$lane->date_submitted ==  null || $lane->date_received == null ||
-				$lane->total_reads == null || $lane->phix_requested == null ||
-				$lane->phix_in_lane == null || $lane->total_samples == null ||
-				$lane->resequenced == null || $lane->notes == null){
-				$lane_warning_check = true;
-=======
->>>>>>> 3f15e693c5ca100b54c17bc57a565463923ede3f
 			}
 		}
 		if($lane_warning_check){
@@ -1087,7 +1071,7 @@ class Ngsimport extends VanillaModel {
 			//For every directory added, find the id from the fastq directory and the backup directory
 			$dir_ids_check = [];
 			foreach($this->dir_arr as $da){
-				$dir_id_ret = json_decode($this->query("SELECT id FROM ngs_dirs WHERE fastq_dir = '" . $da->fastq_dir . "' and backup_dir = '" . $da->backup_dir . "'"));
+				$dir_id_ret = json_decode($this->query("SELECT id FROM ngs_dirs WHERE fastq_dir = '" . $da->fastq_dir . "' and backup_dir = '" . $this->backup_dir . "'"));
 				array_push($dir_ids_check, $dir_id_ret[0]->id);
 			}
 			
@@ -2121,7 +2105,7 @@ class dirs extends main{
 
 	function getId($dir)
 	{
-		$sql="select id from ngs_dirs where `fastq_dir`='".$dir->fastq_dir."' and `backup_dir` = '" . $dir->backup_dir."'";
+		$sql="select id from ngs_dirs where `fastq_dir`='".$dir->fastq_dir."' and `backup_dir` = '" . $this->backup_dir."'";
 		return $this->model->query($sql,1);
 	}
 
