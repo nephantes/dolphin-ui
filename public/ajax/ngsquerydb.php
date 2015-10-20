@@ -12,7 +12,7 @@ $pDictionary = ['getSelectedSamples', 'submitPipeline', 'getStatus', 'getRunSamp
 				'checkMatePaired', 'getAllSampleIds', 'getLaneIdFromSample', 'getSingleSample', 'getSeriesIdFromLane', 'getAllLaneIds',
                 'getGIDs', 'getSampleNames', 'getWKey', 'getFastQCBool', 'getReportList', 'getTSVFileList', 'profileLoad',
                 'obtainAmazonKeys', 'checkAmazonPermissions', 'getInfoBoxData', 'getSamplesFromName', 'getLanesWithSamples',
-                'getLanesFromName'];
+                'getLanesFromName', 'getSamplesfromExperimentSeries', 'getExperimentIdFromSample'];
 
 $data = "";
                 
@@ -402,7 +402,7 @@ else if ($p =='getStatus')
 	$time="";
 	if (isset($start)){$time="and `date_created`>='$start' and `date_created`<='$end'";}
 	$data=$query->queryTable("
-	SELECT id, run_group_id, run_name, outdir, run_description, run_status
+	SELECT id, run_group_id, run_name, wkey, outdir, run_description, run_status
 	FROM ngs_runparams
 	$perms $time
 	");
@@ -413,7 +413,7 @@ else if($p == 'getRunSamples')
 	if (isset($_GET['runID'])){$runID = $_GET['runID'];}
 
 	$data=$query->queryTable("
-	SELECT sample_id
+	SELECT DISTINCT sample_id
 	FROM ngs_runlist
 	WHERE ngs_runlist.run_id = $runID $andPerms
 	");
@@ -487,6 +487,18 @@ else if ($p == 'getLaneIdFromSample')
 				from ngs_samples
 				where ngs_samples.id = $sample)
         $andPerms;
+	");
+}
+else if ($p == 'getExperimentIdFromSample')
+{
+    if (isset($_GET['sample'])){$sample = $_GET['sample'];}
+    $data=$query->queryTable("
+		SELECT id
+		FROM ngs_experiment_series
+		where id =
+				(select series_id
+				from ngs_samples
+				where ngs_samples.id = $sample);
 	");
 }
 else if($p == 'getSingleSample')
@@ -610,23 +622,13 @@ else if($p == 'getSamplesFromName')
             $sqlnames.= "'".$n."'";    
         }
     }
-    if(strpos($lane, ',') !== false){
-        $data=$query->queryTable("
-        SELECT DISTINCT ns.id
-        FROM ngs_samples ns, ngs_lanes nl, ngs_experiment_series ne 
-        WHERE ns.name in ($sqlnames)
-        AND nl.id = ns.lane_id and nl.name in ($lane)
-        AND ns.series_id = ne.id and ne.experiment_name = '$experiment';
-        ");
-    }else{
-        $data=$query->queryTable("
-        SELECT DISTINCT ns.id
-        FROM ngs_samples ns, ngs_lanes nl, ngs_experiment_series ne 
-        WHERE ns.name in ($sqlnames)
-        AND nl.id = ns.lane_id and nl.name = $lane
-        AND ns.series_id = ne.id and ne.experiment_name = '$experiment';
-        ");
-    }
+    $data=$query->queryTable("
+    SELECT DISTINCT ns.id
+    FROM ngs_samples ns, ngs_lanes nl, ngs_experiment_series ne 
+    WHERE ns.name in ($sqlnames)
+    AND ns.lane_id IN (SELECT id from ngs_lanes where name in ($lane))
+    AND ns.series_id IN (SELECT id from ngs_experiment_series where experiment_name = '$experiment');
+    ");
 }
 else if ($p == 'getLanesWithSamples')
 {
@@ -642,6 +644,15 @@ else if ($p == 'getLanesWithSamples')
             WHERE total_reads > 0
         )
     )
+    ");
+}
+else if ($p == 'getSamplesfromExperimentSeries')
+{
+    if (isset($_GET['experiment'])){$experiment = $_GET['experiment'];}
+    $data=$query->queryTable("
+    SELECT id
+    FROM ngs_samples
+    where series_id = $experiment
     ");
 }
 

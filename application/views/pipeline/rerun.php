@@ -55,7 +55,7 @@
 					</div><!-- /.row -->
 					<div class="row">
 						<?php echo $html->getStaticSelectionBox("Name the Run", "run_name", "TEXT", 4)?>
-						<?php echo $html->getStaticSelectionBox("Description", "description", "TEXT", 8)?>
+						<?php echo $html->getStaticSelectionBox("Run Description", "run_description", "TEXT", 8)?>
 						<?php echo $html->getStaticSelectionBox("Genome Build", "genomebuild", "<option>human,hg19</option>
 																				<option>hamster,cho-k1</option>
 																				<option>rat,rn5</option>
@@ -86,8 +86,8 @@
 																	[["TEXT","10"],["TEXT","15"],["TEXT","5"],["TEXT","5"],["TEXT","36"]])?>
 						<?php echo $html->getExpandingSelectionBox("Trimming", "trim", 3, 12, ["single or paired-end", "5 length 1", "3 length 1"],
 																	[["ONCHANGE", "single-end", "paired-end"],["TEXT","0"],["TEXT","0"]])?>
-						<?php echo $html->getExpandingCommonRNABox("Common RNAs", "commonind", 7, 12, ["ercc","rRNA","miRNA","tRNA","snRNA","rmsk","genome"],
-																	[["no","yes"],["no","yes"],["no","yes"],["no","yes"],["no","yes"],["no","yes"],["no","yes"]])?>
+						<?php echo $html->getExpandingCommonRNABox("Common RNAs", "commonind", 8, 12, ["ercc","rRNA","miRNA","tRNA","piRNA","snRNA","rmsk","genome"],
+																	[["no","yes"],["no","yes"],["no","yes"],["no","yes"],["no","yes"],["no","yes"],["no","yes"],["no","yes"]])?>
 			<?php echo $html->endExpandingSelectionBox()?>
 
 			<div class="col-md-12">

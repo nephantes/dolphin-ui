@@ -10,11 +10,12 @@ var radioTypeCheckList = ['pipeline', 'trimpaired', 'advparams', 'custom'];
 var currentChecked = "";
 var checklist_samples = [];
 var checklist_lanes = [];
+var checklist_experiment_series = [];
 var pipelineNum = 0;
 var customSeqNum = 0;
 var customSeqNumCheck = [];
-var pipelineDict = ['RNASeqRSEM', 'Tophat', 'ChipSeq', 'DESeq'];
-var rnaList = ["ercc","rRNA","miRNA","tRNA","snRNA","rmsk","genome","change_params"];
+var pipelineDict = ['RNASeqRSEM', 'Tophat', 'ChipSeq', 'DESeq', 'BisulphiteMapping'];
+var rnaList = ["ercc","rRNA","miRNA","tRNA","piRNA","snRNA","rmsk","genome","change_params"];
 var qualityDict = ["window size","required quality","leading","trailing","minlen"];
 var trimmingDict = ["single or paired-end", "5 length 1", "3 length 1", "5 length 2", "3 length 2"];
 var currentPipelineID = [];
@@ -29,7 +30,7 @@ function rerunLoad() {
 	if (hrefSplit[4] == 'search') {
 		document.getElementById('dolphin_basket').parentNode.setAttribute('style','overflow:scroll');
 	}
-	var rerunLoc = $.inArray('rerun', hrefSplit)
+	var rerunLoc = $.inArray('rerun', hrefSplit);
 	var infoArray = [];
 	var json_primer = '';
 	var jsonObj;
@@ -179,6 +180,51 @@ function rerunLoad() {
 							document.getElementById('text_1_'+i).value = splt2[5];
 							document.getElementById('text_2_'+i).value = splt2[6];
 							document.getElementById('select_5_'+i).value = splt2[7];
+						}else if (splt2[0] == pipelineDict[4]) {
+							//MMap
+							additionalPipes();
+							document.getElementById('select_'+i).value = pipelineDict[4];
+							pipelineSelect(i);
+							
+							document.getElementById('text_1_'+i).value = splt2[2];
+							document.getElementById('textarea_1_'+i).value = splt2[3];
+							
+							//MCall
+							//handle for multiple selections
+							if (splt2[4] == 1) {
+								document.getElementById('checkbox_2_'+i).checked = true;
+							}
+							var select_values = splt2[5].split(",");
+							var select_locations = splt2[6].split(",");
+							var select1_values = [];
+							var select2_values = [];
+							for(var f = 0; f < select_locations.length; f++){
+								if (select_locations[f] == 'Cond1') {
+									select1_values.push(select_values[f]);
+								}else{
+									select2_values.push(select_values[f]);
+								}
+							}
+							
+							var select1 = document.getElementById('multi_select_1_'+i);
+							for(var h = 0; h < select1.options.length; h++){
+								if (select1_values.indexOf(select1.options[h].value) != -1) {
+									select1.options[h].selected = true;
+								}
+							}
+							var select2 = document.getElementById('multi_select_2_'+i);
+							for(var h = 0; h < select1.options.length; h++){
+								if (select2_values.indexOf(select2.options[h].value) != -1) {
+									select2.options[h].selected = true;
+								}
+							}
+							document.getElementById('textarea_2_'+i).value = splt2[7];
+							
+							//MComp
+							if (splt2[8] == '1') {
+								document.getElementById('checkbox_3_'+i).checked = true;
+							}
+							document.getElementById('textarea_3_'+i).value = splt2[9];
 						}
 					}
 					document.getElementById(jsonTypeList[x]+'_exp_body').setAttribute('style', 'display: block');
@@ -188,7 +234,7 @@ function rerunLoad() {
 	}
 	document.getElementById('outdir').value = infoArray[1];
 	document.getElementById('run_name').value = infoArray[2];
-	document.getElementById('description').value = infoArray[3];
+	document.getElementById('run_description').value = infoArray[3];
 	}
 }
 
@@ -281,6 +327,49 @@ function pipelineSelect(num){
 		divAdj = mergeTidy(divAdj, 12,
 				[ [createElement('label', ['class','TEXTNODE'], ['box-title', 'Select Sequence']),
 				createElement('select', ['id', 'class'], ['select_5_'+num, 'form-control'])] ]);
+	}else if (pipeType == pipelineDict[4]) {
+		//MMap
+		var labelDiv = createElement('div', ['class'], ['col-md-12 text-center']);
+		labelDiv.appendChild( createElement('label', ['class','TEXTNODE'], ['box-title margin', 'Run BSMap:']));
+		labelDiv.appendChild( createElement('input', ['id', 'type', 'class', 'checked', 'disabled'], ['checkbox_1_'+num, 'checkbox', 'margin']));
+		divAdj.appendChild(labelDiv);
+		var innerDiv = createTidyDiv(12);
+		divAdj = mergeTidy(divAdj, 12,
+				[[createLabeledDiv(12, 'RRBS&nbsp;&nbsp;', '&nbsp;&nbsp;WGBS', createElement('input', ['id', 'name', 'type', 'value', 'onClick', 'checked'], [num+'_RRBS', num, 'radio', 'RRBS', 'bisulphiteSelect(this.id, '+num+')']),
+					   createElement('input', ['id', 'name', 'type', 'value', 'onClick',], [num+'_WGBS', num, 'radio', 'WGBS', 'bisulphiteSelect(this.id, '+num+')']))
+					],
+				[createElement('label', ['class','TEXTNODE'], ['box-title', 'Digestion Site:']),
+				createElement('input', ['id', 'class', 'type', 'value'], ['text_1_'+num, 'form-control', 'text', 'C-CGG'])]
+				]);
+		labelDiv = createElement('div', ['class'], ['col-md-12']);
+		labelDiv.appendChild( createElement('label', ['class','TEXTNODE'], ['box-title', 'Additional BSMap Parameters:']));
+		labelDiv.appendChild( createElement('textarea', ['id', 'class'], ['textarea_1_'+num, 'form-control']));
+		divAdj.appendChild(labelDiv);
+		
+		//MCALL
+		labelDiv = createElement('div', ['class'], ['col-md-12 text-center']);
+		labelDiv.appendChild( createElement('label', ['class','TEXTNODE'], ['box-title margin', 'Run MCall:']));
+		labelDiv.appendChild( createElement('input', ['id', 'type', 'class'], ['checkbox_2_'+num, 'checkbox', 'margin']));
+		divAdj.appendChild(labelDiv);
+		divAdj = mergeTidy(divAdj, 6,
+				[ [createElement('label', ['class','TEXTNODE'], ['box-title', 'MCall Condition 1']),
+				createElement('select',['id', 'class', 'multiple', 'size', 'onchange'],['multi_select_1_'+num, 'form-control', 'multiple', '8', 'deselectCondition(1, '+num+')'])],
+				[createElement('label', ['class','TEXTNODE'], ['box-title', 'MCall Condition 2']),
+				createElement('select',['id', 'class', 'multiple', 'size', 'onchange'],['multi_select_2_'+num, 'form-control', 'multiple', '8', 'deselectCondition(2, '+num+')'])] ]);
+		labelDiv = createElement('div', ['class'], ['col-md-12']);
+		labelDiv.appendChild( createElement('label', ['class','TEXTNODE'], ['box-title', 'Additional MCall Parameters:']));
+		labelDiv.appendChild( createElement('textarea', ['id', 'class'], ['textarea_2_'+num, 'form-control']));
+		divAdj.appendChild(labelDiv);
+		
+		//MComp
+		labelDiv = createElement('div', ['class'], ['col-md-12 text-center']);
+		labelDiv.appendChild( createElement('label', ['class','TEXTNODE'], ['box-title margin', 'Run MComp:']));
+		labelDiv.appendChild( createElement('input', ['id', 'type', 'class'], ['checkbox_3_'+num, 'checkbox', 'margin']));
+		divAdj.appendChild(labelDiv);
+		labelDiv = createElement('div', ['class'], ['col-md-12']);
+		labelDiv.appendChild( createElement('label', ['class','TEXTNODE'], ['box-title', 'Additional MComp Parameters:']));
+		labelDiv.appendChild( createElement('textarea', ['id', 'class'], ['textarea_3_'+num, 'form-control']));
+		divAdj.appendChild(labelDiv);
 	}
 	//replace div
 	$('#select_child_'+num).replaceWith(divAdj);
@@ -292,9 +381,10 @@ function pipelineSelect(num){
 		}
 	}
 	
-	//if DESEQ
+	//MULTI-SELECT
 	if (document.getElementById('multi_select_1_'+num) != null) {
 		var sample_names = getSampleNames(window.location.href.split('/')[window.location.href.split('/').length - 1].replace('$', ''));
+		console.log(sample_names);
 		for(var x = 0; x < sample_names.length; x++){
 				document.getElementById('multi_select_1_'+num).appendChild(createElement('option', ['id', 'value'], [num+'_1_'+sample_names[x], sample_names[x]]));
 				document.getElementById(num+'_1_'+sample_names[x]).innerHTML = sample_names[x]
@@ -327,7 +417,7 @@ function submitPipeline(type) {
 	var outputdir = document.getElementById("outdir").value;
 	var fastqc = document.getElementById("fastqc").value;
 	var run_name = document.getElementById("run_name").value;
-	var description = document.getElementById("description").value;
+	var description = document.getElementById("run_description").value;
 
 	var empty_values = []
 	if (run_name == "") {
@@ -529,134 +619,162 @@ function backFromDetails(back_type){
 /*##### CHECKBOX FUNCTIONS #####*/
 function manageChecklists(name, type){
 	if (type == 'sample_checkbox') {
-	//sample checkbox
-	if ( checklist_samples.indexOf( name ) > -1 ){
-		//remove
-		checklist_samples.splice(checklist_samples.indexOf(name), 1);
-		removeFromDolphinBasket(name);
-		removeBasketInfo();
-
-		var lane_check = getLaneIdFromSample(name);
-		if (checklist_lanes.indexOf(lane_check) > -1) {
-			if (document.getElementById('lane_checkbox_' + lane_check) != undefined) {
-				var check = document.getElementById('lane_checkbox_' + lane_check);
-				check.checked = !check.checked;
-			}
-			checklist_lanes.splice(checklist_lanes.indexOf(lane_check), 1);
-		}
-		if (document.getElementById('sample_checkbox_' + name) != undefined) {
-			if (document.getElementById('sample_checkbox_' + name).checked != false) {
-				var check = document.getElementById('sample_checkbox_' + name);
-				check.checked = !check.checked;
-			}
-		}
-		if (checklist_samples.length == 0) {
-			document.getElementById('clear_basket').disabled = 'true';
-		}
-		checkCheckedLanes();
-	}else{
-		//add
-		checklist_samples.push(name);
-		addToDolphinBasket(name);
-		sendBasketInfo(name);
-
-		var lane_check = getLaneIdFromSample(name);
-		var lane_samples = getLanesToSamples(lane_check);
-		var lanes_bool = true;
-		var valid_samples = getValidSamples(lane_samples);
-
-		if (document.getElementById('clear_basket').disabled) {
-			document.getElementById('clear_basket').disabled = false;
-		}
-		if (document.getElementById('sample_checkbox_' + name) != undefined) {
-			if (document.getElementById('sample_checkbox_' + name).checked != true) {
-				var check = document.getElementById('sample_checkbox_' + name);
-				check.checked = !check.checked;
-			}
-		}
-		if (checklist_lanes.indexOf(lane_check) == -1) {
-			for(var x = 0; x < valid_samples.length; x++){
-				if (valid_samples[x] == undefined) {
-					lanes_bool = false;
-				}else{
-					if (checklist_samples.indexOf(valid_samples[x].sample_id) == -1 && lanes_bool) {
-						lanes_bool = false;
-					}
-				}
-			}
-			if (lanes_bool) {
+		//sample checkbox
+		if ( checklist_samples.indexOf( name ) > -1 ){
+			//remove
+			checklist_samples.splice(checklist_samples.indexOf(name), 1);
+			removeFromDolphinBasket(name);
+			removeBasketInfo(name);
+	
+			var lane_check = getLaneIdFromSample(name);
+			var experiment_check = getExperimentIdFromSample(name);
+			if (checklist_lanes.indexOf(lane_check) > -1) {
 				if (document.getElementById('lane_checkbox_' + lane_check) != undefined) {
 					var check = document.getElementById('lane_checkbox_' + lane_check);
 					check.checked = !check.checked;
 				}
-				checklist_lanes.push(lane_check);
+				checklist_lanes.splice(checklist_lanes.indexOf(lane_check), 1);
 			}
-		}
-	}
-	}
-	else
-	{
-	//lane checkbox
-	if ( checklist_lanes.indexOf( name ) > -1 ){
-		//remove
-		checklist_lanes.splice(checklist_lanes.indexOf(name), 1);
-		var lane_samples = getLanesToSamples(name);
-		var valid_samples = getValidSamples(lane_samples);
-		for (var x = 0; x < valid_samples.length; x++) {
-			if ( document.getElementById('sample_checkbox_' + valid_samples[x].sample_id) != null ) {
-				var check = document.getElementById('sample_checkbox_' + valid_samples[x].sample_id);
-				check.checked = !check.checked;
+			console.log(name);
+			console.log(experiment_check);
+			if (checklist_experiment_series.indexOf(experiment_check) > -1) {
+				if (document.getElementById('experiment_checkbox_' + experiment_check) != undefined) {
+					var check = document.getElementById('experiment_checkbox_' + experiment_check);
+					check.checked = !check.checked;
+				}
+				checklist_experiment_series.splice(checklist_experiment_series.indexOf(experiment_check), 1);
 			}
-			if ( checklist_samples.indexOf( valid_samples[x].sample_id ) > -1 ){
-				removeFromDolphinBasket(valid_samples[x].sample_id);
-				checklist_samples.splice(checklist_samples.indexOf(valid_samples[x].sample_id), 1);
-				removeBasketInfo();
+			
+			if (document.getElementById('sample_checkbox_' + name) != undefined) {
+				if (document.getElementById('sample_checkbox_' + name).checked != false) {
+					var check = document.getElementById('sample_checkbox_' + name);
+					check.checked = !check.checked;
+				}
 			}
-		}
-		if (checklist_samples.length == 0) {
-			document.getElementById('clear_basket').disabled = 'true';
-		}
-	}
-	else
-	{
-		//add
-		checklist_lanes.push(name);
-		var sampleBoolCheck = false;
-		var lane_samples = getLanesToSamples(name);
-		var valid_samples = getValidSamples(lane_samples);
-		
-		for (var x = 0; x < valid_samples.length; x++) {
-			if (lane_samples.indexOf(valid_samples[x].sample_id) > -1) {
-				sampleBoolCheck = true;
-				if ( checklist_samples.indexOf( valid_samples[x].sample_id ) == -1 ){
-					checklist_samples.push(valid_samples[x].sample_id);
-					addToDolphinBasket(valid_samples[x].sample_id);
-					sendBasketInfo(valid_samples[x].sample_id);
+			if (checklist_samples.length == 0) {
+				document.getElementById('clear_basket').disabled = 'true';
+			}
+		}else{
+			//add
+			checklist_samples.push(name);
+			addToDolphinBasket(name);
+			sendBasketInfo(name);
+	
+			var lane_check = getLaneIdFromSample(name);
+			var lane_samples = getLanesToSamples(lane_check);
+			var lanes_bool = true;
+			var experiment_check = getExperimentIdFromSample(name);
+			var experiment_samples = getSamplesFromExperimentSeries(experiment_check);
+			var experiment_bool = true;
+			
+			if (document.getElementById('clear_basket').disabled) {
+				document.getElementById('clear_basket').disabled = false;
+			}
+			if (document.getElementById('sample_checkbox_' + name) != undefined) {
+				if (document.getElementById('sample_checkbox_' + name).checked != true) {
+					var check = document.getElementById('sample_checkbox_' + name);
+					check.checked = !check.checked;
+				}
+			}
+			if (checklist_lanes.indexOf(lane_check) == -1) {
+				for(var x = 0; x < lane_samples.length; x++){
+					if (lane_samples[x] == undefined) {
+						lanes_bool = false;
+					}else{
+						if (checklist_samples.indexOf(lane_samples[x]) == -1 && lanes_bool) {
+							lanes_bool = false;
+						}
+					}
+				}
+				if (lanes_bool) {
+					if (document.getElementById('lane_checkbox_' + lane_check) != undefined) {
+						var check = document.getElementById('lane_checkbox_' + lane_check);
+						check.checked = !check.checked;
+					}
+					checklist_lanes.push(lane_check);
+				}
+			}
+			
+			if (checklist_experiment_series.indexOf(experiment_check) == -1) {
+				for(var x = 0; x < experiment_samples.length; x++){
+					if (experiment_samples[x] == undefined) {
+						experiment_bool = false;
+					}else{
+						if (checklist_samples.indexOf(experiment_samples[x]) == -1 && experiment_bool) {
+							experiment_bool = false;
+						}
+					}
+				}
+				if (experiment_bool) {
+					if (document.getElementById('experiment_checkbox_' + experiment_check) != undefined) {
+						var check = document.getElementById('experiment_checkbox_' + experiment_check);
+						check.checked = !check.checked;
+					}
+					checklist_experiment_series.push(experiment_check);
 				}
 			}
 		}
-		if (document.getElementById('clear_basket').disabled && sampleBoolCheck) {
-			document.getElementById('clear_basket').disabled = false;
-		}
-		for(var y = 0; y < checklist_samples.length; y++){
-			if ( document.getElementById('sample_checkbox_' + checklist_samples[y]) != null) {
-				var check = document.getElementById('sample_checkbox_' + checklist_samples[y]);
-				check.checked = !check.checked;
+	}else if (type == "experiment_checkbox") {
+		//	experiment series checkbox
+		if (checklist_experiment_series.indexOf(name) > -1) {
+			//remove
+			checklist_experiment_series.splice(checklist_experiment_series.indexOf(name), 1);
+			var experiment_samples = getSamplesFromExperimentSeries(name);
+			console.log(experiment_samples);
+			for (var y = 0; y < experiment_samples.length; y++){
+				if ( checklist_samples.indexOf( experiment_samples[y] ) > -1 ){
+					manageChecklists(experiment_samples[y], 'sample_checkbox');
+				}
+			}
+		}else{
+			//add
+			checklist_experiment_series.push(name);
+			var experiment_samples = getSamplesFromExperimentSeries(name);
+			console.log(experiment_samples);
+			for (var y = 0; y < experiment_samples.length; y++){
+				if ( checklist_samples.indexOf( experiment_samples[y] ) < 0 ){
+					manageChecklists(experiment_samples[y], 'sample_checkbox');
+				}
 			}
 		}
-	}
+	}else{
+		//lane checkbox
+		if ( checklist_lanes.indexOf( name ) > -1 ){
+			//remove
+			checklist_lanes.splice(checklist_lanes.indexOf(name), 1);
+			var lane_samples = getLanesToSamples(name);
+			
+			for (var x = 0; x < lane_samples.length; x++) {
+				if ( checklist_samples.indexOf( lane_samples[x] ) > -1 ){
+					manageChecklists(lane_samples[x], 'sample_checkbox');
+				}
+			}
+		}
+		else
+		{
+			//add
+			checklist_lanes.push(name);
+			var lane_samples = getLanesToSamples(name);
+			
+			for (var x = 0; x < lane_samples.length; x++) {
+				if (checklist_samples.indexOf(lane_samples[x]) < 0) {
+					manageChecklists(lane_samples[x], 'sample_checkbox');
+				}
+			}
+		}
 	}
 }
 
 function reloadBasket(){
 	var lastBasket = getBasketInfo();
 	if (lastBasket != undefined) {
-	var basketArray = lastBasket.split(",");
-	for (var x = 0; x < basketArray.length; x++) {
-		if (basketArray != '0') {
-		manageChecklists(basketArray[x], 'sample_checkbox');
+		var basketArray = lastBasket.split(",");
+		console.log(basketArray);
+		for (var x = 0; x < basketArray.length; x++) {
+			if (basketArray != '0') {
+				manageChecklists(basketArray[x], 'sample_checkbox');
+			}
 		}
-	}
 	}
 }
 
@@ -737,14 +855,14 @@ function checkOffAllLanes(){
 function getValidSamples(lane_samples){
 	var valid_samples;
 	$.ajax({ type: "GET",
-					url: BASE_PATH+"/public/ajax/initialmappingdb.php",
-					data: { p: 'laneToSampleChecking', sample_ids: lane_samples.toString()},
-					async: false,
-					success : function(r)
-					{
-						valid_samples = r;
-					}
-				});
+				url: BASE_PATH+"/public/ajax/initialmappingdb.php",
+				data: { p: 'laneToSampleChecking', sample_ids: lane_samples.toString()},
+				async: false,
+				success : function(r)
+				{
+					valid_samples = r;
+				}
+			});
 	return valid_samples;
 }
 
@@ -795,10 +913,65 @@ function returnToIndex(){
 
 /*##### SEND TO PIPELINE WITH SELECTION #####*/
 function submitSelected(){
-	var selection_test = SelectionTest();
-	
-	if (selection_test) {
-		window.location.href = BASE_PATH+"/pipeline/selected/" + checklist_samples + "$";
+	if (selectionTest()) {
+		if (initialRunTest()) {
+			window.location.href = BASE_PATH+"/pipeline/selected/" + checklist_samples + "$";
+		}
+	}
+}
+
+function selectionTest(){
+	if (checklist_samples.length > 0) {
+		return true;
+	}else{
+		$('#deleteModal').modal({
+			show: true
+		});
+		document.getElementById('myModalLabel').innerHTML = 'Selection error';
+		document.getElementById('deleteLabel').innerHTML ='No samples/imports selected.  Please select samples/imports in order to send them to the pipeline';
+		document.getElementById('deleteAreas').innerHTML = '';
+			
+		document.getElementById('cancelDeleteButton').innerHTML = "OK";
+		document.getElementById('confirmDeleteButton').setAttribute('style', 'display:none');
+		return false;
+	}
+}
+
+function initialRunTest(){
+	var valid_samples = [];
+	$.ajax({ type: "GET",
+				url: BASE_PATH+"/public/ajax/browse_edit.php",
+				data: { p: 'intialRunCheck', samples: checklist_samples.toString()},
+				async: false,
+				success : function(r)
+				{
+					console.log(r);
+					for (var x = 0; x < r.length; x++) {
+						valid_samples.push(r[x].sample_id);
+					}
+				}
+			});
+	if (valid_samples.length == checklist_samples.length) {
+		return true;
+	}else{
+		$('#deleteModal').modal({
+			show: true
+		});
+		
+		var spliced_samples = checklist_samples;
+		for(var x = 0; x < valid_samples.length; x++){
+			var loc = spliced_samples.indexOf(valid_samples[x]);
+			spliced_samples.splice(loc, 1);
+		}
+		
+		document.getElementById('myModalLabel').innerHTML = 'Selection error';
+		document.getElementById('deleteLabel').innerHTML ='Some samples/imports selected have not finished their initial processing.';
+		document.getElementById('deleteAreas').innerHTML = 'You cannot use these sample(s) within the pipeline until they finish their initial processing:' +
+			'<br><br>Sample id(s): ' + spliced_samples.join(", ");
+			
+		document.getElementById('cancelDeleteButton').innerHTML = "OK";
+		document.getElementById('confirmDeleteButton').setAttribute('style', 'display:none');
+		return false;
 	}
 }
 
@@ -847,9 +1020,9 @@ function additionalPipes(){
 	var innerDiv = document.createElement( 'div' );
 	//attach children to parent
 	innerDiv.appendChild( createElement('select',
-					['id', 'class', 'onchange', 'OPTION_DIS_SEL', 'OPTION', 'OPTION', 'OPTION', 'OPTION'],
+					['id', 'class', 'onchange', 'OPTION_DIS_SEL', 'OPTION', 'OPTION', 'OPTION', 'OPTION', 'OPTION'],
 					['select_'+pipelineNum, 'form-control', 'pipelineSelect('+pipelineNum+')', '--- Select a Pipeline ---',
-					pipelineDict[0], pipelineDict[1], pipelineDict[2], pipelineDict[3] ]));
+					pipelineDict[0], pipelineDict[1], pipelineDict[2], pipelineDict[3], pipelineDict[4]]));
 	innerDiv.appendChild( createElement('div', ['id'], ['select_child_'+pipelineNum]));
 	outerDiv.appendChild( innerDiv );
 	outerDiv.appendChild( createElement('input', ['id', 'type', 'class', 'style', 'value', 'onclick'],
@@ -864,8 +1037,12 @@ function deselectCondition(condition, pipeNum){
 	var selection = document.getElementById('multi_select_'+condition+'_'+pipeNum);
 	if (condition == 1) {
 		var opposite = 2;
-	}else{
+	}else if(condition == 2){
 		var opposite = 1;
+	}else if (condition == 3) {
+		var opposite = 4;
+	}else if (condition == 4) {
+		var opposite = 3;
 	}
 	var opposite_selection = document.getElementById('multi_select_'+opposite+'_'+pipeNum);
 	for (var x = 0; x < selection.options.length; x++) {
@@ -926,7 +1103,13 @@ function findPipelineValues(){
 		
 		var conditions_array = [];
 		var conditions_type_array = [];
+		var multireset = false;
 		for (var x = 0; x < masterDiv.length; x++) {
+			if (multireset == true) {
+				conditions_array = [];
+				conditions_type_array = [];
+				multireset = false;
+			}
 			var e = masterDiv[x];
 			if (e.type != undefined) {
 				if (e.type == "select-multiple") {
@@ -943,9 +1126,18 @@ function findPipelineValues(){
 							conditions_type_array.push('Cond2');
 						}
 						pipeJSON += ':' + conditions_array.toString() + ':' + conditions_type_array.toString();
+						multireset = true;
 					}
 				}else{
-					pipeJSON += ':' + e.value.replace(/\r\n|\r|\n/g, "__cr____cn__");
+					if (e.type == 'checkbox') {
+						if (e.checked) {
+							pipeJSON += ':1';
+						}else{
+							pipeJSON += ':0';
+						}
+					}else if(e.type != 'radio'){
+						pipeJSON += ':' + e.value.replace(/\r\n|\r|\n/g, "__cr____cn__");
+					}
 				}
 			}
 		}
@@ -1088,5 +1280,17 @@ function selectTrimming(select_id, five_num, three_num) {
 	}else{
 	trim_parent_parent.removeChild(trim_parent_parent.childNodes[5]);
 	trim_parent_parent.removeChild(trim_parent_parent.childNodes[4]);
+	}
+}
+
+function bisulphiteSelect(id, num){
+	if (id == num+'_RRBS') {
+		var dig_site = document.getElementById('text_1_'+num);
+		dig_site.disabled = false;
+		dig_site.value = 'C-CGG';
+	}else{
+		var dig_site = document.getElementById('text_1_'+num);
+		dig_site.disabled = true;
+		dig_site.value = '';
 	}
 }

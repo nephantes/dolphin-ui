@@ -11,8 +11,15 @@ $query = new dbfuncs();
 
 function runCmd($idKey, $query)
 {
-	 $cmd = "cd ../../scripts && mkdir -p ../tmp/logs/run$idKey && python dolphin_wrapper.py -r $idKey -c ".CONFIG.">> ../tmp/logs/run$idKey/run.$idKey.wrapper.std 2>&1 & echo $! &";
-	 $PID =pclose(popen( $cmd, "r" ) );
+    $cmd = "cd ../../scripts && mkdir -p ../tmp/logs/run$idKey && python dolphin_wrapper.py -r $idKey -c ".CONFIG.">> ../tmp/logs/run$idKey/run.$idKey.wrapper.std 2>&1 & echo $! &";
+    $PID_COMMAND = popen( $cmd, "r" );
+    $PID =fread($PID_COMMAND, 2096);
+    $data=$query->runSQL("
+        UPDATE ngs_runparams
+        SET wrapper_pid = $PID
+        WHERE id = '$idKey'
+        ");
+    pclose($PID_COMMAND);
 }
 
 function killPid($run_id, $query)
@@ -62,12 +69,25 @@ if ($p == "submitPipeline" )
     $outdir_check = $query->queryAVal("SELECT outdir FROM ngs_runparams WHERE outdir = '$outdir'");
     
     if($outdir_check == $outdir){
-        
         $idKey=$query->queryAVal("SELECT id FROM ngs_runparams WHERE outdir = '$outdir' limit 1");
+        $wrapper_pid=$query->queryAVal("SELECT wrapper_pid FROM ngs_runparams WHERE outdir = '$outdir'");
+        $workflow_pid=$query->queryAVal("SELECT runworkflow_pid FROM ngs_runparams WHERE outdir = '$outdir'");
+        $wkey=$query->queryAVal("SELECT wkey FROM ngs_runparams WHERE outdir = '$outdir'");
+        
         killPid($idKey, $query);
+        $data=$query->runSQL("
+        INSERT INTO ngs_wkeylist
+        (run_id, wkey, wrapper_pid, workflow_pid, time_added)
+        VALUES
+        ($idKey, '$wkey', $wrapper_pid, $workflow_pid, now())
+        ");
+        
         $data=$query->runSQL("
         UPDATE ngs_runparams
         SET run_status = 0,
+        wrapper_pid = NULL,
+        runworkflow_pid = NULL,
+        wkey = NULL,
         barcode = $barcode,
         json_parameters = '$json',
         run_name = '$name',
@@ -138,7 +158,9 @@ else if ($p == 'noAddedParamsRerun')
     
     $data=$query->runSQL("
 	UPDATE ngs_runparams
-    SET run_status=0
+    SET run_status=0,
+    wrapper_pid = NULL,
+    runworkflow_pid = NULL
     WHERE id = $run_id
     ");
     

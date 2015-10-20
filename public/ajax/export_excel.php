@@ -241,6 +241,8 @@ if($p == 'exportExcel')
 		"));
 	
 	$stored_dirs = [];
+	$objPHPExcel->getActiveSheet()->setCellValue('C3', 'backup directory');
+    $objPHPExcel->getActiveSheet()->setCellValue('D3', 'amazon bucket');
 	$col_number = 4;
 	foreach($sample_file_directories as $sfd){
 		$objPHPExcel->getActiveSheet()->setCellValue('A'.$col_number, $sfd->id);

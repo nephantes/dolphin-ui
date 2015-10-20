@@ -67,6 +67,90 @@ function selectJob(id){
 		});
 }
 
+function errorOutModal(run_id, wkey){
+	var obtained_log;
+	$.ajax({ type: "GET",
+			url: BASE_PATH +"/public/ajax/dataerrorlogs.php",
+			data: { p: 'getStdOut', run_id: run_id },
+			async: false,
+			success : function(s)
+			{
+				if (s.length > 20) {
+					obtained_log = "...<br>"
+					for(var i = s.length - 20; i < s.length; i++){
+						obtained_log += s[i];
+					}
+				}else{
+					for(var i = 0; i < s.length; i++){
+						obtained_log += s[i];
+					}
+				}
+			}
+	});
+	$('#logModal').modal({
+      show: true
+	});
+	document.getElementById('logRunId').innerHTML = "run." + run_id + ".wrapper.std:";
+	document.getElementById('logDetails').innerHTML = obtained_log;
+	
+	if (wkey == null || wkey == "null") {
+		document.getElementById('modal_adv_status').style.display = "none";
+	}else{
+		var adv_stat_check = [];
+		$.ajax({ type: "GET",
+				url: BASE_PATH + "/public/ajax/dataservice.php?wkey=" + wkey,
+				async: false,
+				success : function(s)
+				{
+					adv_stat_check = s;
+				}
+		});
+		
+		if (adv_stat_check.length > 0) {
+			document.getElementById('modal_adv_status').style.display = "show";
+			document.getElementById('modal_adv_status').setAttribute("onclick", "sendToAdvancedStatus("+run_id+")");
+		}else{
+			document.getElementById('modal_adv_status').style.display = "none";
+		}
+	}
+}
+
+function queueCheck(run_id){
+	var run_status = [];
+	$.ajax({ type: "GET",
+			url: BASE_PATH +"/public/ajax/dataerrorlogs.php",
+			data: { p: 'checkQueued', run_id: run_id },
+			async: false,
+			success : function(s)
+			{
+				run_status = s;
+			}
+	});
+	
+	if (run_status.length == 3) {
+		if (run_status[2] == null && run_status[0] == '0' && run_status[1] == '0') {
+			console.log(run_status);
+		}else{
+			errorOutModal(run_id, run_status[2]);
+		}
+	}
+	
+}
+
+function runningErrorCheck(run_id){
+	var run_status;
+	$.ajax({ type: "GET",
+			url: BASE_PATH +"/public/ajax/dataerrorlogs.php",
+			data: { p: 'errorCheck', run_id: run_id },
+			async: false,
+			success : function(s)
+			{
+				run_status = s;
+			}
+	});
+	return run_status
+}
+
 function joboutDataModal(jobname, jobout) {
    $('#joboutData').modal({
       show: true

@@ -80,6 +80,7 @@ class SearchController extends VanillaController {
             $this->set('lane_file', $this->Search->getLaneFileLocation($this->Search->getId($value, 'lane_id', 'ngs_samples')));
 			$this->set('samples', $this->Search->getValues($value, 'ngs_samples'));
             $this->set('sample_file', $this->Search->getSampleFileLocation($value));
+            $this->set('sample_fastq_file', $this->Search->getSampleFastqFileLocation($value));
 		}
 	}
 

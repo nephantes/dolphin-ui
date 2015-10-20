@@ -196,6 +196,9 @@ class Ngsimport extends VanillaModel {
 		elseif ( $worksheet['worksheetName']=="LANES"){
 			$text.=$this->getLanes();
 		}
+		elseif ( $worksheet['worksheetName']=="IMPORTS"){
+			$text.=$this->getLanes();
+		}
 		elseif ( $worksheet['worksheetName']=="PROTOCOLS"){
 			$text.=$this->getProtocols();
 		}
@@ -224,6 +227,8 @@ class Ngsimport extends VanillaModel {
 		if ( $this->worksheet['worksheetName']=="METADATA"){
 			$text.=$this->processMeta();
 		}elseif ( $worksheet['worksheetName']=="LANES"){
+			$text.=$this->processLanes();
+		}elseif ( $worksheet['worksheetName']=="IMPORTS"){
 			$text.=$this->processLanes();
 		}elseif ( $worksheet['worksheetName']=="PROTOCOLS"){
 			$text.=$this->processProtocols();
@@ -264,7 +269,6 @@ class Ngsimport extends VanillaModel {
 	}
 	
 	function getMeta() {
-		//var_dump($sheetData);
 		$meta_check = true;
 		$text = "";
 		/*
@@ -279,14 +283,23 @@ class Ngsimport extends VanillaModel {
 			if($this->sheetData[$i]["A"]=="lab"){$this->lab=$this->esc($this->sheetData[$i]["B"]);}
 			if($this->sheetData[$i]["A"]=="grant"){$this->grant=$this->esc($this->sheetData[$i]["B"]);}
 			if($this->sheetData[$i]["A"]=="contributor"){array_push($this->conts, $this->esc($this->sheetData[$i]["B"]));}
-			if($this->sheetData[$i]["A"]=="fastq directory"){$this->fastq_dir=$this->esc($this->sheetData[$i]["B"]);}
-			if($this->sheetData[$i]["A"]=="backup directory"){$this->backup_dir=$this->esc($this->sheetData[$i]["B"]);}
+			if($this->sheetData[$i]["A"]=="fastq directory"){
+				$this->fastq_dir=$this->esc($this->sheetData[$i]["B"]);
+			}elseif($this->sheetData[$i]["A"]=="processed directory"){
+				$this->fastq_dir=$this->esc($this->sheetData[$i]["B"]);
+			}
+			if($this->sheetData[$i]["A"]=="backup directory"){
+				$this->backup_dir=$this->esc($this->sheetData[$i]["B"]);
+			}elseif($this->sheetData[$i]["A"]=="temporary directory"){
+				$this->backup_dir=$this->esc($this->sheetData[$i]["B"]);
+				
+			}
 			if($this->sheetData[$i]["A"]=="amazon bucket"){$this->amazon_bucket=$this->esc($this->sheetData[$i]["B"]);}
 			
 			if($this->sheetData[$i]["A"]=="title"){
 				array_push($this->initialSubmission, $this->esc($this->sheetData[$i]["B"]));
 			}
-			if($this->sheetData[$i]["A"]=="backup directory"){
+			if($this->sheetData[$i]["A"]=="backup directory" || $this->sheetData[$i]["A"]=="temporary directory"){
 				array_push($this->initialSubmission, $this->esc($this->sheetData[$i]["B"]));
 			}
 			
@@ -298,7 +311,7 @@ class Ngsimport extends VanillaModel {
 			}
 			
 			//	Backup Directory
-			if($this->backup_dir == null && $this->sheetData[$i]["A"]=="backup directory"){
+			if($this->backup_dir == null && ($this->sheetData[$i]["A"]=="backup directory" || $this->sheetData[$i]["A"]=="temporary directory")){
 				$text.= $this->errorText("backup directory is required for submission");
 				$this->final_check = false;
 				$meta_check = false;
@@ -383,10 +396,11 @@ class Ngsimport extends VanillaModel {
 			$dir->amazon_bucket=$this->amazon_bucket;
 			$this->dir_arr[$dir->dir_tag]=$dir;
 			
-			$new_dirs = new dirs($this, $this->dir_arr);
+			$new_dirs = new dirs($this, $this->dir_arr,  $dir->backup_dir, $dir->amazon_bucket);
 			$text="DIR:".$new_dirs->getStat()."<BR>";
 			$dir_id = json_decode($this->query("SELECT id FROM ngs_dirs
-											   WHERE fastq_dir = $this->fastq_dir"));
+											   WHERE fastq_dir = '".$this->fastq_dir."'
+											   AND backup_dir = '".$this->backup_dir."'"));
 			array_push($this->dir_ids, $dir_id);
 		}
 		return $text;
@@ -407,7 +421,11 @@ class Ngsimport extends VanillaModel {
 			$lane = new lane();
 			for ($j='A';$j<=$this->worksheet['lastColumnLetter'];$j++)
 			{
-				if($this->sheetData[3][$j]=="Lane name"){$lane->name=$this->esc($this->sheetData[$i][$j]);}
+				if($this->sheetData[3][$j]=="Import name"){
+					$lane->name=$this->esc($this->sheetData[$i][$j]);
+				}elseif($this->sheetData[3][$j]=="Lane name"){
+					$lane->name=$this->esc($this->sheetData[$i][$j]);
+				}
 				if($this->sheetData[3][$j]=="Sequencing id"){
 					$lane->lane_id=$this->esc($this->sheetData[$i][$j]);
 				}elseif($this->sheetData[3][$j]=="Lane id"){
@@ -425,31 +443,44 @@ class Ngsimport extends VanillaModel {
 				if($this->sheetData[3][$j]=="Total reads"){$lane->total_reads=$this->esc($this->sheetData[$i][$j]);}
 			}
 			
+			$blank = 'true';
+			foreach($lane as $l){
+				if(preg_replace('/\s+/', '', $l) != ''){
+					$blank = 'false';
+				}
+			}
+			
 			/*
 			 *	Check for proper data input
 			 */
 			//	Lane Name
-			if(isset($lane->name)){
-				if($this->checkAlphaNumWithAddChars('_-', $lane->name)){
-					$this->lane_arr[$lane->name]=$lane;
+			if($blank == 'false'){
+				if(isset($lane->name)){
+					if($this->checkAlphaNumWithAddChars('_-', $lane->name)){
+						$this->lane_arr[$lane->name]=$lane;
+					}else{
+						$text.= $this->errorText("Import name does not contain proper characters, please use alpha-numeric characters and underscores (row " . $i . ")");
+						$this->final_check = false;
+						$lane_check = false;
+					}
 				}else{
-					$text.= $this->errorText("Lane name does not contain proper characters, please use alpha-numeric characters and underscores (row " . $i . ")");
+					$text.= $this->errorText("Import name is required for submission (row " . $i . ")");
 					$this->final_check = false;
 					$lane_check = false;
 				}
-			}else{
-				$text.= $this->errorText("Lane name is required for submission (row " . $i . ")");
-				$this->final_check = false;
-				$lane_check = false;
-			}
-			
-			//	Lane id
-			if(isset($lane->lane_id)){
-				if(!$this->checkAlphaNumWithAddChars('_-', $lane->lane_id)){
-					$text.= $this->errorText("Lane id does not contain proper characters, please use alpha-numeric characters and underscores (row " . $i . ")");
-					$this->final_check = false;
-					$lane_check = false;
+				
+				if(!isset($lane->total_reads)){
+					$lane->total_reads = NULL;
 				}
+				
+				//	Other Values
+				if($lane->lane_id == null || $lane->facility == null || $lane->cost == null ||
+					$lane->date_submitted ==  null || $lane->date_received == null || $lane->phix_requested == null ||
+					$lane->phix_in_lane == null || $lane->total_samples == null ||
+					$lane->resequenced == null || $lane->notes == null){
+					$lane_warning_check = true;
+				}
+<<<<<<< HEAD
 			}else{
 				$lane->lane_id = NULL;
 			}
@@ -465,6 +496,8 @@ class Ngsimport extends VanillaModel {
 				$lane->phix_in_lane == null || $lane->total_samples == null ||
 				$lane->resequenced == null || $lane->notes == null){
 				$lane_warning_check = true;
+=======
+>>>>>>> 3f15e693c5ca100b54c17bc57a565463923ede3f
 			}
 		}
 		if($lane_warning_check){
@@ -518,35 +551,43 @@ class Ngsimport extends VanillaModel {
 			/*
 			 *	Check for proper data input
 			 */
-			//	Protocol Name
-			if(isset($prot->name)){
-				$this->prot_arr[$prot->name]=$prot;	
-			}else{
-				$text.= $this->errorText("protocol name is required for submission (row " . $i . ")");
-				$this->final_check = false;
-				$prot_check = false;
+			$blank = 'true';
+			foreach($prot as $p){
+				if(preg_replace('/\s+/', '', $p) != ''){
+					$blank = 'false';
+				}
 			}
-			
-			//	Crosslinking Method
-			if(!isset($prot->crosslinking_method)){
-				$prot->crosslinking_method = NULL;
-			}
-			
-			//	Fragmentation Method
-			if(!isset($prot->fragmentation_method)){
-				$prot->fragmentation_method = NULL;
-			}
-			
-			//	Strand Specific
-			if(!isset($prot->strand_specific)){
-				$prot->strand_specific = NULL;
-			}
-			
-			//	Other Values
-			if($prot->growth == null || $prot->extraction == null || $prot->library_construction == null ||
-				$prot->library_strategy == null || !isset($prot->crosslinking_method) ||
-				$prot->fragmentation_method == null || $prot->strand_specific == null){
-				$prot_warning_check = true;
+			if($blank == 'false'){
+				//	Protocol Name
+				if(isset($prot->name)){
+					$this->prot_arr[$prot->name]=$prot;	
+				}else{
+					$text.= $this->errorText("protocol name is required for submission (row " . $i . ")");
+					$this->final_check = false;
+					$prot_check = false;
+				}
+				
+				//	Crosslinking Method
+				if(!isset($prot->crosslinking_method)){
+					$prot->crosslinking_method = NULL;
+				}
+				
+				//	Fragmentation Method
+				if(!isset($prot->fragmentation_method)){
+					$prot->fragmentation_method = NULL;
+				}
+				
+				//	Strand Specific
+				if(!isset($prot->strand_specific)){
+					$prot->strand_specific = NULL;
+				}
+				
+				//	Other Values
+				if($prot->growth == null || $prot->extraction == null || $prot->library_construction == null ||
+					$prot->library_strategy == null || !isset($prot->crosslinking_method) ||
+					$prot->fragmentation_method == null || $prot->strand_specific == null){
+					$prot_warning_check = true;
+				}
 			}
 		}
 		if($prot_warning_check){
@@ -563,7 +604,6 @@ class Ngsimport extends VanillaModel {
 		//echo json_encode($this->prot_arr);
 		$new_protocol = new protocols($this, $this->prot_arr);
 		$text.= "PROT:".$new_protocol->getStat();
-		//var_dump($sheetData);
 		return $text;
 	}
 
@@ -585,7 +625,11 @@ class Ngsimport extends VanillaModel {
 			{
 				$j = $this->num2alpha($k);
 				if($this->sheetData[3][$j]=="Sample name"){$samp->name=$this->esc($this->sheetData[$i][$j]);}
-				if($this->sheetData[3][$j]=="Lane name"){$samp->lane_name=$this->esc($this->sheetData[$i][$j]);}
+				if($this->sheetData[3][$j]=="Lane name"){
+					$samp->lane_name=$this->esc($this->sheetData[$i][$j]);
+				}elseif($this->sheetData[3][$j]=="Import name"){
+					$samp->lane_name=$this->esc($this->sheetData[$i][$j]);
+				}
 				if($this->sheetData[3][$j]=="Protocol name"){$samp->protocol_name=$this->esc($this->sheetData[$i][$j]);}
 				if($this->sheetData[3][$j]=="barcode"){$samp->barcode=$this->esc($this->sheetData[$i][$j]);}
 				if($this->sheetData[3][$j]=="title"){$samp->title=$this->esc($this->sheetData[$i][$j]);}
@@ -615,14 +659,14 @@ class Ngsimport extends VanillaModel {
 				if($this->sheetData[3][$j]=="Library type"){$samp->lib_type=$this->esc($this->sheetData[$i][$j]);}
 				if($this->sheetData[3][$j]=="Antibody Target"){$samp->target=$this->esc($this->sheetData[$i][$j]);}
 				
-				if($this->sheetData[3][$j]=="Sample name"){
+				if($this->sheetData[3][$j]=="Sample name" && $samp->name != NULL){
 					if($this->namesList == null){
 						$this->namesList = $samp->name;
 					}else{
 						$this->namesList .= "," . $samp->name;
 					}
 				}
-				if($this->sheetData[3][$j]=="Lane name"){
+				if(($this->sheetData[3][$j]=="Lane name" || $this->sheetData[3][$j]=="Import name") && $samp->lane_name != NULL){
 					if ($this->laneList == null){
 						$this->laneList = $samp->lane_name;
 					}else if(strpos($this->laneList, $samp->lane_name) === false){
@@ -651,163 +695,170 @@ class Ngsimport extends VanillaModel {
 			/*
 			 *	Check for proper data input
 			 */
-			
-			//	Samplename
-			//$all_samplenames = json_decode($this->query("SELECT samplename FROM ngs_samples"));
-			if($this->experiment_name == 'Dendritic Cell Transcriptional Landscape'){
-				$samp->samplename = $this->createSampleName($samp);
-			}else{
-				$samp->samplename = $samp->name;
+			$blank = 'true';
+			foreach($samp as $s){
+				if(preg_replace('/\s+/', '', $s) != ''){
+					$blank = 'false';
+				}
 			}
-			
-			$samplename_bool = true;
-			
-			if(isset($this->sample_arr)){
+			if($blank == 'false'){
+				//	Samplename
+				//$all_samplenames = json_decode($this->query("SELECT samplename FROM ngs_samples"));
 				if($this->experiment_name == 'Dendritic Cell Transcriptional Landscape'){
-					foreach($this->sample_arr as $sa){
-						if($samp->samplename == $sa->samplename && $samp->samplename != '' && $samplename_bool){
-							$text.= $this->errorText("samplename naming scheme already exists for another sample (row " . $i . "). <br>
-													 DC project sample naming scheme = Donor_Source_Conditions_Time_Bio-rep_Tech-rep.");
-							$this->final_check = false;
-							$samp_check = false;
-							$samplename_bool = false;
-						}
-					}
+					$samp->samplename = $this->createSampleName($samp);
 				}else{
-					foreach($this->sample_arr as $sa){
-						if($samp->samplename == $sa->samplename && $samp->samplename != '' && $samplename_bool){
-							$text.= $this->errorText("samplename naming scheme already exists for another sample (row " . $i . ")");
-							$this->final_check = false;
-							$samp_check = false;
-							$samplename_bool = false;
-						}
-					}
+					$samp->samplename = $samp->name;
 				}
-			}
-			
-			//	Name
-			if(isset($samp->name)){
-				if($this->checkAlphaNumWithAddChars('_-', $samp->name)){
-					//	Need to check the database for similar names as well at a later date
-					if(isset($this->sample_arr[$samp->name])){
-						$text.= $this->errorText("Sample name already exists in that lane (row " . $i . ")");
-						$this->final_check = false;
-						$samp_check = false;
-					}elseif(ctype_digit($samp->name[0])){
-						$text.= $this->errorText("Sample name cannot not start with a number (row " . $i . ")");
-						$this->final_check = false;
-						$samp_check = false;
+				
+				$samplename_bool = true;
+				
+				if(isset($this->sample_arr)){
+					if($this->experiment_name == 'Dendritic Cell Transcriptional Landscape'){
+						foreach($this->sample_arr as $sa){
+							if($samp->samplename == $sa->samplename && $samp->samplename != '' && $samplename_bool){
+								$text.= $this->errorText("samplename naming scheme already exists for another sample (row " . $i . "). <br>
+														 DC project sample naming scheme = Donor_Source_Conditions_Time_Bio-rep_Tech-rep.");
+								$this->final_check = false;
+								$samp_check = false;
+								$samplename_bool = false;
+							}
+						}
 					}else{
-						$this->sample_arr[$samp->name]=$samp;
+						foreach($this->sample_arr as $sa){
+							if($samp->samplename == $sa->samplename && $samp->samplename != '' && $samplename_bool){
+								$text.= $this->errorText("samplename naming scheme already exists for another sample (row " . $i . ")");
+								$this->final_check = false;
+								$samp_check = false;
+								$samplename_bool = false;
+							}
+						}
+					}
+				}
+				
+				//	Name
+				if(isset($samp->name)){
+					if($this->checkAlphaNumWithAddChars('_-', $samp->name)){
+						//	Need to check the database for similar names as well at a later date
+						if(isset($this->sample_arr[$samp->name])){
+							$text.= $this->errorText("Sample name already exists in that Import (row " . $i . ")");
+							$this->final_check = false;
+							$samp_check = false;
+						}elseif(ctype_digit($samp->name[0])){
+							$text.= $this->errorText("Sample name cannot not start with a number (row " . $i . ")");
+							$this->final_check = false;
+							$samp_check = false;
+						}else{
+							$this->sample_arr[$samp->name]=$samp;
+						}
+					}else{
+						$text.= $this->errorText("Sample name does not contain proper characters, please use alpha-numeric characters and underscores (row " . $i . ")");
+						$this->final_check = false;
+						$samp_check = false;
 					}
 				}else{
-					$text.= $this->errorText("Sample name does not contain proper characters, please use alpha-numeric characters and underscores (row " . $i . ")");
+					$text.= $this->errorText("Sample name is required for submission (row " . $i . ")");
 					$this->final_check = false;
 					$samp_check = false;
 				}
-			}else{
-				$text.= $this->errorText("Sample name is required for submission (row " . $i . ")");
-				$this->final_check = false;
-				$samp_check = false;
-			}
-			
-			//	Lane Name
-			//	For now, it's just checking the Lane given in the excel file, possible to check the database later
-			if(isset($samp->lane_name)){
-				if(!isset($this->lane_arr[$samp->lane_name])){
-					$text.= $this->errorText("Lane name does not match any lane given in the excel file (row " . $i . ")");
+				
+				//	Lane Name
+				//	For now, it's just checking the Lane given in the excel file, possible to check the database later
+				if(isset($samp->lane_name)){
+					if(!isset($this->lane_arr[$samp->lane_name])){
+						$text.= $this->errorText("Import name does not match any import given in the excel file (row " . $i . ")");
+						$this->final_check = false;
+						$samp_check = false;
+					}
+				}else{
+					$text.= $this->errorText("Import name is required for submission (row " . $i . ")");
 					$this->final_check = false;
 					$samp_check = false;
 				}
-			}else{
-				$text.= $this->errorText("Lane name is required for submission (row " . $i . ")");
-				$this->final_check = false;
-				$samp_check = false;
-			}
-			
-			//	Protocol Name
-			if(!isset($this->prot_arr[$samp->protocol_name])){
-				$text.= $this->errorText("Protocol name does not match any protocol given in the excel file (row " . $i . ")");
-					$this->final_check = false;
-					$samp_check = false;
-			}
-			
-			//	Batch ID
-			if(!isset($samp->batch)){
-				$samp->batch = NULL;
-			}
-			
-			//	Source Symbol
-			if(!isset($samp->source_symbol)){
-				$samp->source_symbol = NULL;
-			}
-			
-			//	Condition Symbol
-			if(!isset($samp->condition_symbol)){
-				$samp->condition_symbol = NULL;
-			}
-			
-			//	Concentration
-			if(!isset($samp->concentration)){
-				$samp->concentration = NULL;
-			}
-			
-			//	Treatment Manufacturer
-			if(!isset($samp->treatment_manufacturer)){
-				$samp->treatment_manufacturer = NULL;
-			}
-			
-			//	Biosample Type
-			if(!isset($samp->biosample_type)){
-				$samp->biosample_type = NULL;
-			}
-			
-			//	Donor
-			if(!isset($samp->donor)){
-				$samp->donor = NULL;
-			}
-			
-			//	Time
-			if(!isset($samp->time)){
-				$samp->time = NULL;
-			}
-			
-			//	Biological Replica
-			if(!isset($samp->biological_replica)){
-				$samp->biological_replica = NULL;
-			}
-			
-			//	Technical Replica
-			if(!isset($samp->technical_replica)){
-				$samp->technical_replica = NULL;
-			}
-			
-			//	Spikeins
-			if(!isset($samp->spikeins)){
-				$samp->spikeins = NULL;
-			}
-			
-			//	Library Type
-			if(!isset($samp->lib_type)){
-				$samp->lib_type = NULL;
-			}
-			
-			//	Antibody Target
-			if(!isset($samp->target)){
-				$samp->target = NULL;
-			}
-			
-			//	Other Values
-			if(!isset($samp->title) ||
-				$samp->source == null || $samp->organism == null || !isset($samp->condition_symbol) ||
-				$samp->batch == null || $samp->source_symbol == null || $samp->biosample_type == null ||
-				$samp->molecule == null || $samp->description == null || $samp->instrument_model == null ||
-				$samp->avg_insert_size == null || $samp->read_length == null || $samp->genotype == null ||
-				$samp->condition == null || $samp->adapter == null || $samp->notebook_ref == null ||
-				$samp->notes == null || $samp->concentration == null || $samp->treatment_manufacturer == null ||
-				$samp->donor == null || $samp->time == null || $samp->biological_replica == null ||
-				$samp->technical_replica == null || $samp->spikeins == null){
-				$samp_warning_check = true;
+				
+				//	Protocol Name
+				if(!isset($this->prot_arr[$samp->protocol_name])){
+					$text.= $this->errorText("Protocol name does not match any protocol given in the excel file (row " . $i . ")");
+						$this->final_check = false;
+						$samp_check = false;
+				}
+				
+				//	Batch ID
+				if(!isset($samp->batch)){
+					$samp->batch = NULL;
+				}
+				
+				//	Source Symbol
+				if(!isset($samp->source_symbol)){
+					$samp->source_symbol = NULL;
+				}
+				
+				//	Condition Symbol
+				if(!isset($samp->condition_symbol)){
+					$samp->condition_symbol = NULL;
+				}
+				
+				//	Concentration
+				if(!isset($samp->concentration)){
+					$samp->concentration = NULL;
+				}
+				
+				//	Treatment Manufacturer
+				if(!isset($samp->treatment_manufacturer)){
+					$samp->treatment_manufacturer = NULL;
+				}
+				
+				//	Biosample Type
+				if(!isset($samp->biosample_type)){
+					$samp->biosample_type = NULL;
+				}
+				
+				//	Donor
+				if(!isset($samp->donor)){
+					$samp->donor = NULL;
+				}
+				
+				//	Time
+				if(!isset($samp->time)){
+					$samp->time = NULL;
+				}
+				
+				//	Biological Replica
+				if(!isset($samp->biological_replica)){
+					$samp->biological_replica = NULL;
+				}
+				
+				//	Technical Replica
+				if(!isset($samp->technical_replica)){
+					$samp->technical_replica = NULL;
+				}
+				
+				//	Spikeins
+				if(!isset($samp->spikeins)){
+					$samp->spikeins = NULL;
+				}
+				
+				//	Library Type
+				if(!isset($samp->lib_type)){
+					$samp->lib_type = NULL;
+				}
+				
+				//	Antibody Target
+				if(!isset($samp->target)){
+					$samp->target = NULL;
+				}
+				
+				//	Other Values
+				if(!isset($samp->title) ||
+					$samp->source == null || $samp->organism == null || !isset($samp->condition_symbol) ||
+					$samp->batch == null || $samp->source_symbol == null || $samp->biosample_type == null ||
+					$samp->molecule == null || $samp->description == null || $samp->instrument_model == null ||
+					$samp->avg_insert_size == null || $samp->read_length == null || $samp->genotype == null ||
+					$samp->condition == null || $samp->adapter == null || $samp->notebook_ref == null ||
+					$samp->notes == null || $samp->concentration == null || $samp->treatment_manufacturer == null ||
+					$samp->donor == null || $samp->time == null || $samp->biological_replica == null ||
+					$samp->technical_replica == null || $samp->spikeins == null){
+					$samp_warning_check = true;
+				}
 			}
 		}
 		if($samp_warning_check){
@@ -851,39 +902,38 @@ class Ngsimport extends VanillaModel {
 			for ($j='A';$j<=$this->worksheet['lastColumnLetter'];$j++)
 			{
 				if($this->sheetData[3][$j]=="Directory ID"){$dir->dir_tag=$this->esc($this->sheetData[$i][$j]);}
-				if($this->sheetData[3][$j]=="Fastq directory"){$dir->fastq_dir=$this->esc($this->sheetData[$i][$j]);}
-				if($this->sheetData[3][$j]=="Backup directory"){$dir->backup_dir=$this->esc($this->sheetData[$i][$j]);}
-				if($this->sheetData[3][$j]=="Amazon bucket"){$dir->amazon_bucket=$this->esc($this->sheetData[$i][$j]);}
+				if($this->sheetData[3][$j]=="Fastq directory"){
+					$dir->fastq_dir=$this->esc($this->sheetData[$i][$j]);
+				}elseif($this->sheetData[3][$j]=="Processed directory"){
+					$dir->fastq_dir=$this->esc($this->sheetData[$i][$j]);
+				}
 			}
-			
-			if(!isset($dir->dir_tag) || $dir->dir_tag == ''){
-				$text.= $this->errorText("Dir ID required for submission (row " . $i . ")");
-				$this->final_check = false;
-				$dir_check = false;
-			}else{
-				array_push($this->dir_tags, $dir->dir_tag);
+			$blank = 'true';
+			foreach($dir as $d){
+				if(preg_replace('/\s+/', '', $d) != ''){
+					$blank = 'false';
+				}
 			}
-			
-			if(!isset($dir->fastq_dir) || $dir->fastq_dir == ''){
-				$text.= $this->errorText("Fastq directory required for submission (row " . $i . ")");
-				$this->final_check = false;
-				$dir_check = false;
-			}else{
-				array_push($this->dir_fastq, $dir->fastq_dir);
-			}
-			
-			if(!isset($dir->backup_dir) || $dir->backup_dir == ''){
-				$text.= $this->errorText("Backup directory required for submission (row " . $i . ")");
-				$this->final_check = false;
-				$dir_check = false;
-			}
-			
-			if(!isset($dir->amazon_bucket) || $dir->amazon_bucket == ''){
-				$text.= $this->warningText("Amazon bucket information missing (row " . $i . ")");
-			}
-			
-			if($dir_check){
-				$this->dir_arr[$dir->dir_tag]=$dir;
+			if($blank == 'false'){
+				if(!isset($dir->dir_tag) || $dir->dir_tag == ''){
+					$text.= $this->errorText("Dir ID required for submission (row " . $i . ")");
+					$this->final_check = false;
+					$dir_check = false;
+				}else{
+					array_push($this->dir_tags, $dir->dir_tag);
+				}
+				
+				if(!isset($dir->fastq_dir) || $dir->fastq_dir == ''){
+					$text.= $this->errorText("Fastq directory required for submission (row " . $i . ")");
+					$this->final_check = false;
+					$dir_check = false;
+				}else{
+					array_push($this->dir_fastq, $dir->fastq_dir);
+				}
+				
+				if($dir_check){
+					$this->dir_arr[$dir->dir_tag]=$dir;
+				}
 			}
 		}
 		if($dir_check){
@@ -894,11 +944,12 @@ class Ngsimport extends VanillaModel {
 	
 	function processDirs(){
 		$text = "";
-		$new_dirs = new dirs($this, $this->dir_arr);
+		$new_dirs = new dirs($this, $this->dir_arr, $this->backup_dir, $this->amazon_bucket);
 		$text="DIR:".$new_dirs->getStat()."<BR>";
 		foreach($this->dir_fastq as $df){
 			$dir_id = json_decode($this->query("SELECT id FROM ngs_dirs
-											   WHERE fastq_dir = $df"));
+											   WHERE fastq_dir = '".$df."'
+											   AND backup_dir = '". $this->backup_dir."'"));
 			array_push($this->dir_ids, $dir_id);
 		}
 		return $text;
@@ -918,12 +969,16 @@ class Ngsimport extends VanillaModel {
 			$file = new file();
 			for ($j='A';$j<=$this->worksheet['lastColumnLetter'];$j++)
 			{
-				if($this->sheetData[3][$j]=="Sample or Lane Name (Enter same name for multiple files)"){$file->name=$this->esc($this->sheetData[$i][$j]);}
+				if($this->sheetData[3][$j]=="Sample or Lane Name (Enter same name for multiple files)"){
+					$file->name=$this->esc($this->sheetData[$i][$j]);
+				}elseif($this->sheetData[3][$j]=="Sample or Import Name (Enter same name for multiple files)"){
+					$file->name=$this->esc($this->sheetData[$i][$j]);
+				}
 				if($this->sheetData[3][$j]=="Directory ID"){$file->dir_tag=$this->esc($this->sheetData[$i][$j]);}
 				if($this->sheetData[3][$j]=="file name(comma separated for paired ends)"){$file->file_name=$this->esc($this->sheetData[$i][$j]);$file->file_name=preg_replace('/\s/', '', $file->file_name);}
 				if($this->sheetData[3][$j]=="file checksum"){$file->checksum=$this->esc($this->sheetData[$i][$j]);}
 				
-				if($this->sheetData[3][$j]=="Sample or Lane Name (Enter same name for multiple files)"){
+				if($this->sheetData[3][$j]=="Sample or Lane Name (Enter same name for multiple files)" || $this->sheetData[3][$j]=="Sample or Import Name (Enter same name for multiple files)"){
 					if(isset($this->lane_arr[$file->name]) && $this->laneArrayCheck == null){
 						array_push($this->initialSubmission, 'lane');
 						$this->laneArrayCheck = 'lane';
@@ -941,6 +996,7 @@ class Ngsimport extends VanillaModel {
 				if($this->sheetData[3][$j]=="Directory ID"){
 					if(in_array($file->dir_tag, $this->dir_tags) && isset($this->dir_fastq[array_search($file->dir_tag, $this->dir_tags)])){
 						$file->fastq_dir = $this->dir_fastq[array_search($file->dir_tag, $this->dir_tags)];
+						$file->backup_dir = $this->backup_dir;
 					}
 				}
 			}
@@ -948,43 +1004,52 @@ class Ngsimport extends VanillaModel {
 			/*
 			 *	Check for proper data input
 			 */
-			//	Sample/Lane Name
-			if(isset($file->name)){
-				if($this->checkAlphaNumWithAddChars('_-', $file->name)){
-					if(!(isset($this->sample_arr[$file->name])) & !(isset($this->lane_arr[$file->name]))){
-						$text.= $this->errorText("sample/lane name does not match the samples/lanes given (row " . $i . ")");
+			$blank = 'true';
+			foreach($file as $f){
+				if(preg_replace('/\s+/', '', $f) != ''){
+					$blank = 'false';
+				}
+			}
+			if($blank == 'false'){
+				//	Sample/Lane Name
+				if(isset($file->name)){
+					if($this->checkAlphaNumWithAddChars('_-', $file->name)){
+						if(!(isset($this->sample_arr[$file->name])) & !(isset($this->lane_arr[$file->name]))){
+							$text.= $this->errorText("sample/import name does not match the samples/imports given (row " . $i . ")");
+							$this->final_check = false;
+							$file_check = false;
+						}
+					}else{
+						$text.= $this->errorText("sample/import name does not contain proper characters, please use alpha-numeric characters and underscores (row " . $i . ")");
 						$this->final_check = false;
 						$file_check = false;
 					}
 				}else{
-					$text.= $this->errorText("sample/lane name does not contain proper characters, please use alpha-numeric characters and underscores (row " . $i . ")");
+					$text.= $this->errorText("sample/import name is required for submission (row " . $i . ")");
 					$this->final_check = false;
 					$file_check = false;
 				}
-			}else{
-				$text.= $this->errorText("sample/lane name is required for submission (row " . $i . ")");
-				$this->final_check = false;
-				$file_check = false;
-			}
-			
-			//	File Name
-			if(isset($file->file_name)){
-				$this->file_arr[$file->file_name]=$file;
-				array_push($this->file_names, $file->file_name);
-			}else{
-				$text.= $this->errorText("file name is required for submission (row " . $i . ")");
-				$this->final_check = false;
-				$file_check = false;
-			}
-			
-			//	File Directory
-			if(!isset($file->fastq_dir) && isset($file->dir_tag)){
-				$text.= $this->errorText("Directory information is incorrect (row " . $i . ")");
-				$this->final_check = false;
-				$file_check = false;
-			}elseif($this->fastq_dir != null){
-				$file->dir_tag="old_import_template";
-				$file->fastq_dir = $this->fastq_dir;
+				
+				//	File Name
+				if(isset($file->file_name)){
+					$this->file_arr[$file->file_name]=$file;
+					array_push($this->file_names, $file->file_name);
+				}else{
+					$text.= $this->errorText("file name is required for submission (row " . $i . ")");
+					$this->final_check = false;
+					$file_check = false;
+				}
+				
+				//	File Directory
+				if(!isset($file->fastq_dir) && isset($file->dir_tag)){
+					$text.= $this->errorText("Directory information is incorrect (row " . $i . ")");
+					$this->final_check = false;
+					$file_check = false;
+				}elseif($this->fastq_dir != null){
+					$file->dir_tag="old_import_template";
+					$file->fastq_dir = $this->fastq_dir;
+					$file->backup_dir = $this->backup_dir;
+				}
 			}
 		}
 		if($file_check){
@@ -998,62 +1063,43 @@ class Ngsimport extends VanillaModel {
 		//echo json_encode($this->file_arr);
 		$new_files = new files($this, $this->file_arr, $this->samples);
 		$text.="FILES:".$new_files->getStat();
-		//var_dump($sheetData);
 		
-		//	Checks for new file_names of same samples/lanes
+		//	Checks for new file names of same samples/lanes
 		if($this->laneArrayCheck == 'lane'){
-			$all_file_names_array = [];
-			$all_file_names = json_decode($this->query("select file_name from ngs_temp_lane_files where lane_id in 
-													(SELECT id from ngs_lanes WHERE name in ('".implode("','", explode(",",$this->laneList))."') and series_id in 
-													(SELECT id FROM ngs_experiment_series WHERE experiment_name = '$this->experiment_name'))"));
-			foreach($all_file_names as $afn){
-				array_push($all_file_names_array, $afn->file_name);
+			//For every directory added, find the id from the fastq directory and the backup directory
+			$dir_ids_check = [];
+			foreach($this->dir_arr as $da){
+				$dir_id_ret = json_decode($this->query("SELECT id FROM ngs_dirs WHERE fastq_dir = '" . $da->fastq_dir . "' and backup_dir = '" . $da->backup_dir . "'"));
+				array_push($dir_ids_check, $dir_id_ret[0]->id);
 			}
-			foreach($all_file_names_array as $afna){
-				if(!in_array($afna, $this->file_names)){
-					//remove
-					$this->query("DELETE FROM ngs_temp_lane_files where file_name = '$afna' and lane_id in
-								(SELECT id FROM ngs_lanes WHERE name in ('".implode("','", explode(",",$this->laneList))."') and series_id in 
-								(SELECT id FROM ngs_experiment_series WHERE experiment_name = '$this->experiment_name'))");
-				}
-				$count_files = json_decode($this->query("SELECT lane_id, count(file_name) as count FROM ngs_temp_lane_files LEFT JOIN ngs_dirs ON ngs_temp_lane_files.dir_id = ngs_dirs.id
-									WHERE file_name = '$afna'"));
-				if($count_files[0]->count > 1){
-					$lane_name_removal = json_decode($this->query("SELECT ngs_lanes.id, ngs_lanes.name FROM ngs_temp_lane_files LEFT JOIN ngs_lanes ON ngs_temp_lane_files.lane_id = ngs_lanes.id
-																	WHERE file_name = '$afna'"));
-					foreach($lane_name_removal as $lnr){
-						if(!in_array($lnr->id, $this->lane_ids)){
-							$this->query("DELETE FROM ngs_temp_lane_files where lane_id = $lnr->id");
-							$this->query("DELETE FROM ngs_lanes where id = $lnr->id");
-							$this->query("DELETE FROM ngs_samples where lane_id = $lnr->id");
-						}
-					}
+			//Find the lane Ids based on the directory ID
+			$lane_name_removal = json_decode($this->query("SELECT lane_id FROM ngs_temp_lane_files WHERE dir_id in (" . implode(",", $dir_ids_check) . ")"));
+			
+			//For every lane id found within the directory that isn't in the samples listed, remove them.
+			foreach($lane_name_removal as $lnr){
+				if(!in_array($lnr->lane_id, $this->lane_ids)){
+					$this->query("DELETE FROM ngs_temp_lane_files where lane_id = $lnr->lane_id");
+					$this->query("DELETE FROM ngs_lanes where id = $lnr->lane_id");
+					$this->query("DELETE FROM ngs_samples where lane_id = $lnr->lane_id");
 				}
 			}
 		}else{
-			$all_file_names_array = [];
-			$all_file_names = json_decode($this->query("select file_name from ngs_temp_sample_files where sample_id in (".implode(",",$this->sample_ids).");"));
-			foreach($all_file_names as $afn){
-				array_push($all_file_names_array, $afn->file_name);
+			//For every directory added, find the id from the fastq directory and the backup directory
+			$dir_ids_check = [];
+			foreach($this->dir_arr as $da){
+				$dir_id_ret = json_decode($this->query("SELECT id FROM ngs_dirs WHERE fastq_dir = '" . $da->fastq_dir . "' and backup_dir = '" . $da->backup_dir . "'"));
+				array_push($dir_ids_check, $dir_id_ret[0]->id);
 			}
-			foreach($all_file_names_array as $afna){
-				if(!in_array($afna, $this->file_names)){
-					//remove
-					$this->query("DELETE FROM ngs_temp_sample_files where file_name = '$afna' and sample_id in (".implode(",",$this->sample_ids).");");
+			
+			//Find the sample Ids based on the directory ID
+			$sample_name_removal = json_decode($this->query("SELECT sample_id FROM ngs_temp_sample_files WHERE dir_id in (" . implode(",", $dir_ids_check) . ")"));
+			
+			//For every sample id found within the directory that isn't in the samples listed, remove them.
+			foreach($sample_name_removal as $snr){
+				if(!in_array($snr->sample_id, $this->sample_ids)){
+					$this->query("DELETE FROM ngs_temp_sample_files where sample_id = $snr->sample_id");
+					$this->query("DELETE FROM ngs_samples where id = $snr->sample_id");
 				}
-				$count_files = json_decode($this->query("SELECT sample_id, count(file_name) as count FROM ngs_temp_sample_files LEFT JOIN ngs_dirs ON ngs_temp_sample_files.dir_id = ngs_dirs.id
-									WHERE file_name = '$afna'"));
-				if($count_files[0]->count > 1){
-					$sample_name_removal = json_decode($this->query("SELECT ngs_samples.id, ngs_samples.name FROM ngs_temp_sample_files LEFT JOIN ngs_samples ON ngs_temp_sample_files.sample_id = ngs_samples.id
-																	WHERE file_name = '$afna'"));
-					foreach($sample_name_removal as $snr){
-						if(!in_array($snr->id, $this->sample_ids)){
-							$this->query("DELETE FROM ngs_temp_sample_files where sample_id = $snr->id");
-							$this->query("DELETE FROM ngs_samples where id = $snr->id");
-						}
-					}
-				}
-				
 			}
 		}
 		
@@ -1985,9 +2031,9 @@ class files extends main{
 			return 0;
 		}
 	}
-	function getDirId($fastq_dir)
+	function getDirId($fastq_dir, $backup_dir)
 	{
-		$sql="select id from ngs_dirs where `fastq_dir`='$fastq_dir'";
+		$sql="select id from ngs_dirs where `fastq_dir`='$fastq_dir' and `backup_dir` = '$backup_dir'";
 		return $this->model->query($sql,1);
 	}
 
@@ -1995,7 +2041,7 @@ class files extends main{
 	{
 		$this->sample_id = $this->getSampleId($file->name);
 		$this->lane_id = ($this->sample_id==0 ? $this->getLaneId($file->name) : $this->getLaneIdFromSample($file->name));
-		$this->dir_id = $this->getDirId($file->fastq_dir);
+		$this->dir_id = $this->getDirId($file->fastq_dir, $file->backup_dir);
 		if ($this->sample_id>0)
 		{
 			$this->tablename="ngs_temp_sample_files";
@@ -2052,12 +2098,14 @@ class files extends main{
 /* diretories for the files class */
 class dir{}
 class dirs extends main{
+	private $amazon_bucket;
 
-	function __construct($model, $dir_arr = [])
+	function __construct($model, $dir_arr = [], $backup_dir, $amazon_bucket)
 	{
 		$this->model=$model;
 		$this->dir_arr=$dir_arr;
-		
+		$this->backup_dir = $backup_dir;
+		$this->amazon_bucket = $amazon_bucket;
 		$this->processArr($dir_arr);
 	}
 
@@ -2073,7 +2121,7 @@ class dirs extends main{
 
 	function getId($dir)
 	{
-		$sql="select id from ngs_dirs where `fastq_dir`='".$dir->fastq_dir."'";
+		$sql="select id from ngs_dirs where `fastq_dir`='".$dir->fastq_dir."' and `backup_dir` = '" . $dir->backup_dir."'";
 		return $this->model->query($sql,1);
 	}
 
@@ -2082,7 +2130,7 @@ class dirs extends main{
 		$sql=" INSERT INTO `ngs_dirs`(`fastq_dir`,`backup_dir`, `amazon_bucket`,
 		`owner_id`, `group_id`, `perms`,
 		`date_created`, `date_modified`, `last_modified_user`)
-				 VALUES('".$dir->fastq_dir."', '".$dir->backup_dir."', '".$dir->amazon_bucket."',
+				 VALUES('".$dir->fastq_dir."', '".$this->backup_dir."', '".$this->amazon_bucket."',
 		 '".$this->model->uid."', '".$this->model->gid."', '".$this->model->sid."',
 		 now(), now(), '".$this->model->uid."');";
 		$this->insert++;
@@ -2093,12 +2141,11 @@ class dirs extends main{
 	function update($dir)
 	{
 		$sql="update `ngs_dirs` set
-		`backup_dir`='".$dir->backup_dir."', `amazon_bucket`='".$dir->amazon_bucket."',
+		`backup_dir`='".$this->backup_dir."', `amazon_bucket`='".$this->amazon_bucket."',
 		`group_id`='".$this->model->gid."', `perms`='".$this->model->sid."',
 		`date_modified`=now(), `last_modified_user`='".$this->model->uid."'
 				where `id` = ".$this->getId($dir);
 		$this->update++;
-
 		return $this->model->query($sql);
 	}
 }

@@ -23,7 +23,6 @@ warnings.filterwarnings('ignore', '.*the sets module is deprecated.*',
 from workflowdefs import *
 
 class Dolphin:
-    bin_dir = dirname(argv[0])
     cmd = 'python %(dolphin_tools_dir)s/runWorkflow.py -f %(params_section)s -i %(input_fn)s -w %(workflow)s -p %(dolphin_default_params)s -u %(username)s -o %(outdir)s %(wkeystr)s'
     config = ConfigParser.ConfigParser()
     params_section = ''
@@ -100,23 +99,32 @@ class Dolphin:
         fields="d.backup_dir fastq_dir, d.backup_dir, d.amazon_bucket, rp.outdir"
         idmatch="s.id=tl.sample_id"
         sql = "SELECT DISTINCT %(fields)s FROM ngs_runlist nr, ngs_samples s, %(tablename)s tl, ngs_dirs d, ngs_runparams rp where nr.sample_id=s.id and rp.run_status=0 and %(idmatch)s and d.id=tl.dir_id and rp.id=nr.run_id and nr.run_id='"+str(runparamsid)+"';"
-    
         results=self.runSQL(sql%locals())
-        if (not results):
+        if (results==() or self.checkIfAnewSampleAdded(runparamsid)):
            fields="d.fastq_dir, d.backup_dir, d.amazon_bucket, rp.outdir"
            if (isbarcode):
                idmatch="s.lane_id=tl.lane_id"
                tablename="ngs_temp_lane_files"
            else:
                tablename="ngs_temp_sample_files"
+           print sql%locals() 
            results=self.runSQL(sql%locals())
         return results[0]
-    
+   
+    def checkIfAnewSampleAdded(self, runparamsid):
+        sql = "SELECT a.sample_id FROM (SELECT nr.sample_id FROM ngs_runlist nr, ngs_temp_sample_files ts where nr.sample_id=ts.sample_id and run_id="+str(runparamsid)+") a where sample_id NOT IN(SELECT nr.sample_id FROM ngs_runlist nr, ngs_fastq_files ts where nr.sample_id=ts.sample_id and run_id="+str(runparamsid)+")"
+        sampleids=self.runSQL(sql%locals())
+        if (sampleids != ()):
+            return 1
+        return 0
+ 
     def getSampleList(self, runparamsid):
         tablename="ngs_fastq_files"
-        sql = "SELECT s.samplename, ts.file_name FROM ngs_runparams nrp, ngs_runlist nr, ngs_samples s, %(tablename)s ts, ngs_dirs d where nr.run_id=nrp.id and nr.sample_id=s.id and nrp.run_status=0 and s.id=ts.sample_id and d.id=ts.dir_id and nr.run_id='"+str(runparamsid)+"';"
+        dirfield="d.backup_dir"
+        sql = "SELECT s.samplename, %(dirfield)s dir, ts.file_name FROM ngs_runparams nrp, ngs_runlist nr, ngs_samples s, %(tablename)s ts, ngs_dirs d where nr.run_id=nrp.id and nr.sample_id=s.id and nrp.run_status=0 and s.id=ts.sample_id and d.id=ts.dir_id and nr.run_id='"+str(runparamsid)+"';"
         samplelist=self.runSQL(sql%locals())
-        if (not samplelist):
+        if (samplelist==() or self.checkIfAnewSampleAdded(runparamsid)):
+            dirfield="d.fastq_dir"
             tablename="ngs_temp_sample_files"
             samplelist=self.runSQL(sql%locals())
         return self.getInputParams(samplelist)
@@ -126,29 +134,34 @@ class Dolphin:
         for row in samplelist:
             if (inputparams):
                inputparams=inputparams+":"
-            inputparams=inputparams+row[0]+","+row[1]
+            content = row[2]
+            content = content.replace( ',', ","+row[1]+"/" )
+            inputparams=inputparams+row[0]+","+row[1]+"/"+content
         spaired=None
-        if (',' in row[1]):
+        if (',' in row[2]):
             spaired="paired"
         return (spaired, inputparams)
     
     def getLaneList(self, runparamsid):
         tablename="ngs_fastq_files"
+        fields='d.backup_dir dir, tl.file_name'
         sql = "SELECT DISTINCT %(fields)s FROM ngs_runlist nrl, ngs_runparams nrp, ngs_samples s, %(tablename)s tl where nrl.run_id=nrp.id and nrp.run_status=0 and s.lane_id = tl.lane_id and s.id=nrl.sample_id and nrp.id='"+str(runparamsid)+"';"
-        fields='tl.file_name'
     
         result=self.runSQL(sql%locals())
         if (not result):
             tablename="ngs_temp_lane_files"
+            fields='d.fastq_dir dir, tl.file_name'
             result=self.runSQL(sql%locals())
     
         inputparams=""
         for row in result:
             if (inputparams):
                 inputparams=inputparams+":"
-            inputparams=inputparams+row[0]
+            content = row[1]
+            content = content.replace( ',', ","+row[1]+"/" )
+            inputparams=inputparams+row[0]+"/"+content
         spaired=None
-        if (',' in row[0]):
+        if (',' in row[1]):
             spaired="paired"
     
         fields='s.samplename, s.barcode'
@@ -163,14 +176,6 @@ class Dolphin:
         return (spaired, inputparams, barcode)
 
     def write_input(self,  input_fn, data_dir, content,genomebuild,spaired,barcodes,adapter, quality, trim,trimpaired, split, commonind, advparams, customind, pipeline) :
-       if ('DIR' in content):
-           content = content.replace( 'DIR', data_dir )
-       else:
-           if (str(barcodes) != "None"):
-               content = data_dir+"/"+content
-               content = content.replace( ':', ":"+data_dir+"/" )
-           content = content.replace( ',', ","+data_dir+"/" )
-       content = re.sub(r'/+','/',content)
     
        gb=genomebuild.split(',')
        previous="NONE"
@@ -244,7 +249,7 @@ class Dolphin:
           mapnames="";
        if (customind):
           for i in customind:
-            arr=re.split(r'[,:]+', self.parse_content(customind))
+            arr=re.split(r'[:]', self.parse_content(i))
             index=self.parse_content(arr[0])
             name=self.parse_content(self.replace_space(arr[1]))
             mapnames=str(mapnames)+name+":"+index+","
@@ -297,6 +302,15 @@ class Dolphin:
                print >>fp, '@TSIZE=%s'%(self.remove_space(str(arr[3])));
                print >>fp, '@BWIDTH=%s'%(self.remove_space(str(arr[4])));
                print >>fp, '@GSIZE=%s'%(self.remove_space(str(arr[5])));
+
+             if (pipename=="BisulphiteMapping"):
+               if (arr[1] == "1"):
+                 print >>fp, '@BSMAPPARAM=%s'%(self.remove_space(arr[3]));
+               if (arr[4] == "1"):
+                 print >>fp, '@MCONDS=%s'%(self.remove_space(arr[5]+":"+arr[6]));
+                 print >>fp, '@MCALLPARAM=%s'%(self.remove_space(arr[7]));
+               if (arr[8] == "1"):
+                 print >>fp, '@MCOMPPARAM=%s'%(self.remove_space(arr[9]));
     
     
        print >>fp, '@MAPNAMES=%s'%(mapnames)
@@ -356,7 +370,7 @@ class Dolphin:
         if (customind):
            for i in customind:
               countstep = True
-              arr=i.split(',')
+              arr=i.split(':')
               indexname=arr[1]
               stepline=stepSeqMapping % locals()
               print >>fp, '%s'%stepline
@@ -472,6 +486,19 @@ class Dolphin:
                  print >>fp, '%s'%stepline
                  stepline=stepMergePicard % locals()
                  print >>fp, '%s'%stepline
+
+              if (pipename == "BisulphiteMapping"):
+                 if (arr[1] == "1"):
+                    digestion=arr[2]
+                    stepline=stepBSMap % locals()
+                    print >>fp, '%s'%stepline
+                 if (arr[4] == "1"):
+                    stepline=stepMCall % locals()
+                    print >>fp, '%s'%stepline
+                 if (arr[8] == "1"):
+                    stepline=stepMComp % locals()
+                    print >>fp, '%s'%stepline
+                 #Set running macs step
         
         level=0
         if (clean):
@@ -569,7 +596,7 @@ def main():
               amazonupload     = "Yes"
 
            (inputdir, backup_dir, amazon_bucket, outdir) = dolphin.getDirs(runparamsid, isbarcode)
-           if(inputdir == backup_dir):
+           if(inputdir == backup_dir and outdir.find("/initial_run")==-1 ):
               backupS3 = None
               gettotalreads = None
            else:
@@ -587,7 +614,7 @@ def main():
            runparams = dolphin.getRunParams(runparamsid)
            logging.info(runparams)
 
-           input_fn      = "../tmp/files/input.txt"
+           input_fn      = logdir+'/run'+str(rpid)+'/input.'+str(rpid)+'.'+str(os.getpid())+'.txt'
 
            fastqc      = runparams.get('fastqc')
            adapter     = runparams.get('adapter')
@@ -599,7 +626,7 @@ def main():
            commonind   = runparams.get('commonind')
            advparams   = runparams.get('advparams')
            resume      = runparams.get('resume')
-           customind   = runparams.get('customind')
+           customind   = runparams.get('custom')
            pipeline    = runparams.get('pipeline')
            genomebuild = runparams.get('genomebuild')
 
@@ -622,7 +649,6 @@ def main():
            if pipeline:
               pipeline     = [i for i in pipeline]
            #print pipeline
-
            if not outdir :
               print >>stderr, 'Error: Output dir is NULL.'
               exit( 128 )
@@ -635,7 +661,7 @@ def main():
 
            dolphin.write_input(input_fn, inputdir, content, genomebuild, spaired, barcodes, adapter, quality, trim, trimpaired, split, commonind, advparams, customind, pipeline )
 
-           workflow = join( dolphin.bin_dir, '../tmp/files/seqmapping_workflow.txt' )
+           workflow = logdir+'/run'+str(rpid)+'/seqmapping_workflow.'+str(rpid)+'.'+str(os.getpid())+'.txt'
 
            dolphin.write_workflow(resume, gettotalreads, amazonupload, backupS3, runparamsid, customind, commonind, pipeline, barcodes, fastqc, adapter, quality, trim, split, workflow, clean)
 

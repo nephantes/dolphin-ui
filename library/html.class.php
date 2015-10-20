@@ -449,7 +449,7 @@ e range"><i class="fa fa-calendar"></i></button>
 	return $html;
 	}
 	
-	function getBrowserPanelMore($objects, $fields, $header ,$name, $files)
+	function getBrowserPanelMore($objects, $fields, $header ,$name, $files, $fastq_files)
 	{
 	foreach ($objects as $obj):
 	$html='<div class="panel panel-default">
@@ -465,8 +465,8 @@ e range"><i class="fa fa-calendar"></i></button>
 		<h4>
 			'.$obj[$name].'
 		</h4>
-		</div>
-		<div class="box-body">
+		
+		<div class="box-body col-md-4" style="overflow:scroll">
 		<dl class="dl-horizontal">
 		';
 		foreach ($fields as $field):
@@ -475,13 +475,46 @@ e range"><i class="fa fa-calendar"></i></button>
 			 $html.='<dd>'.$obj[$field['fieldname']].'</dd>';
 		}
 		endforeach;
+		$html.= '</dl>
+				</div>
+				<div class="box-body col-md-8">';
 		if($files != null){
-				$html.='<dt>File(s)</dt>';
-				$html.='<dd>'.$files[0]['file_name'].'</dd>';
+				$html .= '<div class="box-body col-md-12" style="overflow:scroll">
+				<table class="table table-hover table-striped table-condensed">';
+				$html.='<thead><tr><th>Input File(s) Directory:</th></tr></thead>
+						<tbody>';
+				$html.='<tr><td onclick="editBox( '.$_SESSION['uid'].', '. $files[0]['dir_id'].', \'fastq_dir\', \'ngs_dirs\', this)">'.$files[0]['fastq_dir'].'</td></tr>
+						</tbody>';
+				$html.='<thead><tr><th>Input File(s):</th></tr></thead>
+						<tbody>';
+				foreach ($files as $f){
+						if($fastq_files == 'lanes'){
+								$html.='<tr><td onclick="editBox( '.$_SESSION['uid'].', '. $f['id'].', \'file_name\', \'ngs_temp_lane_files\', this)">'.$f['file_name'].'</td></tr>';
+						}else{
+								$html.='<tr><td onclick="editBox( '.$_SESSION['uid'].', '. $f['id'].', \'file_name\', \'ngs_temp_sample_files\', this)">'.$f['file_name'].'</td></tr>';	
+						}
+				}
+				$html .= '</tbody></table>
+						</div>';
 		}
-	$html.=	'</dl>
-		</div> 
-		</div>';
+		if($fastq_files != null && $fastq_files != 'lanes'){
+				$html .= '<div class="box-body col-md-12" style="overflow:scroll">
+				<table class="table table-hover table-striped table-condensed">';
+				$html.='<thead><tr><th>Processed File(s) Directory:</th></tr></thead>
+						<tbody>';
+				$html.='<tr><td onclick="editBox( '.$_SESSION['uid'].', '. $fastq_files[0]['dir_id'].', \'fastq_dir\', \'ngs_dirs\', this)">'.$fastq_files[0]['fastq_dir'].'</td></tr>
+						</tbody>';
+				$html.='<thead><tr><th>Processed File(s):</th></tr></thead>
+						<tbody>';
+				foreach ($fastq_files as $ff){
+						$html.='<tr><td onclick="editBox( '.$_SESSION['uid'].', '. $ff['id'].', \'file_name\', \'ngs_fastq_files\', this)">'.$ff['file_name'].'</td></tr>';
+				}
+				$html .= '</tbody></table>
+						</div>';
+		}
+		$html.=	'</div>
+			</div>
+			</div>';
 	endforeach;
 	return $html;
 	}
@@ -658,8 +691,12 @@ e range"><i class="fa fa-calendar"></i></button>
 	{
 		$html.= 	'<div id="'.$id.'_exp_body" class="box-body" style="display: none;" onchange="">
 				<form role="form">
-					<input id="'.$id.'_yes" type="radio" name="'.$id.'" value="yes"> yes</input>
-					<input id="'.$id.'_no" type="radio" name="'.$id.'" value="no" checked> no</input>';
+				<div class="margin">
+						yes
+					<input id="'.$id.'_yes" type="radio" name="'.$id.'" value="yes"></input>
+					<input id="'.$id.'_no" type="radio" name="'.$id.'" value="no" checked></input>
+						no
+				</div>';
 		$html.= 		'<div class="input-group margin col-md-11">
 					';
 		for($y = 0; $y < $numFields; $y++){
@@ -808,7 +845,32 @@ e range"><i class="fa fa-calendar"></i></button>
 		$html.="</script>\n";
 		return $html;
 	}
-	
+	function groupSelectionOptions($groups){
+		$html = "";
+		foreach($groups as $g){
+				$html.="<option>".$g['name']."</option>";
+		}
+		return $html;
+	}
+	function getStaticPermissionsBox($title, $id, $selection, $width){
+		$html = "";
+		$html = '<div class="col-md-'.$width.'">
+				<div class="box box-default">
+					<div class="box-header with-border">
+					<h3 class="box-title">'.$title.'</h3>';
+		$html.= $this->getInfoBox($id);
+		$html.= '</div><!-- /.box-header -->
+				<div class="box-body">
+					<div class="input-group margin col-md-11">
+						<form role="form">';
+		$html.= $selection;
+		$html.= 		'</form>
+						</div>
+					</div><!-- /.box-body -->
+				</div><!-- /.box -->
+			</div><!-- /.col -->';
+		return $html;
+	}
 	function getInfoBox($id){
 		$left_help_boxes = ['plot_control_panel', 'run_name', 'genomebuild', 'adapter', 'split', 'custom', 'pipeline'];
 		if(in_array($id, $left_help_boxes)){

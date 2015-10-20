@@ -14,6 +14,10 @@ Contents:
    excelimport
    ngsbrowser
    excelexport
+   ngspipeline
+   ngsstatus
+   ngsreports
+   ngsplots
 
 
 
