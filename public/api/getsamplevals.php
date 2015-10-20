@@ -28,7 +28,6 @@ $query = new dbfuncs();
 # b.API_PATH/api/getsamplevals.php?samples=8,10,11;6:13,14;7&file=DESeq2RSEM1/alldetected_genes.tsv&common=name,&keepcols=padj,log2FoldChange&key=name&type=rsem&format=html&filter=Fgf21,0610005C13Rik,Crebbp
 #
 
-
 $samples= $_GET['samples']; # Ex: samples=1:10,13:8
 
 $format=$_GET['format']; # Ex: format:html [html|json|json2]

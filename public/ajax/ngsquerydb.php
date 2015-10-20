@@ -12,7 +12,7 @@ $pDictionary = ['getSelectedSamples', 'submitPipeline', 'getStatus', 'getRunSamp
 				'checkMatePaired', 'getAllSampleIds', 'getLaneIdFromSample', 'getSingleSample', 'getSeriesIdFromLane', 'getAllLaneIds',
                 'getGIDs', 'getSampleNames', 'getWKey', 'getFastQCBool', 'getReportList', 'getTSVFileList', 'profileLoad',
                 'obtainAmazonKeys', 'checkAmazonPermissions', 'getInfoBoxData', 'getSamplesFromName', 'getLanesWithSamples',
-                'getLanesFromName', 'getSamplesfromExperimentSeries', 'getExperimentIdFromSample'];
+                'getLanesFromName', 'getSamplesfromExperimentSeries', 'getExperimentIdFromSample',];
 
 $data = "";
                 

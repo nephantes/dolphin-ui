@@ -581,6 +581,7 @@ e range"><i class="fa fa-calendar"></i></button>
 	$html.= '	<input type="button" class="btn btn-primary" name="pipeline_button" value="Send to Pipeline" onClick="submitSelected();"/>
 				<input type="button" class="btn btn-primary" name="send_to_status_button" value="Pipeline Status" onClick="sendToStatus()"/>
 				<input type="button" class="btn btn-primary" name="export_excel_button" value="Export to Excel" onClick="exportExcel()"/>
+				<input type="button" class="btn btn-primary" name="table_generation_button" value="Generate Tables" onClick="generateTableLink()"/>
 				<input type="button" class="btn btn-primary" name="send_to_NCBI_button" value="Send to NCBI" onClick="sendToStatus()" disabled/>
 				<input type="button" class="btn btn-primary" name="send_to_ENCODE_button" value="Send to ENCODE" onClick="sendToStatus()" disabled/>
 				<input type="button" class="btn btn-danger pull-right" name="delete_Selected" value="Delete Selected" onclick="deleteButton('.$_SESSION['uid'].')"/>';
@@ -774,8 +775,19 @@ e range"><i class="fa fa-calendar"></i></button>
 				
 				if($id == "initial_mapping"){
 					$html.= $this->getInitialMappingTable();
-				}else{
-					
+				}else if ($id == 'table_create'){
+					if(!isset($_SESSION['ngs_samples'])){	
+						$html .= $this->getRespBoxTableStream("Samples", "samples", ["id","Sample Name","Title","Source","Organism","Molecule","Selected"], ["id","name","title","source","organism","molecule","total_reads"]);
+					}else if($_SESSION['ngs_samples'] == ''){
+						$html .= $this->getRespBoxTableStream("Samples", "samples", ["id","Sample Name","Title","Source","Organism","Molecule","Selected"], ["id","name","title","source","organism","molecule","total_reads"]);
+					}else{
+						$html .= $this->getRespBoxTableStream("Samples", "samples", ["id","Sample Name","Title","Source","Organism","Molecule", "Barcode", "Description", "Avg Insert Size", "Read Length",
+																				"Concentration", "Time", "Biological Replica", "Technical Replica", "Spike-ins", "Adapter",
+																				"Notebook Ref", "Notes", "Genotype", "Library Type", "Biosample Type", "Instrument Model", "Treatment Manufacturer","Selected"],
+																				["id","name","title","source","organism","molecule","total_reads", "barcode", "description", "avg_insert_size", "read_length",
+																				"concentration", "time", "biological_replica", "technical_replica", "spike_ins", "adapter",
+																				"notebook_ref", "notes", "genotype", "library_type", "biosample_type", "instrument_model", "treatment_manufacturer"]);
+					}
 				}
 				
 	$html.= 		'</div><!-- /.box-body -->
