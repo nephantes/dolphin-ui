@@ -53,12 +53,12 @@ function manageCreateChecklists(id, tablerow){
 				{
 					for(var i = 0; i < s.length; i++){
 						var run_info = [];
-						var run_select = '<select id="'+ s[i].id + '_run_select" class="form-control" onchange="reportSelection()">';
+						var run_select = '<select id="'+ s[i].id + '_run_select" class="form-control" onchange="optionChange(this)"><form>';
 						for(var x = 0; x < run_ids[s[i].id].length; x = x+3){
 							//Sample id _ Run id _ Run name
 							run_select += '<option id="' + run_ids[s[i].id][x]+ '_' + run_ids[s[i].id][x+1] + '" value="'+ run_ids[s[i].id][x+2] + '">Run ' + run_ids[s[i].id][x] + ': ' + run_ids[s[i].id][x+1] + '</option>'
 						}
-						run_select += '</select>';
+						run_select += '</form></select>';
 						
 						table.fnAddData([
 							s[i].id,
@@ -93,11 +93,12 @@ function reportSelection(){
 		for(var r = 0; r < option_get.length; r++){
 			var option_selected = $(option_get[r][2])[0];
 			option_selected.click();
-			if (wkeys.indexOf(option_selected.options[selectionHelper[y]].value) < 0) {
-				wkeys.push(option_selected.options[selectionHelper[y]].value);
+			if (wkeys.indexOf(option_selected.options[selectionHelper[r]].value) < 0) {
+				wkeys.push(option_selected.options[selectionHelper[r]].value);
 			}
 		}
 	}
+	console.log(wkeys);
 	var wkey_count = wkeys.length;
 	
 	$.ajax({ type: "GET",
@@ -309,6 +310,7 @@ $(function() {
 				async: false,
 				success : function(s)
 				{
+					console.log(s);
 					for(var i = 0; i < s.length; i ++){
 						if (run_ids[s[i].sample_id] == undefined) {
 							if (s[i].run_name != null) {
@@ -323,13 +325,13 @@ $(function() {
 						}
 					}
 				}});
-		console.log(run_ids);
 		$.ajax({ type: "GET",
 				url: BASE_PATH+"/public/ajax/tablegenerator.php",
 				data: { p: "getTableSamples", search: sample_ids },
 				async: false,
 				success : function(s)
 				{
+					console.log(s);
 					runparams.fnClearTable();
 					for(var i = 0; i < s.length; i++){
 						/*
