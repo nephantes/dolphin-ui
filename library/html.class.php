@@ -527,12 +527,14 @@ e range"><i class="fa fa-calendar"></i></button>
 			</div>
 			<div class="box-body table-responsive non-padding">
 				<table id="dolphin_basket" class="table table-hover">
-				<tbody id="dolphin_basket_body">
+				<thead>
 					<tr>
 						<th>ID</th>
 						<th>Sample Name</th>
 						<th><button id="clear_basket" class="btn btn-primary btn-xs pull-right" disabled="true" onclick="clearBasket()">Clear Basket</button></th>
 					</tr>
+					</thead>
+				<tbody id="dolphin_basket_body">
 				</tbody>
 				</table>
 			</div>
