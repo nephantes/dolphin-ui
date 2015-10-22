@@ -81,6 +81,7 @@ else if ($p == 'createNewTable')
 {
 	if (isset($_GET['search'])){$search = $_GET['search'];}
 	if (isset($_GET['name'])){$name = $_GET['name'];}
+	if (isset($_GET['file'])){$file = $_GET['file'];}
 	
 	$current_tables=json_decode($query->queryTable("
 		SELECT *
@@ -98,11 +99,16 @@ else if ($p == 'createNewTable')
 	}
 	
 	if($table_check == false){
+		$handle = popen('pwd', "r");
+		$read = fread($handle, 2096);
+		echo $read;
+		pclose($handle);
+		
 		$data=$query->runSQL("
 		INSERT ngs_createdtables
-		(`name`,`parameters`,`owner_id`,`perms`,`date_created`,`date_modified`,`last_modified_user`)
+		(`name`,`parameters`,`file`,`owner_id`,`perms`,`date_created`,`date_modified`,`last_modified_user`)
 		VALUES
-		( '$name', '$search', ".$_SESSION['uid'].",3,NOW(),NOW(), ".$_SESSION['uid'].")"
+		( '$name', '$search','$file', ".$_SESSION['uid'].",3,NOW(),NOW(), ".$_SESSION['uid'].")"
 		);
 	}else{
 		$data=$query->runSQL("
@@ -110,16 +116,39 @@ else if ($p == 'createNewTable')
 		SET name = '$name'
 		WHERE id = $id
 		");
+		
+		$handle = popen('rm ../tmp/files/'.$file, "r");
+		pclose($handle);
 	}
 }
 else if ($p == 'deleteTable')
 {
 	if (isset($_GET['id'])){$id = $_GET['id'];}
+	$file=$query->queryTable("
+		SELECT file FROM ngs_createdtables
+		WHERE id = $id
+		");
+	$data=json_decode($file);
+	
+	$handle = popen('rm ../tmp/files/'.$file[0]->file, "r");
+	pclose($handle);
 	
 	$data=$query->runSQL("
 		DELETE FROM ngs_createdtables
 		WHERE id = $id
 		");
+}
+else if ($p == 'createTableFile')
+{
+	if (isset($_GET['url'])){$url = $_GET['url'];}
+	$json = file_get_contents($url);
+	$user = $_SESSION['user'].'_'.date('Y-m-d-H-i-s').'.json2';
+	
+	$file = fopen('../tmp/files/'.$user, "w");
+	fwrite($file,$json);
+	fclose($file);
+	
+	$data = json_encode($user);
 }
 
 header('Cache-Control: no-cache, must-revalidate');

@@ -30,11 +30,12 @@ function rerunLoad() {
 	if (hrefSplit[4] == 'search') {
 		document.getElementById('dolphin_basket').parentNode.setAttribute('style','overflow:scroll');
 		var basket = $('#dolphin_basket').dataTable( {
-			"bFilter":	false,
-			"ordering": false,
-			"info":     false,
+			//"bFilter":	false,
+			//"ordering": false,
+			//"info":     false,
 			"lengthChange": false,
-			"pageLength": 20
+			"pageLength": 20,
+			"columnDefs": [ { "targets": 2, "orderable": false } ]
 		} );
 	}
 	var rerunLoc = $.inArray('rerun', hrefSplit);

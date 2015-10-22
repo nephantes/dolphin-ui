@@ -6,6 +6,14 @@ function backToStatus(basepath){
 function sendToPlot(id){
 	var wkey = getWKey(id);
 	sendWKey(wkey);
+	$.ajax({ type: "GET",
+			url: BASE_PATH+"/public/ajax/sessionrequests.php",
+			data: { p: "setPlotToggle", type: 'normal', file: '' },
+			async: false,
+			success : function(s)
+			{
+			}
+	});
 	window.location.href = BASE_PATH+'/plot';
 }
 

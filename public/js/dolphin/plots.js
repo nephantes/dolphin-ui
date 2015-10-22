@@ -20,7 +20,31 @@ function populateFileList(){
 	$('.panel').overflow = scroll;
 }
 
+function checkGeneratedTable(){
+  var table_file = '';
+  $.ajax({ type: "GET",
+			url: BASE_PATH + "/public/ajax/sessionrequests.php",
+            data: { p: "getPlotToggle"},
+			async: false,
+			success : function(s)
+              {
+                table_file = s;
+              }
+		});
+  console.log(table_file);
+  if (table_file != '') {
+	document.getElementById('source_1').innerHTML = '';
+	var opt2 = createElement('option', ['value'], ['input']);
+	opt2.innerHTML = 'Generated File';
+    document.getElementById('source_1').appendChild(opt2);
+	
+	console.log(BASE_PATH + '/public/tmp/files/' + table_file);
+	document.getElementById('source').innerHTML = BASE_PATH + '/public/tmp/files/' + table_file;
+  }
+}
+
 populateFileList();
+checkGeneratedTable();
 
 (function (S,$) {
     $("#source_1").on("change",
@@ -64,7 +88,7 @@ window.handle_sheet_index=function(data){
 	window.view();
 	*/
     d3.selectAll(".loading").property("hidden",true);
-    if($("#source_option").val()=="input" || $("#source_opition").val()=="local_file"){
+    if($("#source_option").val()=="input" || $("#source_option").val()=="local_file"){
         $("#xi").val(0)
         $("#yi").val(0)
         $("#zi").val(0)

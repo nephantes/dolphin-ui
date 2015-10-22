@@ -531,7 +531,7 @@ e range"><i class="fa fa-calendar"></i></button>
 					<tr>
 						<th>ID</th>
 						<th>Sample Name</th>
-						<th><button id="clear_basket" class="btn btn-primary btn-xs pull-right" disabled="true" onclick="clearBasket()">Clear Basket</button></th>
+						<th><button id="clear_basket" class="btn btn-primary btn-xs pull-right" disabled="true" onclick="clearBasket()">Clear Selected Samples</button></th>
 					</tr>
 					</thead>
 				<tbody id="dolphin_basket_body">

@@ -57,7 +57,7 @@ for ($i=0; $i<sizeof($dat); $i++)
     array_push($sample_array, $dat[$i]->samplename);
 }
 
-$new_data="";
+$new_data=array();
 $title=array();
 
 foreach ($a as $i => $row)
@@ -111,8 +111,10 @@ foreach ($a as $i => $row)
    #echo $obj."<br>";
 }
 #var_dump($new_data);
+if($format == 'json2'){
+    $format = 'json2_5';
+}
 $function = 'object_to_' . $format;
-
 $api = new CSV_To_API();
 echo $api->$function($new_data);
 

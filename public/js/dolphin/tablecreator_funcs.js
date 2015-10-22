@@ -249,9 +249,26 @@ function saveTable() {
 		parameters = sendToTableGen();
 	}
 	var pass = false;
+	var file_name = '';
+	var beforeFormat = '';
+	if (window.location.href.split('/').indexOf('table') > -1) {
+		beforeFormat = window.location.href.split("/table/")[1].split('format=')[0];
+	}else{
+		beforeFormat = sendToTableGen().split('format=')[0];
+	}
+	
+	$.ajax({ type: "GET",
+			url: BASE_PATH+"/public/ajax/tablegenerator.php",
+			data: { p: "createTableFile", url: API_PATH+"/public/api/getsamplevals.php?" + beforeFormat + 'format=json2' },
+			async: false,
+			success : function(s)
+			{
+				file_name = s;
+			}
+	});
 	$.ajax({ type: "GET",
 				url: BASE_PATH+"/public/ajax/tablegenerator.php",
-				data: { p: "createNewTable", search: parameters, name: name },
+				data: { p: "createNewTable", search: parameters, name: name, file: file_name },
 				async: false,
 				success : function(s)
 				{
@@ -267,8 +284,16 @@ function optionSelection(args) {
 	console.log(args);
 }
 
-function sendTableToPlot(parameters){
-	//to be finished
+function sendTableToPlot(file){
+	$.ajax({ type: "GET",
+			url: BASE_PATH+"/public/ajax/sessionrequests.php",
+			data: { p: "setPlotToggle", type: 'generated', file: file },
+			async: false,
+			success : function(s)
+			{
+			}
+	});
+	window.location.href = BASE_PATH + '/plot';
 }
 
 function deleteTable(id){
@@ -278,9 +303,9 @@ function deleteTable(id){
 				async: false,
 				success : function(s)
 				{
+					console.log(s);
 				}
 		});
-	location.reload();
 }
 
 function optionChange(selector){
@@ -365,7 +390,7 @@ $(function() {
 		var json_obj;
 		var beforeFormat = window.location.href.split("/table/")[1].split('format=')[0];
 		$.ajax({ type: "GET",
-				url: BASE_PATH +"/public/api/getsamplevals.php?" + beforeFormat + 'format=json2',
+				url: BASE_PATH +"/public/api/getsamplevals.php?" + beforeFormat + 'format=json',
 				async: false,
 				success : function(s)
 				{
@@ -424,7 +449,7 @@ $(function() {
 								'<button type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown" aria-expanded="true">Options <span class="fa fa-caret-down"></span></button>' +
 								'<ul class="dropdown-menu" role="menu">' + 
 									'<li><a href="'+BASE_PATH+'/public/tablecreator/table/'+s[x].parameters+'" id="' + s[x].id+'">View</a></li>' +
-									//'<li><a href="" id="' + s[x].id+'" onclick="sendTableToPlot(\''+s[x].parameters+'\')">Plot</a></li>' +
+									'<li><a id="' + s[x].id+'" onclick="sendTableToPlot(\''+s[x].file+'\')">Plot Table</a></li>' +
 									'<li><a href="" id="' + s[x].id+'" onclick="deleteTable(this.id)">Delete</a></li>' +
 								'</ul>'+
 							'</div>'
