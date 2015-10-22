@@ -213,15 +213,8 @@ function tableCreatorPage(){
 function changeTableType(format, query){
 	var json_obj;
 	var beforeFormat = window.location.href.split("/table/")[1].split('format=')[0];
-	$.ajax({ type: "GET",
-			url: BASE_PATH+"/public/api/getsamplevals.php?" + beforeFormat + 'format=' + format,
-			async: false,
-			success : function(s)
-			{
-				json_obj = s;
-			}
-	});
-	document.getElementById('generated_box').innerHTML = json_obj;
+	var URL = BASE_PATH+"/public/api/getsamplevals.php?" + beforeFormat + 'format=' + format;
+	window.open(URL);
 }
 
 function backToTableIndex(){
@@ -400,11 +393,11 @@ $(function() {
 		});
 		var export_table = document.getElementById('table_export_exp_body');
 		
-		export_table.appendChild(createElement('textarea',['id','class','rows'],['generated_box','form-control','25']));
-		document.getElementById('generated_box').innerHTML = json_obj;
+		//export_table.appendChild(createElement('textarea',['id','class','rows'],['generated_box','form-control','25']));
+		//document.getElementById('generated_box').innerHTML = json_obj;
 		
-		var div = createElement('div',[],[]);
-		var dropdown = createElement('button',['id','type','class','data-toggle','aria-expanded'],['generated_button','button','margin btn btn-primary dropdown-toggle','dropdown','false']);
+		var div = createElement('div',['class'],['btn-group']);
+		var dropdown = createElement('button',['id','type','class','data-toggle','aria-expanded'],['generated_button','button','btn btn-primary dropdown-toggle','dropdown','false']);
 		dropdown.innerHTML = 'Download Type  <span class="fa fa-caret-down"></span>';
 		export_table.appendChild(dropdown);
 		
