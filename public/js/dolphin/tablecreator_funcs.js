@@ -198,6 +198,10 @@ function sendToTableGen(){
 		common_send = '&common=name';
 		key_send = '&key=name';
 		keepcols_send = '&keepcols=padj,log2FoldChange';
+	}else if (file_send.indexOf('picard')) {
+		//DESEQ
+		common_send = '&common=metric';
+		key_send = '&key=metric';
 	}
 	
 	var filter_send = '';
