@@ -521,11 +521,11 @@ e range"><i class="fa fa-calendar"></i></button>
 	
 	function getDolphinBasket(){
 	$html = '';
-	$html.= '<div class="box">
-			<div class="box-header">
+	$html.= '<div class="small box">
+			<div class="small box-header">
 				<h4 class="box-title">Selected Samples</h3>
 			</div>
-			<div class="box-body table-responsive non-padding">
+			<div class="small box-body table-responsive non-padding">
 				<table id="dolphin_basket" class="table table-hover">
 				<thead>
 					<tr>
