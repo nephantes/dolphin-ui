@@ -99,11 +99,6 @@ else if ($p == 'createNewTable')
 	}
 	
 	if($table_check == false){
-		$handle = popen('pwd', "r");
-		$read = fread($handle, 2096);
-		echo $read;
-		pclose($handle);
-		
 		$data=$query->runSQL("
 		INSERT ngs_createdtables
 		(`name`,`parameters`,`file`,`owner_id`,`perms`,`date_created`,`date_modified`,`last_modified_user`)

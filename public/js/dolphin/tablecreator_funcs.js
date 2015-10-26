@@ -266,6 +266,7 @@ function saveTable() {
 				async: false,
 				success : function(s)
 				{
+					console.log('console true');
 					pass = true;
 				}
 		});
