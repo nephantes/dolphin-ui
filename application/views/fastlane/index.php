@@ -56,7 +56,7 @@
 							<?php echo $html->getStaticSelectionBox("Input Files", "input_files", "TEXTBOX", 12)?>
 						</div>
 						<div id="output_files" class="col-md-12">
-							<?php echo $html->getStaticSelectionBox("Backup Directory (Full path)", "backup_dir", "TEXT", 12)?>
+							<?php echo $html->getStaticSelectionBox("Process Directory (Full path)", "backup_dir", "TEXT", 12)?>
 							<?php echo $html->getStaticSelectionBox("Amazon Bucket", "amazon_bucket", "TEXT", 12)?>
 						</div>
 					</div><!-- /.row -->

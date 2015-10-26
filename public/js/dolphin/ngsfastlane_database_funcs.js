@@ -12,6 +12,8 @@ function checkFastlaneInput(info_array){
 	var input_array = [];
 	var database_checks = [];
 	var sample_ids = [];
+	var sample_file_check = [];
+	var true_sample_ids = [];
 	
 	//	Non-database checks
 	//	For each input passed
@@ -110,7 +112,7 @@ function checkFastlaneInput(info_array){
 
 	//	Samples
 	if (experiment_series_id > 0 && lane_id > 0) {
-		if (input_array[1] == 'yes') {
+		if (info_array[1] == 'yes') {
 			for(z in barcode_array){
 				if(sampleCheck(experiment_series_id, lane_id, barcode_array[z][0]) != 0){
 					bad_samples.push(barcode_array[z][0]);
@@ -155,14 +157,28 @@ function checkFastlaneInput(info_array){
 				if (info_array[1] == 'yes') {
 					//	If seperating barcodes
 					for (var a = 0; a < barcode_array.length; a++) {
-						sample_ids.push(insertSample(experiment_series_id, lane_id, barcode_array[a][0],
-										organism, barcode_array[a][1], gid, perms));
+						if (sample_file_check.indexOf(barcode_array[a][0]) == -1) {
+							var true_id = insertSample(experiment_series_id, lane_id, barcode_array[a][0],
+										organism, barcode_array[a][1], gid, perms);
+							true_sample_ids.push(true_id);
+							sample_ids.push(true_id);
+							sample_file_check.push(barcode_array[a][0]);
+						}else{
+							sample_ids.push(sampleCheck(experiment_series_id, lane_id, barcode_array[a][0]));
+						}
 					}
 				}else{
 					//	If not separating barcodes
 					for (var a = 0; a < input_array.length; a++) {
-						sample_ids.push(insertSample(experiment_series_id, lane_id, input_array[a][0],
-										organism, 'nobarcode', gid, perms));
+						if (sample_file_check.indexOf(input_array[a][0]) == -1) {
+							var true_id = insertSample(experiment_series_id, lane_id, input_array[a][0],
+									organism, 'nobarcode', gid, perms);
+							true_sample_ids.push(true_id);
+							sample_ids.push(true_id);
+							sample_file_check.push(input_array[a][0]);
+						}else{
+							sample_ids.push(sampleCheck(experiment_series_id, lane_id, input_array[a][0]));
+						}
 					}
 				}
 			}else{
@@ -172,14 +188,28 @@ function checkFastlaneInput(info_array){
 				if (info_array[1] == 'yes') {
 					//	If separating barcodes
 					for (var a = 0; a < barcode_array.length; a++) {
-						sample_ids.push(insertSample(experiment_series_id, lane_id, barcode_array[a][0],
-										organism, barcode_array[a][1], gid, perms));
+						if (sample_file_check.indexOf(barcode_array[a][0]) == -1) {
+							var true_id = insertSample(experiment_series_id, lane_id, barcode_array[a][0],
+										organism, barcode_array[a][1], gid, perms);
+							true_sample_ids.push(true_id);
+							sample_ids.push(true_id);
+							sample_file_check.push(barcode_array[a][0]);
+						}else{
+							sample_ids.push(sampleCheck(experiment_series_id, lane_id, barcode_array[a][0]));
+						}
 					}
 				}else{
 					//	If not separating barcodes
 					for (var a = 0; a < input_array.length; a++) {
-						sample_ids.push(insertSample(experiment_series_id, lane_id, input_array[a][0],
-										organism, 'nobarcode', gid, perms));
+						if (sample_file_check.indexOf(input_array[a][0]) == -1) {
+							var true_id = insertSample(experiment_series_id, lane_id, input_array[a][0],
+									organism, 'nobarcode', gid, perms);
+						true_sample_ids.push(true_id);
+						sample_ids.push(true_id);
+							sample_file_check.push(input_array[a][0]);
+						}else{
+							sample_ids.push(sampleCheck(experiment_series_id, lane_id, input_array[a][0]));
+						}
 					}
 				}
 			}
@@ -194,14 +224,29 @@ function checkFastlaneInput(info_array){
 			if (info_array[1] == 'yes') {
 				//	If separating barcodes
 				for (var a = 0; a < barcode_array.length; a++) {
-					sample_ids.push(insertSample(experiment_series_id, lane_id, barcode_array[a][0],
-									organism, barcode_array[a][1], gid, perms));
+					if (sample_file_check.indexOf(barcode_array[a][0]) == -1) {
+						var true_id = insertSample(experiment_series_id, lane_id, barcode_array[a][0],
+										organism, barcode_array[a][1], gid, perms);
+							true_sample_ids.push(true_id);
+							sample_ids.push(true_id);
+						sample_file_check.push(barcode_array[a][0]);
+						
+					}else{
+						sample_ids.push(sampleCheck(experiment_series_id, lane_id, barcode_array[a][0]));
+					}
 				}
 			}else{
 				//	If not separating barcodes
 				for (var a = 0; a < input_array.length; a++) {
-					sample_ids.push(insertSample(experiment_series_id, lane_id, input_array[a][0],
-									organism, 'nobarcode', gid, perms));
+					if (sample_file_check.indexOf(input_array[a][0]) == -1) {
+						var true_id = insertSample(experiment_series_id, lane_id, input_array[a][0],
+									organism, 'nobarcode', gid, perms);
+						true_sample_ids.push(true_id);
+						sample_ids.push(true_id);
+						sample_file_check.push(input_array[a][0]);
+					}else{
+						sample_ids.push(sampleCheck(experiment_series_id, lane_id, input_array[a][0]));
+					}
 				}
 			}
 		}
@@ -237,8 +282,7 @@ function checkFastlaneInput(info_array){
 		console.log(organism);
 		console.log(gid);
 		console.log(perms);
-		
-		return sample_ids;
+		return true_sample_ids;
 	}
 }
 
