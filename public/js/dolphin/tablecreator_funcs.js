@@ -268,6 +268,7 @@ function saveTable() {
 					pass = true;
 				}
 		});
+	console.log(pass);
 	if (pass == true) {
 		toTableListing();
 	}
