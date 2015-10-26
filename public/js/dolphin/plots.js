@@ -41,6 +41,14 @@ function checkGeneratedTable(){
 	console.log(BASE_PATH + '/public/tmp/files/' + table_file);
 	document.getElementById('source').innerHTML = BASE_PATH + '/public/tmp/files/' + table_file;
   }
+  $.ajax({ type: "GET",
+		  url: BASE_PATH+"/public/ajax/sessionrequests.php",
+		  data: { p: "setPlotToggle", type: '', file: '' },
+		  async: false,
+		  success : function(s)
+		  {
+		  }
+  });
 }
 
 populateFileList();
