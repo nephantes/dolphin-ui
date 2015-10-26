@@ -15,7 +15,7 @@
 				<section class="content">
 					<div class="row">
 						<div class="col-md-12">
-							<div class="margin col-md-6">
+							<div class="margin col-md-8">
 								<?php 
 									echo $html->getRespBoxTable_ng("Samples Selected", "selected_samples", "<th>id</th><th>Sample Name</th><th>Run ID</th><th>Delete</th>");
 								?>
@@ -34,14 +34,14 @@
 									</div>
 								</div>
 							</div>
-							<div class="margin col-md-9">
+							<div class="margin col-md-12">
 								<?php
 									$_SESSION['tablecreatorcheck'] = true;
 									echo $html->getExpandingAnalysisBox('Additional Sample Selection', "table_create", false);
 									unset($_SESSION['tablecreatorcheck']);
 								?>
 							</div>
-							<div class="margin col-md-9">
+							<div class="margin col-md-12">
 								<button class="btn btn-box-tool btn-primary margin pull-right" onclick="toBrowserPage()">Back to Browser</button>
 								<button class="btn btn-box-tool btn-primary margin pull-right" onclick="tableCreatorPage()">Generate Table</button>
 								<button class="btn btn-box-tool btn-primary margin pull-right" onclick="toTableListing()">To Created Tables</button>

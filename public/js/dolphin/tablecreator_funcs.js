@@ -199,9 +199,14 @@ function sendToTableGen(){
 		key_send = '&key=name';
 		keepcols_send = '&keepcols=padj,log2FoldChange';
 	}else if (file_send.indexOf('picard')) {
-		//DESEQ
-		common_send = '&common=metric';
-		key_send = '&key=metric';
+		//PICARD
+		if (file_send.indexOf('.hist.') > -1) {
+			common_send = '&common=nt';
+			key_send = '&key=nt';
+		}else{
+			common_send = '&common=metric';
+			key_send = '&key=metric';
+		}
 	}
 	
 	var filter_send = '';
@@ -442,7 +447,7 @@ $(function() {
 		export_table.appendChild(div);
 	}else{
 		var runparams = $('#jsontable_table_viewer').dataTable({
-			"scrollX": true
+			//"scrollX": true
 		});
 		$.ajax({ type: "GET",
 				url: BASE_PATH+"/public/ajax/tablegenerator.php",
@@ -466,7 +471,7 @@ $(function() {
 							s[x].id,
 							s[x].name,
 							stringSampleRuns,
-							splitParameters[1].split('file=')[1],
+							splitParameters[1].split('file=')[1].split(',').join(', '),
 							'<div class="btn-group pull-right">' +
 								'<button type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown" aria-expanded="true">Options <span class="fa fa-caret-down"></span></button>' +
 								'<ul class="dropdown-menu" role="menu">' + 

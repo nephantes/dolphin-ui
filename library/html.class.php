@@ -207,7 +207,7 @@ class HTML {
 		$html.= $this->getInfoBox($table);
 		$html.= '</div>
 				<div class="box-body table-responsive">
-				<table id="jsontable_'.$table.'" class="table table-hover table-striped table-condensed table-scrollable">
+				<table id="jsontable_'.$table.'" class="table table-hover table-striped table-condensed">
 		<thead>
 					<tr>
 			'.$fields.'
