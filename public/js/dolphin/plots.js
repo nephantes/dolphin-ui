@@ -26,7 +26,7 @@ function populateFileList(){
 				console.log(s);
                 for (var x = 0; x < s.length; x++){
                   var opt = createElement('option', ['value'], [s[x].file]);
-                  opt.innerHTML = s[x].name;
+                  opt.innerHTML = "Created || " +s[x].name;
                   document.getElementById('source_1').appendChild(opt);
                 }
               }

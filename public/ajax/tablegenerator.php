@@ -37,15 +37,19 @@ else if ($p == 'getTableReportsList')
 	$key_count = count(explode(",",$wkey));
 	if($key_count == 1){
 		$data=$query->queryTable("
-		SELECT file
+		SELECT file, json_parameters
 		FROM report_list
-		WHERE wkey = '". $wkey ."'
+		LEFT JOIN ngs_runparams
+		ON report_list.wkey = ngs_runparams.wkey
+		WHERE report_list.wkey = '". $wkey ."'
 		");
 	}else{
 		$data=$query->queryTable("
-		SELECT file
+		SELECT file, json_parameters
 		FROM report_list
-		WHERE wkey IN ( '". implode("','", explode(",",$wkey))."' )
+		LEFT JOIN ngs_runparams
+		ON report_list.wkey = ngs_runparams.wkey
+		WHERE report_list.wkey IN ( '". implode("','", explode(",",$wkey))."' )
 		");
 	}
 }

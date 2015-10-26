@@ -110,11 +110,16 @@ function reportSelection(){
 				reports = s;
 			}
 	});
+	console.log(reports);
 	
 	var multi_box = document.getElementById('report_multi_box');
 	multi_box.innerHTML = '';
 	var run_cohesion_check = [];
 	var run_cohesion_count_check = [];
+	var genome_check = '';
+	if (reports.length > 0) {
+		genome_check = reports[0].json_parameters.split(',')[0];
+	}
 	for(var y = 0; y < reports.length; y ++){
 		var filename = reports[y].file.split(".")[reports[y].file.split(".").length - 1];
 		if (filename != 'pdf' && filename != 'R') {
@@ -134,7 +139,7 @@ function reportSelection(){
 				multi_box.add(option);
 			}else{
 				run_cohesion_count_check[run_cohesion_check.indexOf(reports[y].file)]++;
-				if (wkey_count != run_cohesion_count_check[run_cohesion_check.indexOf(reports[y].file)]) {
+				if (wkey_count != run_cohesion_count_check[run_cohesion_check.indexOf(reports[y].file)] || genome_check != reports[y].json_parameters.split(",")[0]) {
 					document.getElementById(reports[y].file).disabled = true;
 					document.getElementById(reports[y].file).style.opacity = .35;
 				}else{
