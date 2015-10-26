@@ -110,7 +110,6 @@ function reportSelection(){
 				reports = s;
 			}
 	});
-	console.log(reports);
 	
 	var multi_box = document.getElementById('report_multi_box');
 	multi_box.innerHTML = '';
