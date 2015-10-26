@@ -15,12 +15,12 @@
 				<section class="content">
 					<div class="row">
 						<div class="col-md-12">
-							<div class="margin col-md-8">
+							<div class="col-md-8">
 								<?php 
 									echo $html->getRespBoxTable_ng("Samples Selected", "selected_samples", "<th>id</th><th>Sample Name</th><th>Run ID</th><th>Delete</th>");
 								?>
 							</div>
-							<div class="margin col-md-3">
+							<div class="col-md-4">
 								<div class="col-md-12">
 									<div class="box">
 										<div class="box-header">
@@ -28,13 +28,13 @@
 											</h3>
 										</div>
 										<div class= "box-body">
-											<select id="report_multi_box" class="form-control" size="20" multiple>
+											<select id="report_multi_box" class="form-control" size="31" multiple>
 											</select>
 										</div>
 									</div>
 								</div>
 							</div>
-							<div class="margin col-md-12">
+							<div class="col-md-12">
 								<?php
 									$_SESSION['tablecreatorcheck'] = true;
 									echo $html->getExpandingAnalysisBox('Additional Sample Selection', "table_create", false);
