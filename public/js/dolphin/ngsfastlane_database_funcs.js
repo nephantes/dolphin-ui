@@ -282,7 +282,6 @@ function checkFastlaneInput(info_array){
 		console.log(organism);
 		console.log(gid);
 		console.log(perms);
-		alert(' ');
 		return true_sample_ids;
 	}
 }
