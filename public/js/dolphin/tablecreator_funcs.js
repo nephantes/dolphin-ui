@@ -259,6 +259,7 @@ function saveTable() {
 				file_name = s;
 			}
 	});
+	console.log(file_name);
 	$.ajax({ type: "GET",
 				url: BASE_PATH+"/public/ajax/tablegenerator.php",
 				data: { p: "createNewTable", search: parameters, name: name, file: file_name },

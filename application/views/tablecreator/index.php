@@ -31,16 +31,6 @@
 											<select id="report_multi_box" class="form-control" size="20" multiple>
 											</select>
 										</div>
-										<div class="box-footer">
-											<div>
-												<h4>Table saved as:
-												</h4>
-												<input type="text" id="input_table_name" class="form-control">
-											</div>
-											<div>
-												<button class="btn btn-primary margin" onclick="saveTable()">Save Table</button>
-											</div>
-										</div>
 									</div>
 								</div>
 							</div>

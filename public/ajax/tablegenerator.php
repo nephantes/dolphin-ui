@@ -120,6 +120,7 @@ else if ($p == 'createNewTable')
 		$handle = popen('rm ../tmp/files/'.$file, "r");
 		pclose($handle);
 	}
+	$data = json_encode('true');
 }
 else if ($p == 'deleteTable')
 {
