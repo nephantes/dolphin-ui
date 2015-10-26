@@ -383,15 +383,16 @@ $(function() {
 	}else if (window.location.href.split("/").indexOf('table') > -1){
 		var json_obj;
 		var beforeFormat = window.location.href.split("/table/")[1].split('format=')[0];
+		/*
 		$.ajax({ type: "GET",
 				url: BASE_PATH +"/public/api/getsamplevals.php?" + beforeFormat + 'format=json',
 				async: false,
 				success : function(s)
 				{
-					console.log(s);
 					json_obj = s;
 				}
 		});
+		*/
 		var export_table = document.getElementById('table_export_exp_body');
 		
 		//export_table.appendChild(createElement('textarea',['id','class','rows'],['generated_box','form-control','25']));

@@ -13,9 +13,16 @@ function generateStreamTable(type, queryData, queryType, qvar, rvar, seg, theSea
 		delete queryData.title;
 		var new_header = '<tr>';
 		for (var y = 0; y < keys.length; y++) {
-			new_header += '<th data-sort="'+y+'::string" onclick="shiftColumns(this)">'+
-						keys[y]+'<i id="'+y+'" class="pull-right fa fa-unsorted"></i></th>';
-			keys[y] = keys[y].replace(/ /g,"_").replace(/>/g,"_");
+			if (!queryData[Object.keys(queryData)[0]][y].match(/[^$,.\d]/)) {
+				console.log(queryData[Object.keys(queryData)[0]][y]);
+				new_header += '<th data-sort="'+keys[y]+'::number" onclick="shiftColumns(this)">'+
+							keys[y]+'<i id="'+y+'" class="pull-right fa fa-unsorted"></i></th>';
+				keys[y] = keys[y].replace(/ /g,"_").replace(/>/g,"_");
+			}else{
+				new_header += '<th data-sort="'+keys[y]+'::string" onclick="shiftColumns(this)">'+
+							keys[y]+'<i id="'+y+'" class="pull-right fa fa-unsorted"></i></th>';
+				keys[y] = keys[y].replace(/ /g,"_").replace(/>/g,"_");
+			}
 		}
 		for(var key in queryData){
 			if (Array.isArray(queryData[key])) {
