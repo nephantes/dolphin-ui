@@ -153,9 +153,23 @@ else if ($p == 'createTableFile')
 else if ($p == 'convertToTSV')
 {
 	if (isset($_GET['url'])){$url = $_GET['url'];}
-	var_dump($url);
-	#$json_data = file_get_contents($url);
-	#var_dump($json_data);
+	
+	$json_data = json_decode(file_get_contents($url));
+	
+	$user = $_SESSION['user'].'_'.date('Y-m-d-H-i-s').'.tsv';
+	$file = fopen('../tmp/files/'.$user, "w");
+	foreach($json_data as $jd){
+		fputcsv($file, $jd, chr(9));
+	}
+	fclose($file);
+	$data = json_encode($user);
+}
+else if ($p == 'removeTSV')
+{
+	if (isset($_GET['file'])){$file = $_GET['file'];}
+	$open = popen('rm ../tmp/files/'.$file, "r");
+	pclose($open);
+	$data = json_encode('deleted');
 }
 
 header('Cache-Control: no-cache, must-revalidate');

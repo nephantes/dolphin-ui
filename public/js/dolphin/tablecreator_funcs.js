@@ -274,6 +274,35 @@ function saveTable() {
 	}
 }
 
+function downloadGeneratedTSV(beforeFormat){
+	var url = API_PATH +"/public/api/getsamplevals.php?" + beforeFormat + 'format=json'
+	var file_name = '';
+	console.log(url);
+	$.ajax({ type: "GET",
+			url: BASE_PATH+"/public/ajax/tablegenerator.php",
+			data: { p: "convertToTSV", url: url },
+			async: false,
+			success : function(s)
+			{
+				file_name = s;
+			}
+	});
+	if (file_name != '') {
+		var URL = BASE_PATH + '/public/tmp/files/' + file_name; 
+		window.open(URL, '_blank');
+	
+		$.ajax({ type: "GET",
+				url: BASE_PATH+"/public/ajax/tablegenerator.php",
+				data: { p: "removeTSV", file: file_name },
+				async: false,
+				success : function(s)
+				{
+					console.log('test');
+				}
+		});	
+	}
+}
+
 function optionSelection(args) {
 	console.log(args);
 }
@@ -381,30 +410,8 @@ $(function() {
 				}});
 		reportSelection();
 	}else if (window.location.href.split("/").indexOf('table') > -1){
-		var json_obj;
 		var beforeFormat = window.location.href.split("/table/")[1].split('format=')[0];
-		var url = BASE_PATH +"/public/api/getsamplevals.php?" + beforeFormat + 'format=json'
-		console.log(url);
-		$.ajax({ type: "GET",
-				url: BASE_PATH+"/public/ajax/tablegenerator.php",
-				data: { p: "convertToTSV", url: url },
-				async: false,
-				success : function(s)
-				{
-					json_obj = s;
-				}
-		});
-		/*
-		$.ajax({ type: "GET",
-				url: BASE_PATH +"/public/api/getsamplevals.php?" + beforeFormat + 'format=html',
-				async: false,
-				success : function(s)
-				{
-					json_obj = s;
-				}
-		});
-		*/
-		console.log(json_obj);
+		var json_obj = '';
 		var export_table = document.getElementById('table_export_exp_body');
 		
 		//export_table.appendChild(createElement('textarea',['id','class','rows'],['generated_box','form-control','25']));
@@ -420,6 +427,8 @@ $(function() {
 		li += '<li><a onclick="changeTableType(\'json2\', \''+beforeFormat+'\')" style="cursor:pointer">JSON2 link</a></li>';
 		li += '<li><a onclick="changeTableType(\'html\', \''+beforeFormat+'\')" style="cursor:pointer">HTML link</a></li>';
 		li += '<li><a onclick="changeTableType(\'XML\', \''+beforeFormat+'\')" style="cursor:pointer">XML link</a></li>';
+		li += '<li class="divider"></li>';
+		li += '<li><a value="Download TSV" onclick="downloadGeneratedTSV(\''+beforeFormat+'\')" style="cursor:pointer">Download TSV</a></li>';
 		
 		ul.innerHTML = li;
 		div.appendChild(dropdown);
