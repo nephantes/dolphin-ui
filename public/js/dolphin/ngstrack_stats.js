@@ -12,16 +12,31 @@ function generateStreamTable(type, queryData, queryType, qvar, rvar, seg, theSea
 		keys = queryData.title;
 		delete queryData.title;
 		var new_header = '<tr>';
+		var summary_check = window.location.href.split("/table/")[1];
+		console.log(queryData);
+		console.log(keys);
 		for (var y = 0; y < keys.length; y++) {
-			if (!queryData[Object.keys(queryData)[0]][y].match(/[^$,.\d]/)) {
-				console.log(queryData[Object.keys(queryData)[0]][y]);
-				new_header += '<th data-sort="'+keys[y]+'::number" onclick="shiftColumns(this)">'+
-							keys[y]+'<i id="'+y+'" class="pull-right fa fa-unsorted"></i></th>';
-				keys[y] = keys[y].replace(/ /g,"_").replace(/>/g,"_");
+			if (summary_check.indexOf('.summary.') > -1) {
+				if (!queryData[Object.keys(queryData)[0]][keys[y]].match(/[^$,.\d]/)) {
+					new_header += '<th data-sort="'+keys[y].replace(/ /g,"_").replace(/>/g,"_")+'::number" onclick="shiftColumns(this)">'+
+								keys[y]+'<i id="'+y+'" class="pull-right fa fa-unsorted"></i></th>';
+					keys[y] = keys[y].replace(/ /g,"_").replace(/>/g,"_");
+				}else{
+					new_header += '<th data-sort="'+keys[y].replace(/ /g,"_").replace(/>/g,"_")+'::string" onclick="shiftColumns(this)">'+
+								keys[y]+'<i id="'+y+'" class="pull-right fa fa-unsorted"></i></th>';
+					keys[y] = keys[y].replace(/ /g,"_").replace(/>/g,"_");
+				}
 			}else{
-				new_header += '<th data-sort="'+keys[y]+'::string" onclick="shiftColumns(this)">'+
-							keys[y]+'<i id="'+y+'" class="pull-right fa fa-unsorted"></i></th>';
-				keys[y] = keys[y].replace(/ /g,"_").replace(/>/g,"_");
+				if (!queryData[Object.keys(queryData)[0]][y].match(/[^$,.\d]/)) {
+					console.log(queryData[Object.keys(queryData)[0]][y]);
+					new_header += '<th data-sort="'+keys[y]+'::number" onclick="shiftColumns(this)">'+
+								keys[y]+'<i id="'+y+'" class="pull-right fa fa-unsorted"></i></th>';
+					keys[y] = keys[y].replace(/ /g,"_").replace(/>/g,"_");
+				}else{
+					new_header += '<th data-sort="'+keys[y]+'::string" onclick="shiftColumns(this)">'+
+								keys[y]+'<i id="'+y+'" class="pull-right fa fa-unsorted"></i></th>';
+					keys[y] = keys[y].replace(/ /g,"_").replace(/>/g,"_");
+				}
 			}
 		}
 		for(var key in queryData){

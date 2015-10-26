@@ -383,9 +383,20 @@ $(function() {
 	}else if (window.location.href.split("/").indexOf('table') > -1){
 		var json_obj;
 		var beforeFormat = window.location.href.split("/table/")[1].split('format=')[0];
+		var url = BASE_PATH +"/public/api/getsamplevals.php?" + beforeFormat + 'format=json'
+		console.log(url);
+		$.ajax({ type: "GET",
+				url: BASE_PATH+"/public/ajax/tablegenerator.php",
+				data: { p: "convertToTSV", url: url },
+				async: false,
+				success : function(s)
+				{
+					json_obj = s;
+				}
+		});
 		/*
 		$.ajax({ type: "GET",
-				url: BASE_PATH +"/public/api/getsamplevals.php?" + beforeFormat + 'format=json',
+				url: BASE_PATH +"/public/api/getsamplevals.php?" + beforeFormat + 'format=html',
 				async: false,
 				success : function(s)
 				{
@@ -393,6 +404,7 @@ $(function() {
 				}
 		});
 		*/
+		console.log(json_obj);
 		var export_table = document.getElementById('table_export_exp_body');
 		
 		//export_table.appendChild(createElement('textarea',['id','class','rows'],['generated_box','form-control','25']));

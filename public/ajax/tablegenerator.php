@@ -150,6 +150,13 @@ else if ($p == 'createTableFile')
 	
 	$data = json_encode($user);
 }
+else if ($p == 'convertToTSV')
+{
+	if (isset($_GET['url'])){$url = $_GET['url'];}
+	var_dump($url);
+	#$json_data = file_get_contents($url);
+	#var_dump($json_data);
+}
 
 header('Cache-Control: no-cache, must-revalidate');
 header('Expires: Mon, 26 Jul 1997 05:00:00 GMT');
