@@ -6,6 +6,7 @@
 
 $(function() {
 	if (typeof(initialSubmission) != undefined && window.location.href.split("/")[window.location.href.split("/").length -1] == 'process') {
+		console.log(initialSubmission);
 		var initial_split = initialSubmission.split(",");
 		var json;
 		var outdir;
@@ -40,12 +41,16 @@ $(function() {
 			if (initial_split[2] == 'yes') {
 				var names = initial_split[initial_split.length - 1].split(":");
 				for(var y = 0; y < names.length; y++){
-					names_list.push(names[y].split(" ")[0]);
+					if (names_list.indexOf(names[y].split(" ")[0]) == -1) {
+						names_list.push(names[y].split(" ")[0]);
+					}
 				}
 			}else{
 				var names = initial_split[7].split(":");
 				for(var y = 0; y < names.length; y++){
-					names_list.push(names[y].split(" ")[0]);
+					if (names_list.indexOf(names[y].split(" ")[0]) < 0) {
+						names_list.push(names[y].split(" ")[0]);
+					}
 				}
 			}
 			
