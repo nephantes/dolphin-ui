@@ -18,8 +18,9 @@
 							<div id="generated_table" class="margin col-md-9">
 								<?php
 									$_SESSION['tablecreatorcheck'] = true;
-									echo $html->getRespBoxTableStream("Table Generated", "generated", [], []); ?>
+									echo $html->getRespBoxTableStream("Table Generated", "generated", [], []);
 									unset($_SESSION['tablecreatorcheck']);
+								?>
 							</div>
 						</div>
 						<div class="col-md-12">
