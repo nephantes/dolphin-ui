@@ -45,7 +45,11 @@
 								</div>
 							</div>
 							<div class="margin col-md-9">
-								<?php echo $html->getExpandingAnalysisBox('Additional Sample Selection', "table_create", false); ?>
+								<?php
+									$_SESSION['tablecreatorcheck'] = true;
+									echo $html->getExpandingAnalysisBox('Additional Sample Selection', "table_create", false);
+									unset($_SESSION['tablecreatorcheck']);
+								?>
 							</div>
 							<div class="margin col-md-9">
 								<button class="btn btn-box-tool btn-primary margin pull-right" onclick="toBrowserPage()">Back to Browser</button>
