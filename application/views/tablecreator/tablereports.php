@@ -1,13 +1,4 @@
 <!-- Content Header (Page header) -->
-		<style>
-			div.dropdown-menu .li{
-				margin-left: auto;
-				margin-right: auto;
-				table-layout: fixed;
-				border-collapse: collapse;
-				z-index: 999; position:relative
-			}
-		</style>
 				<section class="content-header">
 					<h1>
 						NGS Table List

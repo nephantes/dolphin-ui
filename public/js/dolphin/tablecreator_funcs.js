@@ -220,7 +220,23 @@ function sendToTableGen(){
 }
 
 function tableCreatorPage(){
-	window.location.href = BASE_PATH + '/tablecreator/table/' + sendToTableGen();
+	var file_values = $('#report_multi_box').val();
+	
+	if(file_values == null){
+		$('#errorModal').modal({
+			show: true
+		});
+		document.getElementById('errorLabel').innerHTML ='A file must be selected in order to generate a report!';
+		document.getElementById('errorAreas').innerHTML = '';
+	}else if(file_values.length > 1){
+		$('#errorModal').modal({
+			show: true
+		});
+		document.getElementById('errorLabel').innerHTML ='Multple file selection is under development.<br>Please select only one file for report generation.';
+		document.getElementById('errorAreas').innerHTML = '';
+	}else{
+		window.location.href = BASE_PATH + '/tablecreator/table/' + sendToTableGen();
+	}
 }
 
 function changeTableType(format, query){
