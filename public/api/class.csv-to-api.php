@@ -327,6 +327,40 @@ class CSV_To_API {
 	return $output;
   }
 
+  function object_to_json2_5( $data ) {
+  	$output .= "{\n";
+	$output .= "  \"table\": {\n";
+	$output .= "    \"cols\": [\n";
+						  
+    foreach ( reset( $data ) as $header ) {
+      $output .= "      {\n        \"label\":\"$header\"\n      },\n";
+    }
+	unset($data["title"]);
+    $output = $this->commatrim($output); 
+    $output .= "\n    ],\n";
+    $output .= "    \"rows\": [\n";
+    $output .= "      {\n";
+    foreach ( $data as $row ) {
+      $cput = "       \"c\": [\n";
+      foreach ( $row as $key => $value ) {
+        //$output .= "[[[".json_decode($row, true)."]]]";
+        $cput .= "         {\n           \"v\":\"$value\"\n         },\n";
+      }
+      $cput = $this->commatrim($cput); 
+      $cput .= "\n       ]";
+      $cput .= "\n      },\n      {\n";
+      if ($value != 'null') {
+         $output.=$cput;
+      }
+    
+    }
+    
+    $output  = $this->commatrim($output, 9); 
+    $output .= "\n    ]\n";
+    $output .= "  }\n";
+    $output .= "}\n";
+	return $output;
+  }
 
   /**
    * Turn a PHP object into XML text.

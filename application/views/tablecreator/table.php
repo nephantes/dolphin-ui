@@ -15,18 +15,22 @@
 				<section class="content">
 					<div class="row">
 						<div class="col-md-12">
-							<div id="generated_table" class="margin col-md-9">
-								<?php echo $html->getRespBoxTableStream("Table Generated", "generated", [], []); ?>
+							<div id="generated_table" class="margin col-md-12">
+								<?php
+									$_SESSION['tablecreatorcheck'] = true;
+									echo $html->getRespBoxTableStream("Table Generated", "generated", [], []);
+									unset($_SESSION['tablecreatorcheck']);
+								?>
 							</div>
 						</div>
 						<div class="col-md-12">
-							<div id="text_table" class="margin col-md-9">
+							<div id="text_table" class="margin col-md-12">
 								<?php echo $html->getExpandingAnalysisBox('Export Table', "table_export", false); ?>
 							</div>
-							<div id="name_run_box" class="margin col-md-9">
+							<div id="name_run_box" class="margin col-md-12">
 								<?php echo $html->getStaticSelectionBox("Save Table As:", "input_table_name", "TEXT", 12)?>
 							</div>
-							<div class="margin col-md-9">
+							<div class="margin col-md-12">
 								<button class="btn btn-box-tool btn-primary margin pull-right" onclick="saveTable()">Save Table</button>
 								<button class="btn btn-box-tool btn-primary margin pull-right" onclick="backToTableIndex()">Back</button>
 							</div>

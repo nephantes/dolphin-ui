@@ -15,12 +15,12 @@
 				<section class="content">
 					<div class="row">
 						<div class="col-md-12">
-							<div id="generated_table" class="margin col-md-9">
+							<div id="generated_table" class="margin col-md-12">
 								<?php echo $html->getRespBoxTable_ng("Tables Created", "table_viewer", "<th>ID</th><th>Name</th><th>Samples/Runs</th><th>Files</th><th>Options</th>"); ?>
 							</div>
 						</div>
 						<div class="col-md-12">
-							<div id="generated_table" class="margin col-md-9">
+							<div id="generated_table" class="margin col-md-12">
 								<button class="btn btn-box-tool btn-primary margin pull-right" onclick="backToTableIndex()">Back to Creation</button>
 								<button class="btn btn-box-tool btn-primary margin pull-right" onclick="toBrowserPage()">Back to Browser</button>
 							</div>

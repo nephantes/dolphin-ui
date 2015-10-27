@@ -36,8 +36,8 @@
         <link rel="stylesheet" type="text/css" href="<?php echo BASE_PATH?>/css/datatables/dataTables.editor.css">
         <link rel="stylesheet" type="text/css" href="<?php echo BASE_PATH?>/js/dataTables/resources/syntax/shCore.css">
    
-        <script src="http://zlab4.umassmed.edu/~zhux3/snowflakes/snowflake.js" charset="utf-8"></script>
-		<script src="http://d3js.org/d3.v3.min.js" charset="utf-8"></script>
+        <script src="<?php echo BASE_PATH?>/js/d3/snowflake.js" charset="utf-8"></script>
+		<script src="<?php echo BASE_PATH?>/js/d3/d3.v3.min.js" charset="utf-8"></script>
    
         <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
         <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->

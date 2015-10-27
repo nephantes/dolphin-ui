@@ -97,6 +97,28 @@ else if ($p == 'getTableToggle')
 		echo "extend";
 	}
 }
+else if ($p == 'setPlotToggle')
+{
+	if (isset($_GET['type'])){$type = $_GET['type'];}
+	if (isset($_GET['file'])){$file = $_GET['file'];}
+	unset($_SESSION['plot_type']);
+	$_SESSION['plot_type'] = $type;
+	if($_SESSION['plot_type'] == 'generated'){
+		unset($_SESSION['plot_file']);
+		$_SESSION['plot_file'] = $file;
+	}else{
+		unset($_SESSION['plot_file']);
+		$_SESSION['plot_file'] = '';
+	}
+}
+else if ($p == 'getPlotToggle')
+{
+	if($_SESSION['plot_type'] == 'generated'){
+		echo $_SESSION['plot_file'];
+	}else{
+		echo '';
+	}
+}
 
 exit;
 ?>

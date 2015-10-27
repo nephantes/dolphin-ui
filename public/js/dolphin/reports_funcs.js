@@ -448,6 +448,14 @@ function getReportWKey(run_id){
 
 function sendToPlots(){
 	sendWKey(wkey);
+	$.ajax({ type: "GET",
+			url: BASE_PATH+"/public/ajax/sessionrequests.php",
+			data: { p: "setPlotToggle", type: 'normal', file: '' },
+			async: false,
+			success : function(s)
+			{
+			}
+	});
 	window.location.href = BASE_PATH+ '/plot';
 }
 

@@ -207,7 +207,7 @@ class HTML {
 		$html.= $this->getInfoBox($table);
 		$html.= '</div>
 				<div class="box-body table-responsive">
-				<table id="jsontable_'.$table.'" class="table table-hover table-striped table-condensed table-scrollable">
+				<table id="jsontable_'.$table.'" class="table table-hover table-striped table-condensed">
 		<thead>
 					<tr>
 			'.$fields.'
@@ -229,12 +229,14 @@ class HTML {
 						<div class="box-header">
 								<h3 class="box-title">'.$title.'</h3>';
 		$html.= $this->getInfoBox($table);
-		$html.=					'<div class="pull-right">
+		if(!isset($_SESSION['tablecreatorcheck'])){
+			$html.=				'<div class="pull-right">
 										<button class="btn btn-default margin" value="'.$table.'" onclick="expandTable(this.value)">
 										<span class="fa fa-arrows-h"></span>
 										</button>
-								</div>
-						</div><!-- /.box-head -->
+								</div>';
+		}						
+		$html.=			'</div><!-- /.box-head -->
 						<div id="table_div_'.$table.'" class="box-body table-responsive">
 								<table id="jsontable_'.$table.'" class="table table-hover table-striped table-condensed table-scrollable">
 										<thead>
@@ -521,18 +523,20 @@ e range"><i class="fa fa-calendar"></i></button>
 	
 	function getDolphinBasket(){
 	$html = '';
-	$html.= '<div class="box">
-			<div class="box-header">
+	$html.= '<div class="small box">
+			<div class="small box-header">
 				<h4 class="box-title">Selected Samples</h3>
 			</div>
-			<div class="box-body table-responsive non-padding">
+			<div class="small box-body table-responsive non-padding">
 				<table id="dolphin_basket" class="table table-hover">
-				<tbody id="dolphin_basket_body">
+				<thead>
 					<tr>
 						<th>ID</th>
 						<th>Sample Name</th>
-						<th><button id="clear_basket" class="btn btn-primary btn-xs pull-right" disabled="true" onclick="clearBasket()">Clear Basket</button></th>
+						<th><button id="clear_basket" class="btn btn-primary btn-xs pull-right" disabled="true" onclick="clearBasket()">Clear</button></th>
 					</tr>
+					</thead>
+				<tbody id="dolphin_basket_body">
 				</tbody>
 				</table>
 			</div>

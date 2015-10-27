@@ -17,10 +17,56 @@ function populateFileList(){
                 }
               }
 		});
+  $.ajax({ type: "GET",
+			url: BASE_PATH + "/public/ajax/ngsquerydb.php",
+            data: { p: "getCustomTSV" },
+			async: false,
+			success : function(s)
+              {
+				console.log(s);
+                for (var x = 0; x < s.length; x++){
+                  var opt = createElement('option', ['value'], [s[x].file]);
+                  opt.innerHTML = "Created || " +s[x].name;
+                  document.getElementById('source_1').appendChild(opt);
+                }
+              }
+		});
 	$('.panel').overflow = scroll;
 }
 
+function checkGeneratedTable(){
+  var table_file = '';
+  $.ajax({ type: "GET",
+			url: BASE_PATH + "/public/ajax/sessionrequests.php",
+            data: { p: "getPlotToggle"},
+			async: false,
+			success : function(s)
+              {
+                table_file = s;
+              }
+		});
+  console.log(table_file);
+  if (table_file != '') {
+	document.getElementById('source_1').innerHTML = '';
+	var opt2 = createElement('option', ['value'], ['input']);
+	opt2.innerHTML = 'Generated File';
+    document.getElementById('source_1').appendChild(opt2);
+	
+	console.log(BASE_PATH + '/public/tmp/files/' + table_file);
+	document.getElementById('source').innerHTML = BASE_PATH + '/public/tmp/files/' + table_file;
+  }
+  $.ajax({ type: "GET",
+		  url: BASE_PATH+"/public/ajax/sessionrequests.php",
+		  data: { p: "setPlotToggle", type: '', file: '' },
+		  async: false,
+		  success : function(s)
+		  {
+		  }
+  });
+}
+
 populateFileList();
+checkGeneratedTable();
 
 (function (S,$) {
     $("#source_1").on("change",
@@ -64,7 +110,7 @@ window.handle_sheet_index=function(data){
 	window.view();
 	*/
     d3.selectAll(".loading").property("hidden",true);
-    if($("#source_option").val()=="input" || $("#source_opition").val()=="local_file"){
+    if($("#source_option").val()=="input" || $("#source_option").val()=="local_file"){
         $("#xi").val(0)
         $("#yi").val(0)
         $("#zi").val(0)
@@ -104,19 +150,25 @@ var getSrc=function(){
 				window.handle_sheet_index(data);})
 		}
 	}else{
+	  if (document.getElementById("source_1").value.indexOf('.json2') > -1) {
+		src= document.getElementById("source_1").value || document.getElementById("source").placeholder;
+		src = BASE_PATH+'/public/tmp/files/'+src;
+	  }else{
 		src= document.getElementById("source_1").value || document.getElementById("source").placeholder;
 		src = API_PATH+'/public/pub/'+wkey+'/'+src;
-		console.log(BASE_PATH + "/public/api/?format=json2&source="+src);
-		var re=/^http/;
-		var OK=re.exec(src);
-		if(!OK){
-			S.gsheet.query("select *", src, "window.handle_sheet_index")   
-		}else{
-			d3.json(BASE_PATH + "/public/api/?format=json2&source="+src,function(error,data){
-				window.handle_sheet_index(data);
-			})
-			
-		}
+		src = BASE_PATH + "/public/api/?format=json2&source="+src
+	  }
+	  console.log(src);
+	  var re=/^http/;
+	  var OK=re.exec(src);
+	  if(!OK){
+		  S.gsheet.query("select *", src, "window.handle_sheet_index")   
+	  }else{
+		  d3.json(src,function(error,data){
+			  window.handle_sheet_index(data);
+		  })
+		  
+	  }
 	}
 }
 getSrc();

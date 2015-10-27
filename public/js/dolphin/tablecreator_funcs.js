@@ -53,12 +53,12 @@ function manageCreateChecklists(id, tablerow){
 				{
 					for(var i = 0; i < s.length; i++){
 						var run_info = [];
-						var run_select = '<select id="'+ s[i].id + '_run_select" class="form-control" onchange="reportSelection()">';
+						var run_select = '<select id="'+ s[i].id + '_run_select" class="form-control" onchange="optionChange(this)"><form>';
 						for(var x = 0; x < run_ids[s[i].id].length; x = x+3){
 							//Sample id _ Run id _ Run name
 							run_select += '<option id="' + run_ids[s[i].id][x]+ '_' + run_ids[s[i].id][x+1] + '" value="'+ run_ids[s[i].id][x+2] + '">Run ' + run_ids[s[i].id][x] + ': ' + run_ids[s[i].id][x+1] + '</option>'
 						}
-						run_select += '</select>';
+						run_select += '</form></select>';
 						
 						table.fnAddData([
 							s[i].id,
@@ -93,11 +93,12 @@ function reportSelection(){
 		for(var r = 0; r < option_get.length; r++){
 			var option_selected = $(option_get[r][2])[0];
 			option_selected.click();
-			if (wkeys.indexOf(option_selected.options[selectionHelper[y]].value) < 0) {
-				wkeys.push(option_selected.options[selectionHelper[y]].value);
+			if (wkeys.indexOf(option_selected.options[selectionHelper[r]].value) < 0) {
+				wkeys.push(option_selected.options[selectionHelper[r]].value);
 			}
 		}
 	}
+	console.log(wkeys);
 	var wkey_count = wkeys.length;
 	
 	$.ajax({ type: "GET",
@@ -114,6 +115,10 @@ function reportSelection(){
 	multi_box.innerHTML = '';
 	var run_cohesion_check = [];
 	var run_cohesion_count_check = [];
+	var genome_check = '';
+	if (reports.length > 0) {
+		genome_check = reports[0].json_parameters.split(',')[0];
+	}
 	for(var y = 0; y < reports.length; y ++){
 		var filename = reports[y].file.split(".")[reports[y].file.split(".").length - 1];
 		if (filename != 'pdf' && filename != 'R') {
@@ -133,7 +138,7 @@ function reportSelection(){
 				multi_box.add(option);
 			}else{
 				run_cohesion_count_check[run_cohesion_check.indexOf(reports[y].file)]++;
-				if (wkey_count != run_cohesion_count_check[run_cohesion_check.indexOf(reports[y].file)]) {
+				if (wkey_count != run_cohesion_count_check[run_cohesion_check.indexOf(reports[y].file)] || genome_check != reports[y].json_parameters.split(",")[0]) {
 					document.getElementById(reports[y].file).disabled = true;
 					document.getElementById(reports[y].file).style.opacity = .35;
 				}else{
@@ -197,6 +202,15 @@ function sendToTableGen(){
 		common_send = '&common=name';
 		key_send = '&key=name';
 		keepcols_send = '&keepcols=padj,log2FoldChange';
+	}else if (file_send.indexOf('picard')) {
+		//PICARD
+		if (file_send.indexOf('.hist.') > -1) {
+			common_send = '&common=nt';
+			key_send = '&key=nt';
+		}else{
+			common_send = '&common=metric';
+			key_send = '&key=metric';
+		}
 	}
 	
 	var filter_send = '';
@@ -206,21 +220,30 @@ function sendToTableGen(){
 }
 
 function tableCreatorPage(){
-	window.location.href = BASE_PATH + '/tablecreator/table/' + sendToTableGen();
+	var file_values = $('#report_multi_box').val();
+	
+	if(file_values == null){
+		$('#errorModal').modal({
+			show: true
+		});
+		document.getElementById('errorLabel').innerHTML ='A file must be selected in order to generate a report!';
+		document.getElementById('errorAreas').innerHTML = '';
+	}else if(file_values.length > 1){
+		$('#errorModal').modal({
+			show: true
+		});
+		document.getElementById('errorLabel').innerHTML ='Multple file selection is under development.<br>Please select only one file for report generation.';
+		document.getElementById('errorAreas').innerHTML = '';
+	}else{
+		window.location.href = BASE_PATH + '/tablecreator/table/' + sendToTableGen();
+	}
 }
 
 function changeTableType(format, query){
 	var json_obj;
 	var beforeFormat = window.location.href.split("/table/")[1].split('format=')[0];
-	$.ajax({ type: "GET",
-			url: BASE_PATH+"/public/api/getsamplevals.php?" + beforeFormat + 'format=' + format,
-			async: false,
-			success : function(s)
-			{
-				json_obj = s;
-			}
-	});
-	document.getElementById('generated_box').innerHTML = json_obj;
+	var URL = BASE_PATH+"/public/api/getsamplevals.php?" + beforeFormat + 'format=' + format;
+	window.open(URL);
 }
 
 function backToTableIndex(){
@@ -248,17 +271,66 @@ function saveTable() {
 		parameters = sendToTableGen();
 	}
 	var pass = false;
+	var file_name = '';
+	var beforeFormat = '';
+	if (window.location.href.split('/').indexOf('table') > -1) {
+		beforeFormat = window.location.href.split("/table/")[1].split('format=')[0];
+	}else{
+		beforeFormat = sendToTableGen().split('format=')[0];
+	}
+	
+	$.ajax({ type: "GET",
+			url: BASE_PATH+"/public/ajax/tablegenerator.php",
+			data: { p: "createTableFile", url: API_PATH+"/public/api/getsamplevals.php?" + beforeFormat + 'format=json2' },
+			async: false,
+			success : function(s)
+			{
+				file_name = s;
+			}
+	});
+	console.log(file_name);
 	$.ajax({ type: "GET",
 				url: BASE_PATH+"/public/ajax/tablegenerator.php",
-				data: { p: "createNewTable", search: parameters, name: name },
+				data: { p: "createNewTable", search: parameters, name: name, file: file_name },
 				async: false,
 				success : function(s)
 				{
+					console.log('console true');
 					pass = true;
 				}
 		});
+	console.log(pass);
 	if (pass == true) {
 		toTableListing();
+	}
+}
+
+function downloadGeneratedTSV(beforeFormat){
+	var url = API_PATH +"/public/api/getsamplevals.php?" + beforeFormat + 'format=json'
+	var file_name = '';
+	console.log(url);
+	$.ajax({ type: "GET",
+			url: BASE_PATH+"/public/ajax/tablegenerator.php",
+			data: { p: "convertToTSV", url: url },
+			async: false,
+			success : function(s)
+			{
+				file_name = s;
+			}
+	});
+	if (file_name != '') {
+		var URL = BASE_PATH + '/public/tmp/files/' + file_name; 
+		window.open(URL, '_blank');
+	
+		$.ajax({ type: "GET",
+				url: BASE_PATH+"/public/ajax/tablegenerator.php",
+				data: { p: "removeTSV", file: file_name },
+				async: false,
+				success : function(s)
+				{
+					console.log('test');
+				}
+		});	
 	}
 }
 
@@ -266,8 +338,16 @@ function optionSelection(args) {
 	console.log(args);
 }
 
-function sendTableToPlot(parameters){
-	//to be finished
+function sendTableToPlot(file){
+	$.ajax({ type: "GET",
+			url: BASE_PATH+"/public/ajax/sessionrequests.php",
+			data: { p: "setPlotToggle", type: 'generated', file: file },
+			async: false,
+			success : function(s)
+			{
+			}
+	});
+	window.location.href = BASE_PATH + '/plot';
 }
 
 function deleteTable(id){
@@ -277,9 +357,9 @@ function deleteTable(id){
 				async: false,
 				success : function(s)
 				{
+					console.log(s);
 				}
 		});
-	location.reload();
 }
 
 function optionChange(selector){
@@ -309,6 +389,7 @@ $(function() {
 				async: false,
 				success : function(s)
 				{
+					console.log(s);
 					for(var i = 0; i < s.length; i ++){
 						if (run_ids[s[i].sample_id] == undefined) {
 							if (s[i].run_name != null) {
@@ -323,13 +404,13 @@ $(function() {
 						}
 					}
 				}});
-		console.log(run_ids);
 		$.ajax({ type: "GET",
 				url: BASE_PATH+"/public/ajax/tablegenerator.php",
 				data: { p: "getTableSamples", search: sample_ids },
 				async: false,
 				success : function(s)
 				{
+					console.log(s);
 					runparams.fnClearTable();
 					for(var i = 0; i < s.length; i++){
 						/*
@@ -360,24 +441,15 @@ $(function() {
 				}});
 		reportSelection();
 	}else if (window.location.href.split("/").indexOf('table') > -1){
-		var json_obj;
 		var beforeFormat = window.location.href.split("/table/")[1].split('format=')[0];
-		$.ajax({ type: "GET",
-				url: BASE_PATH +"/public/api/getsamplevals.php?" + beforeFormat + 'format=json2',
-				async: false,
-				success : function(s)
-				{
-					console.log(s);
-					json_obj = s;
-				}
-		});
+		var json_obj = '';
 		var export_table = document.getElementById('table_export_exp_body');
 		
-		export_table.appendChild(createElement('textarea',['id','class','rows'],['generated_box','form-control','25']));
-		document.getElementById('generated_box').innerHTML = json_obj;
+		//export_table.appendChild(createElement('textarea',['id','class','rows'],['generated_box','form-control','25']));
+		//document.getElementById('generated_box').innerHTML = json_obj;
 		
-		var div = createElement('div',[],[]);
-		var dropdown = createElement('button',['id','type','class','data-toggle','aria-expanded'],['generated_button','button','margin btn btn-primary dropdown-toggle','dropdown','false']);
+		var div = createElement('div',['class'],['btn-group']);
+		var dropdown = createElement('button',['id','type','class','data-toggle','aria-expanded'],['generated_button','button','btn btn-primary dropdown-toggle','dropdown','false']);
 		dropdown.innerHTML = 'Download Type  <span class="fa fa-caret-down"></span>';
 		export_table.appendChild(dropdown);
 		
@@ -386,6 +458,8 @@ $(function() {
 		li += '<li><a onclick="changeTableType(\'json2\', \''+beforeFormat+'\')" style="cursor:pointer">JSON2 link</a></li>';
 		li += '<li><a onclick="changeTableType(\'html\', \''+beforeFormat+'\')" style="cursor:pointer">HTML link</a></li>';
 		li += '<li><a onclick="changeTableType(\'XML\', \''+beforeFormat+'\')" style="cursor:pointer">XML link</a></li>';
+		li += '<li class="divider"></li>';
+		li += '<li><a value="Download TSV" onclick="downloadGeneratedTSV(\''+beforeFormat+'\')" style="cursor:pointer">Download TSV</a></li>';
 		
 		ul.innerHTML = li;
 		div.appendChild(dropdown);
@@ -393,7 +467,7 @@ $(function() {
 		export_table.appendChild(div);
 	}else{
 		var runparams = $('#jsontable_table_viewer').dataTable({
-			"scrollX": true
+			//"scrollX": true
 		});
 		$.ajax({ type: "GET",
 				url: BASE_PATH+"/public/ajax/tablegenerator.php",
@@ -417,12 +491,12 @@ $(function() {
 							s[x].id,
 							s[x].name,
 							stringSampleRuns,
-							splitParameters[1].split('file=')[1],
+							splitParameters[1].split('file=')[1].split(',').join(', '),
 							'<div class="btn-group pull-right">' +
 								'<button type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown" aria-expanded="true">Options <span class="fa fa-caret-down"></span></button>' +
 								'<ul class="dropdown-menu" role="menu">' + 
 									'<li><a href="'+BASE_PATH+'/public/tablecreator/table/'+s[x].parameters+'" id="' + s[x].id+'">View</a></li>' +
-									//'<li><a href="" id="' + s[x].id+'" onclick="sendTableToPlot(\''+s[x].parameters+'\')">Plot</a></li>' +
+									'<li><a id="' + s[x].id+'" onclick="sendTableToPlot(\''+s[x].file+'\')">Plot Table</a></li>' +
 									'<li><a href="" id="' + s[x].id+'" onclick="deleteTable(this.id)">Delete</a></li>' +
 								'</ul>'+
 							'</div>'

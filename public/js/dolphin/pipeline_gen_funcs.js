@@ -29,6 +29,14 @@ function rerunLoad() {
 	var hrefSplit = window.location.href.split("/");
 	if (hrefSplit[4] == 'search') {
 		document.getElementById('dolphin_basket').parentNode.setAttribute('style','overflow:scroll');
+		var basket = $('#dolphin_basket').dataTable( {
+			//"bFilter":	false,
+			//"ordering": false,
+			//"info":     false,
+			"lengthChange": false,
+			"pageLength": 20,
+			"columnDefs": [ { "targets": 2, "orderable": false } ]
+		} );
 	}
 	var rerunLoc = $.inArray('rerun', hrefSplit);
 	var infoArray = [];
@@ -628,7 +636,6 @@ function manageChecklists(name, type){
 			//remove
 			checklist_samples.splice(checklist_samples.indexOf(name), 1);
 			removeFromDolphinBasket(name);
-			removeBasketInfo(name);
 	
 			var lane_check = getLaneIdFromSample(name);
 			var experiment_check = getExperimentIdFromSample(name);
@@ -783,35 +790,49 @@ function reloadBasket(){
 }
 
 function addToDolphinBasket(sampleID){
-	var tblBody = document.getElementById("dolphin_basket_body");
 	var sample_info = getSingleSample(sampleID);
+	var sample_name = '';
+	var table = $('#dolphin_basket').dataTable();
 
-	var tblrow = document.createElement("tr");
-	tblrow.id = sampleID;
-	var tblcol1 = document.createElement("td");
-	tblcol1.appendChild(document.createTextNode(sample_info[0]));
-	tblrow.appendChild(tblcol1);
-	var tblcol2 = document.createElement("td");
 	if (sample_info[1] != '' && sample_info[1] != 'null' && sample_info[1] != null) {
-		tblcol2.appendChild(document.createTextNode(sample_info[1]));	
+		sample_name = sample_info[1];
 	}else{
-		tblcol2.appendChild(document.createTextNode(sample_info[2]));
+		sample_name = sample_info[2];
 	}
-	tblrow.appendChild(tblcol2);
-	var tblcol3 = document.createElement("td");
-	var remove_button = createElement('button', ['id', 'class', 'onclick'], ['remove_basket_'+sampleID, 'btn btn-danger btn-xs pull-right', 'manageChecklists("'+sampleID+'", "sample_checkbox")']);
-	remove_button.appendChild(createElement('i', ['class'], ['fa fa-times']));
-	tblcol3.appendChild(remove_button);
-	tblrow.appendChild(tblcol3);
-
-	if (tblBody != null) {
-		tblBody.appendChild(tblrow);
+	
+	if (table != null) {
+		table.fnAddData([
+			sampleID,
+			sample_name,
+			'<button id="remove_basket_'+sampleID+'" class="btn btn-danger btn-xs pull-right" onclick="manageChecklists(\''+sampleID+'\', \'sample_checkbox\')"><i class="fa fa-times"></i></button>'
+		])
 	}
 }
 
 function removeFromDolphinBasket(sampleID){
+	var table = $('#dolphin_basket').dataTable();
+	var data = table.fnGetData();
+	for (var samp_data in data) {
+		if (data[samp_data][0] == sampleID) {
+			data.splice(samp_data, 1);
+		}
+	}
+	table.fnClearTable();
+	if (data.toString() != "") {
+		table.fnAddData(data);
+	}else{
+		table.fnClearTable();
+	}
+	removeBasketInfo(name);
+	/*
 	var tblrow = document.getElementById(sampleID);
 	tblrow.parentNode.removeChild(tblrow);
+	*/
+}
+
+function testerino(){
+	var table = $('#dolphin_basket').dataTable();
+	table.fnClearTable();
 }
 
 function clearBasket(){

@@ -40,7 +40,6 @@
 				color: #000;padding: 1px;height: auto;cursor: default}
 			div.combobox	.dropdownlist	a.light	{color: #fff;
 				background-color: #007}
-			
 		</style>
 		
 		<?php echo $html->getBasePath(BASE_PATH, API_PATH); ?>

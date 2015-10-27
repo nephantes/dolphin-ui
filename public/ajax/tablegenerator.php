@@ -37,15 +37,19 @@ else if ($p == 'getTableReportsList')
 	$key_count = count(explode(",",$wkey));
 	if($key_count == 1){
 		$data=$query->queryTable("
-		SELECT file
+		SELECT file, json_parameters
 		FROM report_list
-		WHERE wkey = '". $wkey ."'
+		LEFT JOIN ngs_runparams
+		ON report_list.wkey = ngs_runparams.wkey
+		WHERE report_list.wkey = '". $wkey ."'
 		");
 	}else{
 		$data=$query->queryTable("
-		SELECT file
+		SELECT file, json_parameters
 		FROM report_list
-		WHERE wkey IN ( '". implode("','", explode(",",$wkey))."' )
+		LEFT JOIN ngs_runparams
+		ON report_list.wkey = ngs_runparams.wkey
+		WHERE report_list.wkey IN ( '". implode("','", explode(",",$wkey))."' )
 		");
 	}
 }
@@ -81,6 +85,7 @@ else if ($p == 'createNewTable')
 {
 	if (isset($_GET['search'])){$search = $_GET['search'];}
 	if (isset($_GET['name'])){$name = $_GET['name'];}
+	if (isset($_GET['file'])){$file = $_GET['file'];}
 	
 	$current_tables=json_decode($query->queryTable("
 		SELECT *
@@ -100,9 +105,9 @@ else if ($p == 'createNewTable')
 	if($table_check == false){
 		$data=$query->runSQL("
 		INSERT ngs_createdtables
-		(`name`,`parameters`,`owner_id`,`perms`,`date_created`,`date_modified`,`last_modified_user`)
+		(`name`,`parameters`,`file`,`owner_id`,`perms`,`date_created`,`date_modified`,`last_modified_user`)
 		VALUES
-		( '$name', '$search', ".$_SESSION['uid'].",3,NOW(),NOW(), ".$_SESSION['uid'].")"
+		( '$name', '$search','$file', ".$_SESSION['uid'].",3,NOW(),NOW(), ".$_SESSION['uid'].")"
 		);
 	}else{
 		$data=$query->runSQL("
@@ -110,16 +115,61 @@ else if ($p == 'createNewTable')
 		SET name = '$name'
 		WHERE id = $id
 		");
+		
+		$handle = popen('rm ../tmp/files/'.$file, "r");
+		pclose($handle);
 	}
+	$data = json_encode('true');
 }
 else if ($p == 'deleteTable')
 {
 	if (isset($_GET['id'])){$id = $_GET['id'];}
+	$file=$query->queryTable("
+		SELECT file FROM ngs_createdtables
+		WHERE id = $id
+		");
+	$data=json_decode($file);
+	
+	$handle = popen('rm ../tmp/files/'.$file[0]->file, "r");
+	pclose($handle);
 	
 	$data=$query->runSQL("
 		DELETE FROM ngs_createdtables
 		WHERE id = $id
 		");
+}
+else if ($p == 'createTableFile')
+{
+	if (isset($_GET['url'])){$url = $_GET['url'];}
+	$json = file_get_contents($url);
+	$user = $_SESSION['user'].'_'.date('Y-m-d-H-i-s').'.json2';
+	
+	$file = fopen('../tmp/files/'.$user, "w");
+	fwrite($file,$json);
+	fclose($file);
+	
+	$data = json_encode($user);
+}
+else if ($p == 'convertToTSV')
+{
+	if (isset($_GET['url'])){$url = $_GET['url'];}
+	
+	$json_data = json_decode(file_get_contents($url));
+	
+	$user = $_SESSION['user'].'_'.date('Y-m-d-H-i-s').'.tsv';
+	$file = fopen('../tmp/files/'.$user, "w");
+	foreach($json_data as $jd){
+		fputcsv($file, $jd, chr(9));
+	}
+	fclose($file);
+	$data = json_encode($user);
+}
+else if ($p == 'removeTSV')
+{
+	if (isset($_GET['file'])){$file = $_GET['file'];}
+	$open = popen('rm ../tmp/files/'.$file, "r");
+	pclose($open);
+	$data = json_encode('deleted');
 }
 
 header('Cache-Control: no-cache, must-revalidate');
