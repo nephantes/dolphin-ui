@@ -752,6 +752,18 @@ class Ngsimport extends VanillaModel {
 						$text.= $this->errorText("Import name does not match any import given in the excel file (row " . $i . ")");
 						$this->final_check = false;
 						$samp_check = false;
+					}else if($samp->lane_name == $samp->name){
+						$text.= $this->errorText("Import name and Sample name cannot be identical (row " . $i . ")");
+						$this->final_check = false;
+						$samp_check = false;
+					}else{
+						foreach($this->lane_arr as $key => $value){
+							if($samp->name == $key){
+								$text.= $this->errorText("Sample name cannot match a different Import name (row " . $i . ")");
+								$this->final_check = false;
+								$samp_check = false;
+							}
+						}
 					}
 				}else{
 					$text.= $this->errorText("Import name is required for submission (row " . $i . ")");
