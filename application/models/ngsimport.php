@@ -292,7 +292,6 @@ class Ngsimport extends VanillaModel {
 				$this->backup_dir=$this->esc($this->sheetData[$i]["B"]);
 			}elseif($this->sheetData[$i]["A"]=="processed directory"){
 				$this->backup_dir=$this->esc($this->sheetData[$i]["B"]);
-				
 			}
 			if($this->sheetData[$i]["A"]=="amazon bucket"){$this->amazon_bucket=$this->esc($this->sheetData[$i]["B"]);}
 			
