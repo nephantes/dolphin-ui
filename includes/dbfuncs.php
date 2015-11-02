@@ -45,61 +45,10 @@ class dbfuncs {
      }
      return "0";
    }
-   
-   function getTotalGalaxyRuns($username)
-   {
-     $userstr="";
-     if ($username!="")
-     {
-       #For individual user
-       #$userstr=" where username='$username'"; 
-       #For the groups the user belong to
-       $userstr=" where username in (select u.username from user_group ug, users u where u.id=ug.u_id and ug.g_id in ( SELECT ug.g_id from user_group ug, users u where u.id=ug.u_id and u.username='$username'))";
-     }
-     
-     
-     $sql="SELECT count(id) totalGalaxyRuns FROM galaxy_run $userstr;";
-    
-     return $this->queryAVal($sql);
-   }
-   
-   function getTotalDolphinRuns($username)
-   {
-     $userstr="";
-     if ($username!="")
-     {
-       #For individual user
-       #$userstr=" and username='$username'"; 
-       #For the groups the user belong to
-       $userstr=" and username in (select u.username from user_group ug, users u where u.id=ug.u_id and ug.g_id in ( SELECT ug.g_id from user_group ug, users u where u.id=ug.u_id and u.username='$username'))";
-     }
-     $sql="SELECT count(id) totalGalaxyRuns FROM galaxy_run where dolphin=true $userstr;";
-     return $this->queryAVal($sql);
-   }
    function getTotalUsers()
    {
      
      $sql="SELECT count(id) totalUsers FROM users;";
-     return $this->queryAVal($sql);
-   }
-   function getTotalJobs($username)
-   {
-     $userstr="";
-     if ($username!="")
-     {
-       #$userstr=" , users u where j.username=u.clusteruser and u.username='$username'"; 
-       $userstr=" , users u where j.username=u.clusteruser and j.username in (select u.clusteruser from user_group ug, users u where u.id=ug.u_id and ug.g_id in ( SELECT ug.g_id from user_group ug, users u where u.id=ug.u_id and u.username='$username'))";
-     }
-     $sql="SELECT count(j.job_id) totaljobs FROM jobs j $userstr;";
-     return $this->queryAVal($sql);
-   }
-   function getTotalSamples($username)
-   {
-     #For individual user
-     #$userstr=" and username='$username'"; 
-     #For the groups the user belong to
-     $userstr=" and username in (select u.username from user_group ug, users u where u.id=ug.u_id and ug.g_id in ( SELECT ug.g_id from user_group ug, users u where u.id=ug.u_id and u.username='$username'))";
-     $sql="SELECT count(ng.id)  FROM ngs_samples ng, users u where u.id=ng.owner_id $userstr;";
      return $this->queryAVal($sql);
    }
    function getName($username)
