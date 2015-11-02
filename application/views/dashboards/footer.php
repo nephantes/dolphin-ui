@@ -28,7 +28,7 @@
         <script src="<?php echo BASE_PATH?>/js/AdminLTE/app.js" type="text/javascript"></script>
 
         <!-- AdminLTE dashboard demo (This is only for demo purposes) -->
-        <script src="<?php echo BASE_PATH?>/js/dolphin/admindashboard.js" type="text/javascript"></script>
+        <script src="<?php echo BASE_PATH?>/js/dolphin/dashboard.js" type="text/javascript"></script>
 
    </body>
 </html>

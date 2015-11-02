@@ -47,7 +47,7 @@ class funcs
     }
     function runSQL($sql)
     {
-        #sleep(1);
+        sleep(1);
         $this->readINI();
         $link = new mysqli($this->dbhost, $this->dbuser, $this->dbpass, $this->db);
         // check connection
@@ -106,13 +106,18 @@ class funcs
         }
         
     }
+    function getSSH()
+    {
+       sleep(1);
+       return "ssh -o ConnectTimeout=30";
+    }
     
     function checkJobInCluster($wkey, $job_num, $username)
     {
         $this->readINI();
         
         if ($this->remotehost != "N") {
-            $com = "ssh -o ConnectTimeout=30 $username@" . $this->remotehost . " \"" . $this->jobstatus . " $job_num\"|grep " . $job_num . "|awk '{print \$3\"\\t\"\$1}'";
+            $com = $this->getSSH() . " $username@" . $this->remotehost . " \"" . $this->jobstatus . " $job_num\"|grep " . $job_num . "|awk '{print \$3\"\\t\"\$1}'";
         } else {
             $com = "ps -ef|grep \"[[:space:]]" . $job_num . "[[:space:]]\"|awk '{print \$8\"\\t\"\$1}'";
         }
@@ -367,7 +372,7 @@ class funcs
                     
                     $edir = $this->tool_path;
                     if ($this->remotehost != "N") {
-                        $com = "ssh -o ConnectTimeout=30 $username@" . $this->remotehost . " \"" . $this->python . " " . $edir . "/runService.py -f ".$this->config." -d " . $this->dbhost . " $ipf $dpf -o $outdir -u $username -k $wkey -c \\\"$command\\\" -n $servicename -s $servicename\" 2>&1";
+                        $com = $this->getSSH() . " $username@" . $this->remotehost . " \"" . $this->python . " " . $edir . "/runService.py -f ".$this->config." -d " . $this->dbhost . " $ipf $dpf -o $outdir -u $username -k $wkey -c \\\"$command\\\" -n $servicename -s $servicename\" 2>&1";
                     } else {
                         $com = $this->python . " " . $edir . "/runService.py -f ".$this->config." -d " . $this->dbhost . " $ipf $dpf -o $outdir -u $username -k $wkey -c \"$command\" -n $servicename -s $servicename 2>&1";
                     }
