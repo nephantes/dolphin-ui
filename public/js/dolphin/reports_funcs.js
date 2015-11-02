@@ -169,8 +169,8 @@ function showTable(type){
 	var objList;
 	
 	if (type == 'initial_mapping') {
-		console.log(BASE_PATH + "/public/api/?source=" + API_PATH + '/public/pub/' + wkey + '/' + temp_currentResultSelection);
 		temp_currentResultSelection = 'counts/' + currentResultSelection + '.counts.tsv&fields=id,' + lib_checklist.toString();
+		console.log(BASE_PATH + "/public/api/?source=" + API_PATH + '/public/pub/' + wkey + '/' + temp_currentResultSelection);
 	}else if (type == 'RSEM'){
 		temp_currentResultSelection = currentResultSelection;
 	}else if (type == 'DESEQ') {
@@ -188,12 +188,14 @@ function showTable(type){
 			}
 	});
 	var keys = obtainObjectKeys(objList[0]);
+	console.log(keys);
 	
 	if(currentResultSelection.split(".")[currentResultSelection.split(".").length - 1] == "tsv" || type_dictionary.indexOf(currentResultSelection) > -1){
 		var masterDiv = document.getElementById(type+'_exp_body');
 		var tableDiv = createElement('div', ['id', 'class', 'style'], [type+'_table_div', 'panel panel-default margin', 'overflow-x:scroll']);
 		var selectDiv = document.getElementById('select_'+type+'_div');
 		if (document.getElementById('jsontable_' + type + '_results') == null) {
+			console.log('test');
 			var previous_button = false;
 			if (document.getElementById('clear_' + type + '_button_div') != null) {
 				previous_button = true;
@@ -209,6 +211,7 @@ function showTable(type){
 			tableDiv.appendChild(table)
 			masterDiv.appendChild(tableDiv);
 		}else{
+			console.log('fail');
 			document.getElementById(type+'_table_div').remove();
 			document.getElementById('template_'+type).remove();
 			
@@ -220,8 +223,16 @@ function showTable(type){
 		
 		createStreamScript(keys, type)
 		var data = objList, html = $.trim($("#template_"+type).html()), template = Mustache.compile(html);
+		console.log(keys);
 		var view = function(record, index){
-			return template({record: record, index: index});
+			var mergeRecords = '<tr>';
+			for(var x = 0; x < keys.length; x++){
+				mergeRecords += '<td>';
+				mergeRecords += record[keys[x]];
+				mergeRecords += '</td>';
+			}
+			mergeRecords += '</tr>';
+			return mergeRecords;
 		};
 		
 		var callbacks = {
