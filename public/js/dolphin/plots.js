@@ -17,6 +17,7 @@ function populateFileList(){
                 }
               }
 		});
+  /*
   $.ajax({ type: "GET",
 			url: BASE_PATH + "/public/ajax/ngsquerydb.php",
             data: { p: "getCustomTSV" },
@@ -31,6 +32,7 @@ function populateFileList(){
                 }
               }
 		});
+  */
 	$('.panel').overflow = scroll;
 }
 
