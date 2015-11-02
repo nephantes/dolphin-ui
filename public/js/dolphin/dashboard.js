@@ -14,24 +14,6 @@ $(function() {
     //The Calender
     $("#calendar").datepicker();
 
-    /* smallBoxes */
-    $.ajax({ type: "GET",   
-            url: BASE_PATH+"/public/ajax/dashboardquerydb.php",
-            data: { p: "getSmallBoxInfo" },
-            async: false,
-            success : function(text)
-            {
-                $('#totalGalaxyRunsHeader').html(text.item.galaxy);
-                $('#totalGalaxyRunsText').html("Total Galaxy runs");
-                $('#totalDolphinRunsHeader').html(text.item.dolphin);
-                $('#totalDolphinRunsText').html("Total Dolphin runs");
-                $('#totalSamplesHeader').html(text.item.samples);
-                $('#totalSamplesText').html("Total Samples");
-                $('#totalClusterJobsHeader').html(text.item.jobs);
-                $('#totalClusterJobsText').html("Total cluster submissions");
-            }
-    });
-    
     /* Morris.js Charts */
      var responseJobs = '';
             $.ajax({ type: "GET",   
