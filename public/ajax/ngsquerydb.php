@@ -12,7 +12,7 @@ $pDictionary = ['getSelectedSamples', 'submitPipeline', 'getStatus', 'getRunSamp
 				'checkMatePaired', 'getAllSampleIds', 'getLaneIdFromSample', 'getSingleSample', 'getSeriesIdFromLane', 'getAllLaneIds',
                 'getGIDs', 'getSampleNames', 'getWKey', 'getFastQCBool', 'getReportList', 'getTSVFileList', 'profileLoad',
                 'obtainAmazonKeys', 'checkAmazonPermissions', 'getInfoBoxData', 'getSamplesFromName', 'getLanesWithSamples',
-                'getLanesFromName', 'getSamplesfromExperimentSeries', 'getExperimentIdFromSample',];
+                'getLanesFromName', 'getSamplesfromExperimentSeries', 'getExperimentIdFromSample','getCustomTSV'];
 
 $data = "";
                 
@@ -654,6 +654,14 @@ else if ($p == 'getSamplesfromExperimentSeries')
     FROM ngs_samples
     where series_id = $experiment
     ");
+}
+else if ($p == 'getCustomTSV')
+{
+	$data=$query->queryTable("
+    SELECT name, file
+    FROM ngs_createdtables
+    where owner_id = ".$_SESSION['uid']
+    );
 }
 
 header('Cache-Control: no-cache, must-revalidate');

@@ -17,6 +17,20 @@ function populateFileList(){
                 }
               }
 		});
+  $.ajax({ type: "GET",
+			url: BASE_PATH + "/public/ajax/ngsquerydb.php",
+            data: { p: "getCustomTSV" },
+			async: false,
+			success : function(s)
+              {
+				console.log(s);
+                for (var x = 0; x < s.length; x++){
+                  var opt = createElement('option', ['value'], [s[x].file]);
+                  opt.innerHTML = "Created || " +s[x].name;
+                  document.getElementById('source_1').appendChild(opt);
+                }
+              }
+		});
 	$('.panel').overflow = scroll;
 }
 
@@ -136,19 +150,25 @@ var getSrc=function(){
 				window.handle_sheet_index(data);})
 		}
 	}else{
+	  if (document.getElementById("source_1").value.indexOf('.json2') > -1) {
+		src= document.getElementById("source_1").value || document.getElementById("source").placeholder;
+		src = BASE_PATH+'/public/tmp/files/'+src;
+	  }else{
 		src= document.getElementById("source_1").value || document.getElementById("source").placeholder;
 		src = API_PATH+'/public/pub/'+wkey+'/'+src;
-		console.log(BASE_PATH + "/public/api/?format=json2&source="+src);
-		var re=/^http/;
-		var OK=re.exec(src);
-		if(!OK){
-			S.gsheet.query("select *", src, "window.handle_sheet_index")   
-		}else{
-			d3.json(BASE_PATH + "/public/api/?format=json2&source="+src,function(error,data){
-				window.handle_sheet_index(data);
-			})
-			
-		}
+		src = BASE_PATH + "/public/api/?format=json2&source="+src
+	  }
+	  console.log(src);
+	  var re=/^http/;
+	  var OK=re.exec(src);
+	  if(!OK){
+		  S.gsheet.query("select *", src, "window.handle_sheet_index")   
+	  }else{
+		  d3.json(src,function(error,data){
+			  window.handle_sheet_index(data);
+		  })
+		  
+	  }
 	}
 }
 getSrc();

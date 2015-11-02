@@ -115,6 +115,10 @@ function reportSelection(){
 	multi_box.innerHTML = '';
 	var run_cohesion_check = [];
 	var run_cohesion_count_check = [];
+	var genome_check = '';
+	if (reports.length > 0) {
+		genome_check = reports[0].json_parameters.split(',')[0];
+	}
 	for(var y = 0; y < reports.length; y ++){
 		var filename = reports[y].file.split(".")[reports[y].file.split(".").length - 1];
 		if (filename != 'pdf' && filename != 'R') {
@@ -134,7 +138,7 @@ function reportSelection(){
 				multi_box.add(option);
 			}else{
 				run_cohesion_count_check[run_cohesion_check.indexOf(reports[y].file)]++;
-				if (wkey_count != run_cohesion_count_check[run_cohesion_check.indexOf(reports[y].file)]) {
+				if (wkey_count != run_cohesion_count_check[run_cohesion_check.indexOf(reports[y].file)] || genome_check != reports[y].json_parameters.split(",")[0]) {
 					document.getElementById(reports[y].file).disabled = true;
 					document.getElementById(reports[y].file).style.opacity = .35;
 				}else{
@@ -216,7 +220,23 @@ function sendToTableGen(){
 }
 
 function tableCreatorPage(){
-	window.location.href = BASE_PATH + '/tablecreator/table/' + sendToTableGen();
+	var file_values = $('#report_multi_box').val();
+	
+	if(file_values == null){
+		$('#errorModal').modal({
+			show: true
+		});
+		document.getElementById('errorLabel').innerHTML ='A file must be selected in order to generate a report!';
+		document.getElementById('errorAreas').innerHTML = '';
+	}else if(file_values.length > 1){
+		$('#errorModal').modal({
+			show: true
+		});
+		document.getElementById('errorLabel').innerHTML ='Multple file selection is under development.<br>Please select only one file for report generation.';
+		document.getElementById('errorAreas').innerHTML = '';
+	}else{
+		window.location.href = BASE_PATH + '/tablecreator/table/' + sendToTableGen();
+	}
 }
 
 function changeTableType(format, query){

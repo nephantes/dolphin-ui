@@ -285,14 +285,13 @@ class Ngsimport extends VanillaModel {
 			if($this->sheetData[$i]["A"]=="contributor"){array_push($this->conts, $this->esc($this->sheetData[$i]["B"]));}
 			if($this->sheetData[$i]["A"]=="fastq directory"){
 				$this->fastq_dir=$this->esc($this->sheetData[$i]["B"]);
-			}elseif($this->sheetData[$i]["A"]=="processed directory"){
+			}elseif($this->sheetData[$i]["A"]=="input directory"){
 				$this->fastq_dir=$this->esc($this->sheetData[$i]["B"]);
 			}
 			if($this->sheetData[$i]["A"]=="backup directory"){
 				$this->backup_dir=$this->esc($this->sheetData[$i]["B"]);
-			}elseif($this->sheetData[$i]["A"]=="temporary directory"){
+			}elseif($this->sheetData[$i]["A"]=="processed directory"){
 				$this->backup_dir=$this->esc($this->sheetData[$i]["B"]);
-				
 			}
 			if($this->sheetData[$i]["A"]=="amazon bucket"){$this->amazon_bucket=$this->esc($this->sheetData[$i]["B"]);}
 			
@@ -752,6 +751,18 @@ class Ngsimport extends VanillaModel {
 						$text.= $this->errorText("Import name does not match any import given in the excel file (row " . $i . ")");
 						$this->final_check = false;
 						$samp_check = false;
+					}else if($samp->lane_name == $samp->name){
+						$text.= $this->errorText("Import name and Sample name cannot be identical (row " . $i . ")");
+						$this->final_check = false;
+						$samp_check = false;
+					}else{
+						foreach($this->lane_arr as $key => $value){
+							if($samp->name == $key){
+								$text.= $this->errorText("Sample name cannot match a different Import name (row " . $i . ")");
+								$this->final_check = false;
+								$samp_check = false;
+							}
+						}
 					}
 				}else{
 					$text.= $this->errorText("Import name is required for submission (row " . $i . ")");
@@ -890,6 +901,8 @@ class Ngsimport extends VanillaModel {
 					$dir->fastq_dir=$this->esc($this->sheetData[$i][$j]);
 				}elseif($this->sheetData[3][$j]=="Processed directory"){
 					$dir->fastq_dir=$this->esc($this->sheetData[$i][$j]);
+				}elseif($this->sheetData[3][$j]=="Input directory"){
+					$dir->fastq_dir=$this->esc($this->sheetData[$i][$j]);
 				}
 			}
 			$blank = 'true';
@@ -959,7 +972,26 @@ class Ngsimport extends VanillaModel {
 					$file->name=$this->esc($this->sheetData[$i][$j]);
 				}
 				if($this->sheetData[3][$j]=="Directory ID"){$file->dir_tag=$this->esc($this->sheetData[$i][$j]);}
-				if($this->sheetData[3][$j]=="file name(comma separated for paired ends)"){$file->file_name=$this->esc($this->sheetData[$i][$j]);$file->file_name=preg_replace('/\s/', '', $file->file_name);}
+				if($this->sheetData[3][$j]=="file name(comma separated for paired ends)"){
+					$file->file_name=$this->esc($this->sheetData[$i][$j]);$file->file_name=preg_replace('/\s/', '', $file->file_name);
+					if($j == 'B' && isset($this->sheetData[$i]['C'])){
+						$additional_files = $this->sheetData[$i]['C'];
+					}else if ($j == 'C' && isset($this->sheetData[$i]['D'])){
+						$additional_files = $this->sheetData[$i]['D'];
+					}
+					if(isset($additional_files)){
+						$comma_check = strpos($file->file_name, ",");
+						if($comma_check === false){
+							$file->file_name .= ','.$additional_files;
+						}else{
+							$text.= $this->errorText("Incorrect File formatting, Make sure files are submitted in the specific column. (row " . $i . ")");
+							$this->final_check = false;
+							$file_check = false;
+						}
+						unset($additional_files);
+						unset($comma_check);
+					}
+				}
 				if($this->sheetData[3][$j]=="file checksum"){$file->checksum=$this->esc($this->sheetData[$i][$j]);}
 				
 				if($this->sheetData[3][$j]=="Sample or Lane Name (Enter same name for multiple files)" || $this->sheetData[3][$j]=="Sample or Import Name (Enter same name for multiple files)"){
