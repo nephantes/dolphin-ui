@@ -1,11 +1,25 @@
+<?php
+  $totalruns=$query->getTotalGalaxyRuns("");
+  $totalruntext="Total Galaxy runs";
+  $totaldolphinruns=$query->getTotalDolphinRuns("");
+  $totaldolphinruntext="Total dolphin runs";
+  $totalusers=$query->getTotalUsers("");
+  $totaluserstext="Total users";
+  $totalclusterjobs=$query->getTotalJobs("");
+  $totalclusterjobstext="Total cluster submissions";
+?>
 		    <!-- Small boxes (Stat box) -->
                     <div class="row">
                         <div class="col-lg-3 col-xs-6">
                             <!-- small box -->
                             <div class="small-box bg-aqua">
                                 <div class="inner">
-                                    <h3 id="totalGalaxyRunsHeader"></h3>
-                                    <p id="totalGalaxyRunsText"></p>
+                                    <h3>
+                                        <?php print $totalruns;?>
+                                    </h3>
+                                    <p>
+                                        <?php print $totalruntext;?>
+                                    </p>
                                 </div>
                                 <div class="icon">
                                     <i class="ion ion-stats-bars"></i>
@@ -19,8 +33,12 @@
                             <!-- small box -->
                             <div class="small-box bg-green">
                                 <div class="inner">
-                                    <h3 id="totalDolphinRunsHeader"></h3>
-                                    <p id="totalDolphinRunsText"></p>
+                                    <h3>
+                                        <?php print $totaldolphinruns;?>
+                                    </h3>
+                                    <p>
+                                        <?php print $totaldolphinruntext;?>
+                                    </p>
                                 </div>
                                 <div class="icon">
                                     <i class="ion ion-stats-bars"></i>
@@ -34,8 +52,13 @@
                             <!-- small box -->
                             <div class="small-box bg-yellow">
                                 <div class="inner">
-                                    <h3 id="totalSamplesHeader"></h3>
-                                    <p id="totalSamplesText"></p>
+                                    <h3>
+                                        <?php print $totalusers;?>
+                                        
+                                    </h3>
+                                    <p>
+                                        <?php print $totaluserstext;?>
+                                    </p>
                                 </div>
                                 <div class="icon">
                                     <i class="ion ion-person-add"></i>
@@ -49,8 +72,12 @@
                             <!-- small box -->
                             <div class="small-box bg-red">
                                 <div class="inner">
-                                    <h3 id="totalClusterJobsHeader"></h3>
-                                    <p id="totalClusterJobsText"></p>
+                                    <h3>
+                                        <?php print $totalclusterjobs;?>
+                                    </h3>
+                                    <p>
+                                        <?php print $totalclusterjobstext;?>
+                                    </p>
                                 </div>
                                 <div class="icon">
                                     <i class="ion ion-pie-graph"></i>
