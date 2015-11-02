@@ -169,8 +169,8 @@ function showTable(type){
 	var objList;
 	
 	if (type == 'initial_mapping') {
-		console.log(BASE_PATH + "/public/api/?source=" + API_PATH + '/public/pub/' + wkey + '/' + temp_currentResultSelection);
 		temp_currentResultSelection = 'counts/' + currentResultSelection + '.counts.tsv&fields=id,' + lib_checklist.toString();
+		console.log(BASE_PATH + "/public/api/?source=" + API_PATH + '/public/pub/' + wkey + '/' + temp_currentResultSelection);
 	}else if (type == 'RSEM'){
 		temp_currentResultSelection = currentResultSelection;
 	}else if (type == 'DESEQ') {
@@ -188,6 +188,7 @@ function showTable(type){
 			}
 	});
 	var keys = obtainObjectKeys(objList[0]);
+	console.log(keys);
 	
 	if(currentResultSelection.split(".")[currentResultSelection.split(".").length - 1] == "tsv" || type_dictionary.indexOf(currentResultSelection) > -1){
 		var masterDiv = document.getElementById(type+'_exp_body');
@@ -220,8 +221,16 @@ function showTable(type){
 		
 		createStreamScript(keys, type)
 		var data = objList, html = $.trim($("#template_"+type).html()), template = Mustache.compile(html);
+		console.log(keys);
 		var view = function(record, index){
-			return template({record: record, index: index});
+			var mergeRecords = '<tr>';
+			for(var x = 0; x < keys.length; x++){
+				mergeRecords += '<td>';
+				mergeRecords += record[keys[x]];
+				mergeRecords += '</td>';
+			}
+			mergeRecords += '</tr>';
+			return mergeRecords;
 		};
 		
 		var callbacks = {
