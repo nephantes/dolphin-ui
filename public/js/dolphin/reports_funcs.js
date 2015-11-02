@@ -195,7 +195,6 @@ function showTable(type){
 		var tableDiv = createElement('div', ['id', 'class', 'style'], [type+'_table_div', 'panel panel-default margin', 'overflow-x:scroll']);
 		var selectDiv = document.getElementById('select_'+type+'_div');
 		if (document.getElementById('jsontable_' + type + '_results') == null) {
-			console.log('test');
 			var previous_button = false;
 			if (document.getElementById('clear_' + type + '_button_div') != null) {
 				previous_button = true;
@@ -211,7 +210,6 @@ function showTable(type){
 			tableDiv.appendChild(table)
 			masterDiv.appendChild(tableDiv);
 		}else{
-			console.log('fail');
 			document.getElementById(type+'_table_div').remove();
 			document.getElementById('template_'+type).remove();
 			
