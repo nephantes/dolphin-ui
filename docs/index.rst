@@ -6,6 +6,8 @@
 Welcome to Dolphin-UI's documentation!
 ==========================================
 
+To access our version of Dolphin, visit our `Galaxyweb Instance<http://galaxyweb.umassmed.edu/dolphin/>`_
+
 Contents:
 
 .. toctree::
