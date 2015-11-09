@@ -574,5 +574,47 @@ class funcs
          return $res;
      }
 
+      /** getJob Parameters for a submission
+      *
+      * @return string Response
+      */
+
+      public function getJobParams($servicename, $name, $wkey)
+      {
+		$libname=preg_replace("/".$servicename."/", "", $name);
+                $predvals = $this->getPredVals($libname, $servicename);
+                
+                #$res = '{"'.$servicename.'":"'.$libname.':'.$wkey.'"}'; 
+                $res = '{"'.$predvals.'"}'; 
+                return $res;
+      }
+      private function getPredVals($libname, $servicename) 
+      {
+          $predvals = $servicename.'":"'.$libname; 
+          $totalreads=0;
+          if ($servicename == "stepCheck")
+          {
+	     $sql="SELECT DISTINCT total_reads FROM ngs_temp_sample_files where file_name like '%$libname%';";
+             $totalreads = $this->queryAVal($sql);
+             if ($totalreads==0)
+             {
+	       $sql="SELECT DISTINCT total_reads FROM ngs_temp_lane_files where file_name like '%$libname%';";
+               $totalreads = $this->queryAVal($sql);
+             }
+          }
+          else
+          {
+             $sql="SELECT DISTINCT total_reads FROM ngs_fastq_files nff, ngs_samples ns where ns.id=nff.sample_id and ns.samplename='$libname';";
+             $totalreads = $this->queryAVal($sql);
+          }
+          $sql="SELECT field, floor(a + abs(x)*$totalreads) val  from predjob p where p.step='$servicename'";
+          $res=$this->queryTable($sql); 
+          if (isset($res) && isset($res[0]) && isset($res[1]))
+          {
+            return join($res[0], "\":\"")."\", \"".join($res[1], "\":\"");
+          }
+          return "cputime\":\"240\",\"maxmemory\":\"4096";
+      }
+
 }
 ?>

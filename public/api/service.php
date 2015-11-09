@@ -218,7 +218,17 @@ class Pipeline{
                 $res = $myClass->insertReportTable($params['wkey'], $params['version'], $params['type'], $params['file']);
                 return $res;
          }
+         /** getJob Parameters for a submission
+         *
+         * @return string Response
+         */
 
+         public function getJobParams($params)
+         {
+                $myClass = new funcs();
+                $res = $myClass->getJobParams($params['servicename'], $params['name'], $params['wkey']);
+                return $res;
+         }
 }
 
 error_reporting(E_ALL);
