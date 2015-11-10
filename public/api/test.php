@@ -9,7 +9,7 @@ ini_set('report_errors','on');
 $myClass = new funcs();
 $result=$myClass->getINI();
 $result=json_encode($result);
-$data = $result;
+#$data = $result;
 
 header('Cache-Control: no-cache, must-revalidate');
 header('Expires: Mon, 26 Jul 1997 05:00:00 GMT');
