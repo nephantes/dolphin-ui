@@ -47,7 +47,7 @@ class funcs
     }
     function runSQL($sql)
     {
-        sleep(1);
+        #sleep(1);
         $this->readINI();
         $link = new mysqli($this->dbhost, $this->dbuser, $this->dbpass, $this->db);
         // check connection
@@ -607,7 +607,7 @@ class funcs
              $sql="SELECT DISTINCT total_reads FROM ngs_fastq_files nff, ngs_samples ns where ns.id=nff.sample_id and ns.samplename='$libname';";
              $totalreads = $this->queryAVal($sql);
           }
-          $sql="SELECT field, floor(a + abs(x)*$totalreads) val  from predjob p where p.step='$servicename'";
+          $sql="SELECT field2, floor(a + abs(x)*$totalreads) val  from predjob p where p.set='$servicename'";
           $res=$this->queryTable($sql); 
           if (isset($res) && isset($res[0]) && isset($res[1]))
           {
