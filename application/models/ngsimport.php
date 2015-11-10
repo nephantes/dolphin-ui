@@ -298,7 +298,7 @@ class Ngsimport extends VanillaModel {
 			if($this->sheetData[$i]["A"]=="title"){
 				array_push($this->initialSubmission, $this->esc($this->sheetData[$i]["B"]));
 			}
-			if($this->sheetData[$i]["A"]=="backup directory" || $this->sheetData[$i]["A"]=="temporary directory"){
+			if($this->sheetData[$i]["A"]=="backup directory" || $this->sheetData[$i]["A"]=="processed directory"){
 				array_push($this->initialSubmission, $this->esc($this->sheetData[$i]["B"]));
 			}
 			
