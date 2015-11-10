@@ -1,7 +1,7 @@
                 <!-- Content Header (Page header) -->
                 <section class="content-header">
                     <h1>
-                        Admin Dashboard
+                        Dashboard
                         <small>Control panel</small>
                     </h1>
                     <ol class="breadcrumb">
