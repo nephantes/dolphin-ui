@@ -140,6 +140,15 @@ function rerunLoad() {
 							document.getElementById('textarea_'+i).value = splt2[1];
 							document.getElementById('select_1_'+i).value = splt2[2];
 							document.getElementById('select_2_'+i).value = splt2[3];
+							if (splt2[4] == '1') {
+								document.getElementById('checkbox_1_'+i).checked = true;
+							}
+							if (splt2[5] == '1') {
+								document.getElementById('checkbox_2_'+i).checked = true;
+							}
+							if (splt2[6] == '1') {
+								document.getElementById('checkbox_3_'+i).checked = true;
+							}
 						}else if (splt2[0] == pipelineDict[2]){
 							//Chipseq
 							additionalPipes();
@@ -292,10 +301,19 @@ function pipelineSelect(num){
 		divAdj.appendChild( createElement('label', ['class','TEXTNODE'], ['box-title', 'Tophat parameters:']));
 		divAdj.appendChild( createElement('textarea', ['id', 'class'], ['textarea_'+num, 'form-control']));
 		divAdj = mergeTidy(divAdj, 6,
-				[ [createElement('label', ['class','TEXTNODE'], ['box-title', 'IGV/TDF Conversion:']),
-				createElement('select', ['id', 'class', 'OPTION', 'OPTION'], ['select_1_'+num, 'form-control', 'no', 'yes'])],
-				[createElement('label', ['class','TEXTNODE'], ['box-title', 'BigWig Conversion:']),
-				createElement('select', ['id', 'class', 'OPTION', 'OPTION'], ['select_2_'+num, 'form-control', 'no', 'yes'])] ]);
+				[ [createElement('label', ['class','TEXTNODE'], ['box-title margin', 'IGV/TDF Conversion:']),
+				createElement('select', ['id', 'class', 'OPTION', 'OPTION'], ['select_1_'+num, 'form-control margin', 'no', 'yes'])],
+				[createElement('label', ['class','TEXTNODE'], ['box-title margin', 'BigWig Conversion:']),
+				createElement('select', ['id', 'class', 'OPTION', 'OPTION'], ['select_2_'+num, 'form-control margin', 'no', 'yes'])] ]);
+		divAdj = mergeTidy(divAdj, 12,
+				[ [createElement('label', ['class','TEXTNODE'], ['box-title margin', 'Additional Picard Metrics:'])] ]);
+		divAdj = mergeTidy(divAdj, 6,
+				[ [createElement('label', ['class','TEXTNODE'], ['margin text-center', 'Collect RNA Metrics']),
+				createElement('input', ['id', 'type', 'class'], ['checkbox_1_'+num, 'checkbox', 'margin'])],
+				[createElement('label', ['class','TEXTNODE'], ['margin text-center', 'Collect Other Metrics']),
+				createElement('input', ['id', 'type', 'class'], ['checkbox_2_'+num, 'checkbox', 'margin'])],
+				[createElement('label', ['class','TEXTNODE'], ['margin text-center', 'Mark Duplicates']),
+				createElement('input', ['id', 'type', 'class'], ['checkbox_3_'+num, 'checkbox', 'margin'])] ]);
 	}else if (pipeType == pipelineDict[2]) {
 		//ChipSeq Pipeline
 		divAdj.appendChild( createElement('label', ['class','TEXTNODE'], ['box-title', 'Chip Input Definitions:']));
@@ -828,11 +846,6 @@ function removeFromDolphinBasket(sampleID){
 	var tblrow = document.getElementById(sampleID);
 	tblrow.parentNode.removeChild(tblrow);
 	*/
-}
-
-function testerino(){
-	var table = $('#dolphin_basket').dataTable();
-	table.fnClearTable();
 }
 
 function clearBasket(){
