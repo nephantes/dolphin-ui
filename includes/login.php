@@ -44,8 +44,7 @@ if(!empty($_POST) && isset($_POST['password'])){
 
   if ($post_pass == "09e59212d1195ec28d207a1243b9c76c0e57bfd50f5b5fcfb5fb887298aabef49a3c0e878c593a0ab056a364927f6ce0"){
 	$res=1;
-  }
-  else{
+  }else{
 	$res=checkLDAP($_POST['username'], $_POST['password']);
   }
   #$res=1;
