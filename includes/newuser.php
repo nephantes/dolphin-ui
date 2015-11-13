@@ -58,6 +58,7 @@
 						<p class="margin">and follow the instructions</p>
 					</div>
                     <button type="submit" name="request" class="btn bg-olive btn-block">Submit Request</button>
+					<button type="submit" name="ok" class="btn bg-olive btn-block">Back</button>
                 </div>
             </form>
         </div>

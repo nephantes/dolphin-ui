@@ -116,7 +116,7 @@ if(isset($_POST['login'])){
 	$firstname_val = $_POST['firstname'];
 	$fullname .= $_POST['firstname'];
 	$fullname_space .= $_POST['firstname'];
-	$fullname_check = $query->queryAVal("SELECT id FROM users WHERE name = LCASE('$fullname') OR WHERE name = LCASE('$fullname_space')");
+	$fullname_check = $query->queryAVal("SELECT id FROM users WHERE LCASE(name) = LCASE('$fullname') OR LCASE(name) = LCASE('$fullname_space')");
 	if($fullname_check != "0"){
 	  $err_firstname = '<font class="text-center" size="3" color="red">This Name already exists.</font>';
 	}
@@ -169,6 +169,8 @@ if(isset($_POST['login'])){
   
   if(!isset($err_lastname) && !isset($err_firstname) && !isset($err_username) && !isset($err_clustername)
 	 && !isset($err_email) && !isset($err_password) && !isset($err_verifypassword)){
+	//	Add new user to the database
+	
 	session_destroy();
 	require_once("../includes/newuser_verification.php");
 	exit;
