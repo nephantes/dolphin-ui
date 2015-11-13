@@ -22,19 +22,14 @@
             <div class="header">Sign In</div>
             <form action="<?php echo BASE_PATH?>/" method="post">
                 <div class="body bg-gray">
-                    <div class="form-group">
-                        <input type="text" name="username" class="form-control" placeholder="User Id"/>
-                    </div>
-                    <div class="form-group">
-                        <input type="password" name="password" class="form-control" placeholder="Password"/>
-                    </div>
-                    <div class="text-center">
-                        <?php echo $loginfail ?>
+                    <div class="text-center form-group">
+                        <label>
+							Please check your email for a verification email.
+						</label>
                     </div>
                 </div>
                 <div class="footer">                                                               
-                    <button type="submit" name="login" class="btn bg-olive btn-block">Sign me in</button>
-                    <button type="submit" name="signup" class="btn bg-olive btn-block">New User</button>  
+                    <button type="ok" name="login" class="btn bg-olive btn-block">OK</button>
                 </div>
             </form>
         </div>
