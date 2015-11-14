@@ -387,6 +387,7 @@ class Dolphin:
         if (pipeline):
            deseq_count=1
            for i in pipeline:
+              print i
               arr=i.split(':')
               pipename=arr[0]
               if (pipename == "RNASeqRSEM"):
@@ -417,9 +418,11 @@ class Dolphin:
                  if (bam2bw.lower()=="yes"):
                     stepline=stepBam2BW % locals()
                     print >>fp, '%s'%stepline
-                 #stepline=stepPicard % locals()
-                 #print >>fp, '%s'%stepline
-     
+                 rseqc=arr[4]
+                 if(rseqc=="1"):
+                    stepline=stepRSEQC % locals()
+                    print >>fp, '%s'%stepline
+
               if (pipename == "Tophat"):
                  stepline=stepTophat % locals()
                  print >>fp, '%s'%stepline
@@ -432,17 +435,28 @@ class Dolphin:
                  if (bam2bw.lower()=="yes"):
                     stepline=stepBam2BW % locals()
                     print >>fp, '%s'%stepline
-                 metric="CollectRnaSeqMetrics"
-                 stepline=stepPicard % locals()
-                 print >>fp, '%s'%stepline
-                 metric="CollectMultipleMetrics"
-                 stepline=stepPicard % locals()
-                 print >>fp, '%s'%stepline
-                 metric="MarkDuplicates"
-                 stepline=stepPicard % locals()
-                 print >>fp, '%s'%stepline
-                 stepline=stepMergePicard % locals()
-                 print >>fp, '%s'%stepline
+                 rseqc=arr[4]   
+                 if(rseqc=="1"):
+                    stepline=stepRSEQC % locals()
+                    print >>fp, '%s'%stepline
+                 picRNA=arr[5]   
+                 if(picRNA=="1"): 
+                    metric="CollectRnaSeqMetrics"
+                    stepline=stepPicard % locals()
+                    print >>fp, '%s'%stepline
+                 mulMet=arr[6] 
+                 if(mulMet=="1"):    
+                    metric="CollectMultipleMetrics"
+                    stepline=stepPicard % locals()
+                    print >>fp, '%s'%stepline
+                 markDup=arr[7]
+                 if(markDup=="1"):  
+                    metric="MarkDuplicates"
+                    stepline=stepPicard % locals()
+                    print >>fp, '%s'%stepline
+                 if (picRNA=="1" or mulMet=="1"):
+                    stepline=stepMergePicard % locals()
+                    print >>fp, '%s'%stepline
      
               if (pipename == "DESeq"):
                  stepline=stepDESeq2 % locals()
@@ -613,7 +627,7 @@ def main():
 
            runparams = dolphin.getRunParams(runparamsid)
            logging.info(runparams)
-
+           
            input_fn      = logdir+'/run'+str(rpid)+'/input.'+str(rpid)+'.'+str(os.getpid())+'.txt'
 
            fastqc      = runparams.get('fastqc')
