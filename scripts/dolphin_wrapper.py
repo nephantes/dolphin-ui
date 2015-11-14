@@ -422,7 +422,9 @@ class Dolphin:
                  if(rseqc=="1"):
                     stepline=stepRSEQC % locals()
                     print >>fp, '%s'%stepline
-
+                    stepline=stepMergeRSEQC % locals()
+                    print >>fp, '%s'%stepline
+                    
               if (pipename == "Tophat"):
                  stepline=stepTophat % locals()
                  print >>fp, '%s'%stepline
@@ -438,6 +440,8 @@ class Dolphin:
                  rseqc=arr[4]   
                  if(rseqc=="1"):
                     stepline=stepRSEQC % locals()
+                    print >>fp, '%s'%stepline
+                    stepline=stepMergeRSEQC % locals()
                     print >>fp, '%s'%stepline
                  picRNA=arr[5]   
                  if(picRNA=="1"): 
