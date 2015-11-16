@@ -8,6 +8,7 @@ require_once("../../includes/dbfuncs.php");
 if (!isset($_SESSION) || !is_array($_SESSION)) session_start();
 $query = new dbfuncs();
 
+//	Declair variables
 $data = "";
 $q = "";
 $r = "";
@@ -18,6 +19,7 @@ $gids = "";
 $perms = "";
 $andPerms = "";
 
+//	Grab passed variables
 if (isset($_GET['p'])){$p = $_GET['p'];}
 if (isset($_GET['q'])){$q = $_GET['q'];}
 if (isset($_GET['r'])){$r = $_GET['r'];}
@@ -25,11 +27,12 @@ if (isset($_GET['seg'])){$seg = $_GET['seg'];}
 if (isset($_GET['search'])){$search = $_GET['search'];}
 if (isset($_GET['uid'])){$uid = $_GET['uid'];}
 if (isset($_GET['gids'])){$gids = $_GET['gids'];}
+//	Create permissions statements
 if($uid != "" && $gids != ""){
     $perms = "WHERE (((group_id in ($gids)) AND (perms >= 15)) OR (owner_id = $uid))";
     $andPerms = "AND (((group_id in ($gids)) AND (perms >= 15)) OR (owner_id = $uid))";
 }
-
+//	inner join for samples table
 $innerJoin = "LEFT JOIN ngs_source
                 ON ngs_samples.source_id = ngs_source.id
                 LEFT JOIN ngs_organism
@@ -46,26 +49,26 @@ $innerJoin = "LEFT JOIN ngs_source
                 ON ngs_samples.instrument_model_id = ngs_instrument_model.id
                 LEFT JOIN ngs_treatment_manufacturer
                 ON ngs_samples.treatment_manufacturer_id = ngs_treatment_manufacturer.id";
-                
+//	inner join for specific samples tables
 $sampleJoin = "LEFT JOIN ngs_fastq_files
                 ON ngs_samples.id = ngs_fastq_files.sample_id";
-                
+//	inner join for lane tables
 $laneJoin = "LEFT JOIN ngs_facility
                 ON ngs_lanes.facility_id = ngs_facility.id";
-
+//	inner join for experiment tables
 $experimentSeriesJoin = "LEFT JOIN ngs_lab
                         ON ngs_experiment_series.lab_id = ngs_lab.id
                         LEFT JOIN ngs_organization
                         ON ngs_experiment_series.organization_id = ngs_organization.id";
-
+//	grab date variables if passed
 if (isset($_GET['start'])){$start = $_GET['start'];}
 if (isset($_GET['end'])){$end = $_GET['end'];}
 
-//make the q val proper for queries
+//	make the q val proper for queries (accordian box)
 if($q == "Assay"){ $q = "library_type"; }
 else { $q = strtolower($q); }
 
-if ($p == 'getStatus')
+if ($p == 'getStatus')	//	Status tables
 {
 	$time="";
 	if (isset($start)){$time="and `date_created`>='$start' and `date_created`<='$end'";}
@@ -75,10 +78,9 @@ if ($p == 'getStatus')
 	$perms $time
 	");
 }
-else if ($p == "getSelectedSamples")
+else if ($p == "getSelectedSamples")	//	Selected samples table
 {
-
-	//Prepare selected sample search query
+	//	Prepare selected sample search query
 	$searchQuery = "";
 	$splitIndex = ['id','lane_id'];
 	$typeCount = 0;
@@ -130,9 +132,10 @@ else if ($p == "getSelectedSamples")
 	WHERE $searchQuery $andPerms $time
 	");
 }
-else if($search != "")
+else if($search != "")	//	If there is a search term(s) (experiments, lanes, samples)
 {
-	//Prepare search query
+	//	Prepare search query
+	//	Merges multiple search terms for SQL query
 	$searchQuery = "";
 	$splt = explode("$", $search);
 	foreach ($splt as $s){
@@ -146,8 +149,7 @@ else if($search != "")
             }
         }
 	}
-    
-	//browse (search included)
+	//	browse (search included)
 	if($seg == "browse")
 	{
 		if($p == "getLanes")
@@ -192,7 +194,7 @@ else if($search != "")
 	}
 	else
 	{
-		//details (search included)
+		//	details (search included)
 		if($p == "getLanes" && $q != "")
 		{
 			$time="";
@@ -252,9 +254,9 @@ else if($search != "")
 		}
 	}
 }
-else
+else	//	if there isn't a search term (experiments, lanes, samples)
 {
-	//browse (no search)
+	//	browse (no search)
 	if($seg == "browse")
 	{
 		if($p == "getExperimentSeries")
@@ -309,7 +311,7 @@ else
 	}
 	else
 	{
-		//details (no search)
+		//	details (no search)
 		if($p == "getLanes" && $q != "")
 		{
 			$time="";
@@ -351,7 +353,7 @@ else
             $time
 			");
 		}
-		//index
+		//	index
 		else if($p == "getExperimentSeries")
 		{
 			$time="";
