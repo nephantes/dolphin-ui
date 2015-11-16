@@ -2,10 +2,10 @@
 
 function checkLDAP($username, $password)
 {
-  $ldapserver = 'edunivad02.ad.umassmed.edu';
-  $dn_string  = 'ou=Accounts,dc=ad,dc=umassmed,dc=edu';
-  $binduser   = 'SVCLinuxLDAPAuth';
-  $bindpass   = 'Umass2008';
+  $ldapserver = LDAP_SERVER;
+  $dn_string = DN_STRING;
+  $binduser = BIND_USER;
+  $bindpass = BIND_PASS;
  
   $connection = ldap_connect($ldapserver);
   ldap_set_option($connection, LDAP_OPT_PROTOCOL_VERSION, 3);

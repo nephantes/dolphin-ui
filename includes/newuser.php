@@ -38,6 +38,14 @@
 						<?php echo $err_clustername ?>
                     </div>
 					<div class="text-center form-group">
+                        <input type="text" name="institute" class="form-control" placeholder="Institute" value="<?php echo $institute_val ?>"/>
+						<?php echo $err_institute ?>
+                    </div>
+					<div class="text-center form-group">
+                        <input type="text" name="lab" class="form-control" placeholder="Lab" value="<?php echo $lab_val ?>"/>
+						<?php echo $err_lab ?>
+                    </div>
+					<div class="text-center form-group">
                         <input type="text" name="email" class="form-control" placeholder="Email" value="<?php echo $email_val ?>"/>
 						<?php echo $err_email ?>
                     </div>
@@ -49,14 +57,8 @@
                         <input type="password" name="verifypassword" class="form-control password" placeholder="Verify Password"/>
 						<?php echo $err_verifypassword ?>
                     </div>
-					
                 </div>
                 <div class="footer">
-					<div class="form-group text-center">
-						<p class="margin">New users should</p>
-						<a class="margin" href="http://umassmed.edu/biocore/resources/galaxy-group/">visit this page before starting</a>
-						<p class="margin">and follow the instructions</p>
-					</div>
                     <button type="submit" name="request" class="btn bg-olive btn-block">Submit Request</button>
 					<button type="submit" name="ok" class="btn bg-olive btn-block">Back</button>
                 </div>

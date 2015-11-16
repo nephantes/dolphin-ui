@@ -1,9 +1,12 @@
 <?php
 if (!isset($_SESSION) || !is_array($_SESSION)) session_start();
 
+  
 if ($_SESSION['user'] == "")
 {
-  if(isset($_POST['request'])){
+  if(isset($_GET['p']) && $_GET['p'] == "verify" ){
+    require_once("../includes/login.php");
+  }if(isset($_POST['request'])){
     require_once("../includes/login.php");
   }else{
     if ($_POST['username']=="" && $_POST['password']=="")
@@ -19,8 +22,7 @@ if ($_SESSION['user'] == "")
 }
 if (isset($_GET['p']) && $_GET['p'] == "logout" )
 {
-  session_destroy();
   require_once("../includes/loginform.php");
+  session_destroy();
   exit;
 }
-

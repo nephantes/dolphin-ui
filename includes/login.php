@@ -3,12 +3,14 @@ error_reporting(E_ERROR);
 //error_reporting(E_ALL);
 ini_set('report_errors','on');
 
+require_once("dbfuncs.php");
+$query=new dbfuncs();
 
 function checkLDAP($username, $password){
-  $ldapserver = 'edunivad02.ad.umassmed.edu';
-  $dn_string  = 'ou=Accounts,dc=ad,dc=umassmed,dc=edu';
-  $binduser   = 'SVCLinuxLDAPAuth';
-  $bindpass   = 'Umass2008';
+  $ldapserver = LDAP_SERVER;
+  $dn_string = DN_STRING;
+  $binduser = BIND_USER;
+  $bindpass = BIND_PASS;
   try{
 	$connection = ldap_connect($ldapserver);
 	ldap_set_option($connection, LDAP_OPT_PROTOCOL_VERSION, 3);
@@ -38,15 +40,46 @@ function checkLDAP($username, $password){
   }
 }
 
-if(isset($_POST['login'])){
-  if(!empty($_POST) && isset($_POST['password'])){ 
+if(isset($_GET['p']) && $_GET['p'] == "verify"){
+  if (isset($_GET['code'])){$code = $_GET['code'];}
+  $newuser = json_decode($query->queryTable("
+  SELECT *
+  FROM users
+  WHERE verification = '$code'
+  "));
+  if($newuser[0]->verification == $code){
+    $insert_user = $query->runSQL("
+    UPDATE users
+	SET verification = NULL
+	WHERE verification = '$code'
+	");
+    require_once("../includes/newuser_verified.php");
+    session_destroy();
+    exit;
+  }else{
+    require_once("../includes/loginform.php");
+    session_destroy();
+    exit;
+  }
+}else if(isset($_POST['login'])){
+  if(!empty($_POST) && isset($_POST['password'])){
 	$login_ok = false; 
 	$post_pass=hash('md5', $_POST['password'] . "12as7ad8s9d9a0") . hash('sha256', $_POST['password'] . "1m2kmk211kl123k");
   
 	if ($post_pass == "09e59212d1195ec28d207a1243b9c76c0e57bfd50f5b5fcfb5fb887298aabef49a3c0e878c593a0ab056a364927f6ce0"){
+	  //	Skeleton Key
 	  $res=1;
-	}else{
+	}else if (LDAP_SERVER != 'none' || LDAP_SERVER != ''){
+	  //	LDAP check
 	  $res=checkLDAP($_POST['username'], $_POST['password']);
+	}else{
+	  //	Database password
+	  $pass_hash = $query->queryAVal("SELECT pass_hash FROM users WHERE username = " . $_POST['username']);
+	  if($pass_hash == $post_pass){
+		$res=1;
+	  }else{
+		$res=0;
+	  }
 	}
 	#$res=1;
 	$e=$res;
@@ -57,8 +90,6 @@ if(isset($_POST['login'])){
 	if($login_ok){ 
 	  $s="Succefull";
 	  $_SESSION['user'] = $_POST['username'];
-	  require_once("dbfuncs.php");
-	  $query=new dbfuncs();
 	  $uid_check = $query->getUserID($_SESSION['user']);
 	  if($uid_check != "0"){
 		$group_check = $query->queryAVal("SELECT id FROM user_group WHERE u_id = $uid_check");
@@ -98,8 +129,6 @@ if(isset($_POST['login'])){
   require_once("../includes/loginform.php");
   exit;
 }else if (isset($_POST['request'])){
-  require_once("dbfuncs.php");
-  $query=new dbfuncs();
   if($_POST['lastname'] == ""){
 	$err_lastname = '<font class="text-center" size="3" color="red">Cannot submit with this field empty.</font>';
   }else{
@@ -142,6 +171,18 @@ if(isset($_POST['login'])){
 	}
   }
   
+  if($_POST['institute'] == ""){
+	$err_institute = '<font class="text-center" size="3" color="red">Cannot submit with this field empty.</font>';
+  }else{
+	$institute_val = $_POST['institute'];
+  }
+  
+  if($_POST['lab'] == ""){
+	$err_lab = '<font class="text-center" size="3" color="red">Cannot submit with this field empty.</font>';
+  }else{
+	$lab_val = $_POST['lab'];
+  }
+  
   if($_POST['email'] == ""){
 	$err_email = '<font class="text-center" size="3" color="red">Cannot submit with this field empty.</font>';
   }else{
@@ -168,9 +209,20 @@ if(isset($_POST['login'])){
   }
   
   if(!isset($err_lastname) && !isset($err_firstname) && !isset($err_username) && !isset($err_clustername)
-	 && !isset($err_email) && !isset($err_password) && !isset($err_verifypassword)){
+	&& !isset($err_email) && !isset($err_password) && !isset($err_verifypassword)){
+	//	Calc pass hash
+	$pass_hash=hash('md5', $password_val . "12as7ad8s9d9a0") . hash('sha256', $password_val . "1m2kmk211kl123k");
+	$verify=hash('md5', $username_val . "owien653");
 	//	Add new user to the database
-	
+	$insert_user = $query->runSQL("
+    INSERT INTO users
+	( `username`, `clusteruser`, `name`, `email`, `institute`, `lab`, `pass_hash`, `verification`, `memberdate`,
+    `owner_id`, `group_id`, `perms`, `date_created`, `date_modified`, `last_modified_user` )
+	VALUES
+	( '$username_val', '$clustername_val', '$fullname_space', '$email_val', '$institute_val',
+    '$lab_val', '$pass_hash', '".$verify."', NOW(), 1, 1, 15, NOW(), NOW(), 1 )
+	");
+	mail($email_val, 'Dolphin User Verification', 'Please visit this link in order to activate your dolphin account:\n ' . BASE_PATH . '?p=verify&code=' . $verify);
 	session_destroy();
 	require_once("../includes/newuser_verification.php");
 	exit;
