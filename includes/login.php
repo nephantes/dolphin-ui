@@ -44,22 +44,15 @@ if(isset($_GET['p']) && $_GET['p'] == "verify"){
   if (isset($_GET['code'])){$code = $_GET['code'];}
   $newuser = json_decode($query->queryTable("
   SELECT *
-  FROM users_pending
+  FROM users
   WHERE verification = '$code'
   "));
   if($newuser[0]->verification == $code){
     $insert_user = $query->runSQL("
-    INSERT INTO users
-	( `username`, `clusteruser`, `name`, `email`, `institute`, `lab`, `pass_hash`, `memberdate`,
-    `owner_id`, `group_id`, `perms`, `date_created`, `date_modified`, `last_modified_user` )
-	VALUES
-	( '".$newuser[0]->username."', '".$newuser[0]->clusteruser."', '".$newuser[0]->name."', '".$newuser[0]->email."', '".$newuser[0]->institute."',
-    '".$newuser[0]->lab."', '".$newuser[0]->pass_hash."', NOW(), 1, 1, 15, NOW(), NOW(), 1 )
+    UPDATE users
+	SET verification = NULL
+	WHERE verification = '$code'
 	");
-    $remove_pending = $query->runSQL("
-    DELETE FROM users_pending
-    WHERE verification = '$code'
-    ");
     require_once("../includes/newuser_verified.php");
     session_destroy();
     exit;
@@ -221,11 +214,13 @@ if(isset($_GET['p']) && $_GET['p'] == "verify"){
 	$pass_hash=hash('md5', $password_val . "12as7ad8s9d9a0") . hash('sha256', $password_val . "1m2kmk211kl123k");
 	$verify=hash('md5', $username_val . "owien653");
 	//	Add new user to the database
-	$submit = $query->runSQL("
-	INSERT INTO users_pending
-	( `username`, `clusteruser`, `name`, `email`, `institute`, `lab`, `pass_hash`, `verification` )
+	$insert_user = $query->runSQL("
+    INSERT INTO users
+	( `username`, `clusteruser`, `name`, `email`, `institute`, `lab`, `pass_hash`, `verification`, `memberdate`,
+    `owner_id`, `group_id`, `perms`, `date_created`, `date_modified`, `last_modified_user` )
 	VALUES
-	( '$username_val', '$clustername_val', '$fullname_space', '$email_val', '$institute_val', '$lab_val', '$pass_hash', '$verify' )
+	( '$username_val', '$clustername_val', '$fullname_space', '$email_val', '$institute_val',
+    '$lab_val', '$pass_hash', '".$verify."', NOW(), 1, 1, 15, NOW(), NOW(), 1 )
 	");
 	mail($email_val, 'Dolphin User Verification', 'Please visit this link in order to activate your dolphin account:\n ' . BASE_PATH . '?p=verify&code=' . $verify);
 	session_destroy();
