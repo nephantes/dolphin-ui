@@ -38,7 +38,7 @@ $(function() {
 	});
 	
 	$.ajax({ type: "GET",
-			 url: BASE_PATH+"/public/ajax/ngsquerydb.php",
+			 url: BASE_PATH+"/public/ajax/ngs_tables.php",
 			 data: { p: "getStatus", q: qvar, r: rvar, seg: segment, search: theSearch, uid: uid, gids: gids },
 			 async: false,
 			 success : function(s)
@@ -111,7 +111,7 @@ $(function() {
 		},
 	function(start, end) {
 		$.ajax({ type: "GET",
-			 url: BASE_PATH+"/public/ajax/ngsquerydb.php",
+			 url: BASE_PATH+"/public/ajax/ngs_tables.php",
 			 data: { p: "getStatus", q: qvar, r: rvar, seg: segment, search: theSearch, uid: uid, gids: gids, start:start.format('YYYY-MM-DD'), end:end.format('YYYY-MM-DD') },
 			 async: false,
 			 success : function(s)
@@ -227,7 +227,7 @@ $(function() {
 		if (segment == 'status') {
 			var runparams = $('#jsontable_runparams').dataTable();
 			$.ajax({ type: "GET",
-				 url: BASE_PATH+"/public/ajax/ngsquerydb.php",
+				 url: BASE_PATH+"/public/ajax/ngs_tables.php",
 				 data: { p: "getStatus", q: qvar, r: rvar, seg: segment, search: theSearch, uid: uid, gids: gids },
 				 async: false,
 				 success : function(s)

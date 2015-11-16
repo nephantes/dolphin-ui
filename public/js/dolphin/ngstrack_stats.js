@@ -572,7 +572,7 @@ $(function() {
 			samplesType = "getSamples";
 		}
 		$.ajax({ type: "GET",
-					url: BASE_PATH+"/public/ajax/ngsquerydb.php",
+					url: BASE_PATH+"/public/ajax/ngs_tables.php",
 					data: { p: samplesType, q: qvar, r: rvar, seg: segment, search: theSearch, uid: uid, gids: gids },
 					async: false,
 					success : function(s)
@@ -620,9 +620,8 @@ $(function() {
 		/*##### LANES TABLE #####*/
 	
 		//var lanesTable = $('#jsontable_lanes').dataTable();
-	
 		$.ajax({ type: "GET",
-						url: BASE_PATH+"/public/ajax/ngsquerydb.php",
+						url: BASE_PATH+"/public/ajax/ngs_tables.php",
 						data: { p: "getLanes", q: qvar, r: rvar, seg: segment, search: theSearch, uid: uid, gids: gids },
 						async: false,
 						success : function(s)
@@ -646,7 +645,7 @@ $(function() {
 	
 		//var experiment_seriesTable = $('#jsontable_experiment_series').dataTable({responsive: true});
 		$.ajax({ type: "GET",
-						url: BASE_PATH+"/public/ajax/ngsquerydb.php",
+						url: BASE_PATH+"/public/ajax/ngs_tables.php",
 						data: { p: "getExperimentSeries", q: qvar, r: rvar, seg: segment, search: theSearch, uid: uid, gids: gids },
 						async: false,
 						success : function(s)
@@ -668,4 +667,8 @@ $(function() {
 			reloadBasket();
 		}
 	}
+	console.log(qvar);
+	console.log(rvar);
+	console.log(segment);
+	console.log(theSearch);
 });
