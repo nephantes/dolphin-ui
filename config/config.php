@@ -39,6 +39,10 @@ define('REMOTE_HOST', $ini_array['REMOTE_HOST']);
 define('JOB_STATUS', $ini_array['JOB_STATUS']);
 define('PYTHON', $ini_array['PYTHON']);
 define('CONFIG', $ini_array['CONFIG']);
+define('LDAP_SERVER', $ini_array['LDAP_SERVER']);
+define('DN_STRING', $ini_array['DN_STRING']);
+define('BIND_USER', $ini_array['BIND_USER']);
+define('BIND_PASS', $ini_array['BIND_PASS']);
 
 if (!isset($_SESSION) || !is_array($_SESSION)) session_start();
 if (isset($_SESSION['user']))
