@@ -43,7 +43,7 @@ function postInsertRunparams(json, outputdir, name, description){
                    runID = r;
                }else{
                    runlistCheck = 'insertRunlist';
-                   runID = (parseInt(runGroupID) + r);
+                   runID = r;
                }
            }
        });
