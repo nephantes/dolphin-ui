@@ -62,7 +62,7 @@ class Dolphin:
          rpstr="";
          if (rpid > 0):
            rpstr=" AND nrp.id=%s"%str(rpid)
-         sql = "SELECT DISTINCT nrl.run_id, u.username, nrp.barcode from ngs_runlist nrl, ngs_runparams nrp, users u where nrp.id=nrl.run_id and u.id=nrl.owner_id and nrp.run_status=0 %s;"%rpstr
+         sql = "SELECT DISTINCT nrl.run_id, u.username, nrp.barcode from ngs_runlist nrl, ngs_runparams nrp, users u where nrp.id=nrl.run_id and u.id=nrl.owner_id %s;"%rpstr
          return self.trySQL(sql, "getRunParamsID")
 
     def trySQL(self, sql, func):
@@ -81,7 +81,7 @@ class Dolphin:
         return ret 
  
     def getRunParams(self, runparamsid):
-        sql = "SELECT json_parameters from ngs_runparams where run_status=0 and id='%d'"%runparamsid
+        sql = "SELECT json_parameters from ngs_runparams where id='%d'"%runparamsid
         result = self.runSQL(sql)
         for row in result:
             #print row[0]
@@ -98,7 +98,7 @@ class Dolphin:
         tablename="ngs_fastq_files"
         fields="d.backup_dir fastq_dir, d.backup_dir, d.amazon_bucket, rp.outdir"
         idmatch="s.id=tl.sample_id"
-        sql = "SELECT DISTINCT %(fields)s FROM ngs_runlist nr, ngs_samples s, %(tablename)s tl, ngs_dirs d, ngs_runparams rp where nr.sample_id=s.id and rp.run_status=0 and %(idmatch)s and d.id=tl.dir_id and rp.id=nr.run_id and nr.run_id='"+str(runparamsid)+"';"
+        sql = "SELECT DISTINCT %(fields)s FROM ngs_runlist nr, ngs_samples s, %(tablename)s tl, ngs_dirs d, ngs_runparams rp where nr.sample_id=s.id and %(idmatch)s and d.id=tl.dir_id and rp.id=nr.run_id and nr.run_id='"+str(runparamsid)+"';"
         results=self.runSQL(sql%locals())
         if (results==() or self.checkIfAnewSampleAdded(runparamsid)):
            fields="d.fastq_dir, d.backup_dir, d.amazon_bucket, rp.outdir"
@@ -121,7 +121,7 @@ class Dolphin:
     def getSampleList(self, runparamsid):
         tablename="ngs_fastq_files"
         dirfield="d.backup_dir"
-        sql = "SELECT s.samplename, %(dirfield)s dir, ts.file_name FROM ngs_runparams nrp, ngs_runlist nr, ngs_samples s, %(tablename)s ts, ngs_dirs d where nr.run_id=nrp.id and nr.sample_id=s.id and nrp.run_status=0 and s.id=ts.sample_id and d.id=ts.dir_id and nr.run_id='"+str(runparamsid)+"';"
+        sql = "SELECT s.samplename, %(dirfield)s dir, ts.file_name FROM ngs_runparams nrp, ngs_runlist nr, ngs_samples s, %(tablename)s ts, ngs_dirs d where nr.run_id=nrp.id and nr.sample_id=s.id and s.id=ts.sample_id and d.id=ts.dir_id and nr.run_id='"+str(runparamsid)+"';"
         samplelist=self.runSQL(sql%locals())
         if (samplelist==() or self.checkIfAnewSampleAdded(runparamsid)):
             dirfield="d.fastq_dir"
@@ -145,7 +145,7 @@ class Dolphin:
     def getLaneList(self, runparamsid):
         tablename="ngs_fastq_files"
         fields='d.backup_dir dir, tl.file_name'
-        sql = "SELECT DISTINCT %(fields)s FROM ngs_runlist nrl, ngs_runparams nrp, ngs_samples s, %(tablename)s tl where nrl.run_id=nrp.id and nrp.run_status=0 and s.lane_id = tl.lane_id and s.id=nrl.sample_id and nrp.id='"+str(runparamsid)+"';"
+        sql = "SELECT DISTINCT %(fields)s FROM ngs_runlist nrl, ngs_runparams nrp, ngs_samples s, %(tablename)s tl where nrl.run_id=nrp.id and s.lane_id = tl.lane_id and s.id=nrl.sample_id and nrp.id='"+str(runparamsid)+"';"
     
         result=self.runSQL(sql%locals())
         if (not result):
@@ -418,12 +418,13 @@ class Dolphin:
                  if (bam2bw.lower()=="yes"):
                     stepline=stepBam2BW % locals()
                     print >>fp, '%s'%stepline
-                 rseqc=arr[4]
-                 if(rseqc=="1"):
-                    stepline=stepRSEQC % locals()
-                    print >>fp, '%s'%stepline
-                    stepline=stepMergeRSEQC % locals()
-                    print >>fp, '%s'%stepline
+                 if (len(arr)>4):
+                    rseqc=arr[4]
+                    if(rseqc=="1"):
+                       stepline=stepRSEQC % locals()
+                       print >>fp, '%s'%stepline
+                       stepline=stepMergeRSEQC % locals()
+                       print >>fp, '%s'%stepline
                     
               if (pipename == "Tophat"):
                  stepline=stepTophat % locals()
@@ -437,27 +438,34 @@ class Dolphin:
                  if (bam2bw.lower()=="yes"):
                     stepline=stepBam2BW % locals()
                     print >>fp, '%s'%stepline
-                 rseqc=arr[4]   
-                 if(rseqc=="1"):
-                    stepline=stepRSEQC % locals()
-                    print >>fp, '%s'%stepline
-                    stepline=stepMergeRSEQC % locals()
-                    print >>fp, '%s'%stepline
-                 picRNA=arr[5]   
-                 if(picRNA=="1"): 
-                    metric="CollectRnaSeqMetrics"
-                    stepline=stepPicard % locals()
-                    print >>fp, '%s'%stepline
-                 mulMet=arr[6] 
-                 if(mulMet=="1"):    
-                    metric="CollectMultipleMetrics"
-                    stepline=stepPicard % locals()
-                    print >>fp, '%s'%stepline
-                 markDup=arr[7]
-                 if(markDup=="1"):  
-                    metric="MarkDuplicates"
-                    stepline=stepPicard % locals()
-                    print >>fp, '%s'%stepline
+                 if (len(arr)>4):
+                    rseqc=arr[4]   
+                    if(rseqc=="1"):
+                       stepline=stepRSEQC % locals()
+                       print >>fp, '%s'%stepline
+                       stepline=stepMergeRSEQC % locals()
+                       print >>fp, '%s'%stepline
+                 picRNA=0
+                 mulMet=0
+                 print len(arr)
+                 if (len(arr)>5):
+                    picRNA=arr[5]   
+                    if(picRNA=="1"): 
+                       metric="CollectRnaSeqMetrics"
+                       stepline=stepPicard % locals()
+                       print >>fp, '%s'%stepline
+                 if (len(arr)>6):
+                    mulMet=arr[6] 
+                    if(mulMet=="1"):    
+                        metric="CollectMultipleMetrics"
+                        stepline=stepPicard % locals()
+                        print >>fp, '%s'%stepline
+                 if (len(arr)>7):
+                    markDup=arr[7]
+                    if(markDup=="1"):  
+                        metric="MarkDuplicates"
+                        stepline=stepPicard % locals()
+                        print >>fp, '%s'%stepline
                  if (picRNA=="1" or mulMet=="1"):
                     stepline=stepMergePicard % locals()
                     print >>fp, '%s'%stepline
