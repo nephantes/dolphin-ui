@@ -181,7 +181,6 @@ function sendToTableGen(){
 	if (file_send.indexOf('.summary.') > -1) {
 		type_send = '&type=summary';
 	}
-	alert(file_send);
 	var common_send = '';
 	var key_send = '';
 	var keepcols_send = '';
