@@ -181,7 +181,7 @@ function sendToTableGen(){
 	if (file_send.indexOf('.summary.') > -1) {
 		type_send = '&type=summary';
 	}
-
+	alert(file_send);
 	var common_send = '';
 	var key_send = '';
 	var keepcols_send = '';
@@ -202,7 +202,7 @@ function sendToTableGen(){
 		common_send = '&common=name';
 		key_send = '&key=name';
 		keepcols_send = '&keepcols=padj,log2FoldChange';
-	}else if (file_send.indexOf('picard')) {
+	}else if (file_send.indexOf('picard') > -1) {
 		//PICARD
 		if (file_send.indexOf('.hist.') > -1) {
 			common_send = '&common=nt';
@@ -211,6 +211,10 @@ function sendToTableGen(){
 			common_send = '&common=metric';
 			key_send = '&key=metric';
 		}
+	}else if (file_send.indexOf('RSeQC') > -1) {
+		//RSeQC
+		common_send = '&common=region'
+		key_send = '&key=region';
 	}
 	
 	var filter_send = '';
@@ -421,6 +425,7 @@ $(function() {
 						var run_info = [];
 						var wkey_passer = [];
 						var run_select = '<select id="'+ s[i].id + '_run_select" class="form-control" onchange="optionChange(this)"><form>';
+						console.log(run_ids);
 						for(var x = 0; x < run_ids[s[i].id].length; x = x+3){
 							//	Add wkey's to runID
 							wkey_passer.push(run_ids[s[i].id][x+2]);

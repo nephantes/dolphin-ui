@@ -171,11 +171,7 @@ function showTable(type){
 	if (type == 'initial_mapping') {
 		temp_currentResultSelection = 'counts/' + currentResultSelection + '.counts.tsv&fields=id,' + lib_checklist.toString();
 		console.log(BASE_PATH + "/public/api/?source=" + API_PATH + '/public/pub/' + wkey + '/' + temp_currentResultSelection);
-	}else if (type == 'RSEM'){
-		temp_currentResultSelection = currentResultSelection;
-	}else if (type == 'DESEQ') {
-		temp_currentResultSelection = currentResultSelection;
-	}else if (type == 'picard') {
+	}else{
 		temp_currentResultSelection = currentResultSelection;
 	}
 	
@@ -419,11 +415,7 @@ function downloadReports(buttonType, type){
 	var temp_currentResultSelection;
 	if (type == 'initial_mapping') {
 		temp_currentResultSelection = 'counts/' + currentResultSelection + '.counts.tsv';
-	}else if (type == 'RSEM'){
-		temp_currentResultSelection = currentResultSelection;
-	}else if (type == 'DESEQ') {
-		temp_currentResultSelection = currentResultSelection;
-	}else if (type == 'picard') {
+	}else{
 		temp_currentResultSelection = currentResultSelection;
 	}
 	var URL = BASE_PATH + "/public/api/?source=" + API_PATH + '/public/pub/' + wkey + '/' + temp_currentResultSelection + '&format=' + buttonType;
@@ -475,193 +467,205 @@ function numberWithCommas(x) {
 $(function() {
 	"use strict";
 	if (phpGrab.theSegment == 'report') {
-
-	var hrefSplit = window.location.href.split("/");
-	var runId = hrefSplit[hrefSplit.length - 2];
-	wkey = getReportWKey(runId);
-	var samples = hrefSplit[hrefSplit.length - 1].substring(0, hrefSplit[hrefSplit.length - 1].length - 1).split(",");
-	
-	var summary_files = [];
-	var count_files = [];
-	var RSEM_files = [];
-	var DESEQ_files = [];
-	var picard_files = [];
-	
-	$.ajax({ type: "GET",
-			url: BASE_PATH+"/public/ajax/ngsquerydb.php",
-			data: { p: 'getReportList', wkey: wkey },
-			async: false,
-			success : function(s)
-			{
-				for(var x = 0; x < s.length; x++){
-					if(s[x].type == 'rsem'){
-						RSEM_files.push(s[x]);
-					}else if (s[x].type == 'deseq'){
-						DESEQ_files.push(s[x]);
-					}else if (s[x].type == 'summary') {
-						summary_files.push(s[x]);
-					}else if (s[x].type == 'counts'){
-						count_files.push(s[x]);
-					}else if (s[x].type.split('_')[0] == 'picard') {
-						picard_files.push(s[x]);
+		var hrefSplit = window.location.href.split("/");
+		var runId = hrefSplit[hrefSplit.length - 2];
+		wkey = getReportWKey(runId);
+		var samples = hrefSplit[hrefSplit.length - 1].substring(0, hrefSplit[hrefSplit.length - 1].length - 1).split(",");
+		
+		var summary_files = [];
+		var count_files = [];
+		var RSEM_files = [];
+		var DESEQ_files = [];
+		var picard_files = [];
+		var rseqc_files = [];
+		
+		$.ajax({ type: "GET",
+				url: BASE_PATH+"/public/ajax/ngsquerydb.php",
+				data: { p: 'getReportList', wkey: wkey },
+				async: false,
+				success : function(s)
+				{
+					for(var x = 0; x < s.length; x++){
+						if(s[x].type == 'rsem'){
+							RSEM_files.push(s[x]);
+						}else if (s[x].type == 'deseq'){
+							DESEQ_files.push(s[x]);
+						}else if (s[x].type == 'summary') {
+							summary_files.push(s[x]);
+						}else if (s[x].type == 'counts'){
+							count_files.push(s[x]);
+						}else if (s[x].type.split('_')[0] == 'picard') {
+							picard_files.push(s[x]);
+						}else if (s[x].type.split('_')[0] == 'RSeQC') {
+							rseqc_files.push(s[x]);
+						}
 					}
 				}
-			}
-	});
-	
-	var summary_rna_type = [];
-	for (var z = 0; z < summary_files.length; z++) {
-		summary_rna_type.push(summary_files[z]['file'].split("/")[summary_files[z]['file'].split("/").length - 1].split(".")[0]);
-	}
-	for (var z = 0; z < summary_files.length; z++) {
-		document.getElementById('tablerow').appendChild(createElement('th', ['id'], [summary_rna_type[z]]));
-		document.getElementById(summary_rna_type[z]).innerHTML = summary_rna_type[z];
-	}
-	
-	var samplenames = [];
-	$.ajax({ type: "GET",
-			url: BASE_PATH+"/public/ajax/ngsquerydb.php",
-			data: { p: 'getSampleNames', samples: samples.toString() },
-			async: false,
-			success : function(s)
-			{
-				for(var x  = 0; x < s.length; x++){
-					if (s[x].samplename == null) {
-						libraries.push(s[x].name);
-					}else{
-						libraries.push(s[x].samplename);
-					}
-				}
-				for(var x  = 0; x < s.length; x++){
-					samplenames.push(s[x].samplename);
-				}
-			}
-	});
-	
-	var read_counts = [];
-	
-	$.ajax({ type: "GET",
-			url: BASE_PATH+"/public/ajax/initialmappingdb.php",
-			data: { p: 'getCounts', samples: samples.toString() },
-			async: false,
-			success : function(s)
-			{
-				for(var x  = 0; x < s.length; x++){
-					read_counts.push(s[x].total_reads);
-				}
-			}
-	});
-	
-	console.log(summary_files);
-	
-	if (summary_files.length > 0) {
-		document.getElementById('tablerow').appendChild(createElement('th', ['id'], ['unused']));
-		document.getElementById('unused').innerHTML = 'Reads Left';
-		document.getElementById('tablerow').appendChild(createElement('th', ['id'], ['selection']));
-		document.getElementById('selection').innerHTML = 'Selected';
+		});
+		
+		var summary_rna_type = [];
 		for (var z = 0; z < summary_files.length; z++) {
-			if (z == 0){
-				if (summary_files.length == 1) {
-					var table_array_raw = (parseMoreTSV(['File','Total Reads','Reads 1','Reads >1','Unmapped Reads'], summary_files[z]['file']));
-					for(var x = 0; x < table_array_raw.length; x++){
-						var table_array_push = [table_array_raw[x][0], table_array_raw[x][1], parseInt(table_array_raw[x][2].split(" ")[0]) + parseInt(table_array_raw[x][3].split(" ")[0]), table_array_raw[x][4].split(" ")[0]];
-						table_array.push(table_array_push);
-					}
-				}else{
-					var table_array_raw = (parseMoreTSV(['File','Total Reads','Reads 1','Reads >1'], summary_files[z]['file']));
-					for(var x = 0; x < table_array_raw.length; x++){
-						var table_array_push = [table_array_raw[x][0], table_array_raw[x][1], parseInt(table_array_raw[x][2].split(" ")[0]) + parseInt(table_array_raw[x][3].split(" ")[0])];
-						table_array.push(table_array_push);
-					}
-				}
-			}else if (z == summary_files.length - 1) {
-				console.log(summary_files[z]['file']);
-				var parsed_add = parseMoreTSV(['Reads 1','Reads >1','Unmapped Reads'], summary_files[z]['file']);
-				for(var x = 0; x < table_array.length; x ++){
-					var concat_array = table_array[x];
-					table_array[x] = concat_array.concat([parseInt(parsed_add[x][0].split(" ")[0]) + parseInt(parsed_add[x][1].split(" ")[0]), parsed_add[x][2].split(" ")[0]]);
-				}
-			}else{
-				var parsed_add = parseMoreTSV(['Reads 1','Reads >1'], summary_files[z]['file']);
-				for(var x = 0; x < table_array.length; x ++){
-					var concat_array = table_array[x];
-					table_array[x] = concat_array.concat([ parseInt(parsed_add[x][0].split(" ")[0]) + parseInt(parsed_add[x][1].split(" ")[0]) ]);
-				}
-			}
+			summary_rna_type.push(summary_files[z]['file'].split("/")[summary_files[z]['file'].split("/").length - 1].split(".")[0]);
+		}
+		for (var z = 0; z < summary_files.length; z++) {
+			document.getElementById('tablerow').appendChild(createElement('th', ['id'], [summary_rna_type[z]]));
+			document.getElementById(summary_rna_type[z]).innerHTML = summary_rna_type[z];
 		}
 		
-		var separator = 3;
-		if (table_array.length == 1) {
-			separator = 4;
-		}
-		//Initial Mapping Results
-		var reports_table = $('#jsontable_initial_mapping').dataTable();
-		reports_table.fnClearTable();
-		document.getElementById('jsontable_initial_mapping').setAttribute('style','overflow-x:scroll');
-		for (var x = 0; x < (table_array.length); x++) {
-			var row_array = table_array[x];
-			var reads_total = row_array[1];
-			row_array[1] = numberWithCommas(row_array[1]);
-			for(var y = 2; y < row_array.length; y++){
-				row_array[y] = numberWithCommas(row_array[y] + " (" + ((row_array[y]/reads_total)*100).toFixed(2) + " %)");
+		var samplenames = [];
+		$.ajax({ type: "GET",
+				url: BASE_PATH+"/public/ajax/ngsquerydb.php",
+				data: { p: 'getSampleNames', samples: samples.toString() },
+				async: false,
+				success : function(s)
+				{
+					for(var x  = 0; x < s.length; x++){
+						if (s[x].samplename == null) {
+							libraries.push(s[x].name);
+						}else{
+							libraries.push(s[x].samplename);
+						}
+					}
+					for(var x  = 0; x < s.length; x++){
+						samplenames.push(s[x].samplename);
+					}
+				}
+		});
+		
+		var read_counts = [];
+		
+		$.ajax({ type: "GET",
+				url: BASE_PATH+"/public/ajax/initialmappingdb.php",
+				data: { p: 'getCounts', samples: samples.toString() },
+				async: false,
+				success : function(s)
+				{
+					for(var x  = 0; x < s.length; x++){
+						read_counts.push(s[x].total_reads);
+					}
+				}
+		});
+		
+		console.log(summary_files);
+		
+		if (summary_files.length > 0) {
+			document.getElementById('tablerow').appendChild(createElement('th', ['id'], ['unused']));
+			document.getElementById('unused').innerHTML = 'Reads Left';
+			document.getElementById('tablerow').appendChild(createElement('th', ['id'], ['selection']));
+			document.getElementById('selection').innerHTML = 'Selected';
+			for (var z = 0; z < summary_files.length; z++) {
+				if (z == 0){
+					if (summary_files.length == 1) {
+						var table_array_raw = (parseMoreTSV(['File','Total Reads','Reads 1','Reads >1','Unmapped Reads'], summary_files[z]['file']));
+						for(var x = 0; x < table_array_raw.length; x++){
+							var table_array_push = [table_array_raw[x][0], table_array_raw[x][1], parseInt(table_array_raw[x][2].split(" ")[0]) + parseInt(table_array_raw[x][3].split(" ")[0]), table_array_raw[x][4].split(" ")[0]];
+							table_array.push(table_array_push);
+						}
+					}else{
+						var table_array_raw = (parseMoreTSV(['File','Total Reads','Reads 1','Reads >1'], summary_files[z]['file']));
+						for(var x = 0; x < table_array_raw.length; x++){
+							var table_array_push = [table_array_raw[x][0], table_array_raw[x][1], parseInt(table_array_raw[x][2].split(" ")[0]) + parseInt(table_array_raw[x][3].split(" ")[0])];
+							table_array.push(table_array_push);
+						}
+					}
+				}else if (z == summary_files.length - 1) {
+					console.log(summary_files[z]['file']);
+					var parsed_add = parseMoreTSV(['Reads 1','Reads >1','Unmapped Reads'], summary_files[z]['file']);
+					for(var x = 0; x < table_array.length; x ++){
+						var concat_array = table_array[x];
+						table_array[x] = concat_array.concat([parseInt(parsed_add[x][0].split(" ")[0]) + parseInt(parsed_add[x][1].split(" ")[0]), parsed_add[x][2].split(" ")[0]]);
+					}
+				}else{
+					var parsed_add = parseMoreTSV(['Reads 1','Reads >1'], summary_files[z]['file']);
+					for(var x = 0; x < table_array.length; x ++){
+						var concat_array = table_array[x];
+						table_array[x] = concat_array.concat([ parseInt(parsed_add[x][0].split(" ")[0]) + parseInt(parsed_add[x][1].split(" ")[0]) ]);
+					}
+				}
 			}
-			row_array.push("<input type=\"checkbox\" class=\"ngs_checkbox\" name=\"" + row_array[0] + "\" id=\"lib_checkbox_"+x+"\" onClick=\"storeLib(this.name)\">");
-			reports_table.fnAddData(row_array);
-		}
-		createDropdown(summary_rna_type, 'initial_mapping');
-	}else if (read_counts.length > 0) {
-		var reports_table = $('#jsontable_initial_mapping').dataTable();
-		reports_table.fnClearTable();
-		for(var y = 0; y < read_counts.length; y++){
-			if (samplenames[y] == '' || samplenames[y] == null || samplenames[y] == undefined) {
-				reports_table.fnAddData([libraries[y], numberWithCommas(read_counts[y])]);
-			}else{
-				reports_table.fnAddData([samplenames[y], numberWithCommas(read_counts[y])]);
+			
+			var separator = 3;
+			if (table_array.length == 1) {
+				separator = 4;
 			}
+			//Initial Mapping Results
+			var reports_table = $('#jsontable_initial_mapping').dataTable();
+			reports_table.fnClearTable();
+			document.getElementById('jsontable_initial_mapping').setAttribute('style','overflow-x:scroll');
+			for (var x = 0; x < (table_array.length); x++) {
+				var row_array = table_array[x];
+				var reads_total = row_array[1];
+				row_array[1] = numberWithCommas(row_array[1]);
+				for(var y = 2; y < row_array.length; y++){
+					row_array[y] = numberWithCommas(row_array[y] + " (" + ((row_array[y]/reads_total)*100).toFixed(2) + " %)");
+				}
+				row_array.push("<input type=\"checkbox\" class=\"ngs_checkbox\" name=\"" + row_array[0] + "\" id=\"lib_checkbox_"+x+"\" onClick=\"storeLib(this.name)\">");
+				reports_table.fnAddData(row_array);
+			}
+			createDropdown(summary_rna_type, 'initial_mapping');
+		}else if (read_counts.length > 0) {
+			var reports_table = $('#jsontable_initial_mapping').dataTable();
+			reports_table.fnClearTable();
+			for(var y = 0; y < read_counts.length; y++){
+				if (samplenames[y] == '' || samplenames[y] == null || samplenames[y] == undefined) {
+					reports_table.fnAddData([libraries[y], numberWithCommas(read_counts[y])]);
+				}else{
+					reports_table.fnAddData([samplenames[y], numberWithCommas(read_counts[y])]);
+				}
+			}
+		}else{
+			document.getElementById('send_to_plots').disabled = true;
+			document.getElementById('initial_mapping_exp').remove();
 		}
-	}else{
-		document.getElementById('send_to_plots').disabled = true;
-		document.getElementById('initial_mapping_exp').remove();
-	}
-	
-	//Create a check for FASTQC output????
-	if (getFastQCBool(runId)) {
-		createSummary(true);
-		createDetails(libraries);
-	}else{
-		document.getElementById('summary_exp').remove();
-		document.getElementById('details_exp').remove();
-	}
-	
-	if (DESEQ_files.length > 0) {
-		var deseq_file_paths = [];
-		for (var z = 0; z < DESEQ_files.length; z++){
-			deseq_file_paths.push(DESEQ_files[z].file);
+		
+		//Create a check for FASTQC output????
+		if (getFastQCBool(runId)) {
+			createSummary(true);
+			createDetails(libraries);
+		}else{
+			document.getElementById('summary_exp').remove();
+			document.getElementById('details_exp').remove();
 		}
-		createDropdown(deseq_file_paths, 'DESEQ');
-	}else{
-		document.getElementById('DESEQ_exp').remove();
-	}
-	
-	if (RSEM_files.length > 0) {
-		var rsem_file_paths = [];
-		for (var z = 0; z < RSEM_files.length; z++){
-			rsem_file_paths.push(RSEM_files[z].file);
+		
+		if (DESEQ_files.length > 0) {
+			var deseq_file_paths = [];
+			for (var z = 0; z < DESEQ_files.length; z++){
+				deseq_file_paths.push(DESEQ_files[z].file);
+			}
+			createDropdown(deseq_file_paths, 'DESEQ');
+		}else{
+			document.getElementById('DESEQ_exp').remove();
 		}
-		createDropdown(rsem_file_paths, 'RSEM');
-	}else{
-		document.getElementById('RSEM_exp').remove();
-	}
-	
-	if (picard_files.length > 0) {
-		var picard_file_paths = [];
-		for (var z = 0; z < picard_files.length; z++){
-			picard_file_paths.push(picard_files[z].file);
+		
+		if (RSEM_files.length > 0) {
+			var rsem_file_paths = [];
+			for (var z = 0; z < RSEM_files.length; z++){
+				rsem_file_paths.push(RSEM_files[z].file);
+			}
+			createDropdown(rsem_file_paths, 'RSEM');
+		}else{
+			document.getElementById('RSEM_exp').remove();
 		}
-		createDropdown(picard_file_paths, 'picard');
-	}else{
-		document.getElementById('picard_exp').remove();
-	}
-	//reports_table.fnAdjustColumnSizing(true);
+		
+		if (picard_files.length > 0) {
+			var picard_file_paths = [];
+			for (var z = 0; z < picard_files.length; z++){
+				picard_file_paths.push(picard_files[z].file);
+			}
+			createDropdown(picard_file_paths, 'picard');
+		}else{
+			document.getElementById('picard_exp').remove();
+		}
+		
+		if (rseqc_files.length > 0) {
+			var rseqc_file_paths = [];
+			for (var z = 0; z < rseqc_files.length; z++){
+				rseqc_file_paths.push(rseqc_files[z].file);
+			}
+			createDropdown(rseqc_file_paths, 'rseqc');
+		}else{
+			document.getElementById('rseqc_exp').remove();
+		}
+		//reports_table.fnAdjustColumnSizing(true);
 	}
 });
