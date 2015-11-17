@@ -594,6 +594,8 @@ function submitPipeline(type) {
 			//insert new values into ngs_runparams
 			var runparamsInsert = postInsertRunparams(json, outputdir, run_name, description);
 			//insert new values into ngs_runlist
+			console.log(runparamsInsert);
+			console.log(ids);
 			var submitted = postInsertRunlist(runparamsInsert[0], ids, runparamsInsert[1]);
 			if (submitted) {
 				window.location.href = BASE_PATH+"/stat/status";

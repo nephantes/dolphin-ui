@@ -16,9 +16,20 @@ function postInsertRunparams(json, outputdir, name, description){
    
    //find the run group ID
    var hrefSplit = window.location.href.split("/");
-   var rerunLoc = $.inArray('rerun', hrefSplit)
+   var rerunLoc = $.inArray('rerun', hrefSplit);
+   var outdir_check;
    var runGroupID;
-   if (rerunLoc != -1) {
+   $.ajax({
+		type: 	'GET',
+		url: 	BASE_PATH+'/public/ajax/ngsquerydb.php',
+		data:  	{ p: "checkOutputDir", outdir: outputdir},
+		async:	false,
+		success: function(r)
+		{
+			outdir_check = r;
+		}
+	});
+   if (outdir_check != 0) {
        runGroupID = hrefSplit[rerunLoc+1];
    }else{
        //if not a rerun
@@ -36,15 +47,13 @@ function postInsertRunparams(json, outputdir, name, description){
            async:	false,
            success: function(r)
            {
-               console.log(r);
                successCheck = true;
                if (runGroupID == 'new') {
                    runlistCheck = 'insertRunlist';
                    runID = r;
                }else{
-                   runlistCheck = 'insertRunlist';
-                   runID = r;
-               }
+				runlistCheck = 'old';
+			   }
            }
        });
    if (successCheck) {
@@ -69,7 +78,9 @@ function postInsertRunlist(runlistCheck, sample_ids, runID){
                    successCheck = true;
                }
            });
-       }
+       }else if (runlistCheck == 'old') {
+			successCheck = true;
+	   }
    return successCheck;
 }
 

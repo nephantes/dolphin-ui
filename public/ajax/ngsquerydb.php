@@ -310,6 +310,15 @@ else if ($p == 'getCustomTSV')
     where owner_id = ".$_SESSION['uid']
     );
 }
+else if ($p == 'checkOutputDir')
+{
+	if (isset($_GET['outdir'])){$outdir = $_GET['outdir'];}
+	$data=$query->queryAVal("
+    SELECT outdir
+    FROM ngs_runparams
+    where outdir = '$outdir'
+    ");
+}
 
 header('Cache-Control: no-cache, must-revalidate');
 header('Expires: Mon, 26 Jul 1997 05:00:00 GMT');
