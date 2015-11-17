@@ -113,7 +113,6 @@ if ($p == "submitPipeline" )
             $data=$query->runSQL("UPDATE ngs_runparams SET run_group_id = id WHERE run_group_id = -1");
         }else{
             $data=$query->runSQL("UPDATE ngs_runparams SET run_group_id = $runGroupID WHERE run_group_id = -1");
-            $idKey= $idKey - $runGroupID;
         }
         $data=$idKey;
     }

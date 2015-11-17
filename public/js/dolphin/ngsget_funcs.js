@@ -40,7 +40,7 @@ function reportSelected(runID, groupID){
 function getSampleIDs(search){
 	var ids= [];
 	$.ajax({ type: "GET",
-		url: BASE_PATH+"/public/ajax/ngsquerydb.php",
+		url: BASE_PATH+"/public/ajax/ngs_tables.php",
 		data: { p: "getSelectedSamples", search: search },
 		async: false,
 		success : function(s)
