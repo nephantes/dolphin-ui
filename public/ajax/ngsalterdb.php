@@ -109,12 +109,10 @@ if ($p == "submitPipeline" )
         $idKey=$query->queryAVal("SELECT id FROM ngs_runparams WHERE run_group_id = -1 and run_name = '$name' order by id desc limit 1");
         runCmd($idKey, $query);
         //update required to make run_group_id equal to it's primary key "id".Replace the arbitrary -1 with the id
-        if (isset($_POST['runid'])){$runGroupID = $_POST['runid'];}
         if( $runGroupID == 'new'){
             $data=$query->runSQL("UPDATE ngs_runparams SET run_group_id = id WHERE run_group_id = -1");
         }else{
             $data=$query->runSQL("UPDATE ngs_runparams SET run_group_id = $runGroupID WHERE run_group_id = -1");
-            $idKey= $idKey - $runGroupID;
         }
         $data=$idKey;
     }
