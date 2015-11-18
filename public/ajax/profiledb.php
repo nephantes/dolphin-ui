@@ -162,14 +162,15 @@ else if ($p == 'viewGroupMembers')
 else if ($p == 'deleteGroup')
 {
 	if (isset($_GET['group_id'])){$group_id = $_GET['group_id'];}
-	$data=$query->runSQL("
+	$delete=$query->runSQL("
 	DELETE FROM groups
 	WHERE id = $group_id
 	");
-	$data=$query->runSQL("
+	$delete=$query->runSQL("
 	DELETE FROM user_group
 	WHERE group_id = $group_id
 	");
+	$data=json_encode('pass');
 }
 else if ($p == 'getGroupMemberAdd')
 {

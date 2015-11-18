@@ -161,6 +161,7 @@ function viewGroupMembers(group){
 	document.getElementById('confirmGroupButton').setAttribute('onClick', '');
 	document.getElementById('confirmGroupButton').setAttribute('style', 'display:none');
 	document.getElementById('cancelGroupButton').setAttribute('onClick', '');
+	document.getElementById('cancelGroupButton').innerHTML = 'OK';
 	$.ajax({ type: "GET",
 		url: BASE_PATH+"/public/ajax/profiledb.php",
 		data: { p: 'viewGroupMembers', group: group },
@@ -186,6 +187,7 @@ function addNewUsers(id){
 	document.getElementById('confirmGroupButton').setAttribute('data-dismiss', '');
 	document.getElementById('confirmGroupButton').innerHTML = 'Add to group';
 	document.getElementById('confirmGroupButton').setAttribute('style', 'display:show');
+	document.getElementById('cancelGroupButton').innerHTML = 'Cancel';
 	$.ajax({ type: "GET",
 		url: BASE_PATH+"/public/ajax/profiledb.php",
 		data: { p: 'getGroupMemberAdd', group_id: id },
@@ -230,21 +232,35 @@ function deleteGroup(id){
 	});
 	document.getElementById('myModalLabel').innerHTML = 'Delete group';
 	document.getElementById('groupLabel').innerHTML ='Are you sure you want to delete group id: '+id;
-	
+	document.getElementById('groupModalDiv').innerHTML = '';
 	document.getElementById('confirmGroupButton').innerHTML = 'Delete';
 	document.getElementById('confirmGroupButton').setAttribute('onClick', 'confirmDeleteGroup('+id+')');
+	document.getElementById('confirmGroupButton').setAttribute('data-dismiss', '');
 	document.getElementById('confirmGroupButton').setAttribute('style', 'display:show');
+	document.getElementById('cancelGroupButton').innerHTML = 'Cancel';
 }
 
 function confirmDeleteGroup(id) {
+	var confirmDelete;
 	$.ajax({ type: "GET",
 		url: BASE_PATH+"/public/ajax/profiledb.php",
 		data: { p: 'deleteGroup', group_id: id },
 		async: false,
 		success : function(s)
 		{
+			console.log(s);
+			confirmDelete = s;
 		}
 	});
+	document.getElementById('myModalLabel').innerHTML = 'Delete group';
+	if (confirmDelete == 'pass') {
+		document.getElementById('groupLabel').innerHTML ='This group has been deleted';
+	}else{
+		document.getElementById('groupLabel').innerHTML ='Error occured, this group has not been deleted.';
+	}
+	document.getElementById('groupModalDiv').innerHTML = '';
+	document.getElementById('confirmGroupButton').setAttribute('style', 'display:none');
+	document.getElementById('cancelGroupButton').innerHTML = 'OK';
 	
 	document.getElementById('st_search_groups').remove();
 	document.getElementById('st_label_groups').remove();
@@ -283,6 +299,7 @@ function requestNewGroup(){
 	document.getElementById('confirmGroupButton').setAttribute('data-dismiss', '');
 	document.getElementById('confirmGroupButton').setAttribute('onClick', 'confirmNewGroup()');
 	document.getElementById('confirmGroupButton').setAttribute('style', 'display:show');
+	document.getElementById('cancelGroupButton').innerHTML = 'Cancel';
 }
 
 function confirmNewGroup() {
@@ -316,10 +333,12 @@ function requestJoinGroup(){
 	document.getElementById('myModalLabel').innerHTML = 'Request to join a group';
 	document.getElementById('groupLabel').innerHTML ='Select a group to join';
 	document.getElementById('groupModalDiv').innerHTML = '<select id="joinGroup" class="form-control" size="25" multiple>';
+	document.getElementById('confirmGroupButton').innerHTML = 'Request';
 	document.getElementById('confirmGroupButton').setAttribute('onClick', 'submitJoinRequest()');
 	document.getElementById('confirmGroupButton').setAttribute('style', 'display:show');
 	document.getElementById('confirmGroupButton').setAttribute('data-dismiss', '');
 	document.getElementById('cancelGroupButton').setAttribute('onClick', '');
+	document.getElementById('cancelGroupButton').innerHTML = 'Cancel';
 	$.ajax({ type: "GET",
 		url: BASE_PATH+"/public/ajax/profiledb.php",
 		data: { p: 'joinGroupList' },
