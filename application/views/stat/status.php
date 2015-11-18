@@ -91,19 +91,19 @@
 									<div class="form-group">
 											<label for="Group">Who can see?</label>
 											<div class="radio">
-												<label class="">
-													<input type="radio" name="security_id" id="only me" value="3" style="position: absolute;">
+												<label for="only me">
+													<input type="radio" name="security_id" id="only_me" value="3" style="position: absolute;">
 													&nbsp;only me
 												</label>
 											</div>
 											<div class="radio">
-												<label>
-													<input type="radio" name="security_id" id="only my group" value="15" style="position: absolute;">
+												<label for="only my group">
+													<input type="radio" name="security_id" id="only_my_group" value="15" style="position: absolute;">
 													&nbsp;only my group
 												</label>
 											</div>
 											<div class="radio">
-												<label>
+												<label for="everyone">
 													<input type="radio" name="security_id" id="everyone" value="32" style="position: absolute;">
 													&nbsp;everyone
 												</label>

@@ -384,6 +384,15 @@ else if ($p == 'getGroups')
 	)
 	");
 }
+else if ($p == 'getRunPerms')
+{
+	if (isset($_GET['run_id'])){$run_id = $_GET['run_id'];}
+	$data=$query->queryAVal("
+	SELECT perms
+	FROM ngs_runparams
+	WHERE id = $run_id
+	");
+}
 else if ($p == 'changeRunGroup')
 {
 	if (isset($_GET['run_id'])){$run_id = $_GET['run_id'];}

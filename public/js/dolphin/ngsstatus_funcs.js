@@ -183,9 +183,9 @@ function changeRunGroup(id, group){
 			console.log(s);
 			for(var x = 0; x < s.length; x++){
 				if (s[x].id == group) {
-					document.getElementById('groupsIDSelect').innerHTML += '<option value="' + s[x].id + '" selected="true">' + s[x].name + '</option>';
+					document.getElementById('groupsIDSelect').innerHTML += '<option id="group_' + s[x].id + '" value="' + s[x].id + '" selected="true">' + s[x].name + '</option>';
 				}else{
-					document.getElementById('groupsIDSelect').innerHTML += '<option value="' + s[x].id + '">' + s[x].name + '</option>';
+					document.getElementById('groupsIDSelect').innerHTML += '<option id="group_' + s[x].id + '" value="' + s[x].id + '">' + s[x].name + '</option>';
 				}
 			}
 		}
@@ -213,6 +213,7 @@ function confirmGroupChange(id){
 		document.getElementById('groupsLabel').innerHTML = 'Run group has been changed!'
 		document.getElementById('groupsDiv').innerHTML = '';
 		document.getElementById(id).setAttribute('name', group_id);
+		document.getElementById('group_'+id).setAttribute('selected','true');
 	}else{
 		document.getElementById('groupsLabel').innerHTML = 'Error occured, run group was not changed.'
 		document.getElementById('groupsDiv').innerHTML = '';
@@ -225,6 +226,25 @@ function changeRunPerms(id, group) {
 	$('#permsModal').modal({
 		show: true
 	});
+	var perms;
+	$.ajax({ type: "GET",
+		url: BASE_PATH+"/public/ajax/ngsquerydb.php",
+		data: { p: 'getRunPerms', run_id: id},
+		async: false,
+		success : function(s)
+		{
+			perms = s;
+		}	
+	});
+	if (perms == 3) {
+		$('#only_me').iCheck('check')
+	}else if (perms == 15) {
+		$('#only_my_group').iCheck('check')
+	}else if (perms == 32) {
+		$('#everyone').iCheck('check')
+	}else if (perms == 63) {
+		$('#everyone').iCheck('check')
+	}
 }
 
 function confirmPermsChange(id){
