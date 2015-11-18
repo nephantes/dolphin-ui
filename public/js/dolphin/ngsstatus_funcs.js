@@ -166,4 +166,79 @@ function joboutDataModal(jobname, jobout) {
    document.getElementById('job_modal_jobname').innerHTML = jobname;
    document.getElementById('job_modal_text').innerHTML = jobout;
 }
-	
+
+function changeRunGroup(id, group){
+	document.getElementById('myModalGroups').innerHTML = 'Change run group';
+	document.getElementById('groupsLabel').innerHTML = 'Which group should see this run?'
+	document.getElementById('groupsDiv').innerHTML = '<select id="groupsIDSelect" class="form-control"></select>'
+	document.getElementById('confirmGroupsButton').setAttribute('style', 'display:show');
+	document.getElementById('confirmGroupsButton').setAttribute('onclick','confirmGroupChange('+id+')');
+	document.getElementById('cancelGroupsButton').innerHTML = 'Cancel';
+	$.ajax({ type: "GET",
+		url: BASE_PATH+"/public/ajax/ngsquerydb.php",
+		data: { p: 'getGroups'},
+		async: false,
+		success : function(s)
+		{
+			console.log(s);
+			for(var x = 0; x < s.length; x++){
+				if (s[x].id == group) {
+					document.getElementById('groupsIDSelect').innerHTML += '<option value="' + s[x].id + '" selected="true">' + s[x].name + '</option>';
+				}else{
+					document.getElementById('groupsIDSelect').innerHTML += '<option value="' + s[x].id + '">' + s[x].name + '</option>';
+				}
+			}
+		}
+	});
+	$('#groupsModal').modal({
+		show: true
+	});
+}
+
+function confirmGroupChange(id){
+	var group_id = document.querySelector("select").selectedOptions[0].value;
+	var group_changed;
+	$.ajax({ type: "GET",
+		url: BASE_PATH+"/public/ajax/ngsquerydb.php",
+		data: { p: 'changeRunGroup', group_id: group_id, run_id: id},
+		async: false,
+		success : function(s)
+		{
+			group_changed = s;
+		}	
+	});
+	if (group_changed == 'pass') {
+		document.getElementById('groupsLabel').innerHTML = 'Run group has been changed!'
+		document.getElementById('groupsDiv').innerHTML = '';
+		document.getElementById(id).setAttribute('name', group_id);
+	}else{
+		document.getElementById('groupsLabel').innerHTML = 'Error occured, run group was not changed.'
+		document.getElementById('groupsDiv').innerHTML = '';
+	}
+}
+
+function changeRunPerms(id, group) {
+	document.getElementById('myModalPerms').innerHTML = 'Change run permissions';
+	document.getElementById('confirmPermsButton').setAttribute('onclick','confirmPermsChange("'+id+'")');
+	$('#permsModal').modal({
+		show: true
+	});
+}
+
+function confirmPermsChange(id){
+	var perms = $('.checked')[0].children[0].value;
+	var permsPassed;
+	$.ajax({ type: "GET",
+		url: BASE_PATH+"/public/ajax/ngsquerydb.php",
+		data: { p: 'changeRunPerms', perms: perms, run_id: id},
+		async: false,
+		success : function(s)
+		{
+			permsPassed = s;
+		}	
+	});
+	$('.checked').iCheck('uncheck');
+	$('#groupsModal').modal({
+		show: true
+	});
+}
