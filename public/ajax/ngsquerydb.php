@@ -319,6 +319,93 @@ else if ($p == 'checkOutputDir')
     where outdir = '$outdir'
     ");
 }
+else if ($p == 'changeDataGroupNames')
+{
+	if (isset($_GET['experiment'])){$experiment = $_GET['experiment'];}
+	$owner_check=$query->queryAVal("
+	SELECT owner_id
+	FROM ngs_experiment_series
+	WHERE id = $experiment
+	");
+	if($owner_check == $_SESSION['uid']){
+		$data=$query->queryTable("
+		SELECT id,name
+		FROM groups
+		WHERE owner_id = " . $_SESSION['uid'] . "
+		");
+	}else{
+		$data=json_encode("");
+	}
+}
+else if ($p == 'changeDataGroup')
+{
+	if (isset($_GET['oldGID'])){$oldGID = $_GET['oldGID'];}
+	if (isset($_GET['group_id'])){$group_id = $_GET['group_id'];}
+	if (isset($_GET['experiment'])){$experiment = $_GET['experiment'];}
+	
+	//	EXPERIMENT SERIES
+	$ES_UPDATE=$query->runSQL("
+	UPDATE ngs_experiment_series
+	SET group_id = $group_id
+	WHERE id = $experiment
+	");
+	//	IMPORTS
+	$IMPORTS_UPDATE=$query->runSQL("
+	UPDATE ngs_lanes
+	SET group_id = $group_id
+	WHERE series_id = $experiment
+	");
+	//	SAMPLES
+	$SAMPLE_UPDATE=$query->runSQL("
+	UPDATE ngs_samples
+	SET group_id = $group_id
+	WHERE series_id = $experiment
+	");
+	$data=json_encode('passed');
+}
+else if ($p == 'getExperimentSeriesGroup')
+{
+	if (isset($_GET['experiment'])){$experiment = $_GET['experiment'];}
+	$data=json_encode($query->queryAVal("
+	SELECT group_id
+	FROM ngs_experiment_series
+	WHERE id = $experiment
+	"));
+}
+else if ($p == 'getGroups')
+{
+	$data=$query->queryTable("
+	SELECT id, name
+	FROM groups
+	WHERE id in (
+		SELECT g_id
+		FROM user_group
+		WHERE u_id = ".$_SESSION['uid']."
+	)
+	");
+}
+else if ($p == 'changeRunGroup')
+{
+	if (isset($_GET['run_id'])){$run_id = $_GET['run_id'];}
+	if (isset($_GET['group_id'])){$group_id = $_GET['group_id'];}
+	$RUNPARAM_UPDATE=$query->runSQL("
+	UPDATE ngs_runparams
+	SET group_id = $group_id
+	WHERE id = $run_id
+	");
+	$data=json_encode('pass');
+}
+else if ($p == 'changeRunPerms')
+{
+	if (isset($_GET['run_id'])){$run_id = $_GET['run_id'];}
+	if (isset($_GET['perms'])){$perms = $_GET['perms'];}
+	$RUNPARAM_UPDATE=$query->runSQL("
+	UPDATE ngs_runparams
+	SET perms = $perms
+	WHERE id = $run_id
+	");
+	$data=json_encode('pass');
+}
 
 header('Cache-Control: no-cache, must-revalidate');
 header('Expires: Mon, 26 Jul 1997 05:00:00 GMT');
