@@ -166,7 +166,7 @@ function joboutDataModal(jobname, jobout) {
    document.getElementById('job_modal_jobname').innerHTML = jobname;
    document.getElementById('job_modal_text').innerHTML = jobout;
 }
-
+	
 function changeRunGroup(id, group){
 	document.getElementById('myModalGroups').innerHTML = 'Change run group';
 	document.getElementById('groupsLabel').innerHTML = 'Which group should see this run?'
@@ -207,6 +207,8 @@ function confirmGroupChange(id){
 			group_changed = s;
 		}	
 	});
+	document.getElementById('confirmGroupsButton').setAttribute('style', 'display:none');
+	document.getElementById('cancelGroupsButton').innerHTML = 'OK';
 	if (group_changed == 'pass') {
 		document.getElementById('groupsLabel').innerHTML = 'Run group has been changed!'
 		document.getElementById('groupsDiv').innerHTML = '';
@@ -241,4 +243,13 @@ function confirmPermsChange(id){
 	$('#groupsModal').modal({
 		show: true
 	});
+	document.getElementById('myModalGroups').innerHTML = 'Change run permissions';
+	document.getElementById('groupsDiv').innerHTML = '';
+	document.getElementById('confirmGroupsButton').setAttribute('style', 'display:none');
+	document.getElementById('cancelGroupsButton').innerHTML = 'OK';
+	if (permsPassed == 'pass') {
+		document.getElementById('groupsLabel').innerHTML = 'Run permissions has been changed!'
+	}else{
+		document.getElementById('groupsLabel').innerHTML = 'Error occured, run permissions was not changed.'
+	}
 }
