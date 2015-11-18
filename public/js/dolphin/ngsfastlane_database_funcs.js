@@ -19,13 +19,13 @@ function checkFastlaneInput(info_array){
 	//	For each input passed
 	console.log(info_array);
 	console.log(id_array);
-	for(var x = 0; x < (id_array.length - 1); x ++){
-		if (info_array[x] == '' && id_array[x] != 'amazon_bucket') {
+	for(var x = 0; x < (id_array.length); x ++){
+		if (info_array[x] == '' && id_array[x] != 'amazon_bucket' && id_array[x] != 'Barcode Definitions') {
 			//	Left a field blank
 			database_checks.push(false);
 		}else if (id_array[x] == 'barcode_sep' && info_array[x] == 'yes') {
 			//	Check Barcode Separation
-			var split_barcodes = info_array[id_array.length - 1].split('\n');
+			var split_barcodes = info_array[id_array.length - 3].split('\n');
 			split_barcodes = split_barcodes.filter(function(n){return n != ''});
 			var split_check = true;
 			for (var y = 0; y < split_barcodes.length; y++) {

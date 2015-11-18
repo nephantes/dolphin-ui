@@ -455,7 +455,9 @@ function submitPipeline(type) {
 	var fastqc = document.getElementById("fastqc").value;
 	var run_name = document.getElementById("run_name").value;
 	var description = document.getElementById("run_description").value;
-
+	var perms = document.getElementById("perms").value;
+	var group = document.getElementById("groups").value;
+	
 	var empty_values = []
 	if (run_name == "") {
 		empty_values.push('Run Name');
@@ -592,7 +594,7 @@ function submitPipeline(type) {
 			document.getElementById('errorAreas').innerHTML = '';
 		}else{
 			//insert new values into ngs_runparams
-			var runparamsInsert = postInsertRunparams(json, outputdir, run_name, description);
+			var runparamsInsert = postInsertRunparams(json, outputdir, run_name, description, perms, group);
 			//insert new values into ngs_runlist
 			console.log(runparamsInsert);
 			console.log(ids);

@@ -906,7 +906,7 @@ e range"><i class="fa fa-calendar"></i></button>
 	function groupSelectionOptions($groups){
 		$html = "";
 		foreach($groups as $g){
-				$html.="<option>".$g['name']."</option>";
+				$html.="<option value=".$g['id'].">".$g['name']."</option>";
 		}
 		return $html;
 	}
