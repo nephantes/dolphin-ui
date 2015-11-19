@@ -964,6 +964,79 @@ function returnToIndex(){
 	window.location.href = BASE_PATH+"/search/index/";
 }
 
+function changeDataGroup(){
+	if (checklist_experiment_series.length == 1) {
+		document.getElementById('permsLabel').innerHTML = 'Which group should own the selected Experiment Series?';
+		document.getElementById('permsDiv').innerHTML = '<select id="permsIDSelect" class="form-control"></select>';
+		var experiment_series_group;
+		$.ajax({ type: "GET",
+				url: BASE_PATH+"/public/ajax/ngsquerydb.php",
+				data: { p: 'getExperimentSeriesGroup', experiment: checklist_experiment_series.toString() },
+				async: false,
+				success : function(s)
+				{
+					experiment_series_group = s;
+				}
+			});
+		$.ajax({ type: "GET",
+				url: BASE_PATH+"/public/ajax/ngsquerydb.php",
+				data: { p: 'changeDataGroupNames', experiment: checklist_experiment_series.toString() },
+				async: false,
+				success : function(s)
+				{
+					console.log(s);
+					for(var x = 0; x < s.length; x++){
+						if (s[x].id == experiment_series_group) {
+							document.getElementById('permsIDSelect').innerHTML += '<option value="' + s[x].id + '" selected="true">' + s[x].name + '</option>';
+						}else{
+							document.getElementById('permsIDSelect').innerHTML += '<option value="' + s[x].id + '">' + s[x].name + '</option>';
+						}
+					}
+				}
+			});
+		if (document.getElementById('permsIDSelect').innerHTML != '') {
+			document.getElementById('confirmPermsButton').setAttribute('style', 'display:show');
+			document.getElementById('cancelPermsButton').innerHTML = 'Cancel';
+			document.getElementById('confirmPermsButton').setAttribute('onclick', 'confirmPermsPressed()');
+		}else{
+			document.getElementById('permsLabel').innerHTML = 'You do not have permissions to change this Experiment Series Group.';
+			document.getElementById('permsDiv').innerHTML = '';
+			document.getElementById('confirmPermsButton').setAttribute('style', 'display:none');
+			document.getElementById('cancelPermsButton').innerHTML = 'OK';
+		}
+	}else if (checklist_experiment_series.length == 0){
+		document.getElementById('permsLabel').innerHTML = 'You must select a Experiment Series to change it\'s group.';
+		document.getElementById('permsDiv').innerHTML = '';
+		document.getElementById('confirmPermsButton').setAttribute('style', 'display:none');
+		document.getElementById('cancelPermsButton').innerHTML = 'OK';
+	}else{
+		document.getElementById('permsLabel').innerHTML = 'You may only select one Experiment Series at a time.';
+		document.getElementById('permsDiv').innerHTML = '';
+		document.getElementById('confirmPermsButton').setAttribute('style', 'display:none');
+		document.getElementById('cancelPermsButton').innerHTML = 'OK';
+	}
+	$('#permsModal').modal({
+		show: true
+	});
+}
+
+function confirmPermsPressed(){
+	console.log(document.querySelector("select").selectedOptions[0].value);
+	$.ajax({ type: "GET",
+		url: BASE_PATH+"/public/ajax/ngsquerydb.php",
+		data: { p: 'changeDataGroup', group_id: document.querySelector("select").selectedOptions[0].value, experiment: checklist_experiment_series.toString() },
+		async: false,
+		success : function(s)
+		{
+			console.log(s);
+		}
+	});
+	document.getElementById('permsLabel').innerHTML = 'Selected data\'s group has been changed!'
+	document.getElementById('permsDiv').innerHTML = '';
+	document.getElementById('confirmPermsButton').setAttribute('style', 'display:none');
+	document.getElementById('cancelPermsButton').innerHTML = 'OK';
+}
+
 /*##### SEND TO PIPELINE WITH SELECTION #####*/
 function submitSelected(){
 	if (selectionTest()) {

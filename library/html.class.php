@@ -614,14 +614,14 @@ e range"><i class="fa fa-calendar"></i></button>
 	$html.= '<div class="col-md-9">
 				<div class="margin pull-left btn-group">
 					<button id="dso_menu" type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown" aria-expanded="true">Data Selection Options <span class="fa fa-caret-down"></span></button>
-					<ul class="dropdown-menu" role="menu" aria-labelledby="dso_menu" onClick="scrollWindow(0,200)">
+					<ul class="dropdown-menu" role="menu" aria-labelledby="dso_menu">
 						<li><a name="pipeline_button">Send to Pipeline</a></li>
 						<li><a name="send_to_status_button" onClick="sendToStatus()">Pipeline Status</a></li>
 						<li><a name="export_excel_button" onClick="exportExcel()">Export to Excel</a></li>
 						<li class="divider"></li>
 						<li><a name="table_generation_button" onClick="generateTableLink()">Generate Tables</a></li>
 						<li class="divider"></li>
-						<li><a name="change_group_perms" onClick="changeDataGroup()" disabled>Change Data Group</a></li>';
+						<li><a name="change_group_perms" onClick="changeDataGroup()" disabled>Change Experiment Group</a></li>';
 	if($_SESSION['uid'] == 1){
 							#<li><a name="send_to_NCBI_button" onClick="" disabled>Send to NCBI</a></li>
 		$html.= 			'<li><a name="send_to_ENCODE_button" onClick="checkForEncodeSubmission()" disabled>Send to ENCODE</a></li>';
