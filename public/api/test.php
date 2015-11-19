@@ -9,6 +9,7 @@ ini_set('report_errors','on');
 $myClass = new funcs();
 
 $result=$myClass->startService("step1", "khAO8pFxKzigjtrMyk1M660xKOG6j", "ls -l");
+#$result=$myClass->startService("step1", "khAO8pFxKzigjtrMyk1M660xKOG6j", "ls -l");
 
 #$result=$myClass->getINI();
 #$result=json_encode($result);
