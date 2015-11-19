@@ -12,6 +12,10 @@ class funcs
     public $jobstatus = "";
     public $config = "";
     public $python = "";
+    public $schedular = "";
+    public $checkjob_cmd = "";
+    public $job_num = "";
+    public $username = "";
     function readINI()
     {
             $this->dbhost     = DB_HOST;
@@ -23,13 +27,68 @@ class funcs
             $this->jobstatus  = JOB_STATUS;
             $this->config     = CONFIG;
             $this->python     = PYTHON;
+            $this->schedular  = SCHEDULAR;
+            $this->setCMDs();
     }
     function getINI()
     {
         $this->readINI();
         return $this;
     }
-    
+    function setCMDs()
+    { 
+        if($this->schedular = "LSF")
+        {
+            $this->checkjob_cmd = $this->getSSH() . " \"" . $this->jobstatus . " $this->job_num\"|grep " . $this->job_num . "|awk '{print \$3\"\\t\"\$1}'";
+        }
+        else if($this->schedular = "SGE")
+        {
+            #Put SGE commands here
+        }
+        else
+        {
+            $this->checkjob_cmd = "ps -ef|grep \"[[:space:]]" . $this->job_num . "[[:space:]]\"|awk '{print \$8\"\\t\"\$1}'";
+        }
+    }
+    function getCMDs($com)
+    {
+        if($this->schedular == "LSF" || $this->schedular == "SGE")
+        {
+            $com=str_replace("\"", "\\\"", $com);
+            $com=$this->getSSH() . " \"" . $com . "\"";
+        } 
+        return $com;
+    }
+
+    function checkFile($params)
+    {
+         $this->username=$params['username'];
+         $this->readINI();         
+         $com = "ls ".$params['file'];
+         $retval = $this->syscall($this->getCMDs($com));
+
+         if (preg_match('/No such file or directory/', $retval)) {
+              return "{\"ERROR\": \"No such file or directory: ".$params['file']."\"}";
+         }
+         if (preg_match('/Permission denied/', $retval)) {
+              return "{\"ERROR\": \"Permission denied: ".$params['file']."\"}";
+         }
+         return "{\"Result\":\"Ok\"}";
+    }
+    function checkPermissions($params)
+    {
+         $this->username=$params['username'];
+         $this->readINI();         
+         $com = "mkdir -p  ".$params['outdir'];
+         $retval = $this->syscall($this->getCMDs($com));
+
+         if (preg_match('/Permission denied/', $retval)) {
+              return "{\"ERROR\": \"Permission denied: ".$params['outdir']."\"}";
+         }
+         return "{\"Result\":\"Ok\"}";
+   
+    }
+     
     function getKey()
     {
         $characters = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
@@ -108,20 +167,16 @@ class funcs
     }
     function getSSH()
     {
-       sleep(1);
-       return "ssh -o ConnectTimeout=30";
+       #sleep(1);
+       return "ssh -o ConnectTimeout=30  ". $this->username. "@" . $this->remotehost . " ";
     }
-    
+
     function checkJobInCluster($wkey, $job_num, $username)
     {
+        $this->job_num = $job_num; 
+        $this->username = $username;
         $this->readINI();
-        
-        if ($this->remotehost != "N") {
-            $com = $this->getSSH() . " $username@" . $this->remotehost . " \"" . $this->jobstatus . " $job_num\"|grep " . $job_num . "|awk '{print \$3\"\\t\"\$1}'";
-        } else {
-            $com = "ps -ef|grep \"[[:space:]]" . $job_num . "[[:space:]]\"|awk '{print \$8\"\\t\"\$1}'";
-        }
-        $retval = $this->syscall($com);
+        $retval = $this->syscall($this->checkjob_cmd);
         while (preg_match('/is not found/', $retval)) {
             $retval = $this->syscall($com);
         }
@@ -148,8 +203,10 @@ class funcs
         return 0;
     }
     
-    function checkStatus($servicename, $wkey)
+    function checkStatus($params)
     {
+        $servicename = $params['servicename'];
+        $wkey        = $params['wkey'];
         $sql      = "select * from jobs j, services s where s.service_id=j.service_id and s.servicename='$servicename' and j.wkey='$wkey'";
         #return $sql;
         $res      = $this->runSQL($sql);
@@ -272,7 +329,7 @@ class funcs
         if (is_object($result) && $row = $result->fetch_row()) {
             return $row;
         }
-        return "ERROR 001: in getWorkflowInformation";
+        return "ERROR 001: in getWorkflowInformation:$sql";
     }
     function updateInputParam($wkey, $username, $inputparam)
     {
@@ -314,36 +371,58 @@ class funcs
         return "ERROR 003: in getServiceCommand";
     }
     
-    function startWorkflow($inputparam, $defaultparam, $username, $workflowname, $wkey, $status, $outdir, $services)
+    function startWorkflow( $params )
     {
+        $inputparam=$params['inputparam'];
+        $defaultparam=$params['defaultparam'];
+        $username=$params['username'];
+        $status =$params['status'];
+        $outdir = $params['outdir'];
+        $services= $params['services'];
+
+        $status = "exist";
+        $wkey=$params['wkey'];
+        if($wkey=='' || $wkey=='start')
+        {
+            $wkey = $this->getKey();
+            $status = "new";
+        }
+
         if ($status == "new") {
             $workflow_id = $this->getId("workflow", $username, $workflowname, $wkey, $defaultparam);
             // sql query for INSERT INTO workflowrun
-            $sql         = "INSERT INTO `workflow_run` ( `workflow_id`, `username`, `wkey`, `inputparam`, `outdir`, `result`, `start_time`, `services`) VALUES ('$workflow_id', '$username', '$wkey', '$inputparam', '$outdir', '0', now(), $services)";
+            $sql = "INSERT INTO `workflow_run` ( `workflow_id`, `username`, `wkey`, `inputparam`, `outdir`, `result`, `start_time`, `services`) VALUES ('$workflow_id', '$username', '$wkey', '$inputparam', '$outdir', '0', now(), $services)";
             $this->updateDefaultParam($workflowname, $username, $defaultparam);
             if ($result = $this->runSQL($sql)) {
-                return $result;
+                $ret = $result;
             }
-            
         } else {
             $inputparam = $this->updateInputParam($wkey, $username, $inputparam);
-            
-            return $inputparam;
+            $ret =  $inputparam;
         }
-        return 0;
+        if(preg_match('/^ERROR/', $ret))
+        {
+           return $ret;
+        }
+        return $wkey;
     }
     
-    function startService($servicename, $wkey, $inputcommand)
+    function startService($params)
     {
-        $this->readINI();
-        
+     $this->readINI();
+     $servicename  = $params['servicename'];
+     $wkey         = $params['wkey'];
+     $inputcommand = $params['command'];
+     $result_stat = $this->checkStatus($params);
+     if ( $result_stat == "START") # Job hasn't started yet 
+     {
         $wf = $this->getWorkflowInformation($wkey);
         if (is_array($wf)) {
             $username     = $wf[0];
             $inputparam   = $wf[1];
             $outdir       = $wf[2];
             $defaultparam = $wf[3];
-            
+            $this->username = $username; 
             $service_id = $this->getId("service", $username, $servicename, $wkey, $defaultparam);
             
             $sql = "SELECT service_id FROM service_run where wkey='$wkey' and service_id='$service_id';";
@@ -357,39 +436,27 @@ class funcs
                     $command = $this->getCommand($servicename, $username, $inputcommand, $defaultparam);
                     
                     $ipf = "";
-                    if ($inputparam != "" && $inputparam != "None") {
-                        #If the service will run over ssh we need \\\ otherwise \
-                        if ($this->remotehost != "N") {
-                            $ipf = "-i \\\"$inputparam\\\"";
-                        } else {
-                            $ipf = "-i \"$inputparam\"";
-                        }
-                    }
+                    if ($inputparam != "" && $inputparam != "None") 
+                        $ipf = "-i \"$inputparam\"";
                     $dpf = "";
                     if ($defaultparam != "" && $defaultparam != "None")
                         $dpf = "-p $defaultparam";
                     
-                    
                     $edir = $this->tool_path;
-                    if ($this->remotehost != "N") {
-                        $com = $this->getSSH() . " $username@" . $this->remotehost . " \"" . $this->python . " " . $edir . "/runService.py -f ".$this->config." -d " . $this->dbhost . " $ipf $dpf -o $outdir -u $username -k $wkey -c \\\"$command\\\" -n $servicename -s $servicename\" 2>&1";
-                    } else {
-                        $com = $this->python . " " . $edir . "/runService.py -f ".$this->config." -d " . $this->dbhost . " $ipf $dpf -o $outdir -u $username -k $wkey -c \"$command\" -n $servicename -s $servicename 2>&1";
-                    }
-                    $retval = $this->syscall($com);
+                    $com = $this->python . " " . $edir . "/runService.py -f ".$this->config." -d " . $this->dbhost . " $ipf $dpf -o $outdir -u $username -k $wkey -c \"$command\" -n $servicename -s $servicename 2>&1";
+                    $retval = $this->syscall($this->getCMDs($com));
                     
                     if (preg_match('/Error/', $retval)) {
                         return "ERROR: $retval";
                     }
-                    #return $com;
-                    return "RUNNING(2):$com";
-                    #return "RUNNING(2)";
-                    #return "RUNNING";
+                    return "RUNNING(2):$inputcommand";
                 }
             }
         } else {
             return $wf;
         }
+      }
+      return $result_stat;
     }
     
     function checkLastServiceJobs($wkey)
@@ -411,8 +478,9 @@ class funcs
         }
         return $ret;
     }
-    function endWorkflow($wkey)
+    function endWorkflow($params)
     {
+        $wkey=$params['wkey'];
         $sql    = "update workflow_run set result='1', end_time=now() where wkey='$wkey'";
         $result = $this->runSQL($sql);
         $sql    = "update ngs_runparams set run_status='1' where wkey='$wkey'";
@@ -448,8 +516,16 @@ class funcs
         
     }
     #Insert a job to the database
-    function insertJob($username, $wkey, $com, $jobname, $servicename, $jobnum, $result)
+    function insertJob($params)
     {
+        $username=$params['username']; 
+        $wkey=$params['wkey'];
+        $com=$params['com'];
+        $jobname=$params['jobname'];
+        $servicename=$params['servicename']; 
+        $jobnum=$params['jobnum'];
+        $result=$params['result'];
+ 
         $workflow_id = $this->getWorkflowId($wkey);
         $service_id  = $this->getId("service", $username, $servicename, $wkey, "");
         
@@ -461,8 +537,15 @@ class funcs
     }
     
     #Update a job to the database
-    function updateJob($username, $wkey, $jobname, $servicename, $field, $jobnum, $result)
+    function updateJob($params)
     {
+        $username=$params['username']; 
+        $wkey=$params['wkey'];
+        $jobname=$params['jobname'];
+        $servicename=$params['servicename']; 
+        $field=$params['field']; 
+        $jobnum=$params['jobnum'];
+        $result=$params['result'];
         if ($result == 0) {
             $sql = "UPDATE ngs_runparams set run_status=3 where wkey='$wkey'";
             $this->runSQL($sql);
@@ -477,8 +560,12 @@ class funcs
     }
     
     #Check if all jobs are finished or not for a service
-    function checkAllJobsFinished($username, $wkey, $servicename)
+    function checkAllJobsFinished($params)
     {
+        $username=$params['username']; 
+        $wkey=$params['wkey'];
+        $servicename=$params['servicename']; 
+    
         $workflow_id = $this->getWorkflowId($wkey);
         $service_id  = $this->getId("service", $username, $servicename, $wkey, "");
         $select      = "select count(job_id) c from jobs ";
@@ -509,8 +596,12 @@ class funcs
         return $res;
     }
     #Insert a job output to the database
-    function insertJobOut($username, $wkey, $jobnum, $jobout)
+    function insertJobOut($params)
     {
+        $username=$params['username']; 
+        $wkey=$params['wkey'];
+        $jobnum=$params['jobnum']; 
+        $jobout=$params['jobout']; 
         
         $sql = "insert into jobsout(`username`, `wkey`, `jobnum`, `jobout`) values ('$username','$wkey','$jobnum','$jobout')";
         $res = $this->runSQL($sql);
@@ -519,8 +610,12 @@ class funcs
     }
     
     #Insert a job output to the database
-    function insertJobStats($username, $wkey, $jobnum, $stats)
+    function insertJobStats($params)
     {
+        $username=$params['username']; 
+        $wkey=$params['wkey'];
+        $jobnum=$params['jobnum']; 
+        $stats=$params['stats']; 
         $stats = json_decode($stats, true);
         
         $sql = "select id from jobstats where wkey='$wkey' and jobnum='$jobnum' and username='$username'";
@@ -539,8 +634,9 @@ class funcs
         return $res;
     }
     #get job numbers
-    function getJobNums($wkey)
+    function getJobNums($params)
     {
+        $wkey=$params['wkey'];
         $sql = "select job_num from jobs where wkey='$wkey'";
         return $this->queryTable($sql);
     }
@@ -549,8 +645,11 @@ class funcs
      *
      * @return string Response
      */
-     public function updateRunParams($wkey, $runparamsid)
+     public function updateRunParams($params)
      {
+         $wkey        = $params['wkey'];
+         $runparamsid = $params['runparamsid'];
+
          $sql = "UPDATE ngs_runparams set run_status=2, wkey='$wkey' where id=$runparamsid";
          $res = $this->runSQL($sql);
 
@@ -561,8 +660,13 @@ class funcs
      *
      * @return string Response
      */
-     function insertReportTable($wkey, $version, $type, $file)
+     function insertReportTable($params)
      {
+         $wkey=$params['wkey'];
+         $version= $params['version']; 
+         $type=$params['type'];
+         $file=$params['file'];
+
          $sql = "select id from report_list where wkey='$wkey' and file='$file'";
          $res = $this->queryAVal($sql);
          if ($res == 0) {
@@ -579,17 +683,21 @@ class funcs
       * @return string Response
       */
 
-      public function getJobParams($servicename, $name, $wkey)
-      {
-		$libname=preg_replace("/".$servicename."/", "", $name);
-                $predvals = $this->getPredVals($libname, $servicename);
-                
-                #$res = '{"'.$servicename.'":"'.$libname.':'.$wkey.'"}'; 
-                $res = '{"'.$predvals.'"}'; 
-                return $res;
+      public function getJobParams($params)
+      { 
+          $servicename=$params['servicename'];
+          $name=$params['name'];
+          $wkey=$params['wkey']; 
+          $libname=preg_replace("/".$servicename."/", "", $name);
+          $predvals = $this->getPredVals($libname, $servicename);
+             
+          #$res = '{"'.$servicename.'":"'.$libname.':'.$wkey.'"}'; 
+          $res = '{"'.$predvals.'"}'; 
+          return $res;
       }
       private function getPredVals($libname, $servicename) 
       {
+         
           $predvals = $servicename.'":"'.$libname; 
           $totalreads=0;
           if ($servicename == "stepCheck")
