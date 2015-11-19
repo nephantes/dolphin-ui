@@ -43,6 +43,7 @@ define('LDAP_SERVER', $ini_array['LDAP_SERVER']);
 define('DN_STRING', $ini_array['DN_STRING']);
 define('BIND_USER', $ini_array['BIND_USER']);
 define('BIND_PASS', $ini_array['BIND_PASS']);
+define('SCHEDULAR', $ini_array['SCHEDULAR']);
 
 if (!isset($_SESSION) || !is_array($_SESSION)) session_start();
 if (isset($_SESSION['user']))

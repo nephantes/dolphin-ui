@@ -12,6 +12,10 @@ class funcs
     public $jobstatus = "";
     public $config = "";
     public $python = "";
+    public $schedular = "";
+    public $checkjob_cmd = "";
+    public $job_num = "";
+    public $username = "";
     function readINI()
     {
             $this->dbhost     = DB_HOST;
@@ -23,13 +27,68 @@ class funcs
             $this->jobstatus  = JOB_STATUS;
             $this->config     = CONFIG;
             $this->python     = PYTHON;
+            $this->schedular  = SCHEDULAR;
+            $this->setCMDs();
     }
     function getINI()
     {
         $this->readINI();
         return $this;
     }
-    
+    function setCMDs()
+    { 
+        if($this->schedular = "LSF")
+        {
+            $this->checkjob_cmd = $this->getSSH() . " \"" . $this->jobstatus . " $this->job_num\"|grep " . $this->job_num . "|awk '{print \$3\"\\t\"\$1}'";
+        }
+        else if($this->schedular = "SGE")
+        {
+            #Put SGE commands here
+        }
+        else
+        {
+            $this->checkjob_cmd = "ps -ef|grep \"[[:space:]]" . $this->job_num . "[[:space:]]\"|awk '{print \$8\"\\t\"\$1}'";
+        }
+    }
+    function getCMDs($com)
+    {
+        if($this->schedular == "LSF" || $this->schedular == "SGE")
+        {
+            $com=str_replace("\"", "\\\"", $com);
+            $com=$this->getSSH() . " \"" . $com . "\"";
+        } 
+        return $com;
+    }
+
+    function checkFile($params)
+    {
+         $this->username=$params['username'];
+         $this->readINI();         
+         $com = "ls ".$params['file'];
+         $retval = $this->syscall($this->getCMDs($com));
+
+         if (preg_match('/No such file or directory/', $retval)) {
+              return "{\"ERROR\": \"No such file or directory: ".$params['file']."\"}";
+         }
+         if (preg_match('/Permission denied/', $retval)) {
+              return "{\"ERROR\": \"Permission denied: ".$params['file']."\"}";
+         }
+         return "{\"Result\":\"Ok\"}";
+    }
+    function checkPermissions($params)
+    {
+         $this->username=$params['username'];
+         $this->readINI();         
+         $com = "mkdir -p  ".$params['outdir'];
+         $retval = $this->syscall($this->getCMDs($com));
+
+         if (preg_match('/Permission denied/', $retval)) {
+              return "{\"ERROR\": \"Permission denied: ".$params['outdir']."\"}";
+         }
+         return "{\"Result\":\"Ok\"}";
+   
+    }
+     
     function getKey()
     {
         $characters = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
@@ -109,19 +168,15 @@ class funcs
     function getSSH()
     {
        sleep(1);
-       return "ssh -o ConnectTimeout=30";
+       return "ssh -o ConnectTimeout=30  ". $this->username. "@" . $this->remotehost . " ";
     }
-    
+
     function checkJobInCluster($wkey, $job_num, $username)
     {
+        $this->job_num = $job_num; 
+        $this->username = $username;
         $this->readINI();
-        
-        if ($this->remotehost != "N") {
-            $com = $this->getSSH() . " $username@" . $this->remotehost . " \"" . $this->jobstatus . " $job_num\"|grep " . $job_num . "|awk '{print \$3\"\\t\"\$1}'";
-        } else {
-            $com = "ps -ef|grep \"[[:space:]]" . $job_num . "[[:space:]]\"|awk '{print \$8\"\\t\"\$1}'";
-        }
-        $retval = $this->syscall($com);
+        $retval = $this->syscall($this->checkjob_cmd);
         while (preg_match('/is not found/', $retval)) {
             $retval = $this->syscall($com);
         }
@@ -343,7 +398,7 @@ class funcs
             $inputparam   = $wf[1];
             $outdir       = $wf[2];
             $defaultparam = $wf[3];
-            
+            $this->username = $username; 
             $service_id = $this->getId("service", $username, $servicename, $wkey, $defaultparam);
             
             $sql = "SELECT service_id FROM service_run where wkey='$wkey' and service_id='$service_id';";
@@ -357,34 +412,20 @@ class funcs
                     $command = $this->getCommand($servicename, $username, $inputcommand, $defaultparam);
                     
                     $ipf = "";
-                    if ($inputparam != "" && $inputparam != "None") {
-                        #If the service will run over ssh we need \\\ otherwise \
-                        if ($this->remotehost != "N") {
-                            $ipf = "-i \\\"$inputparam\\\"";
-                        } else {
-                            $ipf = "-i \"$inputparam\"";
-                        }
-                    }
+                    if ($inputparam != "" && $inputparam != "None") 
+                        $ipf = "-i \"$inputparam\"";
                     $dpf = "";
                     if ($defaultparam != "" && $defaultparam != "None")
                         $dpf = "-p $defaultparam";
                     
-                    
                     $edir = $this->tool_path;
-                    if ($this->remotehost != "N") {
-                        $com = $this->getSSH() . " $username@" . $this->remotehost . " \"" . $this->python . " " . $edir . "/runService.py -f ".$this->config." -d " . $this->dbhost . " $ipf $dpf -o $outdir -u $username -k $wkey -c \\\"$command\\\" -n $servicename -s $servicename\" 2>&1";
-                    } else {
-                        $com = $this->python . " " . $edir . "/runService.py -f ".$this->config." -d " . $this->dbhost . " $ipf $dpf -o $outdir -u $username -k $wkey -c \"$command\" -n $servicename -s $servicename 2>&1";
-                    }
-                    $retval = $this->syscall($com);
+                    $com = $this->python . " " . $edir . "/runService.py -f ".$this->config." -d " . $this->dbhost . " $ipf $dpf -o $outdir -u $username -k $wkey -c \"$command\" -n $servicename -s $servicename 2>&1";
+                    $retval = $this->syscall($this->getCMDs($com));
                     
                     if (preg_match('/Error/', $retval)) {
                         return "ERROR: $retval";
                     }
-                    #return $com;
-                    return "RUNNING(2):$com";
-                    #return "RUNNING(2)";
-                    #return "RUNNING";
+                    return "RUNNING(2):$retval:".$this->getCMDs($com);
                 }
             }
         } else {
@@ -579,17 +620,21 @@ class funcs
       * @return string Response
       */
 
-      public function getJobParams($servicename, $name, $wkey)
-      {
-		$libname=preg_replace("/".$servicename."/", "", $name);
-                $predvals = $this->getPredVals($libname, $servicename);
-                
-                #$res = '{"'.$servicename.'":"'.$libname.':'.$wkey.'"}'; 
-                $res = '{"'.$predvals.'"}'; 
-                return $res;
+      public function getJobParams($params)
+      { 
+          $servicename=$params['servicename'];
+          $name=$params['name'];
+          $wkey=$params['wkey']; 
+          $libname=preg_replace("/".$servicename."/", "", $name);
+          $predvals = $this->getPredVals($libname, $servicename);
+             
+          #$res = '{"'.$servicename.'":"'.$libname.':'.$wkey.'"}'; 
+          $res = '{"'.$predvals.'"}'; 
+          return $res;
       }
       private function getPredVals($libname, $servicename) 
       {
+         
           $predvals = $servicename.'":"'.$libname; 
           $totalreads=0;
           if ($servicename == "stepCheck")

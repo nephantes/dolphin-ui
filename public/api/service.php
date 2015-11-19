@@ -31,7 +31,7 @@ class Pipeline{
          *
 	 * @return string Response is a new random key if it is a new run otherwise old key.
 	 */
-	public function getINI(){
+  	public function getINI(){
 		$myClass = new funcs(); 
                 
  		$ini = $myClass->getINI();
@@ -229,23 +229,30 @@ class Pipeline{
                 $res = $myClass->getJobParams($params['servicename'], $params['name'], $params['wkey']);
                 return $res;
          }
+         /** checkPermission
+         *
+         * @return string Response
+         */
+         public function runFuncs($params)
+         {
+                $myClass = new funcs();
+                $func=$params['func'];
+                if ($func)
+                {
+                    $result=$myClass->$func($params);
+                    return json_encode($result);
+                }
+         }
 }
 
 error_reporting(E_ALL);
 ini_set('report_errors','on');
-
 $myClass = new Pipeline();
 #$result=$myClass->getINI();
 #$data=json_encode($result);
 
-
 $result=$myClass->parse_params();
-$func=$result['params']['func'];
-if ($func)
-{
-  $result=$myClass->$func($result['params']);
-  $data=json_encode($result);
-}
+$data=$myClass->runFuncs($result['params']);
 
 header('Cache-Control: no-cache, must-revalidate');
 header('Expires: Mon, 26 Jul 1997 05:00:00 GMT');
