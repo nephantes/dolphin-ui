@@ -92,6 +92,7 @@
 		</div>
 		<!-- END ACCORDION & CAROUSEL-->
 			</div><!-- /.col (LEFT) -->
+			<?php echo $html->getSubmitBrowserButton()?>
 						<div class="col-md-9">
 				<?php
 				if ($table!=""){
@@ -141,7 +142,6 @@
 																				"notebook_ref", "notes", "genotype", "library_type", "biosample_type", "instrument_model", "treatment_manufacturer"]);
 					}
 				}
-				echo $html->getSubmitBrowserButton();
 				?>
 						</div><!-- /.col (RIGHT) -->
 					</div><!-- /.row -->

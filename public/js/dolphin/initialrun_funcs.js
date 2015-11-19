@@ -14,7 +14,9 @@ $(function() {
 		var rundesc;
 		var sample_lane;
 		var experiment_series;
-		
+		var group;
+		var perms;
+
 		//	Create the Json object
 		if (window.location.href.split("/")[window.location.href.split("/").length - 2] == 'fastlane') {
 			runname = 'Fastlane Initial Run';
@@ -32,14 +34,14 @@ $(function() {
 				json = json + ',"barcodes":"none","adapters":"none"';
 			}else{
 				json = json + ',"barcodes":"distance,' + barcode_array.split(',')[0] + ':format,'+ barcode_array.split(",")[1];
-				json = json + '","adapters":"' + initial_split[initial_split.length - 1].split(" ")[1].replace(/\:/g, "__cr____cn__") + '"';
+				json = json + '","adapters":"' + initial_split[initial_split.length - 3].split(" ")[1].replace(/\:/g, "__cr____cn__") + '"';
 			}
 			json = json + ',"quality":"none",';
 			json = json + '"trim":"none","split":"none","commonind":"none"}'
 			
 			var names_list = [];
 			if (initial_split[2] == 'yes') {
-				var names = initial_split[initial_split.length - 1].split(":");
+				var names = initial_split[initial_split.length - 3].split(":");
 				for(var y = 0; y < names.length; y++){
 					if (names_list.indexOf(names[y].split(" ")[0]) == -1) {
 						names_list.push(names[y].split(" ")[0]);
@@ -56,6 +58,8 @@ $(function() {
 			
 			sample_lane = "'" + initial_split[5] + "'";
 			experiment_series = initial_split[4];
+			group = initial_split[initial_split.length - 2];
+			perms = initial_split[initial_split.length - 1];
 			
 		}else{
 			runname = 'Import Initial Run';
@@ -88,6 +92,8 @@ $(function() {
 					sample_lane = sample_lane + ",'" + initial_split[y] + "'";
 				}
 			}
+			group = initial_split[initial_split.length - 2];
+			perms = initial_split[initial_split.length - 1];
 		}
 		
 		if (json != undefined && outdir != undefined && runname != undefined && rundesc != undefined) {
@@ -173,29 +179,30 @@ $(function() {
 								}
 							});
 						}
-							var runparamsInsert = postInsertRunparams(json, outdir, runname, rundesc);
+							var runparamsInsert = postInsertRunparams(json, outdir, runname, rundesc, perms, group);
 							console.log(runparamsInsert);
 					}
 				}
 			}else{
 				//insert new values into ngs_runparams
-				var runparamsInsert = postInsertRunparams(json, outdir, runname, rundesc);
+				var runparamsInsert = postInsertRunparams(json, outdir, runname, rundesc, perms, group);
 				console.log(runparamsInsert);
 				console.log(names_to_ids);
-				$.ajax({
-					type: 	'GET',
-					url: 	BASE_PATH+'/public/ajax/initialmappingdb.php',
-					data:  	{ p: 'removeRunlistSamples', run_id: runparamsInsert[1], sample_ids: names_to_ids.toString()},
-					async:	false,
-					success: function(s)
-					{
-					}
-				});
+				if (window.location.href.split("/")[window.location.href.split("/").length - 2] != 'fastlane') {
+					$.ajax({
+						type: 	'GET',
+						url: 	BASE_PATH+'/public/ajax/initialmappingdb.php',
+						data:  	{ p: 'removeRunlistSamples', run_id: runparamsInsert[1], sample_ids: names_to_ids.toString()},
+						async:	false,
+						success: function(s)
+						{
+						}
+					});
+				}
 				//insert new values into ngs_runlist
 				var submitted = postInsertRunlist(runparamsInsert[0], names_to_ids, runparamsInsert[1]);
 				console.log(submitted);
 			}
-			
 		}
 	}
 	

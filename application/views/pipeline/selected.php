@@ -73,15 +73,18 @@
 						<?php echo $html->getStaticSelectionBox("Output Directory", "outdir", "TEXT", 8)?>
 						<?php echo $html->getStaticSelectionBox("FastQC", "fastqc", "<option>yes</option>
 																			<option>no</option>", 4)?>
-
-			<?php echo $html->startExpandingSelectionBox(6)?>
+						<?php echo $html->getStaticSelectionBox("Permissions", "perms", "<option value='3'>only me</option>
+																			<option value='15'>only my group</option>
+																			<option value='32'>everyone</option>", 6)?>
+						<?php echo $html->getStaticSelectionBox("Group Selection", "groups", $html->groupSelectionOptions($groups), 6)?>
+					<?php echo $html->startExpandingSelectionBox(6)?>
 						<?php echo $html->getExpandingSelectionBox("Adapter Removal", "adapter", 1, 12, ["adapter"], [["TEXTBOX"]])?>
-			<?php echo $html->getExpandingSelectionBox("Split FastQ", "split", 1, 12, ["number of reads per file"], [["TEXT","5000000"]])?>
-			<?php echo $html->getExpandingSelectionBox("Custom Sequence Set", "custom", 1, 12, ["Add new Custom Sequence Set"], [["BUTTON"]])?>
-			<?php echo $html->getExpandingSelectionBox("Additional Pipelines", "pipeline", 1, 12, ["Add a Pipeline"], [["BUTTON"]])?>
-			<?php echo $html->endExpandingSelectionBox()?>
-
-			<?php echo $html->startExpandingSelectionBox(6)?>
+						<?php echo $html->getExpandingSelectionBox("Split FastQ", "split", 1, 12, ["number of reads per file"], [["TEXT","5000000"]])?>
+						<?php echo $html->getExpandingSelectionBox("Custom Sequence Set", "custom", 1, 12, ["Add new Custom Sequence Set"], [["BUTTON"]])?>
+						<?php echo $html->getExpandingSelectionBox("Additional Pipelines", "pipeline", 1, 12, ["Add a Pipeline"], [["BUTTON"]])?>
+					<?php echo $html->endExpandingSelectionBox()?>
+			
+					<?php echo $html->startExpandingSelectionBox(6)?>
 						<?php echo $html->getExpandingSelectionBox("Quality Filtering", "quality", 5, 12, ["window size","required quality","leading","trailing","minlen"],
 																	[["TEXT","10"],["TEXT","15"],["TEXT","5"],["TEXT","5"],["TEXT","36"]])?>
 						<?php echo $html->getExpandingSelectionBox("Trimming", "trim", 3, 12, ["single or paired-end", "5 length 1", "3 length 1"],
@@ -89,7 +92,7 @@
 						<?php echo $html->getExpandingCommonRNABox("Common RNAs", "commonind", 8, 12, ["ercc","rRNA","miRNA","tRNA","piRNA","snRNA","rmsk","genome"],
 																	[["no","yes"],["no","yes"],["no","yes"],["no","yes"],["no","yes"],["no","yes"],["no","yes"],["no","yes"]])?>
 																	
-			<?php echo $html->endExpandingSelectionBox()?>
+					<?php echo $html->endExpandingSelectionBox()?>
 
 			<div class="col-md-12">
 				<input type="button" id="submitPipeline" class="btn btn-primary" name="pipeline_send_button" value="Submit Pipeline" onClick="submitPipeline('selected');"/>

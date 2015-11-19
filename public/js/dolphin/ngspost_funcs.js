@@ -4,7 +4,7 @@
  *Ascription:
  */
 
-function postInsertRunparams(json, outputdir, name, description){
+function postInsertRunparams(json, outputdir, name, description, perms, group){
 
    var successCheck = false;
    var runlistCheck = "";
@@ -12,7 +12,6 @@ function postInsertRunparams(json, outputdir, name, description){
    var barcode = 1;
 
    var uid = phpGrab.uid;
-   var gids = phpGrab.gids;
    
    //find the run group ID
    var hrefSplit = window.location.href.split("/");
@@ -29,7 +28,10 @@ function postInsertRunparams(json, outputdir, name, description){
 			outdir_check = r;
 		}
 	});
-   if (outdir_check != 0) {
+   if(window.location.href.split("/")[window.location.href.split("/").length - 2] == 'fastlane'){
+		//if from fastlane
+       runGroupID = 'new';
+   }else if (outdir_check != 0) {
        runGroupID = hrefSplit[rerunLoc+1];
    }else{
        //if not a rerun
@@ -43,7 +45,7 @@ function postInsertRunparams(json, outputdir, name, description){
    $.ajax({
            type: 	'POST',
            url: 	BASE_PATH+'/public/ajax/ngsalterdb.php',
-           data:  	{ p: "submitPipeline", json: json, outdir: outputdir, name: name, desc: description, runGroupID: runGroupID, barcode: barcode, uid: uid, gids: gids},
+           data:  	{ p: "submitPipeline", json: json, outdir: outputdir, name: name, desc: description, runGroupID: runGroupID, barcode: barcode, uid: uid, group: group, perms: perms},
            async:	false,
            success: function(r)
            {

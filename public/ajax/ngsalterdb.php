@@ -64,7 +64,8 @@ if ($p == "submitPipeline" )
 	if (isset($_POST['runGroupID'])){$runGroupID = $_POST['runGroupID'];}
     if (isset($_POST['barcode'])){$barcode = $_POST['barcode'];}
     if (isset($_POST['uid'])){$uid = $_POST['uid'];}
-    if (isset($_POST['gids'])){$gids = $_POST['gids'];}
+    if (isset($_POST['group'])){$group = $_POST['group'];}
+	if (isset($_POST['perms'])){$perms = $_POST['perms'];}
     
     $outdir_check = $query->queryAVal("SELECT outdir FROM ngs_runparams WHERE outdir = '$outdir'");
     
@@ -92,6 +93,8 @@ if ($p == "submitPipeline" )
         json_parameters = '$json',
         run_name = '$name',
         run_description = '$desc',
+		group_id = $group,
+		perms = $perms,
         date_modified = now(),
         last_modified_user = $uid
         WHERE id = '$idKey'
@@ -104,7 +107,7 @@ if ($p == "submitPipeline" )
         INSERT INTO ngs_runparams (run_group_id, outdir, run_status, barcode, json_parameters, run_name, run_description,
         owner_id, group_id, perms, date_created, date_modified, last_modified_user)
         VALUES (-1, '$outdir', 0, $barcode, '$json', '$name', '$desc',
-        $uid, NULL, 3, now(), now(), $uid)");
+        $uid, $group, $perms, now(), now(), $uid)");
         //need to grab the id for runlist insertion
         $idKey=$query->queryAVal("SELECT id FROM ngs_runparams WHERE run_group_id = -1 and run_name = '$name' order by id desc limit 1");
         runCmd($idKey, $query);
