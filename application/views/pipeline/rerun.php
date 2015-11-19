@@ -73,7 +73,10 @@
 						<?php echo $html->getStaticSelectionBox("Output Directory", "outdir", "TEXT", 8)?>
 						<?php echo $html->getStaticSelectionBox("FastQC", "fastqc", "<option>yes</option>
 																			<option>no</option>", 4)?>
-
+						<?php echo $html->getStaticSelectionBox("Permissions", "perms", "<option value='3'>only me</option>
+																			<option value='15'>only my group</option>
+																			<option value='32'>everyone</option>", 6)?>
+						<?php echo $html->getStaticSelectionBox("Group Selection", "groups", $html->groupSelectionOptions($groups), 6)?>
 			<?php echo $html->startExpandingSelectionBox(6)?>
 						<?php echo $html->getExpandingSelectionBox("Split FastQ", "split", 1, 12, ["number of reads per file"], [["TEXT","5000000"]])?>
 						<?php echo $html->getExpandingSelectionBox("Adapter Removal", "adapter", 1, 12, ["adapter"], [["TEXTBOX"]])?>

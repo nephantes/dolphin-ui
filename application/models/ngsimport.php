@@ -243,6 +243,10 @@ class Ngsimport extends VanillaModel {
 		if(!isset($this->initialSubmission[5])){
 			array_push($this->initialSubmission, $this->laneList);
 		}
+		if($worksheet['worksheetName']=="FILES"){
+			array_push($this->initialSubmission, $_POST['group_id']);
+			array_push($this->initialSubmission, $_POST['security_id']);
+		}
 		$text.="<script type='text/javascript'>";
 		$text.="var initialSubmission = '" . implode(",", $this->initialSubmission) . "';";
 		$text.="var initialNameList = '" . $this->namesList . "';";
