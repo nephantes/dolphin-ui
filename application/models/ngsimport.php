@@ -52,21 +52,6 @@ class Ngsimport extends VanillaModel {
 	//	Sheet Check bools
 	public $final_check;
 	
-	function postURL($url, $post = array()) {
-		$ch = curl_init($url);
-	 
-		#curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, 0);
-		#curl_setopt($ch, CURLOPT_FOLLOWLOCATION, 1);
-		curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
-		#curl_setopt($ch, CURLOPT_TIMEOUT, 30);
-		curl_setopt($ch, CURLOPT_POST, 1);
-		curl_setopt($ch, CURLOPT_POSTFIELDS,$post);
-	 
-		$result = curl_exec($ch);
-		curl_close($ch);
-		return $result;
-	}
-	
 	function num2alpha($n){
 		for($r = ""; $n >= 0; $n = intval($n / 26) - 1){
 			$r = chr($n%26 + 0x41) . $r;
