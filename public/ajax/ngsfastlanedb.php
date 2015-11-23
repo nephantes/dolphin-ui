@@ -148,8 +148,12 @@ if ($p == 'experimentSeriesCheck'){
 }else if ($p == 'obtainGroupFromName'){
 	if (isset($_GET['name'])){$name = $_GET['name'];}
 	$data = $query->queryAVal("SELECT `id` FROM `groups` WHERE name = '".$name."'");
-}else if ($p == 'getUserName'){
-	$data=json_encode($_SESSION['user']);
+}else if ($p == 'getClusterName'){
+	$data=$query->queryTable("
+	SELECT username, clusteruser
+	FROM users
+	WHERE username = '".$_SESSION['user']."'
+	");
 }
 
 //footer

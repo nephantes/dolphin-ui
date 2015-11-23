@@ -85,7 +85,8 @@ class funcs
          if (preg_match('/Permission denied/', $retval)) {
               return "{\"ERROR\": \"Permission denied: ".$params['outdir']."\"}";
          }
-         return "{\"Result\":\"Ok\"}";
+         //return "{\"Result\":\"Ok\"}";
+         return $retval;
    
     }
      

@@ -591,33 +591,33 @@ function submitPipeline(type) {
 		$.ajax({
 			type: 	'GET',
 			url: 	BASE_PATH+'/public/ajax/ngsfastlanedb.php',
-			data:  	{ p: 'getUserName' },
+			data:  	{ p: 'getClusterName' },
 			async:	false,
 			success: function(s)
 			{
-				username = s;
+				username = JSON.parse(s)[0];
 			}
 		});
 		//	Directory Checks
 		var dir_check_1;
 		$.ajax({
 				type: 	'GET',
-				url: 	BASE_PATH+'/public/api/service.php',
-				data:  	{ func: 'checkPermissions', username: username },
+				url: 	BASE_PATH+'/public/api/service.php?func=checkPermissions&username='+username.clusteruser,
 				async:	false,
 				success: function(s)
 				{
+					console.log(s);
 					dir_check_1 = JSON.parse(s);
 				}
 		});
 		var dir_check_2;
 		$.ajax({
 				type: 	'GET',
-				url: 	BASE_PATH+'/public/api/service.php',
-				data:  	{ func: 'checkPermissions', username: username, outdir: outputdir },
+				url: 	BASE_PATH+'/public/api/service.php?func=checkPermissions&username='+username.clusteruser+'&outdir=' + outputdir,
 				async:	false,
 				success: function(s)
 				{
+					console.log(s);
 					dir_check_2 = JSON.parse(s);
 				}
 		});
