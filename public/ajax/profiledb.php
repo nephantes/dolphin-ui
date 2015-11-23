@@ -150,7 +150,7 @@ else if ($p == 'viewGroupMembers')
 {
 	if (isset($_GET['group'])){$group = $_GET['group'];}
 	$data=$query->queryTable("
-	SELECT username
+	SELECT id, username
 	FROM users
 	WHERE id in (
 		SELECT u_id
@@ -203,6 +203,40 @@ else if ($p == 'addGroupMember')
 	AND user_request = $user_id
 	");
 }
+else if ($p == 'getMemberAdd')
+{
+       if (isset($_GET['group_id'])){$group_id = $_GET['group_id'];}
+       $data=$query->queryTable("
+       SELECT id, username
+       FROM users
+       WHERE id NOT IN (
+               SELECT u_id
+               FROM user_group
+               WHERE g_id = $group_id
+       )
+       ");
+}
+else if ($p == 'transferOwner')
+{
+       if (isset($_GET['group_id'])){$group_id = $_GET['group_id'];}
+       if (isset($_GET['user_id'])){$user_id = $_GET['user_id'];}
+       $new_owner=$query->runSQL("
+       UPDATE groups
+       SET owner_id = $user_id
+       WHERE id = $group_id
+       ");
+	   $pending_user=$query->runSQL("
+		DELETE FROM user_group_requests
+		WHERE group_id = $group_id
+		AND user_request = $user_id
+		");
+       $data=json_encode('pass');
+}
+else if ($p == 'getUID')
+{
+    $data=json_encode($_SESSION['uid']);
+}
+
 
 
 header('Cache-Control: no-cache, must-revalidate');

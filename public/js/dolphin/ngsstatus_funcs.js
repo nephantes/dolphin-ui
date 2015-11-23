@@ -167,13 +167,13 @@ function joboutDataModal(jobname, jobout) {
    document.getElementById('job_modal_text').innerHTML = jobout;
 }
 	
-function changeRunGroup(id, group){
-	document.getElementById('myModalGroups').innerHTML = 'Change run group';
-	document.getElementById('groupsLabel').innerHTML = 'Which group should see this run?'
-	document.getElementById('groupsDiv').innerHTML = '<select id="groupsIDSelect" class="form-control"></select>'
-	document.getElementById('confirmGroupsButton').setAttribute('style', 'display:show');
-	document.getElementById('confirmGroupsButton').setAttribute('onclick','confirmGroupChange('+id+')');
-	document.getElementById('cancelGroupsButton').innerHTML = 'Cancel';
+function changeRunPerms(id, group){
+	document.getElementById('myModalPerms').innerHTML = 'Change run group';
+	document.getElementById('editLabel').innerHTML = 'Which group should see this run?'
+	document.getElementById('editDiv').innerHTML = '<select id="editIDSelect" class="form-control"></select>'
+	document.getElementById('confirmPermsButton').setAttribute('style', 'display:show');
+	document.getElementById('confirmPermsButton').setAttribute('onclick','confirmPermsChange("'+id+'")');
+	document.getElementById('cancelPermsButton').innerHTML = 'Cancel';
 	$.ajax({ type: "GET",
 		url: BASE_PATH+"/public/ajax/ngsquerydb.php",
 		data: { p: 'getGroups'},
@@ -183,56 +183,22 @@ function changeRunGroup(id, group){
 			console.log(s);
 			for(var x = 0; x < s.length; x++){
 				if (s[x].id == group) {
-					document.getElementById('groupsIDSelect').innerHTML += '<option id="group_' + s[x].id + '" value="' + s[x].id + '" selected="true">' + s[x].name + '</option>';
+					document.getElementById('editIDSelect').innerHTML += '<option id="group_' + s[x].id + '" value="' + s[x].id + '" selected="true">' + s[x].name + '</option>';
 				}else{
-					document.getElementById('groupsIDSelect').innerHTML += '<option id="group_' + s[x].id + '" value="' + s[x].id + '">' + s[x].name + '</option>';
+					document.getElementById('editIDSelect').innerHTML += '<option id="group_' + s[x].id + '" value="' + s[x].id + '">' + s[x].name + '</option>';
 				}
 			}
 		}
 	});
-	$('#groupsModal').modal({
-		show: true
-	});
-}
 
-function confirmGroupChange(id){
-	var group_id = document.querySelector("select").selectedOptions[0].value;
-	var group_changed;
-	$.ajax({ type: "GET",
-		url: BASE_PATH+"/public/ajax/ngsquerydb.php",
-		data: { p: 'changeRunGroup', group_id: group_id, run_id: id},
-		async: false,
-		success : function(s)
-		{
-			group_changed = s;
-		}	
-	});
-	document.getElementById('confirmGroupsButton').setAttribute('style', 'display:none');
-	document.getElementById('cancelGroupsButton').innerHTML = 'OK';
-	if (group_changed == 'pass') {
-		document.getElementById('groupsLabel').innerHTML = 'Run group has been changed!'
-		document.getElementById('groupsDiv').innerHTML = '';
-		document.getElementById(id).setAttribute('name', group_id);
-		document.getElementById('group_'+id).setAttribute('selected','true');
-	}else{
-		document.getElementById('groupsLabel').innerHTML = 'Error occured, run group was not changed.'
-		document.getElementById('groupsDiv').innerHTML = '';
-	}
-}
-
-function changeRunPerms(id, group) {
-	document.getElementById('myModalPerms').innerHTML = 'Change run permissions';
-	document.getElementById('confirmPermsButton').setAttribute('onclick','confirmPermsChange("'+id+'")');
-	$('#permsModal').modal({
-		show: true
-	});
 	var perms;
 	$.ajax({ type: "GET",
 		url: BASE_PATH+"/public/ajax/ngsquerydb.php",
-		data: { p: 'getRunPerms', run_id: id},
+		data: { p: 'getRunPerms', run_id: id.split("_")[1]},
 		async: false,
 		success : function(s)
 		{
+			console.log(s);
 			perms = s;
 		}	
 	});
@@ -245,6 +211,10 @@ function changeRunPerms(id, group) {
 	}else if (perms == 63) {
 		$('#everyone').iCheck('check')
 	}
+	
+	$('#permsModal').modal({
+		show: true
+	});
 }
 
 function confirmPermsChange(id){
@@ -252,24 +222,38 @@ function confirmPermsChange(id){
 	var permsPassed;
 	$.ajax({ type: "GET",
 		url: BASE_PATH+"/public/ajax/ngsquerydb.php",
-		data: { p: 'changeRunPerms', perms: perms, run_id: id},
+		data: { p: 'changeRunPerms', perms: perms, run_id: id.split("_")[1]},
 		async: false,
 		success : function(s)
 		{
 			permsPassed = s;
 		}	
 	});
+	var group_id = document.querySelector("select").selectedOptions[0].value;
+	var group_changed;
+	$.ajax({ type: "GET",
+			url: BASE_PATH+"/public/ajax/ngsquerydb.php",
+			data: { p: 'changeRunGroup', group_id: group_id, run_id: id.split("_")[1]},
+			async: false,
+			success : function(s)
+			{
+				group_changed = s;
+			}       
+    });
 	$('.checked').iCheck('uncheck');
-	$('#groupsModal').modal({
-		show: true
-	});
 	document.getElementById('myModalGroups').innerHTML = 'Change run permissions';
-	document.getElementById('groupsDiv').innerHTML = '';
 	document.getElementById('confirmGroupsButton').setAttribute('style', 'display:none');
 	document.getElementById('cancelGroupsButton').innerHTML = 'OK';
-	if (permsPassed == 'pass') {
-		document.getElementById('groupsLabel').innerHTML = 'Run permissions has been changed!'
+	if (permsPassed == 'pass' && group_changed == 'pass') {
+		    document.getElementById(id).setAttribute('name', group_id);
+		    document.getElementById('group_'+group_id).setAttribute('selected','true');
+		    document.getElementById('groupsLabel').innerHTML = 'Run permissions were changed!'
+		    document.getElementById('groupsDiv').innerHTML = '';
 	}else{
-		document.getElementById('groupsLabel').innerHTML = 'Error occured, run permissions was not changed.'
+			document.getElementById('groupsLabel').innerHTML = 'Error occured, run permissions were not changed.'
+		    document.getElementById('groupsDiv').innerHTML = '';
 	}
+	$('#groupsModal').modal({
+			show: true
+	});
 }

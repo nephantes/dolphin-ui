@@ -300,13 +300,15 @@ class Ngsimport extends VanillaModel {
 				$this->backup_dir=$this->esc($this->sheetData[$i]["B"]);
 			}elseif($this->sheetData[$i]["A"]=="processed directory"){
 				$this->backup_dir=$this->esc($this->sheetData[$i]["B"]);
+			}elseif($this->sheetData[$i]["A"]=="process directory"){
+				$this->backup_dir=$this->esc($this->sheetData[$i]["B"]);
 			}
 			if($this->sheetData[$i]["A"]=="amazon bucket"){$this->amazon_bucket=$this->esc($this->sheetData[$i]["B"]);}
 			
 			if($this->sheetData[$i]["A"]=="title"){
 				array_push($this->initialSubmission, $this->esc($this->sheetData[$i]["B"]));
 			}
-			if($this->sheetData[$i]["A"]=="backup directory" || $this->sheetData[$i]["A"]=="processed directory"){
+			if($this->sheetData[$i]["A"]=="backup directory" || $this->sheetData[$i]["A"]=="processed directory" || $this->sheetData[$i]["A"]=="process directory"){
 				array_push($this->initialSubmission, $this->esc($this->sheetData[$i]["B"]));
 			}
 			
@@ -343,7 +345,7 @@ class Ngsimport extends VanillaModel {
 					$meta_check = false;
 				}
 			}
-			if(isset($this->backup_dir) && ( $this->sheetData[$i]["A"]=="backup directory" || $this->sheetData[$i]["A"]=="processed directory")){
+			if(isset($this->backup_dir) && ( $this->sheetData[$i]["A"]=="backup directory" || $this->sheetData[$i]["A"]=="processed directory" || $this->sheetData[$i]["A"]=="process directory" )){
 				$request = API_PATH.'/api/service.php?func=checkPermissions&username='.$this->clustername;
 				$valid_fastq = json_decode('['.json_decode(file_get_contents($request)).']');
 				if(isset($valid_fastq[0]->ERROR)){
@@ -352,7 +354,7 @@ class Ngsimport extends VanillaModel {
 					$meta_check = false;
 				}
 			}
-			if(isset($this->backup_dir) && ( $this->sheetData[$i]["A"]=="backup directory" || $this->sheetData[$i]["A"]=="processed directory")){
+			if(isset($this->backup_dir) && ( $this->sheetData[$i]["A"]=="backup directory" || $this->sheetData[$i]["A"]=="processed directory" || $this->sheetData[$i]["A"]=="process directory" )){
 				$request = API_PATH.'/api/service.php?func=checkPermissions&username='.$this->clustername.'&outdir='.$this->backup_dir;
 				$valid_fastq = json_decode('['.json_decode(file_get_contents($request)).']');
 				if(isset($valid_fastq[0]->ERROR)){
@@ -897,6 +899,8 @@ class Ngsimport extends VanillaModel {
 				if($this->sheetData[3][$j]=="Fastq directory"){
 					$dir->fastq_dir=$this->esc($this->sheetData[$i][$j]);
 				}elseif($this->sheetData[3][$j]=="Processed directory"){
+					$dir->fastq_dir=$this->esc($this->sheetData[$i][$j]);
+				}elseif($this->sheetData[3][$j]=="Process directory"){
 					$dir->fastq_dir=$this->esc($this->sheetData[$i][$j]);
 				}elseif($this->sheetData[3][$j]=="Input directory"){
 					$dir->fastq_dir=$this->esc($this->sheetData[$i][$j]);
