@@ -104,16 +104,20 @@ function checkFastlaneInput(info_array){
 				}else{
 					end = input_array[0].length - 1;
 				}
+				console.log(input_array);
+				console.log(info_array);
+				
 				for(var z = 0; z < input_array.length; z++){
 					for(var y = end; y > -1; y--){
-						console.log(info_array[x-1]+"/"+info_array[z][y]);
+						console.log(info_array[x-1]+"/"+input_array[z][y]);
 						$.ajax({
 							type: 	'GET',
-							url: 	BASE_PATH+'/public/api/service.php?func=testFile&username='+username.clusteruser+'&file='+info_array[x-1]+"/"+info_array[z][y],
+							url: 	BASE_PATH+'/public/api/service.php?func=testFile&username='+username.clusteruser+'&file='+info_array[x-1]+"/"+input_array[z][y],
 							async:	false,
 							success: function(s)
 							{
 								var file_check = JSON.parse(s);
+								console.log(file_check);
 								if (file_check.Result != 'Ok' ){
 									input_bool_check = false;
 								}

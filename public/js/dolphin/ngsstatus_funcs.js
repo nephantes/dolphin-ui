@@ -78,22 +78,22 @@ function selectJob(id){
 function errorOutModal(run_id, wkey){
 	var obtained_log;
 	$.ajax({ type: "GET",
-			url: BASE_PATH +"/public/ajax/dataerrorlogs.php",
-			data: { p: 'getStdOut', run_id: run_id },
-			async: false,
-			success : function(s)
-			{
-				if (s.length > 20) {
-					obtained_log = "...<br>"
-					for(var i = s.length - 20; i < s.length; i++){
-						obtained_log += s[i];
-					}
-				}else{
-					for(var i = 0; i < s.length; i++){
-						obtained_log += s[i];
-					}
+		url: BASE_PATH +"/public/ajax/dataerrorlogs.php",
+		data: { p: 'getStdOut', run_id: run_id },
+		async: false,
+		success : function(s)
+		{
+			if (s.length > 20) {
+				obtained_log = "...<br>"
+				for(var i = s.length - 20; i < s.length; i++){
+					obtained_log += s[i];
+				}
+			}else{
+				for(var i = 0; i < s.length; i++){
+					obtained_log += s[i];
 				}
 			}
+		}
 	});
 	$('#logModal').modal({
       show: true
@@ -106,12 +106,12 @@ function errorOutModal(run_id, wkey){
 	}else{
 		var adv_stat_check = [];
 		$.ajax({ type: "GET",
-				url: BASE_PATH + "/public/ajax/dataservice.php?wkey=" + wkey,
-				async: false,
-				success : function(s)
-				{
-					adv_stat_check = s;
-				}
+			url: BASE_PATH + "/public/ajax/dataservice.php?wkey=" + wkey,
+			async: false,
+			success : function(s)
+			{
+				adv_stat_check = s;
+			}
 		});
 		
 		if (adv_stat_check.length > 0) {
@@ -126,13 +126,13 @@ function errorOutModal(run_id, wkey){
 function queueCheck(run_id){
 	var run_status = [];
 	$.ajax({ type: "GET",
-			url: BASE_PATH +"/public/ajax/dataerrorlogs.php",
-			data: { p: 'checkQueued', run_id: run_id },
-			async: false,
-			success : function(s)
-			{
-				run_status = s;
-			}
+		url: BASE_PATH +"/public/ajax/dataerrorlogs.php",
+		data: { p: 'checkQueued', run_id: run_id },
+		async: false,
+		success : function(s)
+		{
+			run_status = s;
+		}
 	});
 	
 	if (run_status.length == 3) {
@@ -148,13 +148,13 @@ function queueCheck(run_id){
 function runningErrorCheck(run_id){
 	var run_status;
 	$.ajax({ type: "GET",
-			url: BASE_PATH +"/public/ajax/dataerrorlogs.php",
-			data: { p: 'errorCheck', run_id: run_id },
-			async: false,
-			success : function(s)
-			{
-				run_status = s;
-			}
+		url: BASE_PATH +"/public/ajax/dataerrorlogs.php",
+		data: { p: 'errorCheck', run_id: run_id },
+		async: false,
+		success : function(s)
+		{
+			run_status = s;
+		}
 	});
 	return run_status
 }
@@ -245,13 +245,13 @@ function confirmPermsChange(id){
 	document.getElementById('confirmGroupsButton').setAttribute('style', 'display:none');
 	document.getElementById('cancelGroupsButton').innerHTML = 'OK';
 	if (permsPassed == 'pass' && group_changed == 'pass') {
-		    document.getElementById(id).setAttribute('name', group_id);
-		    document.getElementById('group_'+group_id).setAttribute('selected','true');
-		    document.getElementById('groupsLabel').innerHTML = 'Run permissions were changed!'
-		    document.getElementById('groupsDiv').innerHTML = '';
+		document.getElementById(id).setAttribute('name', group_id);
+		document.getElementById('group_'+group_id).setAttribute('selected','true');
+		document.getElementById('groupsLabel').innerHTML = 'Run permissions were changed!'
+		document.getElementById('groupsDiv').innerHTML = '';
 	}else{
-			document.getElementById('groupsLabel').innerHTML = 'Error occured, run permissions were not changed.'
-		    document.getElementById('groupsDiv').innerHTML = '';
+		document.getElementById('groupsLabel').innerHTML = 'Error occured, run permissions were not changed.'
+		document.getElementById('groupsDiv').innerHTML = '';
 	}
 	$('#groupsModal').modal({
 			show: true

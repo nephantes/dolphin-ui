@@ -642,8 +642,8 @@ function submitPipeline(type) {
 			$('#errorModal').modal({
 				show: true
 			});
-			document.getElementById('errorLabel').innerHTML ='You do not have permissions for the directory: outputdir, or you do not have cluster permissions whatsoever.' +
-				'Please visit <a href="http://umassmed.edu/biocore/resources/galaxy-group/">this website</a> for more help.';
+			document.getElementById('errorLabel').innerHTML ='You do not have permissions for the directory:<br><br>'+outputdir+'<br><br>Or you do not have cluster permissions.' +
+				'<br>Please visit <a href="http://umassmed.edu/biocore/resources/galaxy-group/">this website</a> for more help.';
 			document.getElementById('errorAreas').innerHTML = '';
 		}else{
 			//insert new values into ngs_runparams
