@@ -133,7 +133,7 @@
 					</ol>
 				</section>
 				<!-- Main content -->
-				<section class="content">
+				<section class="">
 					<div class="row">
 						<div class="col-md-12">
 						<?php echo $html->sendJScript('status', "", "", "", $uid, $gids); ?>
