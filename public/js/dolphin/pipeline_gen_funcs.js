@@ -601,29 +601,28 @@ function submitPipeline(type) {
 		//	Directory Checks
 		var dir_check_1;
 		$.ajax({
-				type: 	'GET',
-				url: 	BASE_PATH+'/public/api/service.php?func=checkPermissions&username='+username.clusteruser,
-				async:	false,
-				success: function(s)
-				{
-					console.log(s);
-					dir_check_1 = JSON.parse(s);
-				}
+			type: 	'GET',
+			url: 	BASE_PATH+'/public/api/service.php?func=checkPermissions&username='+username.clusteruser,
+			async:	false,
+			success: function(s)
+			{
+				console.log(s);
+				dir_check_1 = JSON.parse(s);
+			}
 		});
 		var dir_check_2;
 		$.ajax({
-				type: 	'GET',
-				url: 	BASE_PATH+'/public/api/service.php?func=checkPermissions&username='+username.clusteruser+'&outdir=' + outputdir,
-				async:	false,
-				success: function(s)
-				{
-					console.log(s);
-					dir_check_2 = JSON.parse(s);
-				}
+			type: 	'GET',
+			url: 	BASE_PATH+'/public/api/service.php?func=checkPermissions&username='+username.clusteruser+'&outdir=' + outputdir,
+			async:	false,
+			success: function(s)
+			{
+				console.log(s);
+				dir_check_2 = JSON.parse(s);
+			}
 		});
 		console.log(dir_check_1);
 		console.log(dir_check_2);
-		alert();
 		var dir_tests;
 		if (dir_check_1.Result != 'Ok' || dir_check_2.Result != 'Ok') {
 			//	perms errors

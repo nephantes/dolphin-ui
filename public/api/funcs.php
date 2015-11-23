@@ -66,7 +66,7 @@ class funcs
          $this->readINI();         
          $com = "ls ".$params['file'];
          $retval = $this->syscall($this->getCMDs($com));
-
+         
          if (preg_match('/No such file or directory/', $retval)) {
               return "{\"ERROR\": \"No such file or directory: ".$params['file']."\"}";
          }
@@ -85,9 +85,7 @@ class funcs
          if (preg_match('/Permission denied/', $retval)) {
               return "{\"ERROR\": \"Permission denied: ".$params['outdir']."\"}";
          }
-         //return "{\"Result\":\"Ok\"}";
-         return $retval;
-   
+         return "{\"Result\":\"Ok\"}";
     }
      
     function getKey()

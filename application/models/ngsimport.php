@@ -52,6 +52,9 @@ class Ngsimport extends VanillaModel {
 	//	Sheet Check bools
 	public $final_check;
 	
+	//	Cluster name
+	public $clustername;
+	
 	function num2alpha($n){
 		for($r = ""; $n >= 0; $n = intval($n / 26) - 1){
 			$r = chr($n%26 + 0x41) . $r;
@@ -178,6 +181,7 @@ class Ngsimport extends VanillaModel {
 		$this->sid=$sid;
 		$this->gid=$gid;
 		$this->final_check = $passed_final_check;
+		$this->clustername = json_decode($this->query("SELECT clusteruser FROM users WHERE username = '".$_SESSION['user']."'"))[0]->clusteruser;
 		
 		$text = '<li>'.$this->worksheet['worksheetName'].'<br />';
 
@@ -326,8 +330,8 @@ class Ngsimport extends VanillaModel {
 			}
 			
 			//	Directory validity tests
-			if(isset($this->fastq_dir)){
-				$request = API_PATH.'/api/service.php?func=checkPermissions&username='.$_SESSION['user'];
+			if(isset($this->fastq_dir) && ( $this->sheetData[$i]["A"]=="fastq directory" || $this->sheetData[$i]["A"]=="input directory")){
+				$request = API_PATH.'/api/service.php?func=checkPermissions&username='.$this->clustername;
 				$valid_fastq = json_decode('['.json_decode(file_get_contents($request)).']');
 				if(!isset($valid_fastq[0]->Result)){
 					$text.= $this->errorText("Fastq dir error. Do not have permissions to access cluster account.  Please visit <a href='http://umassmed.edu/biocore/resources/galaxy-group/'>this website</a> for more help.");
@@ -335,8 +339,8 @@ class Ngsimport extends VanillaModel {
 					$meta_check = false;
 				}
 			}
-			if(isset($this->fastq_dir)){
-				$request = API_PATH.'/api/service.php?func=checkPermissions&username='.$_SESSION['user'].'&outdir='.$this->fastq_dir;
+			if(isset($this->fastq_dir) && ( $this->sheetData[$i]["A"]=="fastq directory" || $this->sheetData[$i]["A"]=="input directory")){
+				$request = API_PATH.'/api/service.php?func=checkPermissions&username='.$this->clustername.'&outdir='.$this->fastq_dir;
 				$valid_fastq = json_decode('['.json_decode(file_get_contents($request)).']');
 				if(!isset($valid_fastq[0]->Result)){
 					$text.= $this->errorText("Fastq dir error. Do not have permissions for said directory.  Please visit <a href='http://umassmed.edu/biocore/resources/galaxy-group/'>this website</a> for more help.");
@@ -344,8 +348,8 @@ class Ngsimport extends VanillaModel {
 					$meta_check = false;
 				}
 			}
-			if(isset($this->backup_dir)){
-				$request = API_PATH.'/api/service.php?func=checkPermissions&username='.$_SESSION['user'];
+			if(isset($this->backup_dir) && ( $this->sheetData[$i]["A"]=="backup directory" || $this->sheetData[$i]["A"]=="processed directory")){
+				$request = API_PATH.'/api/service.php?func=checkPermissions&username='.$this->clustername;
 				$valid_fastq = json_decode('['.json_decode(file_get_contents($request)).']');
 				if(!isset($valid_fastq[0]->Result)){
 					$text.= $this->errorText("Backup dir error. Do not have permissions to access cluster account.  Please visit <a href='http://umassmed.edu/biocore/resources/galaxy-group/'>this website</a> for more help.");
@@ -353,8 +357,8 @@ class Ngsimport extends VanillaModel {
 					$meta_check = false;
 				}
 			}
-			if(isset($this->backup_dir)){
-				$request = API_PATH.'/api/service.php?func=checkPermissions&username='.$_SESSION['user'].'&outdir='.$this->backup_dir;
+			if(isset($this->backup_dir) && ( $this->sheetData[$i]["A"]=="backup directory" || $this->sheetData[$i]["A"]=="processed directory")){
+				$request = API_PATH.'/api/service.php?func=checkPermissions&username='.$this->clustername.'&outdir='.$this->backup_dir;
 				$valid_fastq = json_decode('['.json_decode(file_get_contents($request)).']');
 				if(!isset($valid_fastq[0]->Result)){
 					$text.= $this->errorText("Backup dir error. Do not have permissions for said directory.  Please visit <a href='http://umassmed.edu/biocore/resources/galaxy-group/'>this website</a> for more help.");
@@ -969,8 +973,8 @@ class Ngsimport extends VanillaModel {
 				}else{
 					array_push($this->dir_fastq, $dir->fastq_dir);
 				}
-				if(isset($dir->fastq_dir) && $dir_check != false){
-					$request = API_PATH.'/api/service.php?func=checkPermissions&username='.$_SESSION['user'].'&outdir='.$dir->fastq_dir;
+				if(isset($dir->fastq_dir)){
+					$request = API_PATH.'/api/service.php?func=checkPermissions&username='.$this->clustername.'&outdir='.$dir->fastq_dir;
 					$valid_fastq = json_decode('['.json_decode(file_get_contents($request)).']');
 					if(!isset($valid_fastq[0]->Result)){
 						$text.= $this->errorText("Fastq dir error (row ". $i ." ). Do not have permissions for said directory.  Please visit <a href='http://umassmed.edu/biocore/resources/galaxy-group/'>this website</a> for more help.");
@@ -978,8 +982,8 @@ class Ngsimport extends VanillaModel {
 						$dir_check = false;
 					}
 				}
-				if(isset($dir->fastq_dir) && $dir_check != false){
-					$request = API_PATH.'/api/service.php?func=checkPermissions&username='.$_SESSION['user'];
+				if(isset($dir->fastq_dir)){
+					$request = API_PATH.'/api/service.php?func=checkPermissions&username='.$this->clustername;
 					$valid_fastq = json_decode('['.json_decode(file_get_contents($request)).']');
 					if(!isset($valid_fastq[0]->Result)){
 						$text.= $this->errorText("Fastq dir error (row ". $i ." ). Do not have permissions to access cluster account.  Please visit <a href='http://umassmed.edu/biocore/resources/galaxy-group/'>this website</a> for more help.");
@@ -1130,14 +1134,14 @@ class Ngsimport extends VanillaModel {
 				//	File Validity Check
 				if(isset($file->fastq_dir)){
 					if($this->pairedEndCheck == 'paired'){
-						$request = API_PATH.'/api/service.php?func=checkFile&username='.$_SESSION['user'].'file=' . $file->fastq_dir . '/' . explode(",",$file->file_name)[0];
+						$request = API_PATH.'/api/service.php?func=checkFile&username='.$this->clustername.'&file=' . $file->fastq_dir . '/' . explode(",",$file->file_name)[0];
 						$valid_fastq = json_decode('['.json_decode(file_get_contents($request)).']');
 						if(!isset($valid_fastq[0]->Result)){
 							$text.= $this->errorText("Fastq error (row ". $i ." ). Do not have file permissions for this file.  Please visit <a href='http://umassmed.edu/biocore/resources/galaxy-group/'>this website</a> for more help.");
 							$this->final_check = false;
 							$file_check = false;
 						}
-						$request = API_PATH.'/api/service.php?func=checkFile&username='.$_SESSION['user'].'file=' . $file->fastq_dir . '/' . explode(",",$file->file_name)[1];
+						$request = API_PATH.'/api/service.php?func=checkFile&username='.$this->clustername.'&file=' . $file->fastq_dir . '/' . explode(",",$file->file_name)[1];
 						$valid_fastq = json_decode('['.json_decode(file_get_contents($request)).']');
 						if(!isset($valid_fastq[0]->Result)){
 							$text.= $this->errorText("Fastq error (row ". $i ." ). Do not have file permissions for this file.  Please visit <a href='http://umassmed.edu/biocore/resources/galaxy-group/'>this website</a> for more help.");
@@ -1145,7 +1149,7 @@ class Ngsimport extends VanillaModel {
 							$file_check = false;
 						}
 					}else{
-						$request = API_PATH.'/api/service.php?func=checkFile&username='.$_SESSION['user'].'file=' . $file->fastq_dir . '/' . $file->file_name;
+						$request = API_PATH.'/api/service.php?func=checkFile&username='.$this->clustername.'&file=' . $file->fastq_dir . '/' . $file->file_name;
 						$valid_fastq = json_decode('['.json_decode(file_get_contents($request)).']');
 						if(!isset($valid_fastq[0]->Result)){
 							$text.= $this->errorText("Fastq error (row ". $i ." ). Do not have file permissions for this file.  Please visit <a href='http://umassmed.edu/biocore/resources/galaxy-group/'>this website</a> for more help.");

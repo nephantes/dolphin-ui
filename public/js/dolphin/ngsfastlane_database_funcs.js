@@ -19,11 +19,11 @@ function checkFastlaneInput(info_array){
 	$.ajax({
 		type: 	'GET',
 		url: 	BASE_PATH+'/public/ajax/ngsfastlanedb.php',
-		data:  	{ p: 'getUserName' },
+		data:  	{ p: 'getClusterName' },
 		async:	false,
 		success: function(s)
 		{
-			username = s;
+			username = JSON.parse(s)[0];
 		}
 	});
 	
@@ -109,13 +109,12 @@ function checkFastlaneInput(info_array){
 						console.log(info_array[x-1]+"/"+info_array[z][y]);
 						$.ajax({
 							type: 	'GET',
-							url: 	BASE_PATH+'/public/api/service.php',
-							data:  	{ func: 'checkFile', username: username, file: info_array[x-1]+"/"+info_array[z][y] },
+							url: 	BASE_PATH+'/public/api/service.php?func=testFile&username='+username.clusteruser+'&file='+info_array[x-1]+"/"+info_array[z][y],
 							async:	false,
 							success: function(s)
 							{
 								var file_check = JSON.parse(s);
-								if (file_check.Result != 'OK' ){
+								if (file_check.Result != 'Ok' ){
 									input_bool_check = false;
 								}
 							}
@@ -134,25 +133,25 @@ function checkFastlaneInput(info_array){
 				//	Directory Checks
 				var dir_check_1;
 				$.ajax({
-						type: 	'GET',
-						url: 	BASE_PATH+'/public/api/service.php',
-						data:  	{ func: 'checkPermissions', username: username },
-						async:	false,
-						success: function(s)
-						{
-							dir_check_1 = JSON.parse(s);
-						}
+					type: 	'GET',
+					url: 	BASE_PATH+'/public/api/service.php?func=checkPermissions&username='+username.clusteruser,
+					async:	false,
+					success: function(s)
+					{
+						console.log(s);
+						dir_check_1 = JSON.parse(s);
+					}
 				});
 				var dir_check_2;
 				$.ajax({
-						type: 	'GET',
-						url: 	BASE_PATH+'/public/api/service.php',
-						data:  	{ func: 'checkPermissions', username: username, outdir: info_array[x] },
-						async:	false,
-						success: function(s)
-						{
-							dir_check_2 = JSON.parse(s);
-						}
+					type: 	'GET',
+					url: 	BASE_PATH+'/public/api/service.php?func=checkPermissions&username='+username.clusteruser+'&outdir=' + info_array[x],
+					async:	false,
+					success: function(s)
+					{
+						console.log(s);
+						dir_check_2 = JSON.parse(s);
+					}
 				});
 				
 				if (dir_check_1.Result != 'Ok' || dir_check_2.Result != 'Ok') {
