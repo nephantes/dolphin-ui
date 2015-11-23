@@ -82,7 +82,7 @@ class funcs
          $com = "mkdir -p  ".$params['outdir']." ; \
             cd ".$params['outdir']." ; \
             touch permstest.txt ; \
-            rm test.txt";
+            rm permstest.txt";
          $retval = $this->syscall($this->getCMDs($com));
 
          if (preg_match('/Permission denied/', $retval)) {
