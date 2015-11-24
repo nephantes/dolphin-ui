@@ -112,7 +112,7 @@ function checkFastlaneInput(info_array){
 						console.log(info_array[x-1]+"/"+input_array[z][y]);
 						$.ajax({
 							type: 	'GET',
-							url: 	BASE_PATH+'/public/api/service.php?func=testFile&username='+username.clusteruser+'&file='+info_array[x-1]+"/"+input_array[z][y],
+							url: 	API_PATH+'/public/api/service.php?func=checkFile&username='+username.clusteruser+'&file='+info_array[x-1]+"/"+input_array[z][y],
 							async:	false,
 							success: function(s)
 							{
@@ -138,7 +138,7 @@ function checkFastlaneInput(info_array){
 				var dir_check_1;
 				$.ajax({
 					type: 	'GET',
-					url: 	BASE_PATH+'/public/api/service.php?func=checkPermissions&username='+username.clusteruser,
+					url: 	API_PATH+'/public/api/service.php?func=checkPermissions&username='+username.clusteruser,
 					async:	false,
 					success: function(s)
 					{
@@ -149,7 +149,7 @@ function checkFastlaneInput(info_array){
 				var dir_check_2;
 				$.ajax({
 					type: 	'GET',
-					url: 	BASE_PATH+'/public/api/service.php?func=checkPermissions&username='+username.clusteruser+'&outdir=' + info_array[x],
+					url: 	API_PATH+'/public/api/service.php?func=checkPermissions&username='+username.clusteruser+'&outdir=' + info_array[x],
 					async:	false,
 					success: function(s)
 					{
