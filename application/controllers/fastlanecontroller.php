@@ -78,10 +78,12 @@ class FastlaneController extends VanillaController {
 							foreach($bad_files_array as $bfa){
 								$text.="<font color=\"red\">".$bfa."</font><br>";
 							}
+							$test.="<br>";
 						}else{
 							$text.="<font color=\"red\">The files listed are not in the proper fastlane format.</font><br><br>";
 						}
 					}else if($key == 7){
+						$text.="<h3>Process Directory</h3>";
 						if($fastlane_array[8]  == ''){
 							$text.="<font color=\"red\">Process Directory is Empty</font><br><br>";
 						}else{
