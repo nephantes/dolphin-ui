@@ -100,15 +100,15 @@ function checkFastlaneInput(info_array){
 				console.log(input_array);
 				var end = 0;
 				if (info_array[1] == 'yes') {
-					end = input_array[0].length;
+					end = -1;
 				}else{
-					end = input_array[0].length - 1;
+					end = 0;
 				}
 				console.log(input_array);
 				console.log(info_array);
 				
 				for(var z = 0; z < input_array.length; z++){
-					for(var y = end; y > -1; y--){
+					for(var y = input_array[z].length - 1; y > end; y--){
 						console.log(info_array[x-1]+"/"+input_array[z][y]);
 						$.ajax({
 							type: 	'GET',
