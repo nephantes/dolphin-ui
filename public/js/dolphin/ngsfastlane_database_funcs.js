@@ -106,7 +106,6 @@ function checkFastlaneInput(info_array){
 				}
 				console.log(input_array);
 				console.log(info_array);
-				
 				for(var z = 0; z < input_array.length; z++){
 					for(var y = input_array[z].length - 1; y > end; y--){
 						console.log(info_array[x-1]+"/"+input_array[z][y]);
@@ -120,6 +119,7 @@ function checkFastlaneInput(info_array){
 								console.log(file_check);
 								if (file_check.Result != 'Ok' ){
 									input_bool_check = false;
+									problem_files.push(file_check.ERROR);
 								}
 							}
 						});
@@ -160,6 +160,13 @@ function checkFastlaneInput(info_array){
 				
 				if (dir_check_1.Result != 'Ok' || dir_check_2.Result != 'Ok') {
 					//	perms errors
+					if (dir_check_1.Result != 'Ok') {
+						problem_dirs.push(id_array[x]);
+						problem_dirs.push(dir_check_1.ERROR);
+					}else{
+						problem_dirs.push(id_array[x]);
+						problem_dirs.push(dir_check_2.ERROR);
+					}
 					database_checks.push(false);
 				}else{
 					//	No errors

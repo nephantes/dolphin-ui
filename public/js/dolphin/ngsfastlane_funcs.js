@@ -51,7 +51,6 @@ function submitFastlaneButton() {
 	sendProcessData(checked_values, 'pass_fail_values');
 	var bad_samples = getBadSamples();
 	sendProcessData(bad_samples, 'bad_samples');
-	console.log(checked_values);
 }
 
 function backToFastlane(){
