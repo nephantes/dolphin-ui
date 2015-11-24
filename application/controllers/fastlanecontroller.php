@@ -45,6 +45,7 @@ class FastlaneController extends VanillaController {
 				$text.="<script type='text/javascript'>";
 				$text.="var fastlane_values = '" . $fastlane_values . "';";
 				$text.="var pass_fail_values = '" . $pass_fail_values . "';";
+				$text.="</script>";
 			}else{
 				$text.= "<h4>Successful Fastlane submission!</h4><br>";
 				$text.= "Don't forget to add more information about your samples!<br><br>";
