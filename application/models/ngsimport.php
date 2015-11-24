@@ -216,6 +216,10 @@ class Ngsimport extends VanillaModel {
 			$text.=$this->getFiles();
 		}
 		
+		if(!$this->final_check){
+			$text.= $this->errorText("If you're not a galaxy group member, visit <a href='http://umassmed.edu/biocore/resources/galaxy-group/'>here</a> for instructions on how to become a member.");
+			$text.= $this->errorText("Please visit our <a href='http://dolphin.readthedocs.org/en/master/dolphin-ui/excelimport.html'>documentation</a> for additional help.");
+		}
 		//	Process Data
 		$parseArray = [$this->final_check, $text];
 		return $parseArray;
@@ -331,7 +335,7 @@ class Ngsimport extends VanillaModel {
 				$request = API_PATH.'/api/service.php?func=checkPermissions&username='.$this->clustername;
 				$valid_fastq = json_decode('['.json_decode(file_get_contents($request)).']');
 				if(isset($valid_fastq[0]->ERROR)){
-					$text.= $this->errorText("Fastq Directory error (".$this->fastq_dir."). ".$valid_fastq[0]->ERROR.".  Please visit <a href='http://umassmed.edu/biocore/resources/galaxy-group/'>this website</a> for more help.");
+					$text.= $this->errorText("Fastq Directory error (".$this->fastq_dir."). ".$valid_fastq[0]->ERROR);
 					$this->final_check = false;
 					$meta_check = false;
 				}
@@ -340,7 +344,7 @@ class Ngsimport extends VanillaModel {
 				$request = API_PATH.'/api/service.php?func=checkPermissions&username='.$this->clustername.'&outdir='.$this->fastq_dir;
 				$valid_fastq = json_decode('['.json_decode(file_get_contents($request)).']');
 				if(isset($valid_fastq[0]->ERROR)){
-					$text.= $this->errorText("Fastq Directory error (".$this->fastq_dir."). ".$valid_fastq[0]->ERROR.".  Please visit <a href='http://umassmed.edu/biocore/resources/galaxy-group/'>this website</a> for more help.");
+					$text.= $this->errorText("Fastq Directory error (".$this->fastq_dir."). ".$valid_fastq[0]->ERROR);
 					$this->final_check = false;
 					$meta_check = false;
 				}
@@ -349,7 +353,7 @@ class Ngsimport extends VanillaModel {
 				$request = API_PATH.'/api/service.php?func=checkPermissions&username='.$this->clustername;
 				$valid_fastq = json_decode('['.json_decode(file_get_contents($request)).']');
 				if(isset($valid_fastq[0]->ERROR)){
-					$text.= $this->errorText("Process Directory error (".$this->backup_dir."). ".$valid_fastq[0]->ERROR.".  Please visit <a href='http://umassmed.edu/biocore/resources/galaxy-group/'>this website</a> for more help.");
+					$text.= $this->errorText("Process Directory error (".$this->backup_dir."). ".$valid_fastq[0]->ERROR);
 					$this->final_check = false;
 					$meta_check = false;
 				}
@@ -358,7 +362,7 @@ class Ngsimport extends VanillaModel {
 				$request = API_PATH.'/api/service.php?func=checkPermissions&username='.$this->clustername.'&outdir='.$this->backup_dir;
 				$valid_fastq = json_decode('['.json_decode(file_get_contents($request)).']');
 				if(isset($valid_fastq[0]->ERROR)){
-					$text.= $this->errorText("Process Directory error (".$this->backup_dir."). ".$valid_fastq[0]->ERROR.".  Please visit <a href='http://umassmed.edu/biocore/resources/galaxy-group/'>this website</a> for more help.");
+					$text.= $this->errorText("Process Directory error (".$this->backup_dir."). ".$valid_fastq[0]->ERROR);
 					$this->final_check = false;
 					$meta_check = false;
 				}
@@ -932,7 +936,7 @@ class Ngsimport extends VanillaModel {
 					$request = API_PATH.'/api/service.php?func=checkPermissions&username='.$this->clustername.'&outdir='.$dir->fastq_dir;
 					$valid_fastq = json_decode('['.json_decode(file_get_contents($request)).']');
 					if(isset($valid_fastq[0]->ERROR)){
-						$text.= $this->errorText("Fastq dir error (".$dir->fastq_dir."). ".$valid_fastq[0]->ERROR.".  Please visit <a href='http://umassmed.edu/biocore/resources/galaxy-group/'>this website</a> for more help.");
+						$text.= $this->errorText("Fastq dir error (".$dir->fastq_dir."). ".$valid_fastq[0]->ERROR);
 						$this->final_check = false;
 						$dir_check = false;
 					}
@@ -941,7 +945,7 @@ class Ngsimport extends VanillaModel {
 					$request = API_PATH.'/api/service.php?func=checkPermissions&username='.$this->clustername;
 					$valid_fastq = json_decode('['.json_decode(file_get_contents($request)).']');
 					if(isset($valid_fastq[0]->ERROR)){
-						$text.= $this->errorText("Fastq dir error (".$dir->fastq_dir."). ".$valid_fastq[0]->ERROR.".  Please visit <a href='http://umassmed.edu/biocore/resources/galaxy-group/'>this website</a> for more help.");
+						$text.= $this->errorText("Fastq dir error (".$dir->fastq_dir."). ".$valid_fastq[0]->ERROR);
 						$this->final_check = false;
 						$dir_check = false;
 					}
@@ -1092,14 +1096,14 @@ class Ngsimport extends VanillaModel {
 						$request = API_PATH.'/api/service.php?func=checkFile&username='.$this->clustername.'&file=' . $file->fastq_dir . '/' . explode(",",$file->file_name)[0];
 						$valid_fastq = json_decode('['.json_decode(file_get_contents($request)).']');
 						if(isset($valid_fastq[0]->ERROR)){
-							$text.= $this->errorText("Fastq error (".$file->file_name."). ".$valid_fastq[0]->ERROR.".  Please visit <a href='http://umassmed.edu/biocore/resources/galaxy-group/'>this website</a> for more help.");
+							$text.= $this->errorText("Fastq error (".$file->file_name."). ".$valid_fastq[0]->ERROR);
 							$this->final_check = false;
 							$file_check = false;
 						}
 						$request = API_PATH.'/api/service.php?func=checkFile&username='.$this->clustername.'&file=' . $file->fastq_dir . '/' . explode(",",$file->file_name)[1];
 						$valid_fastq = json_decode('['.json_decode(file_get_contents($request)).']');
 						if(isset($valid_fastq[0]->ERROR)){
-							$text.= $this->errorText("Fastq error (row ". $i ." ). ".$valid_fastq[0]->ERROR.".  Please visit <a href='http://umassmed.edu/biocore/resources/galaxy-group/'>this website</a> for more help.");
+							$text.= $this->errorText("Fastq error (row ". $i ." ). ".$valid_fastq[0]->ERROR);
 							$this->final_check = false;
 							$file_check = false;
 						}
@@ -1107,7 +1111,7 @@ class Ngsimport extends VanillaModel {
 						$request = API_PATH.'/api/service.php?func=checkFile&username='.$this->clustername.'&file=' . $file->fastq_dir . '/' . $file->file_name;
 						$valid_fastq = json_decode('['.json_decode(file_get_contents($request)).']');
 						if(isset($valid_fastq[0]->ERROR)){
-							$text.= $this->errorText("Fastq error (row ". $i ." ). ".$valid_fastq[0]->ERROR.".  Please visit <a href='http://umassmed.edu/biocore/resources/galaxy-group/'>this website</a> for more help.");
+							$text.= $this->errorText("Fastq error (row ". $i ." ). ".$valid_fastq[0]->ERROR);
 							$this->final_check = false;
 							$file_check = false;
 						}

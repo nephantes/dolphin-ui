@@ -67,9 +67,6 @@ class FastlaneController extends VanillaController {
 						}else{
 							$text.="Input Directory either contains improper white space or you do not have permissions to access it:<br>";
 							$text.="<font color=\"red\">".$fastlane_array[6]."</font><br><br>";
-							$text.="If you're not sure if you have cluster access, visit <a href='http://umassmed.edu/biocore/resources/galaxy-group/'>this website</a> for more help.<br><br>";
-							$text.="If you're already within the cluster, run this script to give dolphin access to your user account to run on your behalf:<br>";
-							$text.="/project/umw_biocore/bin/addKey.bash <br><br>";
 						}
 					}else if($key == 6){
 						$text.="<h3>Files</h3>";
@@ -89,13 +86,12 @@ class FastlaneController extends VanillaController {
 						}else{
 							$text.="Process Directory either contains improper white space or you do not have permissions to access it:<br>";
 							$text.="<font color=\"red\">".$fastlane_array[8]."</font><br><br>";
-							$text.="If you're not sure if you have cluster access, visit <a href='http://umassmed.edu/biocore/resources/galaxy-group/'>this website</a> for more help.<br><br>";
-							$text.="If you're already within the cluster, run this script to give dolphin access to your user account to run on your behalf:<br>";
-							$text.="/project/umw_biocore/bin/addKey.bash <br><br>";
 						}
 					}else if($key >= 9){
 						$database_sample_bool = true;
 					}
+					$text.="If you're not sure if you have cluster access, visit <a href='http://umassmed.edu/biocore/resources/galaxy-group/'>this website</a> for more help.<br><br>";
+					$text.="For all additional questions about fastlane, please see our <a href=\"http://dolphin.readthedocs.org/en/master/dolphin-ui/fastlane.html\">documentation</a><br><br>";
 				}else if($index != 'true' && $index != 'false'){
 					$text.= "Sample created with id #".$index."<br><br>";
 				}
