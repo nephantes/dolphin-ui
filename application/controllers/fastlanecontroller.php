@@ -29,6 +29,7 @@ class FastlaneController extends VanillaController {
 		if(isset($_SESSION['fastlane_values'])){$fastlane_values = $_SESSION['fastlane_values'];}
 		if(isset($_SESSION['barcode_array'])){$barcode_array = $_SESSION['barcode_array'];}
 		if(isset($_SESSION['pass_fail_values'])){$pass_fail_values = $_SESSION['pass_fail_values'];}
+		if(isset($_SESSION['bad_files'])){$bad_files = $_SESSION['bad_files'];}
 		if(isset($_SESSION['bad_samples'])){$bad_samples = $_SESSION['bad_samples'];}
 		if(isset($_SESSION['group_selected'])){$group_selected = $_SESSION['group_selected'];}
 		
@@ -36,16 +37,12 @@ class FastlaneController extends VanillaController {
 			$fastlane_array = explode(",",$fastlane_values);
 			$pass_fail_array = explode(",",$pass_fail_values);
 			$bad_samples_array = explode(",",$bad_samples);
-			
+			$bad_files_array = explode(",", $bad_files);
 			$fastlane_values = str_replace("\n", ":", $fastlane_values);
 		}
 		if($pass_fail_array != []){
 			if($pass_fail_array[0] == "true" || $pass_fail_array == "false"){
 				$text.= "<h4>Errors found during submission:</h4><br>";
-				$text.="<script type='text/javascript'>";
-				$text.="var fastlane_values = '" . $fastlane_values . "';";
-				$text.="var pass_fail_values = '" . $pass_fail_values . "';";
-				$text.="</script>";
 			}else{
 				$text.= "<h4>Successful Fastlane submission!</h4><br>";
 				$text.= "Don't forget to add more information about your samples!<br><br>";

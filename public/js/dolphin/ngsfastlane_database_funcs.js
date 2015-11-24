@@ -63,6 +63,7 @@ function checkFastlaneInput(info_array){
 			
 		}else if (id_array[x] == 'input_files'){
 			//	Paired-end libraries
+			var bad_files = [];
 			var split_inputs = info_array[6].split('\n');
 			split_inputs = split_inputs.filter(function(n){return n != ''});
 			var input_bool_check = true;
@@ -119,12 +120,14 @@ function checkFastlaneInput(info_array){
 								console.log(file_check);
 								if (file_check.Result != 'Ok' ){
 									input_bool_check = false;
+									bad_files.push(file_check.ERROR);
 								}
 							}
 						});
 					}
 				}
 			}
+			sendProcessData(bad_files, 'bad_files');
 			database_checks.push(input_bool_check);
 			
 		}else if (id_array[x] == 'input_dir' || id_array[x] == 'backup_dir'){
