@@ -61,23 +61,26 @@ class FastlaneController extends VanillaController {
 					}else if($key == 4){
 						$text.="Experiment field is either empty or contains improper white space<br>";
 					}else if($key == 5){
-						$text.="Input Directory is either empty, contains improper white space, or you do not have permissions to access it.<br><br>";
-						$text.="You may not have the proper credentials within the cluster!!!<br>";
+						$text.="Input Directory is either empty, contains improper white space, or you do not have permissions to access it:<br>";
+						$text.="<font color=\"red\">".$fastlane_values[$key]."</font><br><br>";
 						$text.="If you're not sure if you have cluster access, visit <a href='http://umassmed.edu/biocore/resources/galaxy-group/'>this website</a> for more help.<br><br>";
 						$text.="If you're already within the cluster, run this script to give dolphin access to your user account to run on your behalf:<br>";
-						$text.="/project/umw_biocore/bin/addKey.bash <br>";
+						$text.="/project/umw_biocore/bin/addKey.bash <br><br>";
 					}else if($key == 6){
-						$text.="There was an error with the file information you sent us.<br>";
-						$text.="Check to make sure that the file names are correct and that you have permissions to use them.<br><br>";
-						$text.="If you're not sure if you have cluster access, visit <a href='http://umassmed.edu/biocore/resources/galaxy-group/'>this website</a> for more help.<br><br>";
-						$text.="If you're already within the cluster, run this script to give dolphin access to your user account to run on your behalf:<br>";
-						$text.="/project/umw_biocore/bin/addKey.bash <br>";
+						$text.="There was an error with the file information:<br>";
+						if(count($bad_files_array) > 0){
+							foreach($bad_files_array as $bfa){
+								$text.="<font color=\"red\">".$bfa."</font><br>";
+							}
+						}else{
+							$text.="<font color=\"red\">The files listed are not in the proper fastlane format.</font><br><br>";
+						}
 					}else if($key == 7){
-						$text.="Backup directory is either empty, contains improper white space, or you do not have permissions to access it.<br><br>";
-						$text.="You may not have the proper credentials within the cluster!!!<br>";
+						$text.="Backup directory is either empty, contains improper white space, or you do not have permissions to access it:<br><br>";
+						$text.="<font color=\"red\">".$fastlane_values[$key]."</font><br><br>";
 						$text.="If you're not sure if you have cluster access, visit <a href='http://umassmed.edu/biocore/resources/galaxy-group/'>this website</a> for more help.<br><br>";
 						$text.="If you're already within the cluster, run this script to give dolphin access to your user account to run on your behalf:<br>";
-						$text.="/project/umw_biocore/bin/addKey.bash <br>";
+						$text.="/project/umw_biocore/bin/addKey.bash <br><br>";
 					}else if($key >= 9){
 						$database_sample_bool = true;
 					}
