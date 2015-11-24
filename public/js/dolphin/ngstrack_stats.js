@@ -5,7 +5,9 @@
  * Ascription:
  **/
 
-function generateStreamTable(type, queryData, queryType, qvar, rvar, seg, theSearch, uid, gids){
+var basket_info = getBasketInfo();
+
+function generateStreamTable(type, queryData, queryType, qvar, rvar, seg, theSearch, uid, gids, basket_info){
 	var keys = [];
 	var obj_conversion = [];
 	if (type == 'generated') {
@@ -225,8 +227,8 @@ function generateStreamTable(type, queryData, queryType, qvar, rvar, seg, theSea
 			sample_name = record.samplename;
 		}
 		var basketSamples = [];
-		if (getBasketInfo() != undefined) {
-			basketSamples = getBasketInfo().split(",");
+		if (basket_info != undefined) {
+			basketSamples = basket_info.split(",");
 		}
 		var checked = '';
 		if (queryType == 'table_create') {
@@ -557,6 +559,10 @@ $(function() {
 				}
 		});
 	}else if (phpGrab.theSegment != 'report' && phpGrab.theSegment != 'table_viewer') {
+		var experiment_series_data = [];
+		var lane_data = [];
+		var sample_data = [];
+	
 		/*##### SAMPLES TABLE #####*/
 	
 		//var samplesTable = $('#jsontable_samples').dataTable();
@@ -565,57 +571,54 @@ $(function() {
 		if (segment == 'selected') {
 			samplesType = "getSelectedSamples";
 			if (window.location.href.split("/")[4] == 'tablecreator') {
-				theSearch = getBasketInfo();
+				theSearch = basket_info;
 				qvar = "getTableSamples";
 			}
 		}else{
 			samplesType = "getSamples";
 		}
 		$.ajax({ type: "GET",
-					url: BASE_PATH+"/public/ajax/ngs_tables.php",
-					data: { p: samplesType, q: qvar, r: rvar, seg: segment, search: theSearch, uid: uid, gids: gids },
-					async: false,
-					success : function(s)
-					{
-						var changeHTML = '';
-						var hrefSplit = window.location.href.split("/");
-						var typeLocSelected = $.inArray('selected', hrefSplit);
-						var typeLocRerun = $.inArray('rerun', hrefSplit);
-						if (typeLocSelected > 0 || typeLocRerun > 0) {
-							theSearch = '';
-						}
-						var type = 'samples';
-						if (samplesType == 'getSamples' && segment == 'table_create') {
-							var samples_with_runs = [];
-							var objects_with_runs = [];
-							$.ajax({ type: "GET",
-									url: BASE_PATH+"/public/ajax/tablegenerator.php",
-									data: { p: "samplesWithRuns" },
-									async: false,
-									success : function(k)
-									{
-										for(var x = 0; x < k.length; x++){
-											samples_with_runs.push(k[x].sample_id);
-										}
-									}
-							});
-							for(var z = 0; z < s.length; z++){
-								if (samples_with_runs.indexOf(s[z].id) > -1) {
-									objects_with_runs.push(s[z]);
+			url: BASE_PATH+"/public/ajax/ngs_tables.php",
+			data: { p: samplesType, q: qvar, r: rvar, seg: segment, search: theSearch, uid: uid, gids: gids },
+			async: false,
+			success : function(s)
+			{
+				sample_data = s;
+				var changeHTML = '';
+				var hrefSplit = window.location.href.split("/");
+				var typeLocSelected = $.inArray('selected', hrefSplit);
+				var typeLocRerun = $.inArray('rerun', hrefSplit);
+				if (typeLocSelected > 0 || typeLocRerun > 0) {
+					theSearch = '';
+				}
+				var type = 'samples';
+				if (samplesType == 'getSamples' && segment == 'table_create') {
+					var samples_with_runs = [];
+					var objects_with_runs = [];
+					$.ajax({ type: "GET",
+							url: BASE_PATH+"/public/ajax/tablegenerator.php",
+							data: { p: "samplesWithRuns" },
+							async: false,
+							success : function(k)
+							{
+								for(var x = 0; x < k.length; x++){
+									samples_with_runs.push(k[x].sample_id);
 								}
 							}
-							s = objects_with_runs;
-							queryType = 'table_create';
-						}else{
-							var queryType = samplesType;
+					});
+					for(var z = 0; z < s.length; z++){
+						if (samples_with_runs.indexOf(s[z].id) > -1) {
+							objects_with_runs.push(s[z]);
 						}
-						generateStreamTable(type, s, queryType, qvar, rvar, segment, theSearch, uid, gids);
 					}
-			});
-	
-		if (phpGrab.theField == "experiments") {
-			reloadBasket();
-		}
+					s = objects_with_runs;
+					queryType = 'table_create';
+				}else{
+					var queryType = samplesType;
+				}
+				generateStreamTable(type, s, queryType, qvar, rvar, segment, theSearch, uid, gids);
+			}
+		});
 	
 		/*##### LANES TABLE #####*/
 	
@@ -626,6 +629,7 @@ $(function() {
 						async: false,
 						success : function(s)
 						{
+							lane_data = s;
 							var type = 'lanes';
 							var queryType = "getLanes";
 							if (window.location.href.split("/")[4] == 'search') {
@@ -637,9 +641,6 @@ $(function() {
 		//lanesTable.fnSort( [ [0,'asc'] ] );
 		//lanesTable.fnAdjustColumnSizing(true);
 	
-		if (phpGrab.theField == "experiment_series") {
-			reloadBasket();
-		}
 	
 		/*##### SERIES TABLE #####*/
 	
@@ -650,6 +651,7 @@ $(function() {
 						async: false,
 						success : function(s)
 						{
+							experiment_series_data = s;
 							var type = 'experiments';
 							var queryType = "getExperimentSeries";
 							if (window.location.href.split("/")[4] == 'search') {
@@ -660,10 +662,13 @@ $(function() {
 	
 		//experiment_seriesTable.fnSort( [ [0,'asc'] ] );
 		//experiment_seriesTable.fnAdjustColumnSizing(true);
-	
 		if (segment == 'index' || segment == 'browse' || segment == 'details') {
+			console.log(experiment_series_data);
+			console.log(lane_data);
+			console.log(sample_data);
 			checkOffAllSamples();
 			checkOffAllLanes();
+			generateIDDictionary(experiment_series_data, lane_data, sample_data);
 			reloadBasket();
 		}
 	}

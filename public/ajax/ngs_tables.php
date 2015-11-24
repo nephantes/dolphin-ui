@@ -157,7 +157,7 @@ else if($search != "")	//	If there is a search term(s) (experiments, lanes, samp
 			$time="";
 			if (isset($start)){$time="WHERE `date_created`>='$start' and `date_created`<='$end'";}
 			$data=$query->queryTable("
-			SELECT ngs_lanes.id,name, facility, total_reads, total_samples, cost, phix_requested, phix_in_lane, notes, owner_id
+			SELECT ngs_lanes.id, series_id, name, facility, total_reads, total_samples, cost, phix_requested, phix_in_lane, notes, owner_id
 			FROM ngs_lanes
             $laneJoin
 			WHERE ngs_lanes.id
@@ -169,7 +169,7 @@ else if($search != "")	//	If there is a search term(s) (experiments, lanes, samp
 			$time="";
 			if (isset($start)){$time="and `date_created`>='$start' and `date_created`<='$end'";}
 			$data=$query->queryTable("
-			SELECT ngs_samples.id, name, samplename, title, source, organism, molecule, total_reads, barcode, description, avg_insert_size, read_length, concentration, time, biological_replica, technical_replica, spike_ins, adapter,
+			SELECT ngs_samples.id, ngs_samples.series_id, ngs_samples.lane_id, name, samplename, title, source, organism, molecule, total_reads, barcode, description, avg_insert_size, read_length, concentration, time, biological_replica, technical_replica, spike_ins, adapter,
             notebook_ref, notes, genotype, library_type, biosample_type, instrument_model, treatment_manufacturer, ngs_samples.owner_id
 			FROM ngs_samples
             $innerJoin
@@ -200,7 +200,7 @@ else if($search != "")	//	If there is a search term(s) (experiments, lanes, samp
 			$time="";
 			if (isset($start)){$time="WHERE `date_created`>='$start' and `date_created`<='$end'";}
 			$data=$query->queryTable("
-			SELECT ngs_lanes.id,name, facility, total_reads, total_samples, cost, phix_requested, phix_in_lane, notes, owner_id
+			SELECT ngs_lanes.id, ngs_lanes.series_id, name, facility, total_reads, total_samples, cost, phix_requested, phix_in_lane, notes, owner_id
 			FROM ngs_lanes
             $laneJoin
 			WHERE ngs_lanes.id
@@ -213,7 +213,7 @@ else if($search != "")	//	If there is a search term(s) (experiments, lanes, samp
 			$time="";
 			if (isset($start)){$time="and `date_created`>='$start' and `date_created`<='$end'";}
 			$data=$query->queryTable("
-			SELECT ngs_samples.id, name, samplename, title, source, organism, molecule, total_reads, barcode, description, avg_insert_size, read_length, concentration, time, biological_replica, technical_replica, spike_ins, adapter,
+			SELECT ngs_samples.id, ngs_samples.series_id, ngs_samples.lane_id,name, samplename, title, source, organism, molecule, total_reads, barcode, description, avg_insert_size, read_length, concentration, time, biological_replica, technical_replica, spike_ins, adapter,
             notebook_ref, notes, genotype, library_type, biosample_type, instrument_model, treatment_manufacturer, ngs_samples.owner_id
 			FROM ngs_samples
             $innerJoin
@@ -229,7 +229,7 @@ else if($search != "")	//	If there is a search term(s) (experiments, lanes, samp
 			$time="";
 			if (isset($start)){$time="and `date_created`>='$start' and `date_created`<='$end'";}
 			$data=$query->queryTable("
-			SELECT ngs_samples.id, name, samplename, title, source, organism, molecule, total_reads, barcode, description, avg_insert_size, read_length, concentration, time, biological_replica, technical_replica, spike_ins, adapter,
+			SELECT ngs_samples.id, ngs_samples.series_id, ngs_samples.lane_id, name, samplename, title, source, organism, molecule, total_reads, barcode, description, avg_insert_size, read_length, concentration, time, biological_replica, technical_replica, spike_ins, adapter,
             notebook_ref, notes, genotype, library_type, biosample_type, instrument_model, treatment_manufacturer, ngs_samples.owner_id
 			FROM ngs_samples
             $innerJoin
@@ -276,7 +276,7 @@ else	//	if there isn't a search term (experiments, lanes, samples)
 			$time="";
 			if (isset($start)){$time="WHERE `date_created`>='$start' and `date_created`<='$end'";}
 			$data=$query->queryTable("
-			SELECT ngs_lanes.id,name, facility, total_reads, total_samples, cost, phix_requested, phix_in_lane, notes, owner_id
+			SELECT ngs_lanes.id, ngs_lanes.series_id, name, facility, total_reads, total_samples, cost, phix_requested, phix_in_lane, notes, owner_id
 			FROM ngs_lanes
             $laneJoin
 			WHERE ngs_lanes.id
@@ -288,7 +288,7 @@ else	//	if there isn't a search term (experiments, lanes, samples)
 			$time="";
 			if (isset($start)){$time="and `date_created`>='$start' and `date_created`<='$end'";}
 			$data=$query->queryTable("
-			SELECT ngs_samples.id, name, samplename, title, source, organism, molecule, total_reads, barcode, description, avg_insert_size, read_length, concentration, time, biological_replica, technical_replica, spike_ins, adapter,
+			SELECT ngs_samples.id, ngs_samples.series_id, ngs_samples.lane_id,name, samplename, title, source, organism, molecule, total_reads, barcode, description, avg_insert_size, read_length, concentration, time, biological_replica, technical_replica, spike_ins, adapter,
             notebook_ref, notes, genotype, library_type, biosample_type, instrument_model, treatment_manufacturer, ngs_samples.owner_id
 			FROM ngs_samples
             $innerJoin
@@ -317,7 +317,7 @@ else	//	if there isn't a search term (experiments, lanes, samples)
 			$time="";
 			if (isset($start)){$time="WHERE `date_created`>='$start' and `date_created`<='$end'";}
 			$data=$query->queryTable("
-			SELECT ngs_lanes.id,name, facility, total_reads, total_samples, cost, phix_requested, phix_in_lane, notes, owner_id
+			SELECT ngs_lanes.id, ngs_lanes.series_id, name, facility, total_reads, total_samples, cost, phix_requested, phix_in_lane, notes, owner_id
 			FROM ngs_lanes
             $laneJoin
 			WHERE ngs_lanes.series_id = $q $andPerms $time
@@ -328,7 +328,7 @@ else	//	if there isn't a search term (experiments, lanes, samples)
 			$time="";
 			if (isset($start)){$time="and `date_created`>='$start' and `date_created`<='$end'";}
 			$data=$query->queryTable("
-			SELECT ngs_samples.id, name, samplename, title, source, organism, molecule, total_reads, barcode, description, avg_insert_size, read_length, concentration, time, biological_replica, technical_replica, spike_ins, adapter,
+			SELECT ngs_samples.id, ngs_samples.series_id, ngs_samples.lane_id, name, samplename, title, source, organism, molecule, total_reads, barcode, description, avg_insert_size, read_length, concentration, time, biological_replica, technical_replica, spike_ins, adapter,
             notebook_ref, notes, genotype, library_type, biosample_type, instrument_model, treatment_manufacturer, ngs_samples.owner_id
 			FROM ngs_samples
             $innerJoin
@@ -343,7 +343,7 @@ else	//	if there isn't a search term (experiments, lanes, samples)
 			$time="";
 			if (isset($start)){$time="and `date_created`>='$start' and `date_created`<='$end'";}
 			$data=$query->queryTable("
-			SELECT ngs_samples.id, name, samplename, title, source, organism, molecule, total_reads, barcode, description, avg_insert_size, read_length, concentration, time, biological_replica, technical_replica, spike_ins, adapter,
+			SELECT ngs_samples.id, ngs_samples.series_id, ngs_samples.lane_id, name, samplename, title, source, organism, molecule, total_reads, barcode, description, avg_insert_size, read_length, concentration, time, biological_replica, technical_replica, spike_ins, adapter,
             notebook_ref, notes, genotype, library_type, biosample_type, instrument_model, treatment_manufacturer, ngs_samples.owner_id
 			FROM ngs_samples
             $innerJoin
@@ -379,7 +379,7 @@ else	//	if there isn't a search term (experiments, lanes, samples)
 			$time="";
 			if (isset($start)){$time="WHERE `date_created`>='$start' and `date_created`<='$end'";}
 			$data=$query->queryTable("
-			SELECT ngs_lanes.id,name, facility, total_reads, total_samples, cost, phix_requested, phix_in_lane, notes, owner_id
+			SELECT ngs_lanes.id, ngs_lanes.series_id, name, facility, total_reads, total_samples, cost, phix_requested, phix_in_lane, notes, owner_id
 			FROM ngs_lanes
             $laneJoin
             $perms $time
@@ -390,7 +390,7 @@ else	//	if there isn't a search term (experiments, lanes, samples)
 			$time="";
 			if (isset($start)){$time="and `date_created`>='$start' and `date_created`<='$end'";}
 			$data=$query->queryTable("
-			SELECT ngs_samples.id, name, samplename, title, source, organism, molecule, total_reads, barcode, description, avg_insert_size, read_length, concentration, time, biological_replica, technical_replica, spike_ins, adapter,
+			SELECT ngs_samples.id, ngs_samples.series_id, ngs_samples.lane_id, name, samplename, title, source, organism, molecule, total_reads, barcode, description, avg_insert_size, read_length, concentration, time, biological_replica, technical_replica, spike_ins, adapter,
             notebook_ref, notes, genotype, library_type, biosample_type, instrument_model, treatment_manufacturer, ngs_samples.owner_id
 			FROM ngs_samples
             $innerJoin

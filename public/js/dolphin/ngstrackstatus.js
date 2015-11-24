@@ -361,5 +361,5 @@ $(function() {
 				$('#jsontable_jobs').DataTable().page(page_mark_jobs).draw(false);
 			}
 		}
-	}, 15000 );
+	}, 60000 );
 });
