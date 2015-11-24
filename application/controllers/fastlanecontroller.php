@@ -62,11 +62,15 @@ class FastlaneController extends VanillaController {
 						$text.="Experiment field is either empty or contains improper white space<br>";
 					}else if($key == 5){
 						$text.="<h3>Input Directory</h3>";
-						$text.="Input Directory is either empty, contains improper white space, or you do not have permissions to access it:<br>";
-						$text.="<font color=\"red\">".$fastlane_array[6]."</font><br><br>";
-						$text.="If you're not sure if you have cluster access, visit <a href='http://umassmed.edu/biocore/resources/galaxy-group/'>this website</a> for more help.<br><br>";
-						$text.="If you're already within the cluster, run this script to give dolphin access to your user account to run on your behalf:<br>";
-						$text.="/project/umw_biocore/bin/addKey.bash <br><br>";
+						if($fastlane_array[6]  == ''){
+							$text.="<font color=\"red\">Input Directory is Empty</font><br><br>";
+						}else{
+							$text.="Input Directory either contains improper white space or you do not have permissions to access it:<br>";
+							$text.="<font color=\"red\">".$fastlane_array[6]."</font><br><br>";
+							$text.="If you're not sure if you have cluster access, visit <a href='http://umassmed.edu/biocore/resources/galaxy-group/'>this website</a> for more help.<br><br>";
+							$text.="If you're already within the cluster, run this script to give dolphin access to your user account to run on your behalf:<br>";
+							$text.="/project/umw_biocore/bin/addKey.bash <br><br>";
+						}
 					}else if($key == 6){
 						$text.="<h3>Files</h3>";
 						$text.="There was an error with the file information:<br>";
@@ -78,12 +82,15 @@ class FastlaneController extends VanillaController {
 							$text.="<font color=\"red\">The files listed are not in the proper fastlane format.</font><br><br>";
 						}
 					}else if($key == 7){
-						$text.="<h3>Process Directory</h3>";
-						$text.="Process directory is either empty, contains improper white space, or you do not have permissions to access it:<br><br>";
-						$text.="<font color=\"red\">".$fastlane_array[8]."</font><br><br>";
-						$text.="If you're not sure if you have cluster access, visit <a href='http://umassmed.edu/biocore/resources/galaxy-group/'>this website</a> for more help.<br><br>";
-						$text.="If you're already within the cluster, run this script to give dolphin access to your user account to run on your behalf:<br>";
-						$text.="/project/umw_biocore/bin/addKey.bash <br><br>";
+						if($fastlane_array[8]  == ''){
+							$text.="<font color=\"red\">Process Directory is Empty</font><br><br>";
+						}else{
+							$text.="Process Directory either contains improper white space or you do not have permissions to access it:<br>";
+							$text.="<font color=\"red\">".$fastlane_array[8]."</font><br><br>";
+							$text.="If you're not sure if you have cluster access, visit <a href='http://umassmed.edu/biocore/resources/galaxy-group/'>this website</a> for more help.<br><br>";
+							$text.="If you're already within the cluster, run this script to give dolphin access to your user account to run on your behalf:<br>";
+							$text.="/project/umw_biocore/bin/addKey.bash <br><br>";
+						}
 					}else if($key >= 9){
 						$database_sample_bool = true;
 					}
