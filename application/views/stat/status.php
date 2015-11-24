@@ -86,10 +86,16 @@
 					<form name="logForm" role="form" method="post">
 						<div class="modal-body" style="overflow:scroll">
 							<fieldset>
-								<div class="form-group">
-									<label id="permsLabel"></label>
 									<div class="form-group">
-											<label for="Group">Who can see?</label>
+										   <label id="editLabel"></label>
+										   <br>
+										   <div id="editDiv">
+										   </div>
+								   </div>
+								   <div class="form-group">
+											<label id="permsLabel"></label>
+											<div class="form-group">
+															<label for="Group">Who can see?</label>
 											<div class="radio">
 												<label for="only me">
 													<input type="radio" name="security_id" id="only_me" value="3" style="position: absolute;">
@@ -133,7 +139,7 @@
 					</ol>
 				</section>
 				<!-- Main content -->
-				<section class="content">
+				<section class="">
 					<div class="row">
 						<div class="col-md-12">
 						<?php echo $html->sendJScript('status', "", "", "", $uid, $gids); ?>

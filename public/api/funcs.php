@@ -66,7 +66,7 @@ class funcs
          $this->readINI();         
          $com = "ls ".$params['file'];
          $retval = $this->syscall($this->getCMDs($com));
-
+         
          if (preg_match('/No such file or directory/', $retval)) {
               return "{\"ERROR\": \"No such file or directory: ".$params['file']."\"}";
          }
@@ -79,14 +79,16 @@ class funcs
     {
          $this->username=$params['username'];
          $this->readINI();         
-         $com = "mkdir -p  ".$params['outdir'];
+         $com = "mkdir -p  ".$params['outdir']." ; \
+            cd ".$params['outdir']." ; \
+            touch permstest.txt ; \
+            rm permstest.txt";
          $retval = $this->syscall($this->getCMDs($com));
 
          if (preg_match('/Permission denied/', $retval)) {
               return "{\"ERROR\": \"Permission denied: ".$params['outdir']."\"}";
          }
          return "{\"Result\":\"Ok\"}";
-   
     }
      
     function getKey()

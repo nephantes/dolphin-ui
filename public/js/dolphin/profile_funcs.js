@@ -136,7 +136,9 @@ function obtainGroups(){
 				'<li><a href="#" onclick="viewGroupMembers(\''+s[i].id+'\')">View Group Members</a></li>';
 				if (uid == s[i].owner_id) {
 					s[i].options += '<li class="divider"></li>' +
-					'<li><a href="#" onclick="addNewUsers(\''+s[i].id+'\')">Add New Users</a></li>' +
+					'<li><a href="#" onclick="addUsers(\''+s[i].id+'\')">Add Users</a></li>' +
+					'<li><a href="#" onclick="addNewUsers(\''+s[i].id+'\')">Add Pending Users</a></li>' +
+					'<li><a href="#" onclick="transferOwner(\''+s[i].id+'\')">Change group owner</a></li>' +
 					'<li class="divider"></li>' +
 					'<li><a href="#" onclick="deleteGroup(\''+s[i].id+'\')">Delete Group</a></li></ul>' +
 					'</div>';
@@ -174,6 +176,97 @@ function viewGroupMembers(group){
 			}
 		}
 	});
+}
+
+function addUsers(id){
+	$('#groupModal').modal({
+		show: true
+	});
+	document.getElementById('myModalLabel').innerHTML = 'List of All Users';
+	document.getElementById('groupLabel').innerHTML ='Select a user to add to this group';
+	document.getElementById('groupModalDiv').innerHTML = '<select id="addGroup" class="form-control" size="25" multiple>';
+	document.getElementById('confirmGroupButton').setAttribute('onClick', 'confirmAddUser('+id+')');
+	document.getElementById('confirmGroupButton').setAttribute('data-dismiss', '');
+	document.getElementById('confirmGroupButton').innerHTML = 'Add to group';
+	document.getElementById('confirmGroupButton').setAttribute('style', 'display:show');
+	document.getElementById('cancelGroupButton').innerHTML = 'Cancel';
+	$.ajax({ type: "GET",
+		url: BASE_PATH+"/public/ajax/profiledb.php",
+		data: { p: 'getMemberAdd', group_id: id },
+		async: false,
+		success : function(s)
+		{
+			for (var x = 0; x < s.length; x++) {
+				document.getElementById('addGroup').innerHTML += '<option value="'+s[x].id+'">'+s[x].username+'</option>';
+			}
+		}
+	});
+}
+
+function transferOwner(id){
+	$('#groupModal').modal({
+		show: true
+	});
+	document.getElementById('myModalLabel').innerHTML = 'Transfer group ownership?';
+	document.getElementById('groupLabel').innerHTML ='Select a user to be the owner';
+	document.getElementById('groupModalDiv').innerHTML = '<select id="addGroup" class="form-control" size="25" multiple></select>';
+	document.getElementById('confirmGroupButton').setAttribute('onClick', 'confirmOwnerTransfer('+id+')');
+	document.getElementById('confirmGroupButton').setAttribute('data-dismiss', '');
+	document.getElementById('confirmGroupButton').innerHTML = 'Make Owner';
+	document.getElementById('confirmGroupButton').setAttribute('style', 'display:show');
+	document.getElementById('cancelGroupButton').innerHTML = 'Cancel';
+	
+	var uid;
+	$.ajax({ type: "GET",
+		url: BASE_PATH+"/public/ajax/profiledb.php",
+		data: { p: 'getUID' },
+		async: false,
+		success : function(s)
+		{
+			uid = s;
+		}
+	});
+	console.log(uid);
+	$.ajax({ type: "GET",
+		url: BASE_PATH+"/public/ajax/profiledb.php",
+		data: { p: 'viewGroupMembers', group: id },
+		async: false,
+		success : function(s)
+		{
+			console.log(s);
+			for (var x = 0; x < s.length; x++) {
+				if (s[x].id != uid) {
+					document.getElementById('addGroup').innerHTML += '<option value="'+s[x].id+'">'+s[x].username+'</option>';
+				}
+			}
+		}
+	});
+}
+
+function confirmOwnerTransfer(id){
+	if (document.querySelector("select").selectedOptions.length > 0) {
+		var result = 0;
+		//      Add request to pending DB table
+		$.ajax({ type: "GET",
+				url: BASE_PATH+"/public/ajax/profiledb.php",
+				data: { p: 'transferOwner', group_id: id, user_id: document.querySelector("select").selectedOptions[0].value },
+				async: false,
+				success : function(s)
+				{
+					result = s;
+				}
+		});
+		document.getElementById('groupModalDiv').innerHTML = '';
+		document.getElementById('confirmGroupButton').setAttribute('onClick', '');
+		document.getElementById('confirmGroupButton').setAttribute('style', 'display:none');
+		document.getElementById('cancelGroupButton').innerHTML = 'OK';
+		if (result == 'pass') {
+			document.getElementById('groupLabel').innerHTML ='User is now the group owner!';
+			document.getElementById('cancelGroupButton').setAttribute('onClick', 'window.location.reload()');
+		}else{
+			document.getElementById('groupLabel').innerHTML ='Request did not process, please try again.';
+		}
+	}
 }
 
 function addNewUsers(id){

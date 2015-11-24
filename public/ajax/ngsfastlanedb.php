@@ -147,8 +147,13 @@ if ($p == 'experimentSeriesCheck'){
 	$_SESSION[$post] = implode(",",$info_array);
 }else if ($p == 'obtainGroupFromName'){
 	if (isset($_GET['name'])){$name = $_GET['name'];}
-	
 	$data = $query->queryAVal("SELECT `id` FROM `groups` WHERE name = '".$name."'");
+}else if ($p == 'getClusterName'){
+	$data=$query->queryTable("
+	SELECT username, clusteruser
+	FROM users
+	WHERE username = '".$_SESSION['user']."'
+	");
 }
 
 //footer

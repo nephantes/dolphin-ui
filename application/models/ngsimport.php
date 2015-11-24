@@ -52,6 +52,9 @@ class Ngsimport extends VanillaModel {
 	//	Sheet Check bools
 	public $final_check;
 	
+	//	Cluster name
+	public $clustername;
+	
 	function num2alpha($n){
 		for($r = ""; $n >= 0; $n = intval($n / 26) - 1){
 			$r = chr($n%26 + 0x41) . $r;
@@ -178,6 +181,7 @@ class Ngsimport extends VanillaModel {
 		$this->sid=$sid;
 		$this->gid=$gid;
 		$this->final_check = $passed_final_check;
+		$this->clustername = json_decode($this->query("SELECT clusteruser FROM users WHERE username = '".$_SESSION['user']."'"))[0]->clusteruser;
 		
 		$text = '<li>'.$this->worksheet['worksheetName'].'<br />';
 
@@ -296,13 +300,15 @@ class Ngsimport extends VanillaModel {
 				$this->backup_dir=$this->esc($this->sheetData[$i]["B"]);
 			}elseif($this->sheetData[$i]["A"]=="processed directory"){
 				$this->backup_dir=$this->esc($this->sheetData[$i]["B"]);
+			}elseif($this->sheetData[$i]["A"]=="process directory"){
+				$this->backup_dir=$this->esc($this->sheetData[$i]["B"]);
 			}
 			if($this->sheetData[$i]["A"]=="amazon bucket"){$this->amazon_bucket=$this->esc($this->sheetData[$i]["B"]);}
 			
 			if($this->sheetData[$i]["A"]=="title"){
 				array_push($this->initialSubmission, $this->esc($this->sheetData[$i]["B"]));
 			}
-			if($this->sheetData[$i]["A"]=="backup directory" || $this->sheetData[$i]["A"]=="processed directory"){
+			if($this->sheetData[$i]["A"]=="backup directory" || $this->sheetData[$i]["A"]=="processed directory" || $this->sheetData[$i]["A"]=="process directory"){
 				array_push($this->initialSubmission, $this->esc($this->sheetData[$i]["B"]));
 			}
 			
@@ -320,9 +326,42 @@ class Ngsimport extends VanillaModel {
 				$meta_check = false;
 			}
 			
-			//	Amazon Bucket
-			if($this->amazon_bucket == null && $this->sheetData[$i]["A"]=="amazon bucket"){
-				$text.= $this->warningText("amazon bucket not specified, please make sure to add it later if desired");
+			//	Directory validity tests
+			if(isset($this->fastq_dir) && ( $this->sheetData[$i]["A"]=="fastq directory" || $this->sheetData[$i]["A"]=="input directory")){
+				$request = API_PATH.'/api/service.php?func=checkPermissions&username='.$this->clustername;
+				$valid_fastq = json_decode('['.json_decode(file_get_contents($request)).']');
+				if(isset($valid_fastq[0]->ERROR)){
+					$text.= $this->errorText("Fastq Directory error (".$this->fastq_dir."). ".$valid_fastq[0]->ERROR);
+					$this->final_check = false;
+					$meta_check = false;
+				}
+			}
+			if(isset($this->fastq_dir) && ( $this->sheetData[$i]["A"]=="fastq directory" || $this->sheetData[$i]["A"]=="input directory")){
+				$request = API_PATH.'/api/service.php?func=checkPermissions&username='.$this->clustername.'&outdir='.$this->fastq_dir;
+				$valid_fastq = json_decode('['.json_decode(file_get_contents($request)).']');
+				if(isset($valid_fastq[0]->ERROR)){
+					$text.= $this->errorText("Fastq Directory error (".$this->fastq_dir."). ".$valid_fastq[0]->ERROR);
+					$this->final_check = false;
+					$meta_check = false;
+				}
+			}
+			if(isset($this->backup_dir) && ( $this->sheetData[$i]["A"]=="backup directory" || $this->sheetData[$i]["A"]=="processed directory" || $this->sheetData[$i]["A"]=="process directory" )){
+				$request = API_PATH.'/api/service.php?func=checkPermissions&username='.$this->clustername;
+				$valid_fastq = json_decode('['.json_decode(file_get_contents($request)).']');
+				if(isset($valid_fastq[0]->ERROR)){
+					$text.= $this->errorText("Process Directory error (".$this->backup_dir."). ".$valid_fastq[0]->ERROR);
+					$this->final_check = false;
+					$meta_check = false;
+				}
+			}
+			if(isset($this->backup_dir) && ( $this->sheetData[$i]["A"]=="backup directory" || $this->sheetData[$i]["A"]=="processed directory" || $this->sheetData[$i]["A"]=="process directory" )){
+				$request = API_PATH.'/api/service.php?func=checkPermissions&username='.$this->clustername.'&outdir='.$this->backup_dir;
+				$valid_fastq = json_decode('['.json_decode(file_get_contents($request)).']');
+				if(isset($valid_fastq[0]->ERROR)){
+					$text.= $this->errorText("Process Directory error (".$this->backup_dir."). ".$valid_fastq[0]->ERROR);
+					$this->final_check = false;
+					$meta_check = false;
+				}
 			}
 		}
 		
@@ -372,11 +411,6 @@ class Ngsimport extends VanillaModel {
 			$this->grant = NULL;
 		}
 		
-		//	Contributors
-		if($this->conts == []){
-			$text.= $this->warningText("No contributors specified, please make sure to add them later if desired");
-		}
-		
 		if($meta_check){
 			$text.= $this->successText('Formatting passed inspection!<BR>');
 		}
@@ -411,7 +445,6 @@ class Ngsimport extends VanillaModel {
 
 	function getLanes(){
 		$lane_check = true;
-		$lane_warning_check = false;
 		$text = "";
 		/*
 		 *	For each row in the lanes worksheet
@@ -477,19 +510,9 @@ class Ngsimport extends VanillaModel {
 				if(!isset($lane->total_reads)){
 					$lane->total_reads = NULL;
 				}
-				
-				//	Other Values
-				if($lane->lane_id == null || $lane->facility == null || $lane->cost == null ||
-					$lane->date_submitted ==  null || $lane->date_received == null || $lane->phix_requested == null ||
-					$lane->phix_in_lane == null || $lane->total_samples == null ||
-					$lane->resequenced == null || $lane->notes == null){
-					$lane_warning_check = true;
-				}
 			}
 		}
-		if($lane_warning_check){
-			$text.= $this->warningText("Some optional columns missing data, please make sure to add them later if desired");
-		}
+		
 		if($lane_check){
 			$text.= $this->successText('Formatting passed inspection!<BR>');
 		}
@@ -512,7 +535,6 @@ class Ngsimport extends VanillaModel {
 
 	function getProtocols(){
 		$prot_check = true;
-		$prot_warning_check = false;
 		$text = "";
 		/*
 		 *	For each row in the protocols worksheet
@@ -568,17 +590,7 @@ class Ngsimport extends VanillaModel {
 				if(!isset($prot->strand_specific)){
 					$prot->strand_specific = NULL;
 				}
-				
-				//	Other Values
-				if($prot->growth == null || $prot->extraction == null || $prot->library_construction == null ||
-					$prot->library_strategy == null || !isset($prot->crosslinking_method) ||
-					$prot->fragmentation_method == null || $prot->strand_specific == null){
-					$prot_warning_check = true;
-				}
 			}
-		}
-		if($prot_warning_check){
-			$text.= $this->warningText("Some optional columns missing data, please make sure to add them later if desired");
 		}
 		if($prot_check){
 			$text.= $this->successText('Formatting passed inspection!<BR>');
@@ -596,7 +608,6 @@ class Ngsimport extends VanillaModel {
 
 	function getSamples(){
 		$samp_check = true;
-		$samp_warning_check = false;
 		$text = "";
 		/*
 		 *	For each row in the samples worksheet
@@ -845,23 +856,7 @@ class Ngsimport extends VanillaModel {
 				if(!isset($samp->target)){
 					$samp->target = NULL;
 				}
-				
-				//	Other Values
-				if(!isset($samp->title) ||
-					$samp->source == null || $samp->organism == null || !isset($samp->condition_symbol) ||
-					$samp->batch == null || $samp->source_symbol == null || $samp->biosample_type == null ||
-					$samp->molecule == null || $samp->description == null || $samp->instrument_model == null ||
-					$samp->avg_insert_size == null || $samp->read_length == null || $samp->genotype == null ||
-					$samp->condition == null || $samp->adapter == null || $samp->notebook_ref == null ||
-					$samp->notes == null || $samp->concentration == null || $samp->treatment_manufacturer == null ||
-					$samp->donor == null || $samp->time == null || $samp->biological_replica == null ||
-					$samp->technical_replica == null || $samp->spikeins == null){
-					$samp_warning_check = true;
-				}
 			}
-		}
-		if($samp_warning_check){
-			$text.= $this->warningText("Some optional columns missing data, please make sure to add them later if desired");
 		}
 		if($samp_check){
 			$text.= $this->successText('Formatting passed inspection!<BR>');
@@ -905,6 +900,8 @@ class Ngsimport extends VanillaModel {
 					$dir->fastq_dir=$this->esc($this->sheetData[$i][$j]);
 				}elseif($this->sheetData[3][$j]=="Processed directory"){
 					$dir->fastq_dir=$this->esc($this->sheetData[$i][$j]);
+				}elseif($this->sheetData[3][$j]=="Process directory"){
+					$dir->fastq_dir=$this->esc($this->sheetData[$i][$j]);
 				}elseif($this->sheetData[3][$j]=="Input directory"){
 					$dir->fastq_dir=$this->esc($this->sheetData[$i][$j]);
 				}
@@ -930,6 +927,24 @@ class Ngsimport extends VanillaModel {
 					$dir_check = false;
 				}else{
 					array_push($this->dir_fastq, $dir->fastq_dir);
+				}
+				if(isset($dir->fastq_dir)){
+					$request = API_PATH.'/api/service.php?func=checkPermissions&username='.$this->clustername.'&outdir='.$dir->fastq_dir;
+					$valid_fastq = json_decode('['.json_decode(file_get_contents($request)).']');
+					if(isset($valid_fastq[0]->ERROR)){
+						$text.= $this->errorText("Fastq dir error (".$dir->fastq_dir."). ".$valid_fastq[0]->ERROR);
+						$this->final_check = false;
+						$dir_check = false;
+					}
+				}
+				if(isset($dir->fastq_dir)){
+					$request = API_PATH.'/api/service.php?func=checkPermissions&username='.$this->clustername;
+					$valid_fastq = json_decode('['.json_decode(file_get_contents($request)).']');
+					if(isset($valid_fastq[0]->ERROR)){
+						$text.= $this->errorText("Fastq dir error (".$dir->fastq_dir."). ".$valid_fastq[0]->ERROR);
+						$this->final_check = false;
+						$dir_check = false;
+					}
 				}
 				
 				if($dir_check){
@@ -1069,6 +1084,34 @@ class Ngsimport extends VanillaModel {
 					$file->dir_tag="old_import_template";
 					$file->fastq_dir = $this->fastq_dir;
 					$file->backup_dir = $this->backup_dir;
+				}
+				
+				//	File Validity Check
+				if(isset($file->fastq_dir)){
+					if($this->pairedEndCheck == 'paired'){
+						$request = API_PATH.'/api/service.php?func=checkFile&username='.$this->clustername.'&file=' . $file->fastq_dir . '/' . explode(",",$file->file_name)[0];
+						$valid_fastq = json_decode('['.json_decode(file_get_contents($request)).']');
+						if(isset($valid_fastq[0]->ERROR)){
+							$text.= $this->errorText("Fastq error (".$file->file_name."). ".$valid_fastq[0]->ERROR);
+							$this->final_check = false;
+							$file_check = false;
+						}
+						$request = API_PATH.'/api/service.php?func=checkFile&username='.$this->clustername.'&file=' . $file->fastq_dir . '/' . explode(",",$file->file_name)[1];
+						$valid_fastq = json_decode('['.json_decode(file_get_contents($request)).']');
+						if(isset($valid_fastq[0]->ERROR)){
+							$text.= $this->errorText("Fastq error (row ". $i ." ). ".$valid_fastq[0]->ERROR);
+							$this->final_check = false;
+							$file_check = false;
+						}
+					}else{
+						$request = API_PATH.'/api/service.php?func=checkFile&username='.$this->clustername.'&file=' . $file->fastq_dir . '/' . $file->file_name;
+						$valid_fastq = json_decode('['.json_decode(file_get_contents($request)).']');
+						if(isset($valid_fastq[0]->ERROR)){
+							$text.= $this->errorText("Fastq error (row ". $i ." ). ".$valid_fastq[0]->ERROR);
+							$this->final_check = false;
+							$file_check = false;
+						}
+					}
 				}
 			}
 		}

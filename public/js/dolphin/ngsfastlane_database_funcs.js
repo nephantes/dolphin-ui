@@ -14,6 +14,18 @@ function checkFastlaneInput(info_array){
 	var sample_ids = [];
 	var sample_file_check = [];
 	var true_sample_ids = [];
+	var username;
+	
+	$.ajax({
+		type: 	'GET',
+		url: 	BASE_PATH+'/public/ajax/ngsfastlanedb.php',
+		data:  	{ p: 'getClusterName' },
+		async:	false,
+		success: function(s)
+		{
+			username = JSON.parse(s)[0];
+		}
+	});
 	
 	//	Non-database checks
 	//	For each input passed
@@ -51,6 +63,7 @@ function checkFastlaneInput(info_array){
 			
 		}else if (id_array[x] == 'input_files'){
 			//	Paired-end libraries
+			var bad_files = [];
 			var split_inputs = info_array[6].split('\n');
 			split_inputs = split_inputs.filter(function(n){return n != ''});
 			var input_bool_check = true;
@@ -84,6 +97,37 @@ function checkFastlaneInput(info_array){
 					}
 				}
 			}
+			if (input_bool_check) {
+				console.log(input_array);
+				var end = 0;
+				if (info_array[1] == 'yes') {
+					end = -1;
+				}else{
+					end = 0;
+				}
+				console.log(input_array);
+				console.log(info_array);
+				for(var z = 0; z < input_array.length; z++){
+					for(var y = input_array[z].length - 1; y > end; y--){
+						console.log(info_array[x-1]+"/"+input_array[z][y]);
+						$.ajax({
+							type: 	'GET',
+							url: 	API_PATH+'/public/api/service.php?func=checkFile&username='+username.clusteruser+'&file='+info_array[x-1]+"/"+input_array[z][y],
+							async:	false,
+							success: function(s)
+							{
+								var file_check = JSON.parse(s);
+								console.log(file_check);
+								if (file_check.Result != 'Ok' ){
+									input_bool_check = false;
+									bad_files.push(file_check.ERROR);
+								}
+							}
+						});
+					}
+				}
+			}
+			sendProcessData(bad_files, 'bad_files');
 			database_checks.push(input_bool_check);
 			
 		}else if (id_array[x] == 'input_dir' || id_array[x] == 'backup_dir'){
@@ -92,9 +136,38 @@ function checkFastlaneInput(info_array){
 				//	Contains whitespace
 				database_checks.push(false);
 			}else{
-				database_checks.push(true);
+				//	Directory Checks
+				var dir_check_1;
+				$.ajax({
+					type: 	'GET',
+					url: 	API_PATH+'/public/api/service.php?func=checkPermissions&username='+username.clusteruser,
+					async:	false,
+					success: function(s)
+					{
+						console.log(s);
+						dir_check_1 = JSON.parse(s);
+					}
+				});
+				var dir_check_2;
+				$.ajax({
+					type: 	'GET',
+					url: 	API_PATH+'/public/api/service.php?func=checkPermissions&username='+username.clusteruser+'&outdir=' + info_array[x],
+					async:	false,
+					success: function(s)
+					{
+						console.log(s);
+						dir_check_2 = JSON.parse(s);
+					}
+				});
+				
+				if (dir_check_1.Result != 'Ok' || dir_check_2.Result != 'Ok') {
+					//	perms errors
+					database_checks.push(false);
+				}else{
+					//	No errors
+					database_checks.push(true);
+				}
 			}
-			
 		}else{
 			//	No errors
 			database_checks.push(true);

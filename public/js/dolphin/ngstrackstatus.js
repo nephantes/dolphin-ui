@@ -70,8 +70,7 @@ $(function() {
 					}
 					
 					if (s[i].owner_id == uid) {
-						disabled += '<li><a href="#" id="'+s[i].id+'" name="'+s[i].group_id+'" onclick="changeRunGroup(this.id, this.name)">Change Group</a></li>' +
-							'<li><a href="#" id="'+s[i].id+'" name="'+s[i].group_id+'" onclick="changeRunPerms(this.id, this.name)">Change Permissions</a></li>' +
+						disabled += '<li><a href="#" id="perms_'+s[i].id+'" name="'+s[i].group_id+'" onclick="changeRunPerms(this.id, this.name)">Change Permissions</a></li>' +
 							'<li class="divider"></li>';
 					}
 					if (s[i].outdir.split("/")[s[i].outdir.split("/").length - 1] != 'initial_run' || s[i].run_status == 1) {
@@ -147,8 +146,7 @@ $(function() {
 						runstat = '<button id="'+s[i].id+'" class="btn btn-danger btn-xs" onclick="sendToAdvancedStatus(this.id)"><i class="fa fa-warning">\tStopped</i></button>';
 					}
 					if (s[i].owner_id == uid) {
-						disabled += '<li><a href="#" id="'+s[i].id+'" name="'+s[i].group_id+'" onclick="changeRunGroup(this.id, this.name)">Change Group</a></li>' +
-							'<li><a href="#" id="'+s[i].id+'" name="'+s[i].group_id+'" onclick="changeRunPerms(this.id, this.name)">Change Permissions</a></li>' +
+						disabled += '<li><a href="#" id="perms_'+s[i].id+'" name="'+s[i].group_id+'" onclick="changeRunPerms(this.id, this.name)">Change Permissions</a></li>' +
 							'<li class="divider"></li>';
 					}
 					if (s[i].outdir.split("/")[s[i].outdir.split("/").length - 1] != 'initial_run' || s[i].run_status == 1) {
@@ -271,8 +269,7 @@ $(function() {
 							runstat = '<button id="'+s[i].id+'" class="btn btn-danger btn-xs" onclick="sendToAdvancedStatus(this.id)"><i class="fa fa-warning">\tStopped</i></button>';
 						}
 						if (s[i].owner_id == uid) {
-							disabled += '<li><a href="#" id="'+s[i].id+'" name="'+s[i].group_id+'" onclick="changeRunGroup(this.id, this.name)">Change Group</a></li>' +
-								'<li><a href="#" id="'+s[i].id+'" name="'+s[i].group_id+'" onclick="changeRunPerms(this.id, this.name)">Change Permissions</a></li>' +
+							disabled += '<li><a href="#" id="perms_'+s[i].id+'" name="'+s[i].group_id+'" onclick="changeRunPerms(this.id, this.name)">Change Permissions</a></li>' +
 								'<li class="divider"></li>';
 						}
 						if (s[i].outdir.split("/")[s[i].outdir.split("/").length - 1] != 'initial_run' || s[i].run_status == 1) {

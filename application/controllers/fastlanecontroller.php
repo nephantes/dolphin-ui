@@ -26,9 +26,11 @@ class FastlaneController extends VanillaController {
 		
 		$text = '';
 		$bad_samples = '';
+		$failed_test = false;
 		if(isset($_SESSION['fastlane_values'])){$fastlane_values = $_SESSION['fastlane_values'];}
 		if(isset($_SESSION['barcode_array'])){$barcode_array = $_SESSION['barcode_array'];}
 		if(isset($_SESSION['pass_fail_values'])){$pass_fail_values = $_SESSION['pass_fail_values'];}
+		if(isset($_SESSION['bad_files'])){$bad_files = $_SESSION['bad_files'];}
 		if(isset($_SESSION['bad_samples'])){$bad_samples = $_SESSION['bad_samples'];}
 		if(isset($_SESSION['group_selected'])){$group_selected = $_SESSION['group_selected'];}
 		
@@ -36,14 +38,14 @@ class FastlaneController extends VanillaController {
 			$fastlane_array = explode(",",$fastlane_values);
 			$pass_fail_array = explode(",",$pass_fail_values);
 			$bad_samples_array = explode(",",$bad_samples);
-			
+			$bad_files_array = explode(",", $bad_files);
 			$fastlane_values = str_replace("\n", ":", $fastlane_values);
 		}
 		if($pass_fail_array != []){
 			if($pass_fail_array[0] == "true" || $pass_fail_array == "false"){
-				$text.= "<h4>Errors found during submission:</h4><br>";
+				$text.= "<h3>Errors found during submission:</h3><br>";
 			}else{
-				$text.= "<h4>Successful Fastlane submission!</h4><br>";
+				$text.= "<h3>Successful Fastlane submission!</h3><br>";
 				$text.= "Don't forget to add more information about your samples!<br><br>";
 				$text.="<script type='text/javascript'>";
 				$text.="var initialSubmission = '" . $fastlane_values . "';";
@@ -60,24 +62,43 @@ class FastlaneController extends VanillaController {
 					}else if($key == 4){
 						$text.="Experiment field is either empty or contains improper white space<br>";
 					}else if($key == 5){
-						$text.="Input Directory is either empty or contains improper white space<br>";
+						$text.="<h3>Input Directory</h3>";
+						if($fastlane_array[6]  == ''){
+							$text.="<font color=\"red\">Input Directory is Empty</font><br><br>";
+						}else{
+							$text.="Input Directory either contains improper white space or you do not have permissions to access it:<br>";
+							$text.="<font color=\"red\">".$fastlane_array[6]."</font><br><br>";
+						}
 					}else if($key == 6){
-						$text.="Input files are either empty or do not fit the correct format for the current selection<br>";
-						$text.="Check to make sure that the file input follows the proper barcode/mate-paired formatting.<br><br>";
-						$text.="If barcode separation is not selected, input files should be the name and the file for single-end or the name and the two files for paired end.<br>";
-						$text.="If barcode separation is selected, input files should either be one file per line for single-end or two files per line for paired-end.<br><br>";
-						$text.="Sample name and file name(s) should be space-separated.<br><br>";
-						$text.="Ex: (No barcode separation, paired-end)<br>";
-						$text.="test_sample sample_fastq_1.fastq.gz sample_fastq_2.fastq.gz<br>";
-						$text.="test2_sample sample2_fastq_1.fastq.gz sample2_fastq_2.fastq.gz<br>";
+						$text.="<h3>Files</h3>";
+						$text.="There was an error with the file information:<br>";
+						if(count($bad_files_array) > 0){
+							foreach($bad_files_array as $bfa){
+								$text.="<font color=\"red\">".$bfa."</font><br>";
+							}
+							$text.="<br>";
+						}else{
+							$text.="<font color=\"red\">The files listed are not in the proper fastlane format.</font><br><br>";
+						}
 					}else if($key == 7){
-						$text.="Backup directory is either empty or contains improper white space<br>";
+						$text.="<h3>Process Directory</h3>";
+						if($fastlane_array[8]  == ''){
+							$text.="<font color=\"red\">Process Directory is Empty</font><br><br>";
+						}else{
+							$text.="Process Directory either contains improper white space or you do not have permissions to access it:<br>";
+							$text.="<font color=\"red\">".$fastlane_array[8]."</font><br><br>";
+						}
 					}else if($key >= 9){
 						$database_sample_bool = true;
 					}
+					$failed_test = true;
 				}else if($index != 'true' && $index != 'false'){
 					$text.= "Sample created with id #".$index."<br><br>";
 				}
+			}
+			if($failed_test){
+				$text.="If you're not sure if you have cluster access, visit <a href='http://umassmed.edu/biocore/resources/galaxy-group/'>this website</a> for more help.<br><br>";
+				$text.="For all additional questions about fastlane, please see our <a href=\"http://dolphin.readthedocs.org/en/master/dolphin-ui/fastlane.html\">documentation</a><br><br>";
 			}
 			if($index != 'true' && $index != 'false'){
 				$text.='<div class="callout callout-info lead"><h4>We are currently processing your samples to obtain read counts and additional information.<br><br>
