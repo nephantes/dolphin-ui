@@ -78,7 +78,7 @@ class FastlaneController extends VanillaController {
 							foreach($bad_files_array as $bfa){
 								$text.="<font color=\"red\">".$bfa."</font><br>";
 							}
-							$test.="<br>";
+							$text.="<br>";
 						}else{
 							$text.="<font color=\"red\">The files listed are not in the proper fastlane format.</font><br><br>";
 						}
