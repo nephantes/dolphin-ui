@@ -42,9 +42,9 @@ class FastlaneController extends VanillaController {
 		}
 		if($pass_fail_array != []){
 			if($pass_fail_array[0] == "true" || $pass_fail_array == "false"){
-				$text.= "<h4>Errors found during submission:</h4><br>";
+				$text.= "<h3>Errors found during submission:</h3><br>";
 			}else{
-				$text.= "<h4>Successful Fastlane submission!</h4><br>";
+				$text.= "<h3>Successful Fastlane submission!</h3><br>";
 				$text.= "Don't forget to add more information about your samples!<br><br>";
 				$text.="<script type='text/javascript'>";
 				$text.="var initialSubmission = '" . $fastlane_values . "';";
