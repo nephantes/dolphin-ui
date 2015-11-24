@@ -216,10 +216,6 @@ class Ngsimport extends VanillaModel {
 			$text.=$this->getFiles();
 		}
 		
-		if(!$this->final_check){
-			$text.= $this->errorText("If you're not a galaxy group member, visit <a href='http://umassmed.edu/biocore/resources/galaxy-group/'>here</a> for instructions on how to become a member.");
-			$text.= $this->errorText("Please visit our <a href='http://dolphin.readthedocs.org/en/master/dolphin-ui/excelimport.html'>documentation</a> for additional help.");
-		}
 		//	Process Data
 		$parseArray = [$this->final_check, $text];
 		return $parseArray;

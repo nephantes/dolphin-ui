@@ -26,6 +26,7 @@ class FastlaneController extends VanillaController {
 		
 		$text = '';
 		$bad_samples = '';
+		$failed_test = false;
 		if(isset($_SESSION['fastlane_values'])){$fastlane_values = $_SESSION['fastlane_values'];}
 		if(isset($_SESSION['barcode_array'])){$barcode_array = $_SESSION['barcode_array'];}
 		if(isset($_SESSION['pass_fail_values'])){$pass_fail_values = $_SESSION['pass_fail_values'];}
@@ -90,11 +91,14 @@ class FastlaneController extends VanillaController {
 					}else if($key >= 9){
 						$database_sample_bool = true;
 					}
-					$text.="If you're not sure if you have cluster access, visit <a href='http://umassmed.edu/biocore/resources/galaxy-group/'>this website</a> for more help.<br><br>";
-					$text.="For all additional questions about fastlane, please see our <a href=\"http://dolphin.readthedocs.org/en/master/dolphin-ui/fastlane.html\">documentation</a><br><br>";
+					$failed_test = true;
 				}else if($index != 'true' && $index != 'false'){
 					$text.= "Sample created with id #".$index."<br><br>";
 				}
+			}
+			if($failed_test){
+				$text.="If you're not sure if you have cluster access, visit <a href='http://umassmed.edu/biocore/resources/galaxy-group/'>this website</a> for more help.<br><br>";
+				$text.="For all additional questions about fastlane, please see our <a href=\"http://dolphin.readthedocs.org/en/master/dolphin-ui/fastlane.html\">documentation</a><br><br>";
 			}
 			if($index != 'true' && $index != 'false'){
 				$text.='<div class="callout callout-info lead"><h4>We are currently processing your samples to obtain read counts and additional information.<br><br>

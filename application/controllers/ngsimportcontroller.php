@@ -80,6 +80,8 @@ class NgsimportController extends VanillaController {
                             </div>';
                 }else{
                     $text.=$ngs->errorText("<BR><BR>Excel import aborted due to errors, see above<BR>");
+					$text.= $ngs->errorText("If you're not a galaxy group member, visit <a href='http://umassmed.edu/biocore/resources/galaxy-group/'>here</a> for instructions on how to become a member.<br>");
+					$text.= $ngs->errorText("Please visit our <a href='http://dolphin.readthedocs.org/en/master/dolphin-ui/excelimport.html'>documentation</a> for additional help.");
                 }
 			}
 			$this->set('mytext', $text);
