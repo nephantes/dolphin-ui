@@ -4,6 +4,9 @@
  *Ascription:
  */
 
+//GLOBAL ID DICTIONARY
+var ID_DICTIONARY = {};
+
 //GLOBAL VARIABLES
 var jsonTypeList = ['genomebuild', 'spaired', 'resume', 'barcodes', 'fastqc', 'adapter', 'quality', 'trim', 'commonind', 'split', 'pipeline', 'advparams', 'custom'];
 var radioTypeCheckList = ['pipeline', 'trimpaired', 'advparams', 'custom'];
@@ -718,13 +721,13 @@ function backFromDetails(back_type){
 function manageChecklists(name, type){
 	if (type == 'sample_checkbox') {
 		//sample checkbox
+		var sample_search = searchIDDictionary(name);
+		var lane_check = sample_search[0];
+		var experiment_check = sample_search[1];
 		if ( checklist_samples.indexOf( name ) > -1 ){
 			//remove
 			checklist_samples.splice(checklist_samples.indexOf(name), 1);
 			removeFromDolphinBasket(name);
-	
-			var lane_check = getLaneIdFromSample(name);
-			var experiment_check = getExperimentIdFromSample(name);
 			if (checklist_lanes.indexOf(lane_check) > -1) {
 				if (document.getElementById('lane_checkbox_' + lane_check) != undefined) {
 					var check = document.getElementById('lane_checkbox_' + lane_check);
@@ -757,10 +760,8 @@ function manageChecklists(name, type){
 			addToDolphinBasket(name);
 			sendBasketInfo(name);
 	
-			var lane_check = getLaneIdFromSample(name);
 			var lane_samples = getLanesToSamples(lane_check);
 			var lanes_bool = true;
-			var experiment_check = getExperimentIdFromSample(name);
 			var experiment_samples = getSamplesFromExperimentSeries(experiment_check);
 			var experiment_bool = true;
 			
@@ -860,6 +861,80 @@ function manageChecklists(name, type){
 			}
 		}
 	}
+}
+
+//	Store all ids in tree based JSON
+function generateIDDictionary(experiment_series_data, lane_data, sample_data){
+	//	for each es
+	for(var x = 0; x < experiment_series_data.length; x++){
+		temp_lane_dict = [];
+		//	for each lane
+		for(var y = 0; y < lane_data.length; y++){
+			//	if lane is in es
+			if (lane_data[y].series_id == experiment_series_data[x].id) {
+				var temp_sample_dict = [];
+				//	for each sample in lane
+				for(var z = 0; z < sample_data.length; z++){
+					//	if sample in lane
+					if (sample_data[z].lane_id == lane_data[y].id) {
+						//	push to sample var
+						temp_sample_dict.push(sample_data[z].id);
+						//	remove sample for faster querying
+						console.log(z);
+						sample_data.splice(z-1, 1);
+					}
+				}
+				//	store in temp lane var
+				temp_lane_dict.push(JSON.parse('{"'+[lane_data[y].id]+"\":["+temp_sample_dict.toString()+"]}"));
+			}
+		}
+		//	store lane/sample side into dictionary under es
+		ID_DICTIONARY[experiment_series_data[x].id] = temp_lane_dict;
+	}
+	console.log(ID_DICTIONARY);
+}
+
+//	Search JSON dictionary for lane and es id
+function searchIDDictionary(sample){
+	//	Grab dictionary key variables
+	var es_keys = Object.keys(ID_DICTIONARY);
+	//	For each es key
+	for(var es_key in es_keys){
+		//	For each es, find position of lane id
+		for(var x = 0; x < ID_DICTIONARY[es_keys[es_key]].length; x++){
+			//	Grab lane ids
+			var lane_keys = Object.keys(ID_DICTIONARY[es_keys[es_key]][x]);
+			//	For each lane id
+			for(lane_key in lane_keys){
+				//	if lane array contains sample
+				if (ID_DICTIONARY[es_keys[es_key]][x][lane_keys[lane_key]].indexOf(parseInt(sample)) > -1) {
+					//	Return ids
+					return [lane_keys[lane_key], es_keys[es_key]];
+				}
+			}
+		}
+	}
+	return ["", ""];
+}
+
+//	Search JSON dictionary for samples for a given lane id
+function seachLaneToSamples(lane){
+	//	Grab dictionary key variables
+	var es_keys = Object.keys(ID_DICTIONARY);
+	//	For each es key
+	for(var es_key in es_keys){
+		//	Grab lane ids
+		var lane_keys = Object.keys(ID_DICTIONARY[es_keys[es_key]][lane]);
+		//	For each lane id
+		for(lane_key in lane_keys){
+			//	if lane array contains sample
+			if (ID_DICTIONARY[es_keys[es_key]][lane][lane_keys[lane_key]] != undefined) {
+				//	Return ids
+				return ID_DICTIONARY[es_keys[es_key]][lane][lane_keys[lane_key]];
+			}
+		}
+	}
+	return undefined;
 }
 
 function reloadBasket(){
