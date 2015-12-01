@@ -70,12 +70,19 @@ else { $q = strtolower($q); }
 
 if ($p == 'getStatus')	//	Status tables
 {
+	if(intval($_SESSION['run_type']) == 1){
+		$run_type = "WHERE run_name = 'Fastlane Initial Run' OR run_name = 'Import Initial Run'";
+	}else if (intval($_SESSION['run_type']) == 2){
+		$run_type = "WHERE run_name != 'Fastlane Initial Run' AND run_name != 'Import Initial Run'";
+	}else{
+		$run_type = "";
+	}
 	$time="";
 	if (isset($start)){$time="and `date_created`>='$start' and `date_created`<='$end'";}
 	$data=$query->queryTable("
 	SELECT id, run_group_id, run_name, wkey, outdir, run_description, run_status, owner_id, group_id
 	FROM ngs_runparams
-	$perms $time
+	$run_type $time
 	");
 }
 else if ($p == "getSelectedSamples")	//	Selected samples table

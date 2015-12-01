@@ -119,6 +119,23 @@ else if ($p == 'getPlotToggle')
 		echo '';
 	}
 }
+else if ($p == 'getRunType')
+{
+	if(isset($_SESSION['run_type'])){
+		echo $_SESSION['run_type'];
+	}else{
+		echo 0;
+	}
+}
+else if ($p == 'changeRunType')
+{
+	if (isset($_GET['run_type'])){$run_type = $_GET['run_type'];}
+	if(isset($run_type)){
+		$_SESSION['run_type'] = intval($run_type);
+	}else{
+		$_SESSION['run_type'] = 0;
+	}
+}
 
 exit;
 ?>

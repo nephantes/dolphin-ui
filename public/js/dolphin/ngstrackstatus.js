@@ -6,7 +6,7 @@ var service_id;
 
 $(function() {
 	"use strict";
-
+	
 	//The Calender
 	$("#calendar").datepicker();
 	
@@ -33,11 +33,15 @@ $(function() {
 	
 	/*##### STATUS TABLE #####*/
 	if (segment == 'status') {
-	var runparams = $('#jsontable_runparams').dataTable( {
-		stateSave: true
-	});
-	
-	$.ajax({ type: "GET",
+		var run_type = getRunType();
+		console.log(run_type);
+		document.getElementById('run_types').setAttribute('onChange', 'changeRunType(this.value)');
+		document.getElementById('run_types').options[run_type].setAttribute('selected', 'true');
+		var runparams = $('#jsontable_runparams').dataTable( {
+			stateSave: true
+		});
+		
+		$.ajax({ type: "GET",
 			 url: BASE_PATH+"/public/ajax/ngs_tables.php",
 			 data: { p: "getStatus", q: qvar, r: rvar, seg: segment, search: theSearch, uid: uid, gids: gids },
 			 async: false,
