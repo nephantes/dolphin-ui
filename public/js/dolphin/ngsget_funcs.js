@@ -152,6 +152,22 @@ function getAllLaneIds(){
 	return lanes_returned;
 }
 
+function getAllExperimentIds(){
+	experiments_returned = [];
+	$.ajax({ type: "GET",
+		url: BASE_PATH+"/public/ajax/ngsquerydb.php",
+		data: { p: "getAllExperimentIds" },
+		async: false,
+		success : function(s)
+		{
+			for(var x = 0; x < s.length; x++){
+				experiments_returned.push(s[x].id);
+			}
+		}
+	});
+	return experiments_returned;
+}
+
 function getSeriesIdFromLane(lane){
 	series_id_returned = -1;
 	$.ajax({ type: "GET",

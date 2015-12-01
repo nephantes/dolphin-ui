@@ -880,7 +880,6 @@ function generateIDDictionary(experiment_series_data, lane_data, sample_data){
 						//	push to sample var
 						temp_sample_dict.push(sample_data[z].id);
 						//	remove sample for faster querying
-						console.log(z);
 						sample_data.splice(z-1, 1);
 					}
 				}
@@ -998,9 +997,6 @@ function clearBasket(){
 	flushBasketInfo();
 }
 
-/*
- *	Used for datatables, discontinued
- */
 function checkOffAllSamples(){
 	var hrefSplit = window.location.href.split("/");
 	var searchLoc = $.inArray('search', hrefSplit);
@@ -1015,9 +1011,6 @@ function checkOffAllSamples(){
 	}
 }
 
-/*
- *	Used for datatables, discontinued
- */
 function checkOffAllLanes(){
 	var hrefSplit = window.location.href.split("/");
 	var searchLoc = $.inArray('search', hrefSplit);
@@ -1069,6 +1062,19 @@ function checkCheckedLanes(){
 				document.getElementById('lane_checkbox_' + allLanes[x]).setAttribute('checked', 'true');
 			}else{
 				document.getElementById('lane_checkbox_' + allLanes[x]).removeAttribute('checked');
+			}
+		}
+	}
+}
+
+function checkCheckedExperiments(){
+	var allExperiments = getAllExperimentIds();
+	for (var x = 0; x < allExperiments.length; x++){
+		if ( document.getElementById('experiment_checkbox_' + allExperiments[x]) != null) {
+			if (checklist_experiment_series.indexOf(allExperiments[x]) > -1) {
+				document.getElementById('experiment_checkbox_' + allExperiments[x]).setAttribute('checked', 'true');
+			}else{
+				document.getElementById('experiment_checkbox_' + allExperiments[x]).removeAttribute('checked');
 			}
 		}
 	}

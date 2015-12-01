@@ -336,6 +336,8 @@ function generateStreamTable(type, queryData, queryType, qvar, rvar, seg, theSea
 				checkCheckedList();
 			}else if (type == 'lanes') {
 				checkCheckedLanes();
+			}else if (type == 'experiments') {
+				checkCheckedExperiments();
 			}
 		},
 		after_add: function(){
@@ -470,7 +472,9 @@ $(function() {
 	"use strict";
 	
 	//Rerun Check
-	rerunLoad();
+	if (window.location.href.split("/")[5] == 'selected' || window.location.href.split("/")[5] == 'rerun') {
+		rerunLoad();
+	}
 	
 	//The Calender
 	$("#calendar").datepicker();
@@ -546,25 +550,25 @@ $(function() {
 	if (phpGrab.theField == "samples") {
 		reloadBasket();
 	}
+	
 	if (phpGrab.theSegment == 'generated') {
 		var json_obj;
 		console.log(BASE_PATH +"/public/api/getsamplevals.php?" + window.location.href.split("/table/")[1]);
 		$.ajax({ type: "GET",
-				url: BASE_PATH +"/public/api/getsamplevals.php?" + window.location.href.split("/table/")[1],
-				async: false,
-				success : function(s)
-				{
-					json_obj = JSON.parse(s);
-					generateStreamTable('generated', json_obj, phpGrab.theSegment, qvar, rvar, segment, theSearch, uid, gids);
-				}
+			url: BASE_PATH +"/public/api/getsamplevals.php?" + window.location.href.split("/table/")[1],
+			async: false,
+			success : function(s)
+			{
+				json_obj = JSON.parse(s);
+				generateStreamTable('generated', json_obj, phpGrab.theSegment, qvar, rvar, segment, theSearch, uid, gids);
+			}
 		});
 	}else if (phpGrab.theSegment != 'report' && phpGrab.theSegment != 'table_viewer') {
 		var experiment_series_data = [];
 		var lane_data = [];
 		var sample_data = [];
 	
-		/*##### SAMPLES TABLE #####*/
-	
+		/*##### SAMPLES TABLE #####*/	
 		//var samplesTable = $('#jsontable_samples').dataTable();
 	
 		var samplesType = "";
@@ -622,46 +626,39 @@ $(function() {
 	
 		/*##### LANES TABLE #####*/
 	
-		//var lanesTable = $('#jsontable_lanes').dataTable();
 		$.ajax({ type: "GET",
-						url: BASE_PATH+"/public/ajax/ngs_tables.php",
-						data: { p: "getLanes", q: qvar, r: rvar, seg: segment, search: theSearch, uid: uid, gids: gids },
-						async: false,
-						success : function(s)
-						{
-							lane_data = s;
-							var type = 'lanes';
-							var queryType = "getLanes";
-							if (window.location.href.split("/")[4] == 'search') {
-								generateStreamTable(type, s, queryType, qvar, rvar, segment, theSearch, uid, gids);
-							}
-						}
-				});
-	
-		//lanesTable.fnSort( [ [0,'asc'] ] );
-		//lanesTable.fnAdjustColumnSizing(true);
-	
+			url: BASE_PATH+"/public/ajax/ngs_tables.php",
+			data: { p: "getLanes", q: qvar, r: rvar, seg: segment, search: theSearch, uid: uid, gids: gids },
+			async: false,
+			success : function(s)
+			{
+				lane_data = s;
+				var type = 'lanes';
+				var queryType = "getLanes";
+				if (window.location.href.split("/")[4] == 'search') {
+					generateStreamTable(type, s, queryType, qvar, rvar, segment, theSearch, uid, gids);
+				}
+			}
+		});
 	
 		/*##### SERIES TABLE #####*/
-	
 		//var experiment_seriesTable = $('#jsontable_experiment_series').dataTable({responsive: true});
+		
 		$.ajax({ type: "GET",
-						url: BASE_PATH+"/public/ajax/ngs_tables.php",
-						data: { p: "getExperimentSeries", q: qvar, r: rvar, seg: segment, search: theSearch, uid: uid, gids: gids },
-						async: false,
-						success : function(s)
-						{
-							experiment_series_data = s;
-							var type = 'experiments';
-							var queryType = "getExperimentSeries";
-							if (window.location.href.split("/")[4] == 'search') {
-								generateStreamTable(type, s, queryType, qvar, rvar, segment, theSearch, uid, gids);
-							}
-						}
-			   });
-	
-		//experiment_seriesTable.fnSort( [ [0,'asc'] ] );
-		//experiment_seriesTable.fnAdjustColumnSizing(true);
+			url: BASE_PATH+"/public/ajax/ngs_tables.php",
+			data: { p: "getExperimentSeries", q: qvar, r: rvar, seg: segment, search: theSearch, uid: uid, gids: gids },
+			async: false,
+			success : function(s)
+			{
+				experiment_series_data = s;
+				var type = 'experiments';
+				var queryType = "getExperimentSeries";
+				if (window.location.href.split("/")[4] == 'search') {
+					generateStreamTable(type, s, queryType, qvar, rvar, segment, theSearch, uid, gids);
+				}
+			}
+		});
+		
 		if (segment == 'index' || segment == 'browse' || segment == 'details') {
 			console.log(experiment_series_data);
 			console.log(lane_data);

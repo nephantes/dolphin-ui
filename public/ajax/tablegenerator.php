@@ -29,6 +29,7 @@ else if ($p == 'getTableRuns')
 	ON ngs_runlist.run_id = ngs_runparams.id
 	WHERE sample_id IN ( $search )
 	AND run_name NOT LIKE '%Initial Run%'
+	AND run_status = 1;
     ");
 }
 else if ($p == 'getTableReportsList')

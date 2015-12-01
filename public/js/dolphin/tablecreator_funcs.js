@@ -407,42 +407,40 @@ $(function() {
 						}
 					}
 				}});
+		console.log(sample_ids);
 		$.ajax({ type: "GET",
-				url: BASE_PATH+"/public/ajax/tablegenerator.php",
-				data: { p: "getTableSamples", search: sample_ids },
-				async: false,
-				success : function(s)
-				{
-					console.log(s);
-					runparams.fnClearTable();
-					for(var i = 0; i < s.length; i++){
-						/*
-						var checkbox = document.getElementById('sample_checkbox_'+s[i].id);
-						console.log(checkbox);
-						checkbox.checked = true;
-						*/
-						var run_info = [];
-						var wkey_passer = [];
-						var run_select = '<select id="'+ s[i].id + '_run_select" class="form-control" onchange="optionChange(this)"><form>';
-						console.log(run_ids);
-						for(var x = 0; x < run_ids[s[i].id].length; x = x+3){
-							//	Add wkey's to runID
-							wkey_passer.push(run_ids[s[i].id][x+2]);
-							//	Sample id _ Run id _ Run name
-							run_select += '<option id="' + run_ids[s[i].id][x]+ '_' + run_ids[s[i].id][x+1] + '" value="'+ run_ids[s[i].id][x+2] + '">Run ' + run_ids[s[i].id][x] + ': ' + run_ids[s[i].id][x+1] + '</option>'
-						}
-						run_select += '</form></select>';
-						runHelper.push(s[i].id);
-						selectionHelper.push(0);
-						
-						runparams.fnAddData([
-							s[i].id,
-							s[i].samplename,
-							run_select,
-							'<button id="sample_removal_'+s[i].id+'" class="btn btn-danger btn-xs pull-right" onclick="manageCreateChecklists(\''+s[i].id+'\', this)"><i class=\"fa fa-times\"></i></button>'
-							]);
+			url: BASE_PATH+"/public/ajax/tablegenerator.php",
+			data: { p: "getTableSamples", search: sample_ids },
+			async: false,
+			success : function(s)
+			{
+				console.log(s);
+				runparams.fnClearTable();
+				console.log(run_ids);
+				for(var i = 0; i < s.length; i++){
+					var run_info = [];
+					var wkey_passer = [];
+					var run_select = '<select id="'+ s[i].id + '_run_select" class="form-control" onchange="optionChange(this)"><form>';
+					console.log(run_ids[s[i].id]);
+					for(var x = 0; x < run_ids[s[i].id].length; x = x+3){
+						//	Add wkey's to runID
+						wkey_passer.push(run_ids[s[i].id][x+2]);
+						//	Sample id _ Run id _ Run name
+						run_select += '<option id="' + run_ids[s[i].id][x]+ '_' + run_ids[s[i].id][x+1] + '" value="'+ run_ids[s[i].id][x+2] + '">Run ' + run_ids[s[i].id][x] + ': ' + run_ids[s[i].id][x+1] + '</option>'
 					}
-				}});
+					run_select += '</form></select>';
+					runHelper.push(s[i].id);
+					selectionHelper.push(0);
+					
+					runparams.fnAddData([
+						s[i].id,
+						s[i].samplename,
+						run_select,
+						'<button id="sample_removal_'+s[i].id+'" class="btn btn-danger btn-xs pull-right" onclick="manageCreateChecklists(\''+s[i].id+'\', this)"><i class=\"fa fa-times\"></i></button>'
+					]);
+				}
+			}
+		});
 		reportSelection();
 	}else if (window.location.href.split("/").indexOf('table') > -1){
 		var beforeFormat = window.location.href.split("/table/")[1].split('format=')[0];

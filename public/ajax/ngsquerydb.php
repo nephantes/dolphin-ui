@@ -123,6 +123,13 @@ else if ($p == 'getAllLaneIds')
 		FROM ngs_lanes $perms
 	");
 }
+else if ($p == 'getAllExperimentIds')
+{
+	$data=$query->queryTable("
+		SELECT id
+		FROM ngs_experiment_series $perms
+	");
+}
 else if ($p == 'getLaneIdFromSample')
 {
 	if (isset($_GET['sample'])){$sample = $_GET['sample'];}
