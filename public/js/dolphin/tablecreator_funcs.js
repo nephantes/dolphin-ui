@@ -421,7 +421,6 @@ $(function() {
 					var run_info = [];
 					var wkey_passer = [];
 					var run_select = '<select id="'+ s[i].id + '_run_select" class="form-control" onchange="optionChange(this)"><form>';
-					console.log(run_ids[s[i].id]);
 					for(var x = 0; x < run_ids[s[i].id].length; x = x+3){
 						//	Add wkey's to runID
 						wkey_passer.push(run_ids[s[i].id][x+2]);
