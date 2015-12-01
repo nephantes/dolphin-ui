@@ -75,6 +75,24 @@ function getBasketInfo() {
 	}
 }
 
+function getAdditionalBasketInfo() {
+	basket = "";
+	$.ajax({ type: "GET",
+		url: BASE_PATH+"/public/ajax/sessionrequests.php",
+		data: { p:"getAdditionalBasketInfo" },
+		async: false,
+		success : function(s)
+		{
+			basket = s;
+		}
+	});
+	if (basket == "") {
+		return undefined;
+	}else{
+		return basket;
+	}
+}
+
 function sendWKey(wkey){
 	$.ajax({ type: "POST",
 		url: BASE_PATH+"/public/ajax/sessionrequests.php",

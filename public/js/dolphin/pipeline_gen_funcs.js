@@ -720,12 +720,19 @@ function backFromDetails(back_type){
 
 /*##### CHECKBOX FUNCTIONS #####*/
 function manageChecklists(name, type){
+	var lane_check;
+	var experiment_check;
 	name = parseInt(name);
 	if (type == 'sample_checkbox') {
 		//sample checkbox
 		var sample_search = searchIDDictionary(name);
-		var lane_check = sample_search[0];
-		var experiment_check = sample_search[1];
+		if (sample_search == undefined) {
+			//	No sample found to be displayed
+			return;
+		}else{
+			lane_check = sample_search[0];
+			experiment_check = sample_search[1];
+		}
 		if ( checklist_samples.indexOf( name ) > -1 ){
 			//remove
 			checklist_samples.splice(checklist_samples.indexOf(name), 1);
@@ -759,7 +766,7 @@ function manageChecklists(name, type){
 			checklist_samples.push(name);
 			addToDolphinBasket(name);
 			sendBasketInfo(name);
-	
+			
 			var lane_samples = seachLaneToSamples(lane_check);
 			var lanes_bool = true;
 			var experiment_samples = searchExperimentToSamples(experiment_check);
@@ -908,7 +915,7 @@ function searchIDDictionary(sample){
 			}
 		}
 	}
-	return ["",""];
+	return undefined;
 }
 
 //	Search JSON dictionary for samples for a given lane id
