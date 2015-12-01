@@ -720,6 +720,7 @@ function backFromDetails(back_type){
 
 /*##### CHECKBOX FUNCTIONS #####*/
 function manageChecklists(name, type){
+	name = parseInt(name);
 	if (type == 'sample_checkbox') {
 		//sample checkbox
 		var sample_search = searchIDDictionary(name);
@@ -729,21 +730,19 @@ function manageChecklists(name, type){
 			//remove
 			checklist_samples.splice(checklist_samples.indexOf(name), 1);
 			removeFromDolphinBasket(name);
-			if (checklist_lanes.indexOf(lane_check) > -1) {
+			if (checklist_lanes.indexOf(parseInt(lane_check)) > -1) {
 				if (document.getElementById('lane_checkbox_' + lane_check) != undefined) {
 					var check = document.getElementById('lane_checkbox_' + lane_check);
 					check.checked = !check.checked;
 				}
 				checklist_lanes.splice(checklist_lanes.indexOf(lane_check), 1);
 			}
-			console.log(name);
-			console.log(experiment_check);
-			if (checklist_experiment_series.indexOf(experiment_check) > -1) {
+			if (checklist_experiment_series.indexOf(parseInt(experiment_check)) > -1) {
 				if (document.getElementById('experiment_checkbox_' + experiment_check) != undefined) {
 					var check = document.getElementById('experiment_checkbox_' + experiment_check);
 					check.checked = !check.checked;
 				}
-				checklist_experiment_series.splice(checklist_experiment_series.indexOf(experiment_check), 1);
+				checklist_experiment_series.splice(checklist_experiment_series.indexOf(parseInt(experiment_check)), 1);
 			}
 			
 			if (document.getElementById('sample_checkbox_' + name) != undefined) {
@@ -775,7 +774,7 @@ function manageChecklists(name, type){
 					check.checked = !check.checked;
 				}
 			}
-			if (checklist_lanes.indexOf(lane_check) == -1) {
+			if (checklist_lanes.indexOf(parseInt(lane_check)) == -1) {
 				for(var x = 0; x < lane_samples.length; x++){
 					if (lane_samples[x] == undefined) {
 						lanes_bool = false;
@@ -790,11 +789,11 @@ function manageChecklists(name, type){
 						var check = document.getElementById('lane_checkbox_' + lane_check);
 						check.checked = !check.checked;
 					}
-					checklist_lanes.push(lane_check);
+					checklist_lanes.push(parseInt(lane_check));
 				}
 			}
 			
-			if (checklist_experiment_series.indexOf(experiment_check) == -1) {
+			if (checklist_experiment_series.indexOf(parseInt(experiment_check)) == -1) {
 				for(var x = 0; x < experiment_samples.length; x++){
 					if (experiment_samples[x] == undefined) {
 						experiment_bool = false;
@@ -809,7 +808,7 @@ function manageChecklists(name, type){
 						var check = document.getElementById('experiment_checkbox_' + experiment_check);
 						check.checked = !check.checked;
 					}
-					checklist_experiment_series.push(experiment_check);
+					checklist_experiment_series.push(parseInt(experiment_check));
 				}
 			}
 		}
@@ -819,7 +818,6 @@ function manageChecklists(name, type){
 			//remove
 			checklist_experiment_series.splice(checklist_experiment_series.indexOf(name), 1);
 			var experiment_samples = searchExperimentToSamples(name);
-			console.log(experiment_samples);
 			for (var y = 0; y < experiment_samples.length; y++){
 				if ( checklist_samples.indexOf( experiment_samples[y] ) > -1 ){
 					manageChecklists(experiment_samples[y], 'sample_checkbox');
@@ -829,7 +827,6 @@ function manageChecklists(name, type){
 			//add
 			checklist_experiment_series.push(name);
 			var experiment_samples = searchExperimentToSamples(name);
-			console.log(experiment_samples);
 			for (var y = 0; y < experiment_samples.length; y++){
 				if ( checklist_samples.indexOf( experiment_samples[y] ) < 0 ){
 					manageChecklists(experiment_samples[y], 'sample_checkbox');
@@ -842,7 +839,6 @@ function manageChecklists(name, type){
 			//remove
 			checklist_lanes.splice(checklist_lanes.indexOf(name), 1);
 			var lane_samples = seachLaneToSamples(name);
-			
 			for (var x = 0; x < lane_samples.length; x++) {
 				if ( checklist_samples.indexOf( lane_samples[x] ) > -1 ){
 					manageChecklists(lane_samples[x], 'sample_checkbox');
@@ -854,7 +850,6 @@ function manageChecklists(name, type){
 			//add
 			checklist_lanes.push(name);
 			var lane_samples = seachLaneToSamples(name);
-			
 			for (var x = 0; x < lane_samples.length; x++) {
 				if (checklist_samples.indexOf(lane_samples[x]) < 0) {
 					manageChecklists(lane_samples[x], 'sample_checkbox');
@@ -984,7 +979,7 @@ function storedSampleSearch(sample){
 			return STORED_SAMPLE_DATA[x];
 		}
 	}
-	return undefined;
+	return [];
 }
 
 function removeFromDolphinBasket(sampleID){
@@ -1001,11 +996,7 @@ function removeFromDolphinBasket(sampleID){
 	}else{
 		table.fnClearTable();
 	}
-	removeBasketInfo(name);
-	/*
-	var tblrow = document.getElementById(sampleID);
-	tblrow.parentNode.removeChild(tblrow);
-	*/
+	removeBasketInfo(sampleID);
 }
 
 function clearBasket(){
@@ -1018,8 +1009,9 @@ function clearBasket(){
 function checkOffAllSamples(){
 	var hrefSplit = window.location.href.split("/");
 	var searchLoc = $.inArray('search', hrefSplit);
+	var samplesCheck = $.inArray('samples', hrefSplit);
 
-	if (searchLoc != -1) {
+	if (searchLoc != -1 && samplesCheck == -1) {
 		var pagination = document.getElementById('st_pagination_samples');
 		var pagination_ul = pagination.childNodes;
 		var pagination_li = pagination_ul[0].childNodes;
@@ -1032,8 +1024,11 @@ function checkOffAllSamples(){
 function checkOffAllLanes(){
 	var hrefSplit = window.location.href.split("/");
 	var searchLoc = $.inArray('search', hrefSplit);
+	var experimentsCheck = $.inArray('experiments', hrefSplit);
+	var samplesCheck = $.inArray('samples', hrefSplit);
+	
 
-	if (searchLoc != -1) {
+	if (searchLoc != -1 && experimentsCheck == -1 && samplesCheck == -1) {
 		var pagination = document.getElementById('st_pagination_lanes');
 		var pagination_ul = pagination.childNodes;
 		pagination_ul[0].setAttribute('onClick', 'checkCheckedLanes()');

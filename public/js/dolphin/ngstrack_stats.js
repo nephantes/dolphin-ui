@@ -581,6 +581,7 @@ $(function() {
 		}else{
 			samplesType = "getSamples";
 		}
+		console.log(basket_info);
 		$.ajax({ type: "GET",
 			url: BASE_PATH+"/public/ajax/ngs_tables.php",
 			data: { p: samplesType, q: qvar, r: rvar, seg: segment, search: theSearch, uid: uid, gids: gids },

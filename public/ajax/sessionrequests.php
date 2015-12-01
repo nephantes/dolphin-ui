@@ -42,7 +42,7 @@ else if ($p == "removeBasketInfo")
 		$current_basket = $_SESSION['basket'];
 		$basket_array = explode(",", $current_basket);
 		$key = array_search($id, $basket_array);
-		array_splice($basket_array, $key, 1);
+		unset($basket_array[$key]);
 		if(!empty($basket_array)){
 			$_SESSION['basket'] = implode(",", $basket_array);
 		}else{
