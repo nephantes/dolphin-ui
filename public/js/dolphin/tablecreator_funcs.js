@@ -441,6 +441,7 @@ $(function() {
 				}
 			}
 		});
+		checkCheckedList();
 		reportSelection();
 	}else if (window.location.href.split("/").indexOf('table') > -1){
 		var beforeFormat = window.location.href.split("/table/")[1].split('format=')[0];
