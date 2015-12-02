@@ -611,11 +611,13 @@ $(function() {
 							}
 						}
 					});
+					console.log(samples_with_runs);
 					for(var z = 0; z < s.length; z++){
 						if (samples_with_runs.indexOf(s[z].id) > -1) {
 							objects_with_runs.push(s[z]);
 						}
 					}
+					console.log(objects_with_runs);
 					s = objects_with_runs;
 					queryType = 'table_create';
 				}else{

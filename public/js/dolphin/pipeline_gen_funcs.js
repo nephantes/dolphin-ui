@@ -1065,7 +1065,7 @@ function checkCheckedList(){
 	console.log(allSamples);
 	for (var x = 0; x < allSamples.length; x++){
 		if ( document.getElementById('sample_checkbox_' + allSamples[x]) != null) {
-			if (checklist_samples.indexOf(parseInt(allSamples[x])) > -1) {
+			if (checklist_samples.indexOf(parseInt(allSamples[x])) > -1 || checklist_samples.indexOf(allSamples[x]) > -1) {
 				document.getElementById('sample_checkbox_' + allSamples[x]).setAttribute('checked', 'true');
 			}else{
 				document.getElementById('sample_checkbox_' + allSamples[x]).removeAttribute('checked');
@@ -1079,7 +1079,7 @@ function checkCheckedLanes(){
 	var allLanes = getAllLaneIds();
 	for (var x = 0; x < allLanes.length; x++){
 		if ( document.getElementById('lane_checkbox_' + allLanes[x]) != null) {
-			if (checklist_lanes.indexOf(parseInt(allLanes[x])) > -1) {
+			if (checklist_lanes.indexOf(parseInt(allLanes[x])) > -1 || checklist_lanes.indexOf(allLanes[x]) > -1) {
 				document.getElementById('lane_checkbox_' + allLanes[x]).setAttribute('checked', 'true');
 			}else{
 				document.getElementById('lane_checkbox_' + allLanes[x]).removeAttribute('checked');
@@ -1092,7 +1092,7 @@ function checkCheckedExperiments(){
 	var allExperiments = getAllExperimentIds();
 	for (var x = 0; x < allExperiments.length; x++){
 		if ( document.getElementById('experiment_checkbox_' + allExperiments[x]) != null) {
-			if (checklist_experiment_series.indexOf(parseInt(allExperiments[x])) > -1) {
+			if (checklist_experiment_series.indexOf(parseInt(allExperiments[x])) > -1 || checklist_experiment_series.indexOf(allExperiments[x]) > -1) {
 				document.getElementById('experiment_checkbox_' + allExperiments[x]).setAttribute('checked', 'true');
 			}else{
 				document.getElementById('experiment_checkbox_' + allExperiments[x]).removeAttribute('checked');
