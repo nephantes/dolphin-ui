@@ -21,7 +21,7 @@
 						</div>
 						<div class="col-md-12">
 							<div id="generated_table" class="margin col-md-12">
-								<button class="btn btn-box-tool btn-primary margin pull-right" onclick="backToTableIndex()">Back to Creation</button>
+								<button class="btn btn-box-tool btn-primary margin pull-right" onclick="backToTableIndex()">Create a Table</button>
 								<button class="btn btn-box-tool btn-primary margin pull-right" onclick="toBrowserPage()">Back to Browser</button>
 							</div>
 						</div>

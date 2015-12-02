@@ -257,3 +257,29 @@ function confirmPermsChange(id){
 			show: true
 	});
 }
+
+function getRunType(){
+	var runType;
+	$.ajax({ type: "GET",
+		url: BASE_PATH+"/public/ajax/sessionrequests.php",
+		data: { p: 'getRunType' },
+		async: false,
+		success : function(s)
+		{
+			runType = s;
+		}	
+	});
+	return runType;
+}
+
+function changeRunType(int_type){
+	$.ajax({ type: "GET",
+		url: BASE_PATH+"/public/ajax/sessionrequests.php",
+		data: { p: 'changeRunType', run_type: int_type },
+		async: false,
+		success : function(s)
+		{
+			location.reload();
+		}	
+	});
+}

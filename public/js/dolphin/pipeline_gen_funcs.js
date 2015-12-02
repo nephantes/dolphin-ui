@@ -6,6 +6,7 @@
 
 //GLOBAL ID DICTIONARY
 var ID_DICTIONARY = {};
+var STORED_SAMPLE_DATA = [];
 
 //GLOBAL VARIABLES
 var jsonTypeList = ['genomebuild', 'spaired', 'resume', 'barcodes', 'fastqc', 'adapter', 'quality', 'trim', 'commonind', 'split', 'pipeline', 'advparams', 'custom'];
@@ -719,30 +720,36 @@ function backFromDetails(back_type){
 
 /*##### CHECKBOX FUNCTIONS #####*/
 function manageChecklists(name, type){
+	var lane_check;
+	var experiment_check;
+	name = parseInt(name);
 	if (type == 'sample_checkbox') {
 		//sample checkbox
 		var sample_search = searchIDDictionary(name);
-		var lane_check = sample_search[0];
-		var experiment_check = sample_search[1];
+		if (sample_search == undefined) {
+			//	No sample found to be displayed
+			return;
+		}else{
+			lane_check = sample_search[0];
+			experiment_check = sample_search[1];
+		}
 		if ( checklist_samples.indexOf( name ) > -1 ){
 			//remove
 			checklist_samples.splice(checklist_samples.indexOf(name), 1);
 			removeFromDolphinBasket(name);
-			if (checklist_lanes.indexOf(lane_check) > -1) {
+			if (checklist_lanes.indexOf(parseInt(lane_check)) > -1) {
 				if (document.getElementById('lane_checkbox_' + lane_check) != undefined) {
 					var check = document.getElementById('lane_checkbox_' + lane_check);
 					check.checked = !check.checked;
 				}
 				checklist_lanes.splice(checklist_lanes.indexOf(lane_check), 1);
 			}
-			console.log(name);
-			console.log(experiment_check);
-			if (checklist_experiment_series.indexOf(experiment_check) > -1) {
+			if (checklist_experiment_series.indexOf(parseInt(experiment_check)) > -1) {
 				if (document.getElementById('experiment_checkbox_' + experiment_check) != undefined) {
 					var check = document.getElementById('experiment_checkbox_' + experiment_check);
 					check.checked = !check.checked;
 				}
-				checklist_experiment_series.splice(checklist_experiment_series.indexOf(experiment_check), 1);
+				checklist_experiment_series.splice(checklist_experiment_series.indexOf(parseInt(experiment_check)), 1);
 			}
 			
 			if (document.getElementById('sample_checkbox_' + name) != undefined) {
@@ -759,10 +766,10 @@ function manageChecklists(name, type){
 			checklist_samples.push(name);
 			addToDolphinBasket(name);
 			sendBasketInfo(name);
-	
-			var lane_samples = getLanesToSamples(lane_check);
+			
+			var lane_samples = seachLaneToSamples(lane_check);
 			var lanes_bool = true;
-			var experiment_samples = getSamplesFromExperimentSeries(experiment_check);
+			var experiment_samples = searchExperimentToSamples(experiment_check);
 			var experiment_bool = true;
 			
 			if (document.getElementById('clear_basket').disabled) {
@@ -774,7 +781,7 @@ function manageChecklists(name, type){
 					check.checked = !check.checked;
 				}
 			}
-			if (checklist_lanes.indexOf(lane_check) == -1) {
+			if (checklist_lanes.indexOf(parseInt(lane_check)) == -1) {
 				for(var x = 0; x < lane_samples.length; x++){
 					if (lane_samples[x] == undefined) {
 						lanes_bool = false;
@@ -789,11 +796,11 @@ function manageChecklists(name, type){
 						var check = document.getElementById('lane_checkbox_' + lane_check);
 						check.checked = !check.checked;
 					}
-					checklist_lanes.push(lane_check);
+					checklist_lanes.push(parseInt(lane_check));
 				}
 			}
 			
-			if (checklist_experiment_series.indexOf(experiment_check) == -1) {
+			if (checklist_experiment_series.indexOf(parseInt(experiment_check)) == -1) {
 				for(var x = 0; x < experiment_samples.length; x++){
 					if (experiment_samples[x] == undefined) {
 						experiment_bool = false;
@@ -808,7 +815,7 @@ function manageChecklists(name, type){
 						var check = document.getElementById('experiment_checkbox_' + experiment_check);
 						check.checked = !check.checked;
 					}
-					checklist_experiment_series.push(experiment_check);
+					checklist_experiment_series.push(parseInt(experiment_check));
 				}
 			}
 		}
@@ -817,8 +824,7 @@ function manageChecklists(name, type){
 		if (checklist_experiment_series.indexOf(name) > -1) {
 			//remove
 			checklist_experiment_series.splice(checklist_experiment_series.indexOf(name), 1);
-			var experiment_samples = getSamplesFromExperimentSeries(name);
-			console.log(experiment_samples);
+			var experiment_samples = searchExperimentToSamples(name);
 			for (var y = 0; y < experiment_samples.length; y++){
 				if ( checklist_samples.indexOf( experiment_samples[y] ) > -1 ){
 					manageChecklists(experiment_samples[y], 'sample_checkbox');
@@ -827,8 +833,7 @@ function manageChecklists(name, type){
 		}else{
 			//add
 			checklist_experiment_series.push(name);
-			var experiment_samples = getSamplesFromExperimentSeries(name);
-			console.log(experiment_samples);
+			var experiment_samples = searchExperimentToSamples(name);
 			for (var y = 0; y < experiment_samples.length; y++){
 				if ( checklist_samples.indexOf( experiment_samples[y] ) < 0 ){
 					manageChecklists(experiment_samples[y], 'sample_checkbox');
@@ -840,8 +845,7 @@ function manageChecklists(name, type){
 		if ( checklist_lanes.indexOf( name ) > -1 ){
 			//remove
 			checklist_lanes.splice(checklist_lanes.indexOf(name), 1);
-			var lane_samples = getLanesToSamples(name);
-			
+			var lane_samples = seachLaneToSamples(name);
 			for (var x = 0; x < lane_samples.length; x++) {
 				if ( checklist_samples.indexOf( lane_samples[x] ) > -1 ){
 					manageChecklists(lane_samples[x], 'sample_checkbox');
@@ -852,8 +856,7 @@ function manageChecklists(name, type){
 		{
 			//add
 			checklist_lanes.push(name);
-			var lane_samples = getLanesToSamples(name);
-			
+			var lane_samples = seachLaneToSamples(name);
 			for (var x = 0; x < lane_samples.length; x++) {
 				if (checklist_samples.indexOf(lane_samples[x]) < 0) {
 					manageChecklists(lane_samples[x], 'sample_checkbox');
@@ -865,6 +868,7 @@ function manageChecklists(name, type){
 
 //	Store all ids in tree based JSON
 function generateIDDictionary(experiment_series_data, lane_data, sample_data){
+	STORED_SAMPLE_DATA = sample_data;
 	//	for each es
 	for(var x = 0; x < experiment_series_data.length; x++){
 		temp_lane_dict = [];
@@ -879,9 +883,6 @@ function generateIDDictionary(experiment_series_data, lane_data, sample_data){
 					if (sample_data[z].lane_id == lane_data[y].id) {
 						//	push to sample var
 						temp_sample_dict.push(sample_data[z].id);
-						//	remove sample for faster querying
-						console.log(z);
-						sample_data.splice(z-1, 1);
 					}
 				}
 				//	store in temp lane var
@@ -914,7 +915,7 @@ function searchIDDictionary(sample){
 			}
 		}
 	}
-	return ["", ""];
+	return undefined;
 }
 
 //	Search JSON dictionary for samples for a given lane id
@@ -923,18 +924,34 @@ function seachLaneToSamples(lane){
 	var es_keys = Object.keys(ID_DICTIONARY);
 	//	For each es key
 	for(var es_key in es_keys){
-		//	Grab lane ids
-		var lane_keys = Object.keys(ID_DICTIONARY[es_keys[es_key]][lane]);
-		//	For each lane id
-		for(lane_key in lane_keys){
-			//	if lane array contains sample
-			if (ID_DICTIONARY[es_keys[es_key]][lane][lane_keys[lane_key]] != undefined) {
+		//	For each es, find position of lane id
+		for(var x = 0; x < ID_DICTIONARY[es_keys[es_key]].length; x++){
+			//	Grab lane ids
+			var lane_keys = Object.keys(ID_DICTIONARY[es_keys[es_key]][x]);
+			//	For each lane id
+			if (ID_DICTIONARY[es_keys[es_key]][x][lane] != undefined) {
 				//	Return ids
-				return ID_DICTIONARY[es_keys[es_key]][lane][lane_keys[lane_key]];
+				return ID_DICTIONARY[es_keys[es_key]][x][lane];
 			}
 		}
 	}
-	return undefined;
+	return [];
+}
+
+function searchExperimentToSamples(experiment){
+	var combined_samples = [];
+	//	For the lanes within the es
+	for(var x = 0; x < ID_DICTIONARY[experiment].length; x++){
+		//	grab each lane id
+		var lane_keys = Object.keys(ID_DICTIONARY[experiment][x]);
+		//	for each id
+		for(var lane_key in lane_keys){
+			for(var y = 0; y < ID_DICTIONARY[experiment][x][lane_keys[lane_key]].length; y++){
+				combined_samples.push(ID_DICTIONARY[experiment][x][lane_keys[lane_key]][y]);
+			}
+		}
+	}
+	return combined_samples;
 }
 
 function reloadBasket(){
@@ -951,23 +968,25 @@ function reloadBasket(){
 }
 
 function addToDolphinBasket(sampleID){
-	var sample_info = getSingleSample(sampleID);
-	var sample_name = '';
+	var sample_info = storedSampleSearch(sampleID);
 	var table = $('#dolphin_basket').dataTable();
-
-	if (sample_info[1] != '' && sample_info[1] != 'null' && sample_info[1] != null) {
-		sample_name = sample_info[1];
-	}else{
-		sample_name = sample_info[2];
-	}
 	
 	if (table != null) {
 		table.fnAddData([
 			sampleID,
-			sample_name,
+			sample_info.samplename,
 			'<button id="remove_basket_'+sampleID+'" class="btn btn-danger btn-xs pull-right" onclick="manageChecklists(\''+sampleID+'\', \'sample_checkbox\')"><i class="fa fa-times"></i></button>'
 		])
 	}
+}
+
+function storedSampleSearch(sample){
+	for(var x = 0; x < STORED_SAMPLE_DATA.length; x++){
+		if (STORED_SAMPLE_DATA[x].id == sample) {
+			return STORED_SAMPLE_DATA[x];
+		}
+	}
+	return [];
 }
 
 function removeFromDolphinBasket(sampleID){
@@ -984,11 +1003,7 @@ function removeFromDolphinBasket(sampleID){
 	}else{
 		table.fnClearTable();
 	}
-	removeBasketInfo(name);
-	/*
-	var tblrow = document.getElementById(sampleID);
-	tblrow.parentNode.removeChild(tblrow);
-	*/
+	removeBasketInfo(sampleID);
 }
 
 function clearBasket(){
@@ -998,14 +1013,12 @@ function clearBasket(){
 	flushBasketInfo();
 }
 
-/*
- *	Used for datatables, discontinued
- */
 function checkOffAllSamples(){
 	var hrefSplit = window.location.href.split("/");
 	var searchLoc = $.inArray('search', hrefSplit);
+	var samplesCheck = $.inArray('samples', hrefSplit);
 
-	if (searchLoc != -1) {
+	if (searchLoc != -1 && samplesCheck == -1) {
 		var pagination = document.getElementById('st_pagination_samples');
 		var pagination_ul = pagination.childNodes;
 		var pagination_li = pagination_ul[0].childNodes;
@@ -1015,14 +1028,14 @@ function checkOffAllSamples(){
 	}
 }
 
-/*
- *	Used for datatables, discontinued
- */
 function checkOffAllLanes(){
 	var hrefSplit = window.location.href.split("/");
 	var searchLoc = $.inArray('search', hrefSplit);
+	var experimentsCheck = $.inArray('experiments', hrefSplit);
+	var samplesCheck = $.inArray('samples', hrefSplit);
+	
 
-	if (searchLoc != -1) {
+	if (searchLoc != -1 && experimentsCheck == -1 && samplesCheck == -1) {
 		var pagination = document.getElementById('st_pagination_lanes');
 		var pagination_ul = pagination.childNodes;
 		pagination_ul[0].setAttribute('onClick', 'checkCheckedLanes()');
@@ -1049,9 +1062,10 @@ function getValidSamples(lane_samples){
 
 function checkCheckedList(){
 	var allSamples = getAllSampleIds();
+	console.log(allSamples);
 	for (var x = 0; x < allSamples.length; x++){
 		if ( document.getElementById('sample_checkbox_' + allSamples[x]) != null) {
-			if (checklist_samples.indexOf(allSamples[x]) > -1) {
+			if (checklist_samples.indexOf(parseInt(allSamples[x])) > -1 || checklist_samples.indexOf(allSamples[x]) > -1) {
 				document.getElementById('sample_checkbox_' + allSamples[x]).setAttribute('checked', 'true');
 			}else{
 				document.getElementById('sample_checkbox_' + allSamples[x]).removeAttribute('checked');
@@ -1065,10 +1079,23 @@ function checkCheckedLanes(){
 	var allLanes = getAllLaneIds();
 	for (var x = 0; x < allLanes.length; x++){
 		if ( document.getElementById('lane_checkbox_' + allLanes[x]) != null) {
-			if (checklist_lanes.indexOf(allLanes[x]) > -1) {
+			if (checklist_lanes.indexOf(parseInt(allLanes[x])) > -1 || checklist_lanes.indexOf(allLanes[x]) > -1) {
 				document.getElementById('lane_checkbox_' + allLanes[x]).setAttribute('checked', 'true');
 			}else{
 				document.getElementById('lane_checkbox_' + allLanes[x]).removeAttribute('checked');
+			}
+		}
+	}
+}
+
+function checkCheckedExperiments(){
+	var allExperiments = getAllExperimentIds();
+	for (var x = 0; x < allExperiments.length; x++){
+		if ( document.getElementById('experiment_checkbox_' + allExperiments[x]) != null) {
+			if (checklist_experiment_series.indexOf(parseInt(allExperiments[x])) > -1 || checklist_experiment_series.indexOf(allExperiments[x]) > -1) {
+				document.getElementById('experiment_checkbox_' + allExperiments[x]).setAttribute('checked', 'true');
+			}else{
+				document.getElementById('experiment_checkbox_' + allExperiments[x]).removeAttribute('checked');
 			}
 		}
 	}

@@ -42,7 +42,7 @@ else if ($p == "removeBasketInfo")
 		$current_basket = $_SESSION['basket'];
 		$basket_array = explode(",", $current_basket);
 		$key = array_search($id, $basket_array);
-		array_splice($basket_array, $key, 1);
+		unset($basket_array[$key]);
 		if(!empty($basket_array)){
 			$_SESSION['basket'] = implode(",", $basket_array);
 		}else{
@@ -117,6 +117,23 @@ else if ($p == 'getPlotToggle')
 		echo $_SESSION['plot_file'];
 	}else{
 		echo '';
+	}
+}
+else if ($p == 'getRunType')
+{
+	if(isset($_SESSION['run_type'])){
+		echo $_SESSION['run_type'];
+	}else{
+		echo 0;
+	}
+}
+else if ($p == 'changeRunType')
+{
+	if (isset($_GET['run_type'])){$run_type = $_GET['run_type'];}
+	if(isset($run_type)){
+		$_SESSION['run_type'] = intval($run_type);
+	}else{
+		$_SESSION['run_type'] = 0;
 	}
 }
 

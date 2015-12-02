@@ -18,6 +18,7 @@ $uid = "";
 $gids = "";
 $perms = "";
 $andPerms = "";
+$run_type = "";
 
 //	Grab passed variables
 if (isset($_GET['p'])){$p = $_GET['p'];}
@@ -70,12 +71,19 @@ else { $q = strtolower($q); }
 
 if ($p == 'getStatus')	//	Status tables
 {
+	if($_SESSION['run_type'] == 1){
+		$run_type = "WHERE run_name = 'Fastlane Initial Run' OR run_name = 'Import Initial Run' " . $andPerms;
+	}else if ($_SESSION['run_type'] == 2){
+		$run_type = "WHERE run_name != 'Fastlane Initial Run' AND run_name != 'Import Initial Run' " . $andPerms;
+	}else{
+		$run_type = $perms;
+	}
 	$time="";
 	if (isset($start)){$time="and `date_created`>='$start' and `date_created`<='$end'";}
 	$data=$query->queryTable("
 	SELECT id, run_group_id, run_name, wkey, outdir, run_description, run_status, owner_id, group_id
 	FROM ngs_runparams
-	$perms $time
+	$run_type $time
 	");
 }
 else if ($p == "getSelectedSamples")	//	Selected samples table

@@ -28,6 +28,7 @@ else if ($p == 'getTableRuns')
 	LEFT JOIN ngs_runparams
 	ON ngs_runlist.run_id = ngs_runparams.id
 	WHERE sample_id IN ( $search )
+	AND wkey != 'NULL'
 	AND run_name NOT LIKE '%Initial Run%'
     ");
 }
@@ -60,6 +61,7 @@ else if ($p == 'samplesWithRuns')
 		FROM biocore.ngs_runparams
 		LEFT JOIN report_list
 		ON ngs_runparams.wkey = report_list.wkey
+		WHERE ngs_runparams.wkey != 'NULL'
 		"));
 	$run_ids = array();
 	foreach($run_ids_json as $rij){
