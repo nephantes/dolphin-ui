@@ -601,15 +601,15 @@ $(function() {
 					var samples_with_runs = [];
 					var objects_with_runs = [];
 					$.ajax({ type: "GET",
-							url: BASE_PATH+"/public/ajax/tablegenerator.php",
-							data: { p: "samplesWithRuns" },
-							async: false,
-							success : function(k)
-							{
-								for(var x = 0; x < k.length; x++){
-									samples_with_runs.push(k[x].sample_id);
-								}
+						url: BASE_PATH+"/public/ajax/tablegenerator.php",
+						data: { p: "samplesWithRuns" },
+						async: false,
+						success : function(k)
+						{
+							for(var x = 0; x < k.length; x++){
+								samples_with_runs.push(k[x].sample_id);
 							}
+						}
 					});
 					for(var z = 0; z < s.length; z++){
 						if (samples_with_runs.indexOf(s[z].id) > -1) {
