@@ -30,8 +30,8 @@ if (isset($_GET['uid'])){$uid = $_GET['uid'];}
 if (isset($_GET['gids'])){$gids = $_GET['gids'];}
 //	Create permissions statements
 if($uid != "" && $gids != ""){
-    $perms = "WHERE (((group_id in ($gids)) AND (perms >= 15)) OR (owner_id = $uid))";
-    $andPerms = "AND (((group_id in ($gids)) AND (perms >= 15)) OR (owner_id = $uid))";
+    $perms = "WHERE (((group_id in ($gids)) AND (perms >= 15)) OR (owner_id = $uid) OR (perms >= 32))";
+    $andPerms = "AND (((group_id in ($gids)) AND (perms >= 15)) OR (owner_id = $uid) OR (perms >= 32))";
 }
 //	inner join for samples table
 $innerJoin = "LEFT JOIN ngs_source
@@ -72,9 +72,9 @@ else { $q = strtolower($q); }
 if ($p == 'getStatus')	//	Status tables
 {
 	if($_SESSION['run_type'] == 1){
-		$run_type = "WHERE run_name = 'Fastlane Initial Run' OR run_name = 'Import Initial Run' " . $andPerms;
+		$run_type = "WHERE ((run_name = 'Fastlane Initial Run') OR (run_name = 'Import Initial Run')) " . $andPerms;
 	}else if ($_SESSION['run_type'] == 2){
-		$run_type = "WHERE run_name != 'Fastlane Initial Run' AND run_name != 'Import Initial Run' " . $andPerms;
+		$run_type = "WHERE ((run_name != 'Fastlane Initial Run') AND (run_name != 'Import Initial Run')) " . $andPerms;
 	}else{
 		$run_type = $perms;
 	}
