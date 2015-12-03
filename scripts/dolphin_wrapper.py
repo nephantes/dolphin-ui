@@ -252,7 +252,10 @@ class Dolphin:
             arr=re.split(r'[:]', self.parse_content(i))
             index=self.parse_content(arr[0])
             name=self.parse_content(self.replace_space(arr[1]))
-            mapnames=str(mapnames)+name+":"+index+","
+            if (mapnames!=""):
+               mapnames=mapnames+","+name+":"+index
+            else:
+               mapnames=name+":"+index
             bowtie_params=self.parse_content(self.replace_space(arr[2]))
             description=self.parse_content(self.replace_space(arr[3]))
             filter_out=arr[4]
