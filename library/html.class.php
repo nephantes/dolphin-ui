@@ -534,7 +534,7 @@ e range"><i class="fa fa-calendar"></i></button>
 				<table class="table table-hover table-striped table-condensed">';
 				$html.='<thead><tr><th>Processed File(s) Directory:</th></tr></thead>
 						<tbody>';
-				$html.='<tr><td onclick="editBox( '.$_SESSION['uid'].', '. $fastq_files[0]['dir_id'].', \'fastq_dir\', \'ngs_dirs\', this)">'.$fastq_files[0]['fastq_dir'].'</td></tr>
+				$html.='<tr><td onclick="editBox( '.$_SESSION['uid'].', '. $fastq_files[0]['dir_id'].', \'backup_dir\', \'ngs_dirs\', this)">'.$fastq_files[0]['backup_dir'].'</td></tr>
 						</tbody>';
 				$html.='<thead><tr><th>Processed File(s):</th></tr></thead>
 						<tbody>';
