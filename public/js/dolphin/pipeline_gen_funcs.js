@@ -654,10 +654,12 @@ function submitPipeline(type) {
 		}else if(customSeqSetCheck[1].indexOf(true) > -1){
 			var custom_error = "";
 			for(var k = 0; k < customSeqSetCheck[1].length; k++){
-				if (k == 0) {
-					custom_error += customSeqSetCheck[0].split(",")[k+1].split(":")[1].split('"')[1]+'<br><br>';
-				}else{
-					custom_error += customSeqSetCheck[0].split(",")[k+1].split(":")[0].split('"')[1]+'<br><br>';
+				if (customSeqSetCheck[1][k] == true) {
+					if (k == 0) {
+						custom_error += customSeqSetCheck[0].split(",")[k+1].split(":")[1].split('"')[1]+'<br><br>';
+					}else{
+						custom_error += customSeqSetCheck[0].split(",")[k+1].split(":")[0].split('"')[1]+'<br><br>';
+					}
 				}
 			}
 			$('#errorModal').modal({
@@ -1552,12 +1554,12 @@ function findCustomSequenceSets(previous){
 							}
 						});
 					}
-					if (file_check_results_1.result == "Ok") {
+					if (file_check_results_1.Result == "Ok") {
 						file_check_array.push(false);
 						var temp_file = file_check_1.split(".");
 						temp_file.pop();
 						pipeJSON+= temp_file.join(".");
-					}else if (file_check_results_2 == "Ok") {
+					}else if (file_check_results_2.Result == "Ok") {
 						file_check_array.push(false);
 						pipeJSON+= e.value;
 					}else{
