@@ -11,7 +11,7 @@ if (isset($_GET['run_id'])){$id = $_GET['run_id'];}
 $query = new dbfuncs();
 
 if($p == 'getStdOut'){
-	$data = array_slice(str_replace("\n", "<br>", file('../../tmp/logs/run'.$id.'/run.'.$id.'.wrapper.std')), -20);	
+	$data = array_slice(str_replace("\n", "<br>", file('../../tmp/logs/run'.$id.'/run.'.$id.'.wrapper.std')), -21);	
 }else if($p == 'checkQueued'){
 	$data = [];
 	$pids = json_decode($query->queryTable("
