@@ -27,6 +27,7 @@ var currentPipelineVal =[];
 var rsemSwitch = false;
 var deseqList = ['RSEM'];
 var valid_samples;
+var username;
 
 /*##### FILL A RERUN PIPELINE WITH PREVIOUS SELECTIONS #####*/
 function rerunLoad() {
@@ -480,6 +481,18 @@ function submitPipeline(type) {
 		document.getElementById('errorLabel').innerHTML ='The following fields may not be empty for submission:';
 		document.getElementById('errorAreas').innerHTML = empty_values.join(", ");
 	}else{
+		//	get Username
+		$.ajax({
+			type: 	'GET',
+			url: 	BASE_PATH+'/public/ajax/ngsfastlanedb.php',
+			data:  	{ p: 'getClusterName' },
+			async:	false,
+			success: function(s)
+			{
+				username = JSON.parse(s)[0];
+			}
+		});
+		
 		//Expanding
 		var doAdapter = findRadioChecked("adapter");
 		var doQuality = findRadioChecked("quality");
@@ -585,23 +598,12 @@ function submitPipeline(type) {
 		}else{
 			json = json + ',"commonind":"none"'
 		}
-		var customSeqSet = findCustomSequenceSets(previous);
+		var customSeqSetCheck = findCustomSequenceSets(previous);
+		var customSeqSet = customSeqSetCheck[0];
 		json = json + customSeqSet;
 		json = json + pipelines + '}'
 		//end json construction
 		
-		//	get Username
-		var username;
-		$.ajax({
-			type: 	'GET',
-			url: 	BASE_PATH+'/public/ajax/ngsfastlanedb.php',
-			data:  	{ p: 'getClusterName' },
-			async:	false,
-			success: function(s)
-			{
-				username = JSON.parse(s)[0];
-			}
-		});
 		//	Directory Checks
 		var dir_check_1;
 		$.ajax({
@@ -648,6 +650,20 @@ function submitPipeline(type) {
 			});
 			document.getElementById('errorLabel').innerHTML ='You do not have permissions for the directory:<br><br>'+outputdir+'<br><br>Or you do not have cluster permissions.' +
 				'<br>Please visit <a href="http://umassmed.edu/biocore/resources/galaxy-group/">this website</a> for more help.';
+			document.getElementById('errorAreas').innerHTML = '';
+		}else if(customSeqSetCheck[1].indexOf(true) > -1){
+			var custom_error = "";
+			for(var k = 0; k < customSeqSetCheck[1].length; k++){
+				if (k == 0) {
+					custom_error += customSeqSetCheck[0].split(",")[k+1].split(":")[1].split('"')[1]+'<br><br>';
+				}else{
+					custom_error += customSeqSetCheck[0].split(",")[k+1].split(":")[0].split('"')[1]+'<br><br>';
+				}
+			}
+			$('#errorModal').modal({
+				show: true
+			});
+			document.getElementById('errorLabel').innerHTML ='You do not have permissions or the file does not exist for the File:<br><br>'+custom_error
 			document.getElementById('errorAreas').innerHTML = '';
 		}else{
 			//insert new values into ngs_runparams
@@ -1485,39 +1501,83 @@ function findPipelineValues(){
 function findCustomSequenceSets(previous){
 	var pipeJSON = '';
 	var placeholdName = '';
+	var file_check_bool = false;
 	if (customSeqNumCheck.length > 0) {
-	//start json str
-	pipeJSON = ',"custom":["';
+		//start json str
+		pipeJSON = ',"custom":["';
 	}
 	for (var y = 0; y < customSeqNumCheck.length; y++){
-	var masterDiv = document.getElementById('custom_seq_inner_'+customSeqNumCheck[y]).getElementsByTagName('*');
-	for (var x = 0; x < masterDiv.length - 1; x++){
-		var e = masterDiv[x];
-		if (e.id == 'custom_5_'+customSeqNumCheck[y]) {
-		if (e.value == 'yes') {
-			pipeJSON+= ':1';
+		var masterDiv = document.getElementById('custom_seq_inner_'+customSeqNumCheck[y]).getElementsByTagName('*');
+		for (var x = 0; x < masterDiv.length - 1; x++){
+			var e = masterDiv[x];
+			if (e.id == 'custom_5_'+customSeqNumCheck[y]) {
+				if (e.value == 'yes') {
+					pipeJSON+= ':1';
+				}else{
+					pipeJSON+= ':0';
+				}
+			}else if (e.type != undefined) {
+				if (x == 2) {
+					var file_check_1 = "";
+					var file_check_2 = "";
+					var file_check_results_1 = [];
+					var file_check_results_2 = [];
+					if (e.value.indexOf(".fasta") > -1 || e.value.indexOf(".fa") > -1) {
+						var file_check_1 = e.value;
+					}else{
+						var file_check_1 = e.value + ".fasta";
+						var file_check_2 = e.value + ".fa";
+					}
+					if (file_check_1 != "") {
+						$.ajax({
+							type: 	'GET',
+							url: 	API_PATH+'/public/api/service.php?func=checkFile&username='+username.clusteruser+'&file=' + file_check_1,
+							async:	false,
+							success: function(s)
+							{
+								file_check_results_1 = JSON.parse(s);
+								console.log(file_check_results_1);
+							}
+						});
+					}
+					if (file_check_2 != "") {
+						$.ajax({
+							type: 	'GET',
+							url: 	API_PATH+'/public/api/service.php?func=checkFile&username='+username.clusteruser+'&file=' + file_check_2,
+							async:	false,
+							success: function(s)
+							{
+								file_check_results_2 = JSON.parse(s);
+								console.log(file_check_results_2);
+							}
+						});
+					}
+					if (file_check_results_1.result == "Ok") {
+						var temp_file = file_check_1.split(".");
+						temp_file.pop();
+						pipeJSON+= temp_file.join(".");
+					}else if (file_check_results_2 == "Ok") {
+						pipeJSON+= e.value;
+					}else{
+						file_check_bool = true;
+						pipeJSON+= e.value;
+					}
+				}else{
+					pipeJSON+= ':' + e.value;
+				}
+				if (x == 5) {
+					placeholdName = e.value;
+				}
+			}
+		}
+		if (customSeqNumCheck[y] == customSeqNumCheck[customSeqNumCheck.length - 1]) {
+			pipeJSON += ':' + previous + '"]';
 		}else{
-			pipeJSON+= ':0';
-		}
-		}else if (e.type != undefined) {
-		if (x == 2) {
-			pipeJSON+= e.value;
-		}else{
-			pipeJSON+= ':' + e.value;
-		}
-		if (x == 5) {
-			placeholdName = e.value;
-		}
+			pipeJSON += ':' + previous + '","';
+			previous = placeholdName;
 		}
 	}
-	if (customSeqNumCheck[y] == customSeqNumCheck[customSeqNumCheck.length - 1]) {
-		pipeJSON += ':' + previous + '"]';
-	}else{
-		pipeJSON += ':' + previous + '","';
-		previous = placeholdName;
-	}
-	}
-	return pipeJSON;
+	return [pipeJSON, file_check_bool];
 }
 
 function sequenceSetsBtn(){
@@ -1530,7 +1590,7 @@ function sequenceSetsBtn(){
 	var babyDiv4 = createElement('div', [], []);
 	var babyDiv5 = createElement('div', [], []);
 
-	babyDiv1.appendChild(createElement('label', ['class','TEXTNODE'], ['box-title', 'Custom sequence index file (full path)']));
+	babyDiv1.appendChild(createElement('label', ['class','TEXTNODE'], ['box-title', 'Custom sequence index file (full path + file prefix)']));
 	babyDiv1.appendChild(createElement('input', ['id', 'class', 'type', 'value'], ['custom_1_'+customSeqNum, 'form-control', 'text', '']));
 	innerDiv.appendChild(babyDiv1);
 
@@ -1539,7 +1599,7 @@ function sequenceSetsBtn(){
 	innerDiv.appendChild(babyDiv2);
 
 	babyDiv3.appendChild(createElement('label', ['class','TEXTNODE'], ['box-title', 'Bowtie parameters']));
-	babyDiv3.appendChild(createElement('input', ['id', 'class', 'type', 'value'], ['custom_3_'+customSeqNum, 'form-control', 'text', '']));
+	babyDiv3.appendChild(createElement('input', ['id', 'class', 'type', 'value'], ['custom_3_'+customSeqNum, 'form-control', 'text', '-N 1']));
 	innerDiv.appendChild(babyDiv3);
 
 	babyDiv4.appendChild(createElement('label', ['class','TEXTNODE'], ['box-title', 'Description']));

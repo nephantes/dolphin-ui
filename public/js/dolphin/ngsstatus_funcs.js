@@ -76,7 +76,7 @@ function selectJob(id){
 }
 
 function errorOutModal(run_id, wkey){
-	var obtained_log;
+	var obtained_log = "";
 	$.ajax({ type: "GET",
 		url: BASE_PATH +"/public/ajax/dataerrorlogs.php",
 		data: { p: 'getStdOut', run_id: run_id },
