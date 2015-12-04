@@ -1501,7 +1501,7 @@ function findPipelineValues(){
 function findCustomSequenceSets(previous){
 	var pipeJSON = '';
 	var placeholdName = '';
-	var file_check_bool = false;
+	var file_check_array = [];
 	if (customSeqNumCheck.length > 0) {
 		//start json str
 		pipeJSON = ',"custom":["';
@@ -1553,13 +1553,15 @@ function findCustomSequenceSets(previous){
 						});
 					}
 					if (file_check_results_1.result == "Ok") {
+						file_check_array.push(false);
 						var temp_file = file_check_1.split(".");
 						temp_file.pop();
 						pipeJSON+= temp_file.join(".");
 					}else if (file_check_results_2 == "Ok") {
+						file_check_array.push(false);
 						pipeJSON+= e.value;
 					}else{
-						file_check_bool = true;
+						file_check_array.push(true);
 						pipeJSON+= e.value;
 					}
 				}else{
@@ -1577,7 +1579,7 @@ function findCustomSequenceSets(previous){
 			previous = placeholdName;
 		}
 	}
-	return [pipeJSON, file_check_bool];
+	return [pipeJSON, file_check_array];
 }
 
 function sequenceSetsBtn(){
