@@ -42,7 +42,7 @@ else if($p == 'checkPerms')
 	if (isset($_GET['table'])){$table = $_GET['table'];}
 	
 	$owner_id = json_decode($query->queryTable("SELECT owner_id FROM $table WHERE id = $id"));
-	if($owner_id[0]->owner_id == $uid){
+	if($owner_id[0]->owner_id == $uid || $_SESSION['uid'] == 1){
 		$data = 1;
 	}else{
 		$data = 0;
@@ -56,17 +56,17 @@ else if($p == 'getDropdownValues')
 else if ($p == 'getExperimentPermissions')
 {
 	if (isset($_GET['experiments'])){$experiments = $_GET['experiments'];}
-	$data=$query->queryTable("SELECT id FROM ngs_experiment_series WHERE id IN ($experiments) AND owner_id = ".$_SESSION['uid']);
+	$data=$query->queryTable("SELECT id FROM ngs_experiment_series WHERE id IN ($experiments) AND (owner_id = ".$_SESSION['uid']." OR 1 = ".$_SESSION['uid'].")");
 }
 else if($p == 'getLanePermissions')
 {
 	if (isset($_GET['lanes'])){$lanes = $_GET['lanes'];}
-	$data=$query->queryTable("SELECT id FROM ngs_lanes WHERE id IN ($lanes) AND owner_id = ".$_SESSION['uid']);
+	$data=$query->queryTable("SELECT id FROM ngs_lanes WHERE id IN ($lanes) AND (owner_id = ".$_SESSION['uid']." OR 1 = ".$_SESSION['uid'].")");
 }
 else if($p == 'getSamplePermissions')
 {
 	if (isset($_GET['samples'])){$samples = $_GET['samples'];}
-	$data=$query->queryTable("SELECT id FROM ngs_samples WHERE id IN ($samples) AND owner_id = ".$_SESSION['uid']);
+	$data=$query->queryTable("SELECT id FROM ngs_samples WHERE id IN ($samples) AND (owner_id = ".$_SESSION['uid']." OR 1 = ".$_SESSION['uid'].")");
 }
 else if($p == 'deleteSelected')
 {

@@ -1229,7 +1229,7 @@ function confirmOwnerPressed(){
 	console.log(document.querySelector("select").selectedOptions[0].value);
 	$.ajax({ type: "GET",
 		url: BASE_PATH+"/public/ajax/ngsquerydb.php",
-		data: { p: 'changeOwnerExperiement', owner_id: document.querySelector("select").selectedOptions[0].value, experiment: checklist_experiment_series.toString() },
+		data: { p: 'changeOwnerExperiment', owner_id: document.querySelector("select").selectedOptions[0].value, experiment: checklist_experiment_series.toString() },
 		async: false,
 		success : function(s)
 		{
