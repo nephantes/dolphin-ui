@@ -1309,9 +1309,9 @@ function initialRunTest(){
 			show: true
 		});
 		
-		var spliced_samples = checklist_samples;
+		var spliced_samples = checklist_samples.splice(0);
 		for(var x = 0; x < valid_samples.length; x++){
-			var loc = spliced_samples.indexOf(valid_samples[x]);
+			var loc = spliced_samples.indexOf(parseInt(valid_samples[x]));
 			spliced_samples.splice(loc, 1);
 		}
 		
