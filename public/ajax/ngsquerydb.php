@@ -18,9 +18,9 @@ if (isset($_GET['p'])){$p = $_GET['p'];}
 
 if (isset($_GET['uid'])){$uid = $_GET['uid'];}
 if (isset($_GET['gids'])){$gids = $_GET['gids'];}
-if($uid != "" && $gids != "" || $_SESSION['uid'] != 1 || $_SESSION['uid'] != 205){
-    $perms = "WHERE (((group_id in ($gids)) AND (perms >= 15)) OR (owner_id = $uid))";
-    $andPerms = "AND (((group_id in ($gids)) AND (perms >= 15)) OR (owner_id = $uid))";
+if($uid != "" && $gids != "" && $_SESSION['uid'] != 1){
+    $perms = "WHERE (((group_id in ($gids)) AND (perms >= 15)) OR (owner_id = $uid) OR (perms >= 32))";
+    $andPerms = "AND (((group_id in ($gids)) AND (perms >= 15)) OR (owner_id = $uid) OR (perms >= 32))";
 }
 
 $innerJoin = "LEFT JOIN ngs_source

@@ -128,6 +128,7 @@ function getAllSampleIds(){
 		async: false,
 		success : function(s)
 		{
+			console.log(s);
 			for(var x = 0; x < s.length; x++){
 				samples_returned.push(s[x].id);
 			}
