@@ -242,22 +242,22 @@ function deletePermsModal(){
 				}
 			}
 	});
-	
+	console.log(experimentPerms);
 	var badExperiments = [];
 	var badLanes = [];
 	var badSamples = [];
 	for (var q = 0; q < checklist_experiment_series.length; q++) {
-		if (experimentPerms.indexOf(checklist_experiment_series[q]) == -1) {
+		if (experimentPerms.indexOf(checklist_experiment_series[q].toString()) == -1) {
 			badExperiments.push(checklist_experiment_series[q]);
 		}
 	}
 	for (var q = 0; q < checklist_lanes.length; q++) {
-		if (lanePerms.indexOf(checklist_lanes[q]) == -1) {
+		if (lanePerms.indexOf(checklist_lanes[q].toString()) == -1) {
 			badLanes.push(checklist_lanes[q]);
 		}
 	}
 	for (var q = 0; q < checklist_samples.length; q++) {
-		if (samplePerms.indexOf(checklist_samples[q]) == -1) {
+		if (samplePerms.indexOf(checklist_samples[q].toString()) == -1) {
 			badSamples.push(checklist_samples[q]);
 		}
 	}
