@@ -1310,15 +1310,19 @@ function initialRunTest(){
 		});
 		
 		var spliced_samples = checklist_samples.splice(0);
+		var not_present_samples = [];
 		for(var x = 0; x < valid_samples.length; x++){
 			var loc = spliced_samples.indexOf(parseInt(valid_samples[x]));
-			spliced_samples.splice(loc, 1);
+			if (loc == -1) {
+				not_present_samples.push(valid_samples[x]);
+			}
+			
 		}
 		
 		document.getElementById('myModalLabel').innerHTML = 'Selection error';
 		document.getElementById('deleteLabel').innerHTML ='Some samples/imports selected have not finished their initial processing.';
 		document.getElementById('deleteAreas').innerHTML = 'You cannot use these sample(s) within the pipeline until they finish their initial processing:' +
-			'<br><br>Sample id(s): ' + spliced_samples.join(", ");
+			'<br><br>Sample id(s): ' + not_present_samples.join(", ");
 			
 		document.getElementById('cancelDeleteButton').innerHTML = "OK";
 		document.getElementById('confirmDeleteButton').setAttribute('style', 'display:none');
