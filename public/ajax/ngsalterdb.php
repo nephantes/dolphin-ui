@@ -9,9 +9,14 @@ require_once("../../includes/dbfuncs.php");
 $query = new dbfuncs();
 //header
 
-function runCmd($idKey, $query)
+function runCmd($idKey, $query, $wkey)
 {
-    $cmd = "cd ../../scripts && mkdir -p ../tmp/logs/run$idKey && python dolphin_wrapper.py -r $idKey -c ".CONFIG.">> ../tmp/logs/run$idKey/run.$idKey.wrapper.std 2>&1 & echo $! &";
+	$wkeystr="";
+	if ($wkey!="")
+	{
+		$wkeystr = "-w $wkey";
+	}
+    $cmd = "cd ../../scripts && mkdir -p ../tmp/logs/run$idKey && python dolphin_wrapper.py $wkeystr -r $idKey -c ".CONFIG.">> ../tmp/logs/run$idKey/run.$idKey.wrapper.std 2>&1 & echo $! &";
     $PID_COMMAND = popen( $cmd, "r" );
     $PID =fread($PID_COMMAND, 2096);
     $data=$query->runSQL("
@@ -24,12 +29,13 @@ function runCmd($idKey, $query)
 
 function killPid($run_id, $query)
 {
-	$pids = json_decode($query->queryTable("SELECT wrapper_pid, runworkflow_pid
+	$pids = json_decode($query->queryTable("SELECT wkey, wrapper_pid, runworkflow_pid
 							   FROM ngs_runparams
 							   WHERE id = $run_id"));
 	
 	$workflow_pid = $pids[0]->runworkflow_pid;
 	$wrapper_pid = $pids[0]->wrapper_pid;
+	$wkey = $pids[0]->wkey;
 
 	if($workflow_pid != NULL && $wrapper_pid != NULL){
         $grep_check_workflow = "ps -ef | grep '[".substr($workflow_pid, 0, 1)."]".substr($workflow_pid,1)."'";
@@ -48,6 +54,7 @@ function killPid($run_id, $query)
 	if($grep_find_wrapper > 0 && $grep_find_wrapper != NULL){
 		pclose(popen( "kill -9 $wrapper_pid", "r" ) );
 	}
+	return $wkey;
 }
 
 if (isset($_POST['p'])){$p = $_POST['p'];}
@@ -70,10 +77,11 @@ if ($p == "submitPipeline" )
     $outdir_check = $query->queryAVal("SELECT outdir FROM ngs_runparams WHERE outdir = '$outdir'");
     
     if($outdir_check == $outdir){
-        $idKey=$query->queryAVal("SELECT id FROM ngs_runparams WHERE outdir = '$outdir' limit 1");
-        $wrapper_pid=$query->queryAVal("SELECT wrapper_pid FROM ngs_runparams WHERE outdir = '$outdir'");
-        $workflow_pid=$query->queryAVal("SELECT runworkflow_pid FROM ngs_runparams WHERE outdir = '$outdir'");
-        $wkey=$query->queryAVal("SELECT wkey FROM ngs_runparams WHERE outdir = '$outdir'");
+		$table=queryTable("SELECT id,wrapper_pid,runworkflow_pid,wkey FROM ngs_runparams WHERE outdir = '$outdir' limit 1");
+        $idKey=$table[0]->id;
+        $wrapper_pid=$table[0]->wrapper_pid;
+        $workflow_pid=$table[0]->runworkflow_pid;
+        $wkey=$table[0]->wkey;
         
         killPid($idKey, $query);
         $data=$query->runSQL("
@@ -99,7 +107,7 @@ if ($p == "submitPipeline" )
         last_modified_user = $uid
         WHERE id = '$idKey'
         ");
-        runCmd($idKey, $query);
+        runCmd($idKey, $query, $wkey);
         $data=$idKey;
     }else{
         //run_group_id set to -1 as a placeholder.Cannot grab primary key as it's being made, so a placeholder is needed.
@@ -110,7 +118,8 @@ if ($p == "submitPipeline" )
         $uid, $group, $perms, now(), now(), $uid)");
         //need to grab the id for runlist insertion
         $idKey=$query->queryAVal("SELECT id FROM ngs_runparams WHERE run_group_id = -1 and run_name = '$name' order by id desc limit 1");
-        runCmd($idKey, $query);
+        $wkey="";
+		runCmd($idKey, $query, $wkey);
         //update required to make run_group_id equal to it's primary key "id".Replace the arbitrary -1 with the id
         if( $runGroupID == 'new'){
             $data=$query->runSQL("UPDATE ngs_runparams SET run_group_id = id WHERE run_group_id = -1");
@@ -155,7 +164,7 @@ else if ($p == 'noAddedParamsRerun')
 {
     if (isset($_POST['run_id'])){$run_id = $_POST['run_id'];}
     
-    killPid($run_id, $query);
+    $wkey=killPid($run_id, $query);
     
     $data=$query->runSQL("
 	UPDATE ngs_runparams
@@ -165,7 +174,7 @@ else if ($p == 'noAddedParamsRerun')
     WHERE id = $run_id
     ");
     
-    runCmd($run_id, $query);  
+    runCmd($run_id, $query, $wkey);  
 }
 else if($p == 'updateProfile')
 {

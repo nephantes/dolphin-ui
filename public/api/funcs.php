@@ -37,21 +37,23 @@ class funcs
     }
     function setCMDs()
     { 
-        if($this->schedular = "LSF")
+        if($this->schedular == "LSF")
         {
             $this->checkjob_cmd = $this->getSSH() . " \"" . $this->jobstatus . " $this->job_num\"|grep " . $this->job_num . "|awk '{print \$3\"\\t\"\$1}'";
         }
-        else if($this->schedular = "SGE")
+        else if($this->schedular == "SGE")
         {
             #Put SGE commands here
         }
         else
         {
-            $this->checkjob_cmd = "ps -ef|grep \"[[:space:]]" . $this->job_num . "[[:space:]]\"|awk '{print \$8\"\\t\"\$1}'";
+            $this->checkjob_cmd = "ps -ef|grep \"[[:space:]]" . $this->job_num . "[[:space:]]\"|awk '{printf(\"%s\t%s\",\$8,\$2)}'";
+            #$this->checkjob_cmd = "ps -ef|grep \"[[:space:]]" . $this->job_num . "[[:space:]]\"";
         }
     }
     function getCMDs($com)
     {
+        
         if($this->schedular == "LSF" || $this->schedular == "SGE")
         {
             $com=str_replace("\"", "\\\"", $com);
@@ -167,6 +169,10 @@ class funcs
         }
         
     }
+    function sysback($command)
+    {
+        Proc_Close (Proc_Open ("($command)2>&1 &", Array (), $foo));
+    }
     function getSSH()
     {
        #sleep(1);
@@ -179,9 +185,7 @@ class funcs
         $this->username = $username;
         $this->readINI();
         $retval = $this->syscall($this->checkjob_cmd);
-        while (preg_match('/is not found/', $retval)) {
-            $retval = $this->syscall($com);
-        }
+
         if ($retval == "") {
             $ret = $this->checkJobInDB($wkey, $job_num, $username);
             if ($ret == 0) {
@@ -192,9 +196,14 @@ class funcs
         }
         return $retval;
     }
+    function checkStartTime($wkey, $job_num,$username)
+    {
+        $sql = "update jobs set start_time=now() where wkey='$wkey' and job_num='$job_num'  and start_time=0 and username='$username'";
+        $this->runSQL($sql);
+    }
     function checkJobInDB($wkey, $job_num, $username)
     {
-        sleep(5);
+        #sleep(5);
         $sql      = "select * from jobs j where wkey='$wkey' and job_num='$job_num' and result=3 and username='$username'";
         $res      = $this->runSQL($sql);
         $num_rows = $res->num_rows;
@@ -209,24 +218,25 @@ class funcs
     {
         $servicename = $params['servicename'];
         $wkey        = $params['wkey'];
-        $sql      = "select * from jobs j, services s where s.service_id=j.service_id and s.servicename='$servicename' and j.wkey='$wkey'";
+        $sql      = "select j.service_id from jobs j, services s where s.service_id=j.service_id and s.servicename='$servicename' and j.wkey='$wkey'";
         #return $sql;
-        $res      = $this->runSQL($sql);
-        $num_rows = $res->num_rows;
-        if (is_object($res) && $num_rows > 0) {
-            $rowser     = $res->fetch_assoc();
-            $service_id = $rowser['service_id'];
+        $service_id   = $this->queryAVal($sql);
+    
+        if ($service_id > 0) {
             $sql        = "select DISTINCT j.job_num job_num, j.jobname jobname, j.jobstatus jobstatus, j.result jresult, s.username username from jobs j, services s where s.service_id=j.service_id and s.servicename='$servicename' and wkey='$wkey' and jobstatus=1 and result<3";
-            
             $res      = $this->runSQL($sql);
             $num_rows = $res->num_rows;
+            
             #Check if there are jobs which are failed or running
             if (is_object($res) && $num_rows > 0) {
                 while ($row = $res->fetch_assoc()) {
                     # If job is running, it turns 1 otherwise 0 and it needs to be restarted
                     # If it doesn't turn Error and if job is working it turns wkey to che
                     $retval = $this->checkJobInCluster($wkey, $row['job_num'], $row['username']);
-                    
+                    if ($retval != "")
+                    {
+                        $this->checkStartTime($wkey, $row['job_num'], $row['username']);
+                    }
                     if (preg_match('/^EXIT/', $retval)) {
                         $sql    = "SELECT j.jobname, jo.jobout FROM jobs j, jobsout jo where j.wkey=jo.wkey and j.job_num=jo.jobnum and j.job_num=" . $row['job_num'] . " and jo.wkey='$wkey'";
                         $resout = $this->runSQL($sql);
@@ -248,23 +258,20 @@ class funcs
                             $sql = "insert into jobs(`username`, `wkey`, `jobname`, `service_id`, `result`, `submit_time`, `start_time`,`end_time`,`job_num`) values ('" . $row['username'] . "', '$wkey', '$servicename', '$service_id', '3', now(), now(), now(),  '$jn' )";
                             
                             $result = $this->runSQL($sql);
-                            
                         }
                     }
                 }
             } else {
-                $sql      = "select * from service_run sr, services s where s.service_id=sr.service_id and s.servicename='$servicename' and sr.wkey='$wkey' and sr.result=1";
-                $res      = $this->runSQL($sql);
-                $num_rows = $res->num_rows;
-                if (is_object($res) && $num_rows > 0) {
+                $sql        = "select sr.service_id from service_run sr, services s where s.service_id=sr.service_id and s.servicename='$servicename' and sr.wkey='$wkey' and sr.result=1";
+                $service_id = $this->queryAVal($sql);
+                if ($service_id > 0) {
                     return "Service ended successfully!!!";
                 }
             }
-            return "RUNNING(1):SERVICENAME:$servicename";
+            return "RUNNING(1):[retval=$retval]:SERVICENAME:$servicename";
         }
         return 'START';
     }
-    
     
     function getServiceOrder($workflow_id, $service_id, $wkey)
     {
@@ -418,18 +425,21 @@ class funcs
      $result_stat = $this->checkStatus($params);
      if ( $result_stat == "START") # Job hasn't started yet 
      {
+        #The service will start. Get general workflow information to start the service
         $wf = $this->getWorkflowInformation($wkey);
         if (is_array($wf)) {
             $username     = $wf[0];
             $inputparam   = $wf[1];
             $outdir       = $wf[2];
             $defaultparam = $wf[3];
-            $this->username = $username; 
+            $this->username = $username;
+            #Get service ID and check if that service started before or not.
             $service_id = $this->getId("service", $username, $servicename, $wkey, $defaultparam);
-            
             $sql = "SELECT service_id FROM service_run where wkey='$wkey' and service_id='$service_id';";
-            $res = $this->runSQL($sql);
-            if (empty($res) == "") {
+            $s_id = $this->queryAVal($sql);
+            #If service hasn't started before, add the service info to service_run table.
+           
+            if ($s_id==0) {
                 // sql query for INSERT INTO service_run
                 $sql = "INSERT INTO `service_run` (`service_id`, `wkey`, `input`,`result`, `start_time`) VALUES ('$service_id', '$wkey', '', '0', now())";
                 
@@ -445,13 +455,13 @@ class funcs
                         $dpf = "-p $defaultparam";
                     
                     $edir = $this->tool_path;
-                    $com = $this->python . " " . $edir . "/runService.py -f ".$this->config." -d " . $this->dbhost . " $ipf $dpf -o $outdir -u $username -k $wkey -c \"$command\" -n $servicename -s $servicename 2>&1";
-                    $retval = $this->syscall($this->getCMDs($com));
+                    $com = $this->python . " " . $edir . "/runService.py -f ".$this->config." -d " . $this->dbhost . " $ipf $dpf -o $outdir -u $username -k $wkey -c \"$command\" -n $servicename -s $servicename";
+                    $retval = $this->sysback($this->getCMDs($com));
                     
                     if (preg_match('/Error/', $retval)) {
                         return "ERROR: $retval";
                     }
-                    return "RUNNING(2):$inputcommand";
+                    return "RUNNING(2):$inputcommand:[$result_stat][$retval][$com]";
                 }
             }
         } else {
