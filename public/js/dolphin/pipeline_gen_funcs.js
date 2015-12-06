@@ -608,7 +608,7 @@ function submitPipeline(type) {
 		var dir_check_1;
 		$.ajax({
 			type: 	'GET',
-			url: 	API_PATH+'/public/api/service.php?func=checkPermissions&username='+username.clusteruser,
+			url: 	BASE_PATH+'/public/api/service.php?func=checkPermissions&username='+username.clusteruser,
 			async:	false,
 			success: function(s)
 			{
@@ -619,7 +619,7 @@ function submitPipeline(type) {
 		var dir_check_2;
 		$.ajax({
 			type: 	'GET',
-			url: 	API_PATH+'/public/api/service.php?func=checkPermissions&username='+username.clusteruser+'&outdir=' + outputdir,
+			url: 	BASE_PATH+'/public/api/service.php?func=checkPermissions&username='+username.clusteruser+'&outdir=' + outputdir,
 			async:	false,
 			success: function(s)
 			{

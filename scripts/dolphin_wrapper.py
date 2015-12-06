@@ -23,7 +23,7 @@ warnings.filterwarnings('ignore', '.*the sets module is deprecated.*',
 from workflowdefs import *
 
 class Dolphin:
-    cmd = 'python %(dolphin_tools_dir)s/runWorkflow.py -f %(params_section)s -i %(input_fn)s -w %(workflow)s -p %(dolphin_default_params)s -u %(username)s -o %(outdir)s %(wkeystr)s'
+    cmd = 'python %(dolphin_tools_dir)s/runWorkflow.py -f %(params_section)s -i %(input_fn)s -w %(workflow)s -p %(dolphin_default_params)s -u %(username)s -o %(outdir)s %(runidstr)s %(wkeystr)s'
     config = ConfigParser.ConfigParser()
     params_section = ''
     
@@ -596,14 +596,15 @@ def main():
         BACKUP  = options.backup
         WKEY    = options.wkey
         params_section = options.config        
-
+        
         dolphin=Dolphin(params_section)
 
         logging.basicConfig(filename=logdir+'/run'+str(rpid)+'/run.'+str(rpid)+'.'+str(os.getpid())+'.log', filemode='w',format='%(asctime)s %(message)s', datefmt='%m/%d/%Y %I:%M:%S %p', level=logging.DEBUG)
 
         if (not rpid):
            rpid=-1
-
+        runidstr=" -r "+str(rpid)
+        
         dolphin.config.read("../config/config.ini")
 
                 

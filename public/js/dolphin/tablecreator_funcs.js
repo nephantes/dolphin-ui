@@ -284,7 +284,7 @@ function saveTable() {
 	
 	$.ajax({ type: "GET",
 			url: BASE_PATH+"/public/ajax/tablegenerator.php",
-			data: { p: "createTableFile", url: API_PATH+"/public/api/getsamplevals.php?" + beforeFormat + 'format=json2' },
+			data: { p: "createTableFile", url: BASE_PATH+"/public/api/getsamplevals.php?" + beforeFormat + 'format=json2' },
 			async: false,
 			success : function(s)
 			{
@@ -309,7 +309,7 @@ function saveTable() {
 }
 
 function downloadGeneratedTSV(beforeFormat){
-	var url = API_PATH +"/public/api/getsamplevals.php?" + beforeFormat + 'format=json'
+	var url = BASE_PATH +"/public/api/getsamplevals.php?" + beforeFormat + 'format=json'
 	var file_name = '';
 	console.log(url);
 	$.ajax({ type: "GET",
