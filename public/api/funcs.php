@@ -39,7 +39,7 @@ class funcs
     { 
         if($this->schedular == "LSF")
         {
-            $this->checkjob_cmd = $this->getSSH() . " \"" . $this->jobstatus . " $this->job_num\"|grep " . $this->job_num . "|awk '{print \$3\"\\t\"\$1}'";
+            $this->checkjob_cmd = $this->getSSH() . " \"" . $this->jobstatus . " $this->job_num\"|grep " . $this->job_num . "|awk '{printf (\"%s\t%s\",\$3,\$1)}'";
         }
         else if($this->schedular == "SGE")
         {
@@ -110,7 +110,7 @@ class funcs
     }
     function runSQL($sql)
     {
-        #sleep(1);
+        sleep(1);
         $this->readINI();
         $link = new mysqli($this->dbhost, $this->dbuser, $this->dbpass, $this->db);
         // check connection
@@ -232,7 +232,7 @@ class funcs
            $sql="update jobs set wkey='$wkey-$trial' where jobname='$servicename' and wkey='$wkey'";
            $this->runSQL($sql);
          }
-         return $sql . "[]";
+         return 1;
        }
        return 0;
     }
@@ -274,7 +274,7 @@ class funcs
                       }
                       else
                       {
-                         return "START1:[$sqlstr]";
+                         return "START1";
                       }
                     }
                     if (preg_match('/DONE/', $retval)) {
@@ -294,7 +294,7 @@ class funcs
             } else {
                     return "Service ended successfully ($servicename)!!!";
             }
-            return "RUNNING(1):[retval=$retval]:SERVICENAME:$servicename:[$sql]";
+            return "RUNNING(1):[retval=$retval]:SERVICENAME:$servicename";
         }
         return 'START';
     }
@@ -489,7 +489,7 @@ class funcs
              if (preg_match('/Error/', $retval)) {
                  return "ERROR: $retval";
              }
-             return "RUNNING(2):$inputcommand:[$result_stat][$retval][$com][$sql]";
+             return "RUNNING(2):$inputcommand";
         } else {
              return $wf;
         }
