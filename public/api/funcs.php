@@ -428,7 +428,10 @@ class funcs
             $workflow_id = $this->getId("workflow", $username, $workflowname, $wkey, $defaultparam);
             // sql query for INSERT INTO workflowrun
             $sql = "INSERT INTO `workflow_run` ( `workflow_id`, `username`, `wkey`, `inputparam`, `outdir`, `result`, `start_time`, `services`) VALUES ('$workflow_id', '$username', '$wkey', '$inputparam', '$outdir', '0', now(), $services)";
-            #$this->updateDefaultParam($workflowname, $username, $defaultparam);
+            if ($workflowname != "")
+            {
+              $this->updateDefaultParam($workflowname, $username, $defaultparam);
+            }
             if ($result = $this->runSQL($sql)) {
                 $ret = $result;
             }
