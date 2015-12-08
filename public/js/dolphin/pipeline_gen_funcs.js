@@ -468,7 +468,7 @@ function submitPipeline(type) {
 	var description = document.getElementById("run_description").value;
 	var perms = document.getElementById("perms").value;
 	var group = document.getElementById("groups").value;
-	var encode = document.getElementById("submission").value;
+	var submission = document.getElementById("submission").value;
 	
 	var empty_values = []
 	if (run_name == "") {
@@ -553,7 +553,7 @@ function submitPipeline(type) {
 		json = json + ',"barcodes":"none"';
 		
 		//submission check
-		json = json + ',"submission":"' + encode + '"';
+		json = json + ',"submission":"' + submission + '"';
 		
 		//adapter
 		if (doAdapter == "yes") {
