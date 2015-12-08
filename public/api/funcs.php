@@ -272,10 +272,6 @@ class funcs
                         $jobout = $h2t->get_text();
                         return 'ERROR:' . $retval . "\n" . $rowout['jobname'] . " Failed\nCheck LSF output\n" . $jobout;
                       }
-                      else
-                      {
-                         return "START1";
-                      }
                     }
                     if (preg_match('/DONE/', $retval)) {
                         $jn     = rtrim(substr($retval, 5));
@@ -474,7 +470,7 @@ class funcs
            
              if ($s_id==0) {
                 // sql query for INSERT INTO service_run
-                $sql = "INSERT INTO `service_run` (`service_id`, `wkey`, `input`,`service_status`, `result`, `start_time`) VALUES ('$service_id', '$wkey', '','0', '0', now())";
+                $sql = "INSERT INTO `service_run` (`service_id`, `wkey`, `input`,`result`, `start_time`) VALUES ('$service_id', '$wkey', '', '0', now())";
                 $this->runSQL($sql); 
              }
              $command = $this->getCommand($servicename, $username, $inputcommand, $defaultparam);
