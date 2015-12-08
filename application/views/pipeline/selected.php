@@ -77,8 +77,9 @@
 																			<option value='15'>only my group</option>
 																			<option value='32'>everyone</option>", 4)?>
 						<?php echo $html->getStaticSelectionBox("Group Selection", "groups", $html->groupSelectionOptions($groups), 4)?>
-						<?php echo $html->getStaticSelectionBox("Encode Submission", "encode", "<option value='0'>no</option>
-																			<option value='1'>yes</option>", 4)?>
+						<?php echo $html->getStaticSelectionBox("Submission", "submission", "<option value='0'>None</option>
+																			<option value='1'>Encode</option>
+																			<option value='2'>Geo</option>", 4)?>
 					<?php echo $html->startExpandingSelectionBox(6)?>
 						<?php echo $html->getExpandingSelectionBox("Adapter Removal", "adapter", 1, 12, ["adapter"], [["TEXTBOX"]])?>
 						<?php echo $html->getExpandingSelectionBox("Split FastQ", "split", 1, 12, ["number of reads per file"], [["TEXT","5000000"]])?>

@@ -9,7 +9,7 @@ var ID_DICTIONARY = {};
 var STORED_SAMPLE_DATA = [];
 
 //GLOBAL VARIABLES
-var jsonTypeList = ['genomebuild', 'spaired', 'resume', 'barcodes', 'fastqc', 'adapter', 'encode', 'quality', 'trim', 'commonind', 'split', 'pipeline', 'advparams', 'custom'];
+var jsonTypeList = ['genomebuild', 'spaired', 'resume', 'barcodes', 'fastqc', 'adapter', 'submission', 'quality', 'trim', 'commonind', 'split', 'pipeline', 'advparams', 'custom'];
 var radioTypeCheckList = ['pipeline', 'trimpaired', 'advparams', 'custom'];
 var currentChecked = "";
 var checklist_samples = [];
@@ -67,9 +67,11 @@ function rerunLoad() {
 				}else if (element.id == "resume"){
 					element.value = 'Resume';
 				}else if (element.id == "0"){
-					element.value = 'no';
+					element.value = 'None';
 				}else if (element.id == "1"){
-					element.value = 'yes';
+					element.value = 'Encode';
+				}else if (element.id == "2"){
+					element.value = 'Geo';
 				}else{
 					element.value = jsonObj[jsonTypeList[x]];
 				}
@@ -466,7 +468,7 @@ function submitPipeline(type) {
 	var description = document.getElementById("run_description").value;
 	var perms = document.getElementById("perms").value;
 	var group = document.getElementById("groups").value;
-	var encode = document.getElementById("encode").value;
+	var encode = document.getElementById("submission").value;
 	
 	var empty_values = []
 	if (run_name == "") {
@@ -550,8 +552,8 @@ function submitPipeline(type) {
 		*/
 		json = json + ',"barcodes":"none"';
 		
-		//encode check
-		json = json + ',"encode":"' + encode + '"';
+		//submission check
+		json = json + ',"submission":"' + encode + '"';
 		
 		//adapter
 		if (doAdapter == "yes") {
