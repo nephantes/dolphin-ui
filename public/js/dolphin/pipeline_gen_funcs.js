@@ -1398,10 +1398,12 @@ function removePipes(num){
 	var index = currentPipelineID.indexOf(num);
 	div.parentNode.removeChild(div);
 	if (currentPipelineVal[index] == pipelineDict[0]) {
-	rsemSwitch = false;
+		rsemSwitch = false;
 	}
-	currentPipelineVal.splice(index,1);
-	currentPipelineID.splice(index,1);
+	if (index != -1) {
+		currentPipelineVal.splice(index,1);
+		currentPipelineID.splice(index,1);
+	}
 }
 
 /*##### ADD PIPELINES #####*/
