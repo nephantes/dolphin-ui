@@ -107,6 +107,9 @@ if ($p == "submitPipeline" )
         last_modified_user = $uid
         WHERE id = '$idKey'
         ");
+        if(strpos($json, '"resume":"no"') > -1){
+        	$wkey = "";
+        }
         runCmd($idKey, $query, $wkey);
         $data=$idKey;
     }else{
