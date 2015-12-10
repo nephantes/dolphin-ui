@@ -112,7 +112,7 @@ function rerunLoad() {
 								document.getElementById( trimmingDict[2]+'_val' ).value = splt1['3len1'];
 								document.getElementById( trimmingDict[3]+'_val' ).value = splt1['5len2'];
 								document.getElementById( trimmingDict[4]+'_val' ).value = splt1['3len2'];
-							}else if(z == 0 && !jsonObj.hasOwnProperty('trimpaired')){
+							}else{
 								document.getElementById( trimmingDict[0]+'_val').value = 'single-end';
 								document.getElementById( trimmingDict[1]+'_val' ).value = splt1['5len1'];
 								document.getElementById( trimmingDict[2]+'_val' ).value = splt1['3len1'];
