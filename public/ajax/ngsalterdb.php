@@ -107,7 +107,6 @@ if ($p == "submitPipeline" )
         last_modified_user = $uid
         WHERE id = '$idKey'
         ");
-		$wkey="";
         runCmd($idKey, $query, $wkey);
         $data=$idKey;
     }else{
@@ -171,7 +170,7 @@ else if ($p == 'noAddedParamsRerun')
 	UPDATE ngs_runparams
     SET run_status=0,
     wrapper_pid = NULL,
-    runworkflow_pid = NULL,
+    runworkflow_pid = NULL
     WHERE id = $run_id
     ");
     
