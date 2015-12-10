@@ -220,8 +220,12 @@ function rerunLoad() {
 							
 							//handle for multiple selections
 							document.getElementById('text_1_'+i).value = splt1[i].Name;
-							var select_values = splt1[i].Columns.split(",");
-							var select_locations = splt1[i].Conditions.split(",");
+							var select_values = [];
+							var select_locations = [];
+							if (splt1[i].Columns != undefined) {
+								select_values = splt1[i].Columns.split(",");
+								select_locations = splt1[i].Conditions.split(",");
+							}
 							var select1_values = [];
 							var select2_values = [];
 							for(var f = 0; f < select_locations.length; f++){
@@ -279,8 +283,13 @@ function rerunLoad() {
 							if (splt1[i].MCallStep == 'yes') {
 								document.getElementById('checkbox_4_'+i).checked = true;
 							}
-							var select_values = splt1[i].Columns.split(",");
-							var select_locations = splt1[i].Conditions.split(",");
+							MCallSelection(i);
+							var select_values = [];
+							var select_locations = [];
+							if (splt1[i].Columns != undefined) {
+								select_values = splt1[i].Columns.split(",");
+								select_locations = splt1[i].Conditions.split(",");
+							}
 							var select1_values = [];
 							var select2_values = [];
 							for(var f = 0; f < select_locations.length; f++){
@@ -309,6 +318,7 @@ function rerunLoad() {
 							if (splt1[i].MCompStep == 'yes') {
 								document.getElementById('checkbox_5_'+i).checked = true;
 							}
+							MCompSelection(i);
 							document.getElementById('textarea_4_'+i).value = splt1[i].MCompParams;
 						}
 					}
@@ -476,26 +486,26 @@ function pipelineSelect(num){
 		//MCALL
 		labelDiv = createElement('div', ['class'], ['col-md-12 text-center']);
 		labelDiv.appendChild( createElement('label', ['class','TEXTNODE'], ['box-title margin', 'Run MCall:']));
-		labelDiv.appendChild( createElement('input', ['id', 'type', 'class'], ['checkbox_4_'+num, 'checkbox', 'margin']));
+		labelDiv.appendChild( createElement('input', ['id', 'type', 'class', 'onClick'], ['checkbox_4_'+num, 'checkbox', 'margin', 'MCallSelection("'+num+'")']));
 		divAdj.appendChild(labelDiv);
 		divAdj = mergeTidy(divAdj, 6,
-				[ [createElement('label', ['class','TEXTNODE'], ['box-title', 'MCall Condition 1']),
-				createElement('select',['id', 'class', 'type', 'multiple', 'size', 'onchange'],['multi_select_1_'+num, 'form-control', 'select-multiple', 'multiple', '8', 'deselectCondition(1, '+num+')'])],
-				[createElement('label', ['class','TEXTNODE'], ['box-title', 'MCall Condition 2']),
-				createElement('select',['id', 'class', 'type', 'multiple', 'size', 'onchange'],['multi_select_2_'+num, 'form-control', 'select-multiple', 'multiple', '8', 'deselectCondition(2, '+num+')'])] ]);
+				[ [createElement('label', ['id', 'class', 'style', 'TEXTNODE'], ['label_2_'+num, 'box-title', 'display:none', 'MCall Condition 1']),
+				createElement('select',['id', 'class', 'type', 'multiple', 'size', 'style', 'onchange'],['multi_select_1_'+num, 'form-control', 'select-multiple', 'multiple', '8', 'display:none', 'deselectCondition(1, '+num+')'])],
+				[createElement('label', ['id', 'class', 'style', 'TEXTNODE'], ['label_3_'+num, 'box-title', 'display:none', 'MCall Condition 2']),
+				createElement('select',['id', 'class', 'type', 'multiple', 'size', 'style', 'onchange'],['multi_select_2_'+num, 'form-control', 'select-multiple', 'multiple', '8', 'display:none', 'deselectCondition(2, '+num+')'])] ]);
 		labelDiv = createElement('div', ['class'], ['col-md-12']);
-		labelDiv.appendChild( createElement('label', ['class','TEXTNODE'], ['box-title', 'Additional MCall Parameters:']));
-		labelDiv.appendChild( createElement('textarea', ['id', 'class'], ['textarea_3_'+num, 'form-control']));
+		labelDiv.appendChild( createElement('label', ['id', 'class', 'style', 'TEXTNODE'], ['label_4_'+num, 'box-title', 'display:none', 'Additional MCall Parameters:']));
+		labelDiv.appendChild( createElement('textarea', ['id', 'class', 'style'], ['textarea_3_'+num, 'form-control', 'display:none']));
 		divAdj.appendChild(labelDiv);
 		
 		//MComp
 		labelDiv = createElement('div', ['class'], ['col-md-12 text-center']);
 		labelDiv.appendChild( createElement('label', ['class','TEXTNODE'], ['box-title margin', 'Run MComp:']));
-		labelDiv.appendChild( createElement('input', ['id', 'type', 'class'], ['checkbox_5_'+num, 'checkbox', 'margin']));
+		labelDiv.appendChild( createElement('input', ['id', 'type', 'class', 'onClick'], ['checkbox_5_'+num, 'checkbox', 'margin', 'MCompSelection("'+num+'")']));
 		divAdj.appendChild(labelDiv);
 		labelDiv = createElement('div', ['class'], ['col-md-12']);
-		labelDiv.appendChild( createElement('label', ['class','TEXTNODE'], ['box-title', 'Additional MComp Parameters:']));
-		labelDiv.appendChild( createElement('textarea', ['id', 'class'], ['textarea_4_'+num, 'form-control']));
+		labelDiv.appendChild( createElement('label', ['id', 'class', 'style', 'TEXTNODE'], ['label_5_'+num, 'box-title', 'display:none', 'Additional MComp Parameters:']));
+		labelDiv.appendChild( createElement('textarea', ['id', 'class', 'style'], ['textarea_4_'+num, 'form-control', 'display:none']));
 		divAdj.appendChild(labelDiv);
 	}
 	//replace div
@@ -752,7 +762,7 @@ function submitPipeline(type) {
 			var custom_error = "";
 			for(var k = 0; k < customSeqSetCheck[1].length; k++){
 				if (customSeqSetCheck[1][k] == true) {
-					custom_error += customSeqSetCheck[0][k].FullPath+'<br><br>';
+					custom_error += customSeqSetCheck[0][k].FullPath+'/'+customSeqSetCheck[0][k].IndexPrefix+'<br><br>';
 				}
 			}
 			$('#errorModal').modal({
@@ -1647,11 +1657,16 @@ function findCustomSequenceSets(previous){
 	for (var y = 0; y < customSeqNumCheck.length; y++){
 		var JSON_OBJECT = {};
 		var dict_counter = 0;
+		var full_path = "";
 		var masterDiv = document.getElementById('custom_seq_inner_'+customSeqNumCheck[y]).getElementsByTagName('*');
 		for (var x = 0; x < masterDiv.length - 1; x++){
 			var e = masterDiv[x];
 			if (e.type != undefined) {
 				if (x == 2) {
+					full_path = e.value;
+					JSON_OBJECT[CUSTOM_SEQ_DICT[dict_counter]] = e.value;
+				}
+				if (x == 5) {
 					var file_check_1 = "";
 					var file_check_2 = "";
 					var file_check_results_1 = [];
@@ -1665,10 +1680,11 @@ function findCustomSequenceSets(previous){
 					if (file_check_1 != "") {
 						$.ajax({
 							type: 	'GET',
-							url: 	BASE_PATH+'/public/api/service.php?func=checkFile&username='+username.clusteruser+'&file=' + file_check_1,
+							url: 	BASE_PATH+'/public/api/service.php?func=checkFile&username='+username.clusteruser+'&file=' + full_path + "/" + file_check_1,
 							async:	false,
 							success: function(s)
 							{
+								console.log(s);
 								file_check_results_1 = JSON.parse(s);
 								console.log(file_check_results_1);
 							}
@@ -1677,10 +1693,11 @@ function findCustomSequenceSets(previous){
 					if (file_check_2 != "") {
 						$.ajax({
 							type: 	'GET',
-							url: 	BASE_PATH+'/public/api/service.php?func=checkFile&username='+username.clusteruser+'&file=' + file_check_2,
+							url: 	BASE_PATH+'/public/api/service.php?func=checkFile&username='+username.clusteruser+'&file=' + full_path + "/" + file_check_2,
 							async:	false,
 							success: function(s)
 							{
+								console.log(s);
 								file_check_results_2 = JSON.parse(s);
 								console.log(file_check_results_2);
 							}
@@ -1719,11 +1736,11 @@ function sequenceSetsBtn(){
 	var babyDiv4 = createElement('div', [], []);
 	var babyDiv5 = createElement('div', [], []);
 
-	babyDiv1.appendChild(createElement('label', ['class','TEXTNODE'], ['box-title', 'Custom sequence index file (full path + file prefix)']));
+	babyDiv1.appendChild(createElement('label', ['class','TEXTNODE'], ['box-title', 'Custom sequence index directory (full path)']));
 	babyDiv1.appendChild(createElement('input', ['id', 'class', 'type', 'value'], ['custom_1_'+customSeqNum, 'form-control', 'text', '']));
 	innerDiv.appendChild(babyDiv1);
 
-	babyDiv2.appendChild(createElement('label', ['class','TEXTNODE'], ['box-title', 'Name of the index']));
+	babyDiv2.appendChild(createElement('label', ['class','TEXTNODE'], ['box-title', 'Name of the index file (prefix)']));
 	babyDiv2.appendChild(createElement('input', ['id', 'class', 'type', 'value'], ['custom_2_'+customSeqNum, 'form-control', 'text', '']));
 	innerDiv.appendChild(babyDiv2);
 
@@ -1763,6 +1780,36 @@ function IGVTDFSelection(id){
 		document.getElementById('label_1_'+id_num).setAttribute("style", "display:none");
 		document.getElementById('textarea_2_'+id_num).setAttribute("style", "display:none");
 		document.getElementById('textarea_2_'+id_num).value = 0;
+	}
+}
+
+function MCallSelection(id){
+	var check = document.getElementById('checkbox_4_'+id).checked;
+	if (check) {
+		document.getElementById('label_2_'+id).setAttribute("style", "display:show");
+		document.getElementById('multi_select_1_'+id).setAttribute("style", "display:show");
+		document.getElementById('label_3_'+id).setAttribute("style", "display:show");
+		document.getElementById('multi_select_2_'+id).setAttribute("style", "display:show");
+		document.getElementById('label_4_'+id).setAttribute("style", "display:show");
+		document.getElementById('textarea_3_'+id).setAttribute("style", "display:show");
+	}else{
+		document.getElementById('label_2_'+id).setAttribute("style", "display:none");
+		document.getElementById('multi_select_1_'+id).setAttribute("style", "display:none");
+		document.getElementById('label_3_'+id).setAttribute("style", "display:none");
+		document.getElementById('multi_select_2_'+id).setAttribute("style", "display:none");
+		document.getElementById('label_4_'+id).setAttribute("style", "display:none");
+		document.getElementById('textarea_3_'+id).setAttribute("style", "display:none");
+	}
+}
+
+function MCompSelection(id){
+	var check = document.getElementById('checkbox_5_'+id).checked;
+	if (check) {
+		document.getElementById('label_5_'+id).setAttribute("style", "display:show");
+		document.getElementById('textarea_4_'+id).setAttribute("style", "display:show");
+	}else{
+		document.getElementById('label_5_'+id).setAttribute("style", "display:none");
+		document.getElementById('textarea_4_'+id).setAttribute("style", "display:none");
 	}
 }
 
