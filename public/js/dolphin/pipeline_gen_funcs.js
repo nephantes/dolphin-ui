@@ -9,7 +9,7 @@ var ID_DICTIONARY = {};
 var STORED_SAMPLE_DATA = [];
 
 //GLOBAL VARIABLES
-var jsonTypeList = ['genomebuild', 'spaired', 'resume', 'barcodes', 'fastqc', 'adapter', 'submission', 'quality', 'trim', 'commonind', 'split', 'pipeline', 'advparams', 'custominds'];
+var jsonTypeList = ['genomebuild', 'spaired', 'resume', 'barcodes', 'fastqc', 'adapters', 'submission', 'quality', 'trim', 'commonind', 'split', 'pipeline', 'advparams', 'custominds'];
 var radioTypeCheckList = ['pipeline', 'trimpaired', 'advparams', 'custom'];
 var currentChecked = "";
 var checklist_samples = [];
@@ -640,10 +640,10 @@ function submitPipeline(type) {
 		
 		//adapter
 		if (doAdapter == "yes") {
-			previous = 'adapter';
-			JSON_OBJECT['adapter'] = adapter[0].toUpperCase().replace(/\r\n|\r|\n/g, "__cr____cn__").replace(/U/g, 'T');
+			previous = 'adapters';
+			JSON_OBJECT['adapters'] = adapter[0].toUpperCase().replace(/\r\n|\r|\n/g, "__cr____cn__").replace(/U/g, 'T');
 		}else{
-			JSON_OBJECT['adapter'] = 'none';
+			JSON_OBJECT['adapters'] = 'none';
 		}
 		//quality
 		var JSON_ARRAY_QUALITY = {};
