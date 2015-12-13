@@ -203,16 +203,14 @@ class Dolphin:
       except Exception, ex:
         self.stop_err('Error (line:%s)running getLaneList\n%s'%(format(sys.exc_info()[-1].tb_lineno), str(ex)))
 
-    def writeInputParamLine(self, fp, runparams, input_str, input_object, itself, previous_str=None, extra_params=None):
+    def writeInputParamLine(self, fp, jsonobj, input_str, input_object, itself, previous_str=None):
       try:
-       previous=None
-       if (runparams[input_object] and runparams[input_object].lower() != 'none'):
-         print >>fp, '%s=%s'%(input_str, self.parse_content(runparams[input_object]))
-         extra_params
-         if (extra_params):
-            print >>fp,'%s',extra_params
+       previous="NONE"
+
+       if (input_object in jsonobj and jsonobj[input_object].lower() != 'none' and jsonobj[input_object]!=''):
+         print >>fp, '%s=%s'%(input_str, self.parse_content(jsonobj[input_object]))
          if (previous_str):
-            print >>fp, '%s=%s'%("PREVIOUS"+itself, previous_str)
+            print >>fp, '%s=%s'%("@PREVIOUS"+itself, previous_str)
          previous=itself
        else:
          print >>fp, '%s=NONE'%(input_str)
@@ -245,15 +243,27 @@ class Dolphin:
        print >>fp, '@OUTFILE=%s'%input_fn
        print >>fp, '@GENOMEBUILD=%s,%s'%(gb[0],gb[1])
        print >>fp, '@SPAIRED=%s'%runparams['spaired']
-       
+       previous="NONE" 
        previous=self.writeInputParamLine(fp, runparams, "@BARCODES", 'barcodes', "BARCODE")
        previous=self.writeInputParamLine(fp, runparams, "@ADAPTER", 'adapter', "ADAPTER", previous )
-       previous=self.writeInputParamLine(fp, runparams, "@QUALITY", 'quality', "QUALITY", previous )
-
-       extra_params = ('@TRIMPAIRED=%s'%runparams['trimpaired'] if ('trimpaired' in runparams) else None)
-       previous=self.writeInputParamLine(fp, runparams, "@TRIM", 'trim', "TRIM", previous, extra_params)
-       previous=self.writeInputParamLine(fp, runparams, "@SPLIT", 'split', "SPLIT", previous )
-
+       
+       if ( 'quality' in runparams and type(runparams['quality']) is list):
+            pipe=runparams['quality'][0]
+            runparams['quality']="%s:%s:%s:%s:%s"%(pipe['windowSize'],pipe['requiredQuality'],pipe['leading'],pipe['trailing'],pipe['minlen'])
+       
+       previous=self.writeInputParamLine(fp, runparams, "@QUALITY", 'quality', "QUALITY", previous)
+       
+       if ( 'trim' in runparams and type(runparams['trim']) is list):
+          pipe=runparams['trim'][0]
+          if (pipe["5len1"]>0 and pipe["3len1"]>0):
+            self.writeInputParamLine(fp, pipe, "@TRIMPAIRED", 'trimpaired', "TRIM")
+            if ('trimpaired' in pipe and pipe['trimpaired']=="paired"):
+               if (pipe["5len2"]>0 and pipe["3len2"]>0):
+                  runparams['trim']="%s:%s:%s:%s"%(pipe["5len1"],pipe["3len1"],pipe["5len2"],pipe["3len2"])
+            else:
+               runparams['trim']="%s:%s"%(str(pipe["5len1"]),str(pipe["3len1"]))
+       previous=self.writeInputParamLine(fp, runparams, "@TRIM", 'trim', "TRIM", previous)
+       
        if (runparams['commonind'] and runparams['commonind'].lower() != 'none'):
          arr=re.split(r'[,:]+', self.parse_content(runparams['commonind']))
          for i in arr:
@@ -282,14 +292,16 @@ class Dolphin:
             print >>fp, '@PARAM%s=%s,%s,%s,%s,%s,%s'%(name,index,name,bowtie_params,description,filter_out,previous)
             if (str(filter_out)=="1"):
                previous=name
-    
+       previoussplit=previous
+       previous=self.writeInputParamLine(fp, runparams, "@SPLIT", 'split', "SPLIT", previous )
+              
        if (runparams['pipeline']):
            for pipe in runparams['pipeline']:
              if (pipe['Type']=="RNASeqRSEM"):
                paramsrsem=pipe['Params'] if (not pipe['Params']) else "NONE"
                print >>fp, '@PARAMSRSEM=%s'%(self.parse_content(paramsrsem))
                print >>fp, '@TSIZE=50';
-               print >>fp, '@PREVIOUSPIPE=%s'%(previous)
+               print >>fp, '@PREVIOUSRSEM=%s'%(previoussplit)
     
              if (pipe['Type']=="Tophat"):
                paramstophat=pipe['Params'] if (not pipe['Params']) else "NONE"
@@ -321,12 +333,12 @@ class Dolphin:
 
              if (pipe['Type']=="BisulphiteMapping"):
                if (pipe['BSMapStep'] == "yes"):
-                 print >>fp, '@BSMAPPARAM=%s'%(self.remove_space(pipe['BSmapParams']))
+                 self.writeInputParamLine(fp, pipe, "@BSMAPPARAM", 'BSMapParams', "BSMapStep")
                if (pipe['MCallStep']== "yes"):
-                 print >>fp, '@MCONDS=%s'%(self.remove_space(pipe['Conditions']))
-                 print >>fp, '@MCALLPARAM=%s'%(self.remove_space(pipe['MCallParams']))
+                 self.writeInputParamLine(fp, pipe, "@MCONDS", 'Conditions', "MCallStep")
+                 self.writeInputParamLine(fp, pipe, "@MCALLPARAM", 'MCallParams', "MCallStep")
                if (pipe['MCompStep'] == ""):
-                 print >>fp, '@MCOMPPARAM=%s'%(self.remove_space(pipe['MCompParams']))
+                 self.writeInputParamLine(fp, pipe, "@MCOMPPARAM", 'MCompParams', "MCompStep")
 
        print >>fp, '@MAPNAMES=%s'%(mapnames)
        print >>fp, '@PREVIOUSPIPE=%s'%(previous)
@@ -341,8 +353,9 @@ class Dolphin:
            
     def writeVisualizationStr(self, fp, type, pipe, sep):
       try:
+        print pipe
         if ('IGVTDF' in pipe and pipe['IGVTDF'].lower()=="yes"):
-            paramExtFactor = ( " --extFactor " + str(pipe['ExtFactor']) if ('ExtFactor' in pipe and pipe['ExtFactor'] > 1) else '')
+            paramExtFactor = ( " -e " + str(pipe['ExtFactor']) if ('ExtFactor' in pipe and pipe['ExtFactor'] > 1) else '')
             self.prf( fp, stepIGVTDF % locals() )
         if ('BAM2BW' in pipe and pipe['BAM2BW'].lower()=="yes"):
             self.prf( fp, stepBam2BW % locals() )
@@ -383,7 +396,7 @@ class Dolphin:
         self.prf(fp, stepAdapter % locals() if ('adapter' in runparams and runparams['adapter'].lower()!="none") else None )
         self.prf(fp, stepQuality % locals() if ('quality' in runparams and runparams['quality'].lower()!="none") else None )
         self.prf(fp, stepTrim % locals() if ('trim' in runparams and runparams['trim'].lower()!="none") else None  )
-
+       
         countstep = False
         if ('commonind' in runparams and runparams['commonind'].lower() != 'none'):
            arr=re.split(r'[,:]+', self.parse_content(runparams['commonind']))
@@ -402,11 +415,10 @@ class Dolphin:
        
         if (countstep):
            self.prf( fp, stepCounts % locals() )
-     
         if ('split' in runparams and runparams['split'].lower() != 'none'):
-           thenumberofreads=str(split)
+           thenumberofreads=str(runparams['split'])
            self.prf( fp, stepSplit % locals() )
-     
+           
         if ('pipeline' in runparams):
            for pipe in runparams['pipeline']:
               if (pipe['Type']=="RNASeqRSEM"):
@@ -423,6 +435,10 @@ class Dolphin:
               
               if (pipe['Type']=="Tophat"):
                  self.prf( fp, stepTophat % locals() )
+                 type="tophat"
+                 if ('split' in runparams and runparams['split'].lower() != 'none'):
+                    self.prf( fp, '%s'%(stepMergeBAM % locals()) )
+                    type="mergetophat"
                  self.writeVisualizationStr( fp, "Tophat", pipe, sep )
                  self.writeRSeQC ( fp, "Tophat", pipe, sep )
                  self.writePicard (fp, "Tophat", pipe, sep )
@@ -592,7 +608,6 @@ def main():
            workflow = logdir+'/run'+str(rpid)+'/seqmapping_workflow.'+str(rpid)+'.'+str(os.getpid())+'.txt'
 
            dolphin.writeWorkflow(workflow, gettotalreads, amazonupload, backupS3, runparamsid, runparams)
-           sys.exit(0)
            dolphin_tools_dir=dolphin.config.get(dolphin.params_section, "dolphin_tools_src_path") 
            dolphin_default_params=dolphin.config.get(dolphin.params_section, "dolphin_default_params_path")
            wkeystr=''
