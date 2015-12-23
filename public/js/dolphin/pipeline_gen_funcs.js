@@ -9,7 +9,7 @@ var ID_DICTIONARY = {};
 var STORED_SAMPLE_DATA = [];
 
 //GLOBAL VARIABLES
-var jsonTypeList = ['genomebuild', 'spaired', 'resume', 'barcodes', 'fastqc', 'adapter', 'quality', 'trim', 'commonind', 'split', 'pipeline', 'advparams', 'custom'];
+var jsonTypeList = ['genomebuild', 'spaired', 'resume', 'barcodes', 'fastqc', 'adapter', 'submission', 'quality', 'trim', 'commonind', 'split', 'pipeline', 'advparams', 'custom'];
 var radioTypeCheckList = ['pipeline', 'trimpaired', 'advparams', 'custom'];
 var currentChecked = "";
 var checklist_samples = [];
@@ -66,6 +66,12 @@ function rerunLoad() {
 					}
 				}else if (element.id == "resume"){
 					element.value = 'Resume';
+				}else if (element.id == "0"){
+					element.value = 'None';
+				}else if (element.id == "1"){
+					element.value = 'Encode';
+				}else if (element.id == "2"){
+					element.value = 'Geo';
 				}else{
 					element.value = jsonObj[jsonTypeList[x]];
 				}
@@ -136,7 +142,11 @@ function rerunLoad() {
 							document.getElementById('textarea_'+i).value = splt2[1];
 							document.getElementById('select_1_'+i).value = splt2[2];
 							document.getElementById('select_2_'+i).value = splt2[3];
-							if (splt2[4] == '1') {
+							if (splt2[4] != '0' && splt2[4] != 0) {
+								IGVTDFSelection('select_1_'+i);
+								document.getElementById('textarea_2_'+i).value = splt2[4];
+							}
+							if (splt2[5] == '1') {
 								document.getElementById('checkbox_1_'+i).checked = true;
 							}
 							rsemSwitch = true;
@@ -148,16 +158,20 @@ function rerunLoad() {
 							document.getElementById('textarea_'+i).value = splt2[1];
 							document.getElementById('select_1_'+i).value = splt2[2];
 							document.getElementById('select_2_'+i).value = splt2[3];
-							if (splt2[4] == '1') {
-								document.getElementById('checkbox_1_'+i).checked = true;
+							if (splt2[4] != '0' && splt2[4] != 0) {
+								IGVTDFSelection('select_1_'+i);
+								document.getElementById('textarea_2_'+i).value = splt2[4];
 							}
 							if (splt2[5] == '1') {
-								document.getElementById('checkbox_2_'+i).checked = true;
+								document.getElementById('checkbox_1_'+i).checked = true;
 							}
 							if (splt2[6] == '1') {
-								document.getElementById('checkbox_3_'+i).checked = true;
+								document.getElementById('checkbox_2_'+i).checked = true;
 							}
 							if (splt2[7] == '1') {
+								document.getElementById('checkbox_3_'+i).checked = true;
+							}
+							if (splt2[8] == '1') {
 								document.getElementById('checkbox_4_'+i).checked = true;
 							}
 						}else if (splt2[0] == pipelineDict[2]){
@@ -172,6 +186,16 @@ function rerunLoad() {
 							document.getElementById('select_2_'+i).value = splt2[5];
 							document.getElementById('select_3_'+i).value = splt2[6];
 							document.getElementById('select_4_'+i).value = splt2[7];
+							if (splt2[8] != '0' && splt2[8] != 0) {
+								IGVTDFSelection('select_3_'+i);
+								document.getElementById('textarea_2_'+i).value = splt2[8];
+							}
+							if (splt2[9] == '1') {
+								document.getElementById('checkbox_1_'+i).checked = true;
+							}
+							if (splt2[10] == '1') {
+								document.getElementById('checkbox_2_'+i).checked = true;
+							}
 						}else if (splt2[0] == pipelineDict[3]) {
 							//DESEQ
 							additionalPipes();
@@ -216,14 +240,26 @@ function rerunLoad() {
 							
 							document.getElementById('text_1_'+i).value = splt2[2];
 							document.getElementById('textarea_1_'+i).value = splt2[3];
+							document.getElementById('select_1_'+i).value = splt2[4];
+							document.getElementById('select_2_'+i).value = splt2[5];
+							if (splt2[6] != '0' && splt2[6] != 0) {
+								IGVTDFSelection('select_1_'+i);
+								document.getElementById('textarea_2_'+i).value = splt2[6];
+							}
+							if (splt2[7] == '1') {
+								document.getElementById('checkbox_2_'+i).checked = true;
+							}
+							if (splt2[8] == '1') {
+								document.getElementById('checkbox_3_'+i).checked = true;
+							}
 							
 							//MCall
 							//handle for multiple selections
-							if (splt2[4] == 1) {
-								document.getElementById('checkbox_2_'+i).checked = true;
+							if (splt2[9] == 1) {
+								document.getElementById('checkbox_4_'+i).checked = true;
 							}
-							var select_values = splt2[5].split(",");
-							var select_locations = splt2[6].split(",");
+							var select_values = splt2[10].split(",");
+							var select_locations = splt2[11].split(",");
 							var select1_values = [];
 							var select2_values = [];
 							for(var f = 0; f < select_locations.length; f++){
@@ -246,13 +282,13 @@ function rerunLoad() {
 									select2.options[h].selected = true;
 								}
 							}
-							document.getElementById('textarea_2_'+i).value = splt2[7];
+							document.getElementById('textarea_3_'+i).value = splt2[12];
 							
 							//MComp
-							if (splt2[8] == '1') {
-								document.getElementById('checkbox_3_'+i).checked = true;
+							if (splt2[13] == '1') {
+								document.getElementById('checkbox_5_'+i).checked = true;
 							}
-							document.getElementById('textarea_3_'+i).value = splt2[9];
+							document.getElementById('textarea_4_'+i).value = splt2[14];
 						}
 					}
 					document.getElementById(jsonTypeList[x]+'_exp_body').setAttribute('style', 'display: block');
@@ -301,10 +337,13 @@ function pipelineSelect(num){
 		divAdj.appendChild( testText );
 		divAdj = mergeTidy(divAdj, 6,
 				[ [createElement('label', ['class','TEXTNODE'], ['box-title', 'IGV/TDF Conversion:']),
-				createElement('select', ['id','class', 'OPTION', 'OPTION'], ['select_1_'+num, 'form-control', 'no', 'yes'])],
+				createElement('select', ['id','class','onChange','OPTION', 'OPTION'], ['select_1_'+num, 'form-control', 'IGVTDFSelection(this.id)','no', 'yes'])],
 
 				[createElement('label', ['class','TEXTNODE'], ['box-title', 'BigWig Conversion:']),
 				createElement('select', ['id', 'class', 'OPTION', 'OPTION'], ['select_2_'+num, 'form-control', 'no', 'yes'])] ]);
+		divAdj = mergeTidy(divAdj, 6,
+				[ [createElement('label', ['id', 'class', 'style', 'TEXTNODE'], ['label_1_'+num, 'box-title', 'display:none', 'extFactor']),
+				   createElement('input', ['id', 'class', 'type', 'style', 'value'], ['textarea_2_'+num, 'form-control', 'text', 'display:none', '0'])] ]);
 		divAdj = mergeTidy(divAdj, 12,
 				[ [createElement('label', ['class','TEXTNODE'], ['box-title margin', 'RNA-Seq QC:']),
 				   createElement('input', ['id', 'type', 'class'], ['checkbox_1_'+num, 'checkbox', 'margin'])] ]);
@@ -314,19 +353,20 @@ function pipelineSelect(num){
 		divAdj.appendChild( createElement('label', ['class','TEXTNODE'], ['box-title', 'Tophat parameters:']));
 		divAdj.appendChild( createElement('textarea', ['id', 'class'], ['textarea_'+num, 'form-control']));
 		divAdj = mergeTidy(divAdj, 6,
-				[ [createElement('label', ['class','TEXTNODE'], ['box-title margin', 'IGV/TDF Conversion:']),
-				createElement('select', ['id', 'class', 'OPTION', 'OPTION'], ['select_1_'+num, 'form-control margin', 'no', 'yes'])],
-				[createElement('label', ['class','TEXTNODE'], ['box-title margin', 'BigWig Conversion:']),
-				createElement('select', ['id', 'class', 'OPTION', 'OPTION'], ['select_2_'+num, 'form-control margin', 'no', 'yes'])] ]);
+				[ [createElement('label', ['class','TEXTNODE'], ['box-title', 'IGV/TDF Conversion:']),
+				createElement('select', ['id','class','onChange','OPTION', 'OPTION'], ['select_1_'+num, 'form-control', 'IGVTDFSelection(this.id)','no', 'yes'])],
+				[createElement('label', ['class','TEXTNODE'], ['box-title', 'BigWig Conversion:']),
+				createElement('select', ['id', 'class', 'OPTION', 'OPTION'], ['select_2_'+num, 'form-control', 'no', 'yes'])] ]);
+		divAdj = mergeTidy(divAdj, 6,
+				[ [createElement('label', ['id', 'class', 'style', 'TEXTNODE'], ['label_1_'+num, 'box-title', 'display:none', 'extFactor']),
+				   createElement('input', ['id', 'class', 'type', 'style', 'value'], ['textarea_2_'+num, 'form-control', 'text', 'display:none', '0'])] ]);
 		divAdj = mergeTidy(divAdj, 12,
 				[ [createElement('label', ['class','TEXTNODE'], ['box-title margin', 'RNA-Seq QC:']),
 				   createElement('input', ['id', 'type', 'class'], ['checkbox_1_'+num, 'checkbox', 'margin'])] ]);
 		divAdj = mergeTidy(divAdj, 12,
-				[ [createElement('label', ['class','TEXTNODE'], ['box-title', 'Picard Metrics:'])] ]);
-		divAdj = mergeTidy(divAdj, 12,
 				[ [createElement('label', ['class','TEXTNODE'], ['margin', 'Collect RNA Metrics']),
 				createElement('input', ['id', 'type', 'class'], ['checkbox_2_'+num, 'checkbox', 'margin'])],
-				[createElement('label', ['class','TEXTNODE'], ['margin', 'Collect Other Metrics']),
+				[createElement('label', ['class','TEXTNODE'], ['margin', 'Collect Multiple Picard Metrics']),
 				createElement('input', ['id', 'type', 'class'], ['checkbox_3_'+num, 'checkbox', 'margin'])],
 				[createElement('label', ['class','TEXTNODE'], ['margin', 'Mark Duplicates']),
 				createElement('input', ['id', 'type', 'class'], ['checkbox_4_'+num, 'checkbox', 'margin'])] ]);
@@ -346,9 +386,17 @@ function pipelineSelect(num){
 				createElement('input', ['id', 'class', 'type', 'value'], ['select_2_'+num, 'form-control', 'text', '2700000000'])] ]);
 		divAdj = mergeTidy(divAdj, 6,
 				[ [createElement('label', ['class','TEXTNODE'], ['box-title', 'IGV/TDF Conversion:']),
-				createElement('select', ['id', 'class', 'OPTION', 'OPTION'], ['select_3_'+num, 'form-control', 'no', 'yes'])],
+				createElement('select', ['id','class','onChange','OPTION', 'OPTION'], ['select_3_'+num, 'form-control', 'IGVTDFSelection(this.id)','no', 'yes'])],
 				[createElement('label', ['class','TEXTNODE'], ['box-title', 'BigWig Conversion:']),
 				createElement('select', ['id', 'class', 'OPTION', 'OPTION'], ['select_4_'+num, 'form-control', 'no', 'yes'])] ]);
+		divAdj = mergeTidy(divAdj, 6,
+				[ [createElement('label', ['id', 'class', 'style', 'TEXTNODE'], ['label_1_'+num, 'box-title', 'display:none', 'extFactor']),
+				   createElement('input', ['id', 'class', 'type', 'style', 'value'], ['textarea_2_'+num, 'form-control', 'text', 'display:none', '0'])] ]);
+		divAdj = mergeTidy(divAdj, 12,
+				[ [createElement('label', ['class','TEXTNODE'], ['margin', 'Collect Multiple Picard Metrics:']),
+				createElement('input', ['id', 'type', 'class'], ['checkbox_1_'+num, 'checkbox', 'margin'])],
+				[createElement('label', ['class','TEXTNODE'], ['margin', 'Mark Duplicates:']),
+				createElement('input', ['id', 'type', 'class'], ['checkbox_2_'+num, 'checkbox', 'margin'])] ]);
 	}else if (pipeType == pipelineDict[3]) {
 		//DESEQ
 		divAdj = mergeTidy(divAdj, 6,
@@ -387,11 +435,24 @@ function pipelineSelect(num){
 		labelDiv.appendChild( createElement('label', ['class','TEXTNODE'], ['box-title', 'Additional BSMap Parameters:']));
 		labelDiv.appendChild( createElement('textarea', ['id', 'class'], ['textarea_1_'+num, 'form-control']));
 		divAdj.appendChild(labelDiv);
+		divAdj = mergeTidy(divAdj, 6,
+				[ [createElement('label', ['class','TEXTNODE'], ['box-title', 'IGV/TDF Conversion:']),
+				createElement('select', ['id','class','onChange','OPTION', 'OPTION'], ['select_1_'+num, 'form-control', 'IGVTDFSelection(this.id)','no', 'yes'])],
+				[createElement('label', ['class','TEXTNODE'], ['box-title', 'BigWig Conversion:']),
+				createElement('select', ['id', 'class', 'OPTION', 'OPTION'], ['select_2_'+num, 'form-control', 'no', 'yes'])] ]);
+		divAdj = mergeTidy(divAdj, 6,
+				[ [createElement('label', ['id', 'class', 'style', 'TEXTNODE'], ['label_1_'+num, 'box-title', 'display:none', 'extFactor']),
+				   createElement('input', ['id', 'class', 'type', 'style', 'value'], ['textarea_2_'+num, 'form-control', 'text', 'display:none', '0'])] ]);
+		divAdj = mergeTidy(divAdj, 12,
+				[ [createElement('label', ['class','TEXTNODE'], ['margin', 'Collect Multiple Picard Metrics:']),
+				createElement('input', ['id', 'type', 'class'], ['checkbox_2_'+num, 'checkbox', 'margin'])],
+				[createElement('label', ['class','TEXTNODE'], ['margin', 'Mark Duplicates:']),
+				createElement('input', ['id', 'type', 'class'], ['checkbox_3_'+num, 'checkbox', 'margin'])] ]);
 		
 		//MCALL
 		labelDiv = createElement('div', ['class'], ['col-md-12 text-center']);
 		labelDiv.appendChild( createElement('label', ['class','TEXTNODE'], ['box-title margin', 'Run MCall:']));
-		labelDiv.appendChild( createElement('input', ['id', 'type', 'class'], ['checkbox_2_'+num, 'checkbox', 'margin']));
+		labelDiv.appendChild( createElement('input', ['id', 'type', 'class'], ['checkbox_4_'+num, 'checkbox', 'margin']));
 		divAdj.appendChild(labelDiv);
 		divAdj = mergeTidy(divAdj, 6,
 				[ [createElement('label', ['class','TEXTNODE'], ['box-title', 'MCall Condition 1']),
@@ -400,17 +461,17 @@ function pipelineSelect(num){
 				createElement('select',['id', 'class', 'multiple', 'size', 'onchange'],['multi_select_2_'+num, 'form-control', 'multiple', '8', 'deselectCondition(2, '+num+')'])] ]);
 		labelDiv = createElement('div', ['class'], ['col-md-12']);
 		labelDiv.appendChild( createElement('label', ['class','TEXTNODE'], ['box-title', 'Additional MCall Parameters:']));
-		labelDiv.appendChild( createElement('textarea', ['id', 'class'], ['textarea_2_'+num, 'form-control']));
+		labelDiv.appendChild( createElement('textarea', ['id', 'class'], ['textarea_3_'+num, 'form-control']));
 		divAdj.appendChild(labelDiv);
 		
 		//MComp
 		labelDiv = createElement('div', ['class'], ['col-md-12 text-center']);
 		labelDiv.appendChild( createElement('label', ['class','TEXTNODE'], ['box-title margin', 'Run MComp:']));
-		labelDiv.appendChild( createElement('input', ['id', 'type', 'class'], ['checkbox_3_'+num, 'checkbox', 'margin']));
+		labelDiv.appendChild( createElement('input', ['id', 'type', 'class'], ['checkbox_5_'+num, 'checkbox', 'margin']));
 		divAdj.appendChild(labelDiv);
 		labelDiv = createElement('div', ['class'], ['col-md-12']);
 		labelDiv.appendChild( createElement('label', ['class','TEXTNODE'], ['box-title', 'Additional MComp Parameters:']));
-		labelDiv.appendChild( createElement('textarea', ['id', 'class'], ['textarea_3_'+num, 'form-control']));
+		labelDiv.appendChild( createElement('textarea', ['id', 'class'], ['textarea_4_'+num, 'form-control']));
 		divAdj.appendChild(labelDiv);
 	}
 	//replace div
@@ -462,6 +523,7 @@ function submitPipeline(type) {
 	var description = document.getElementById("run_description").value;
 	var perms = document.getElementById("perms").value;
 	var group = document.getElementById("groups").value;
+	var submission = document.getElementById("submission").value;
 	
 	var empty_values = []
 	if (run_name == "") {
@@ -544,7 +606,10 @@ function submitPipeline(type) {
 		}else{
 		*/
 		json = json + ',"barcodes":"none"';
-
+		
+		//submission check
+		json = json + ',"submission":"' + submission + '"';
+		
 		//adapter
 		if (doAdapter == "yes") {
 			previous = 'adapter';
@@ -1374,10 +1439,12 @@ function removePipes(num){
 	var index = currentPipelineID.indexOf(num);
 	div.parentNode.removeChild(div);
 	if (currentPipelineVal[index] == pipelineDict[0]) {
-	rsemSwitch = false;
+		rsemSwitch = false;
 	}
-	currentPipelineVal.splice(index,1);
-	currentPipelineID.splice(index,1);
+	if (index != -1) {
+		currentPipelineVal.splice(index,1);
+		currentPipelineID.splice(index,1);
+	}
 }
 
 /*##### ADD PIPELINES #####*/
@@ -1657,6 +1724,20 @@ function removeSequenceSetsBtn(num){
 	var removing = document.getElementById('custom_seq_inner_'+num);
 	removing.parentNode.removeChild(removing);
 	customSeqNumCheck.splice(customSeqNumCheck.indexOf(num), 1);
+}
+
+function IGVTDFSelection(id){
+	var value = document.getElementById(id).value;
+	var id_num = id.split("_")[2];
+	console.log(id_num);
+	if (value == 'yes') {
+		document.getElementById('label_1_'+id_num).setAttribute("style", "display:show");
+		document.getElementById('textarea_2_'+id_num).setAttribute("style", "display:show");
+	}else{
+		document.getElementById('label_1_'+id_num).setAttribute("style", "display:none");
+		document.getElementById('textarea_2_'+id_num).setAttribute("style", "display:none");
+		document.getElementById('textarea_2_'+id_num).value = 0;
+	}
 }
 
 function changeRNAParamsBtn(){
