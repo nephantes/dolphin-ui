@@ -9,7 +9,7 @@ var ID_DICTIONARY = {};
 var STORED_SAMPLE_DATA = [];
 
 //GLOBAL VARIABLES
-var jsonTypeList = ['genomebuild', 'spaired', 'resume', 'barcodes', 'fastqc', 'adapter', 'submission', 'quality', 'trim', 'commonind', 'split', 'pipeline', 'advparams', 'custominds'];
+var jsonTypeList = ['genomebuild', 'spaired', 'resume', 'barcodes', 'fastqc', 'adapters', 'submission', 'quality', 'trim', 'commonind', 'split', 'pipeline', 'advparams', 'custominds'];
 var radioTypeCheckList = ['pipeline', 'trimpaired', 'advparams', 'custom'];
 var currentChecked = "";
 var checklist_samples = [];
@@ -50,286 +50,299 @@ function rerunLoad() {
 
 	//make sure this is a rerun
 	if (rerunLoc != -1) {
-	infoArray = grabReload(hrefSplit[rerunLoc + 1]);
-	json_primer = infoArray[0];
-	console.log(json_primer);
-	jsonObj = JSON.parse(json_primer);
-	//repopulate page
-	for (var x = 0; x < (jsonTypeList.length); x++) {
-		if (jsonObj.hasOwnProperty(jsonTypeList[x]) && jsonObj[jsonTypeList[x]] != 'none' && jsonObj[jsonTypeList[x]] != 'NONE' && jsonObj[jsonTypeList[x]] != 'NO' && jsonTypeList[x] != 'barcodes') {
-			var element = document.getElementById(jsonTypeList[x]);
-			if (element != null) {
-				if (element.id == "spaired") {
-					if ( jsonObj[jsonTypeList[x]] == 'paired') {
-						element.value = 'yes'
-					}else{
-						element.value = 'no';
-					}
-				}else if (element.id == "resume"){
-					element.value = 'Resume';
-				}else if (element.id == "0"){
-					element.value = 'None';
-				}else if (element.id == "1"){
-					element.value = 'Encode';
-				}else if (element.id == "2"){
-					element.value = 'Geo';
-				}else{
-					element.value = jsonObj[jsonTypeList[x]];
-				}
-			}else{
-				//try radio
-				if (radioTypeCheckList.indexOf(jsonTypeList[x]) == -1 && jsonTypeList[x] != 'custominds') {
-					//expand the altered fields
-					$( '#'+jsonTypeList[x]+'_yes' ).iCheck('check');
-					document.getElementById(jsonTypeList[x]+'_exp').setAttribute('class', 'box box-default');
-					document.getElementById(jsonTypeList[x]+'_exp_btn').setAttribute('class', 'fa fa-minus');
-					document.getElementById(jsonTypeList[x]+'_exp_body').setAttribute('style', 'display: block');
-					
-					//fill the fields that have been expanded
-					if (Array.isArray(jsonObj[jsonTypeList[x]])) {
-						var splt1 = jsonObj[jsonTypeList[x]][0];
-					}else{
-						var splt1 = jsonObj[jsonTypeList[x]].split(":");
-					}
-					if (Array.isArray(splt1) && splt1.length == 1 && jsonTypeList[x] != 'commonind') {
-						if (jsonTypeList[x] == 'split') {
-							document.getElementById('number of reads per file_val').value = jsonObj[jsonTypeList[x]];
+		infoArray = grabReload(hrefSplit[rerunLoc + 1]);
+		json_primer = infoArray[0];
+		console.log(json_primer);
+		jsonObj = JSON.parse(json_primer);
+		//repopulate page
+		for (var x = 0; x < (jsonTypeList.length); x++) {
+			if (jsonObj.hasOwnProperty(jsonTypeList[x]) && jsonObj[jsonTypeList[x]] != 'none' && jsonObj[jsonTypeList[x]] != 'NONE' && jsonObj[jsonTypeList[x]] != 'NO' && jsonTypeList[x] != 'barcodes') {
+				var element = document.getElementById(jsonTypeList[x]);
+				if (element != null) {
+					if (element.id == "spaired") {
+						if ( jsonObj[jsonTypeList[x]] == 'paired') {
+							element.value = 'yes'
 						}else{
-							document.getElementById(jsonTypeList[x]+'_val').value = jsonObj[jsonTypeList[x]].replace(/__cr____cn__/g, "\n");;
+							element.value = 'no';
 						}
+					}else if (element.id == "resume"){
+						element.value = 'Resume';
+					}else if (element.id == "0"){
+						element.value = 'None';
+					}else if (element.id == "1"){
+						element.value = 'Encode';
+					}else if (element.id == "2"){
+						element.value = 'Geo';
 					}else{
-						if (jsonTypeList[x] == 'quality') {
-							document.getElementById( qualityDict[0]+'_val' ).value = splt1.windowSize;
-							document.getElementById( qualityDict[1]+'_val' ).value = splt1.requiredQuality;
-							document.getElementById( qualityDict[2]+'_val' ).value = splt1.leading;
-							document.getElementById( qualityDict[3]+'_val' ).value = splt1.trailing;
-							document.getElementById( qualityDict[4]+'_val' ).value = splt1.minlen;
-						}else if (jsonTypeList[x] == 'trim'){
-							if (splt1.hasOwnProperty('trimpaired')) {
-								document.getElementById( trimmingDict[0]+'_val').value = 'paired-end';
-								selectTrimming('single or paired-end_val', 0, 0);
-								document.getElementById( trimmingDict[1]+'_val' ).value = splt1['5len1'];
-								document.getElementById( trimmingDict[2]+'_val' ).value = splt1['3len1'];
-								document.getElementById( trimmingDict[3]+'_val' ).value = splt1['5len2'];
-								document.getElementById( trimmingDict[4]+'_val' ).value = splt1['3len2'];
+						element.value = jsonObj[jsonTypeList[x]];
+					}
+				}else{
+					//try radio
+					if (radioTypeCheckList.indexOf(jsonTypeList[x]) == -1 && jsonTypeList[x] != 'custominds') {
+						//expand the altered fields
+						$( '#'+jsonTypeList[x]+'_yes' ).iCheck('check');
+						document.getElementById(jsonTypeList[x]+'_exp').setAttribute('class', 'box box-default');
+						document.getElementById(jsonTypeList[x]+'_exp_btn').setAttribute('class', 'fa fa-minus');
+						document.getElementById(jsonTypeList[x]+'_exp_body').setAttribute('style', 'display: block');
+						
+						//fill the fields that have been expanded
+						if (Array.isArray(jsonObj[jsonTypeList[x]])) {
+							var splt1 = jsonObj[jsonTypeList[x]][0];
+						}else{
+							var splt1 = jsonObj[jsonTypeList[x]].split(":");
+						}
+						if (Array.isArray(splt1) && splt1.length == 1 && jsonTypeList[x] != 'commonind') {
+							if (jsonTypeList[x] == 'split') {
+								document.getElementById('number of reads per file_val').value = jsonObj[jsonTypeList[x]];
 							}else{
-								document.getElementById( trimmingDict[0]+'_val').value = 'single-end';
-								document.getElementById( trimmingDict[1]+'_val' ).value = splt1['5len1'];
-								document.getElementById( trimmingDict[2]+'_val' ).value = splt1['3len1'];
-							}
-								
-						}else if (jsonTypeList[x] == 'commonind'){
-							var splt2 = splt1[0].split(",");
-							for(var y = 0; y < splt2.length; y++){
-								$( '#'+splt2[y]+'_yes' ).iCheck('check');
-								deseqList.push(splt2[y]);
+								document.getElementById(jsonTypeList[x]+'_val').value = jsonObj[jsonTypeList[x]].replace(/__cr____cn__/g, "\n");;
 							}
 						}else{
-							console.log(splt1);
-						}
-					}
-				}else if (jsonTypeList[x] == 'advparams') {
-					changeRNAParamsBtn();
-					document.getElementById('change_params_val').value = jsonObj[jsonTypeList[x]];
-				}else if (jsonTypeList[x] == 'custominds') {
-					document.getElementById('custom_exp').setAttribute('class', 'box box-default');
-					document.getElementById('custom_exp_btn').setAttribute('class', 'fa fa-minus');
-					for(var y = 0; y < jsonObj[jsonTypeList[x]].length; y++){
-						sequenceSetsBtn();
-						document.getElementById('custom_1_'+y).value = jsonObj[jsonTypeList[x]][y].FullPath;
-						document.getElementById('custom_2_'+y).value = jsonObj[jsonTypeList[x]][y].IndexPrefix;
-						document.getElementById('custom_3_'+y).value = jsonObj[jsonTypeList[x]][y].BowtieParams;
-						document.getElementById('custom_4_'+y).value = jsonObj[jsonTypeList[x]][y].Description;
-						document.getElementById('custom_5_'+y).value = jsonObj[jsonTypeList[x]][y]['Filter Out'];
-					}
-					document.getElementById('custom_exp_body').setAttribute('style', 'display: block');
-				}else{
-					//pipeline
-					document.getElementById(jsonTypeList[x]+'_exp').setAttribute('class', 'box box-default');
-					document.getElementById(jsonTypeList[x]+'_exp_btn').setAttribute('class', 'fa fa-minus');
-	
-					var splt1 = jsonObj[jsonTypeList[x]];
-					for (var i = 0; i < splt1.length; i++){
-						if (splt1[i].Type == pipelineDict[0]) {
-							//RSEM
-							additionalPipes();
-							document.getElementById('select_'+i).value = pipelineDict[0];
-							pipelineSelect(i);
-							document.getElementById('textarea_'+i).value = splt1[i].Params;
-							document.getElementById('select_1_'+i).value = splt1[i].IGVTDF;
-							document.getElementById('select_2_'+i).value = splt1[i].BAM2BW;
-							if (splt1[i].ExtFactor != '0' && splt1[i].ExtFactor != 0) {
-								IGVTDFSelection('select_1_'+i);
-								document.getElementById('textarea_2_'+i).value = splt1[i].ExtFactor;
-							}
-							if (splt1[i].RSeQC == 'yes') {
-								document.getElementById('checkbox_1_'+i).checked = true;
-							}
-							rsemSwitch = true;
-						}else if (splt1[i].Type == pipelineDict[1]) {
-							//Tophat
-							additionalPipes();
-							document.getElementById('select_'+i).value = pipelineDict[1];
-							pipelineSelect(i);
-							document.getElementById('textarea_'+i).value = splt1[i].Params;
-							document.getElementById('select_1_'+i).value = splt1[i].IGVTDF;
-							document.getElementById('select_2_'+i).value = splt1[i].BAM2BW;
-							if (splt1[i].ExtFactor != '0' && splt1[i].ExtFactor != 0) {
-								IGVTDFSelection('select_1_'+i);
-								document.getElementById('textarea_2_'+i).value = splt1[i].ExtFactor;
-							}
-							if (splt1[i].RSeQC == 'yes') {
-								document.getElementById('checkbox_1_'+i).checked = true;
-							}
-							if (splt1[i].CollectRnaSeqMetrics == 'yes') {
-								document.getElementById('checkbox_2_'+i).checked = true;
-							}
-							if (splt1[i].CollectMultipleMetrics == 'yes') {
-								document.getElementById('checkbox_3_'+i).checked = true;
-							}
-							if (splt1[i].MarkDuplicates == 'yes') {
-								document.getElementById('checkbox_4_'+i).checked = true;
-							}
-						}else if (splt1[i].Type == pipelineDict[2]){
-							//Chipseq
-							additionalPipes();
-							document.getElementById('select_'+i).value = pipelineDict[2];
-							pipelineSelect(i);
-							document.getElementById('textarea_'+i).value = splt1[i].ChipInput.replace(/__cr____cn__/g, "\n");
-							document.getElementById('text_1_'+i).value = splt1[i].MultiMapper;
-							document.getElementById('text_2_'+i).value = splt1[i].TagSize;
-							document.getElementById('select_1_'+i).value = splt1[i].BandWith;
-							document.getElementById('select_2_'+i).value = splt1[i].EffectiveGenome;
-							document.getElementById('select_3_'+i).value = splt1[i].IGVTDF;
-							document.getElementById('select_4_'+i).value = splt1[i].BAM2BW;
-							if (splt1[i].ExtFactor != '0' && splt1[i].ExtFactor != 0) {
-								IGVTDFSelection('select_3_'+i);
-								document.getElementById('textarea_2_'+i).value = splt1[i].ExtFactor;
-							}
-							if (splt1[i].CollectMultipleMetrics == 'yes') {
-								document.getElementById('checkbox_1_'+i).checked = true;
-							}
-							if (splt1[i].MarkDuplicates == 'yes') {
-								document.getElementById('checkbox_2_'+i).checked = true;
-							}
-						}else if (splt1[i].Type == pipelineDict[3]) {
-							//DESEQ
-							additionalPipes();
-							document.getElementById('select_'+i).value = pipelineDict[3];
-							pipelineSelect(i);
-							
-							//handle for multiple selections
-							document.getElementById('text_1_'+i).value = splt1[i].Name;
-							var select_values = [];
-							var select_locations = [];
-							if (splt1[i].Columns != undefined) {
-								select_values = splt1[i].Columns.split(",");
-								select_locations = splt1[i].Conditions.split(",");
-							}
-							var select1_values = [];
-							var select2_values = [];
-							for(var f = 0; f < select_locations.length; f++){
-								if (select_locations[f] == 'Cond1') {
-									select1_values.push(select_values[f]);
+							if (jsonTypeList[x] == 'quality') {
+								document.getElementById( qualityDict[0]+'_val' ).value = splt1.windowSize;
+								document.getElementById( qualityDict[1]+'_val' ).value = splt1.requiredQuality;
+								document.getElementById( qualityDict[2]+'_val' ).value = splt1.leading;
+								document.getElementById( qualityDict[3]+'_val' ).value = splt1.trailing;
+								document.getElementById( qualityDict[4]+'_val' ).value = splt1.minlen;
+							}else if (jsonTypeList[x] == 'trim'){
+								if (splt1.hasOwnProperty('trimpaired')) {
+									document.getElementById( trimmingDict[0]+'_val').value = 'paired-end';
+									selectTrimming('single or paired-end_val', 0, 0);
+									document.getElementById( trimmingDict[1]+'_val' ).value = splt1['5len1'];
+									document.getElementById( trimmingDict[2]+'_val' ).value = splt1['3len1'];
+									document.getElementById( trimmingDict[3]+'_val' ).value = splt1['5len2'];
+									document.getElementById( trimmingDict[4]+'_val' ).value = splt1['3len2'];
 								}else{
-									select2_values.push(select_values[f]);
+									document.getElementById( trimmingDict[0]+'_val').value = 'single-end';
+									document.getElementById( trimmingDict[1]+'_val' ).value = splt1['5len1'];
+									document.getElementById( trimmingDict[2]+'_val' ).value = splt1['3len1'];
 								}
-							}
-							
-							var select1 = document.getElementById('multi_select_1_'+i);
-							for(var h = 0; h < select1.options.length; h++){
-								if (select1_values.indexOf(select1.options[h].value) != -1) {
-									select1.options[h].selected = true;
+									
+							}else if (jsonTypeList[x] == 'commonind'){
+								var splt2 = splt1[0].split(",");
+								for(var y = 0; y < splt2.length; y++){
+									$( '#'+splt2[y]+'_yes' ).iCheck('check');
+									deseqList.push(splt2[y]);
 								}
+							}else{
+								console.log(splt1);
 							}
-							var select2 = document.getElementById('multi_select_2_'+i);
-							for(var h = 0; h < select1.options.length; h++){
-								if (select2_values.indexOf(select2.options[h].value) != -1) {
-									select2.options[h].selected = true;
-								}
-							}
-							document.getElementById('select_3_'+i).value = splt1[i].FitType;
-							document.getElementById('select_4_'+i).value = splt1[i].HeatMap;
-							document.getElementById('text_2_'+i).value = splt1[i].padj;
-							document.getElementById('text_3_'+i).value = splt1[i].foldChange;
-							document.getElementById('select_5_'+i).value = splt1[i].DataType;
-						}else if (splt1[i].Type == pipelineDict[4]) {
-							//MMap
-							additionalPipes();
-							document.getElementById('select_'+i).value = pipelineDict[4];
-							pipelineSelect(i);
-							
-							document.getElementById('text_1_'+i).value = splt1[i].Digestion;
-							$("#" + i.toString() + "_" + splt1[i].BisulphiteType).iCheck('check');
-							if (splt1[i].BisulphiteType == 'WGBS') {
-								document.getElementById('text_1_'+i).disabled = true;
-							}
-							document.getElementById('textarea_1_'+i).value = splt1[i].BSMapParams;
-							document.getElementById('select_1_'+i).value = splt1[i].IGVTDF;
-							document.getElementById('select_2_'+i).value = splt1[i].BAM2BW;
-							if (splt1[i].ExtFactor != '0' && splt1[i].ExtFactor != 0) {
-								IGVTDFSelection('select_1_'+i);
-								document.getElementById('textarea_2_'+i).value = splt1[i].ExtFactor;
-							}
-							if (splt1[i].CollectMultipleMetrics == 'yes') {
-								document.getElementById('checkbox_2_'+i).checked = true;
-							}
-							if (splt1[i].MarkDuplicates == 'yes') {
-								document.getElementById('checkbox_3_'+i).checked = true;
-							}
-							
-							//MCall
-							//handle for multiple selections
-							if (splt1[i].MCallStep == 'yes') {
-								document.getElementById('checkbox_4_'+i).checked = true;
-							}
-							MCallSelection(i);
-							var select_values = [];
-							var select_locations = [];
-							if (splt1[i].Columns != undefined) {
-								select_values = splt1[i].Columns.split(",");
-								select_locations = splt1[i].Conditions.split(",");
-							}
-							var select1_values = [];
-							var select2_values = [];
-							for(var f = 0; f < select_locations.length; f++){
-								if (select_locations[f] == 'Cond1') {
-									select1_values.push(select_values[f]);
-								}else{
-									select2_values.push(select_values[f]);
-								}
-							}
-							
-							var select1 = document.getElementById('multi_select_1_'+i);
-							for(var h = 0; h < select1.options.length; h++){
-								if (select1_values.indexOf(select1.options[h].value) != -1) {
-									select1.options[h].selected = true;
-								}
-							}
-							var select2 = document.getElementById('multi_select_2_'+i);
-							for(var h = 0; h < select1.options.length; h++){
-								if (select2_values.indexOf(select2.options[h].value) != -1) {
-									select2.options[h].selected = true;
-								}
-							}
-							document.getElementById('textarea_3_'+i).value = splt1[i].MCallParams;
-							
-							//MComp
-							if (splt1[i].MCompStep == 'yes') {
-								document.getElementById('checkbox_5_'+i).checked = true;
-							}
-							MCompSelection(i);
-							document.getElementById('textarea_4_'+i).value = splt1[i].MCompParams;
 						}
+					}else if (jsonTypeList[x] == 'advparams') {
+						changeRNAParamsBtn();
+						document.getElementById('change_params_val').value = jsonObj[jsonTypeList[x]];
+					}else if (jsonTypeList[x] == 'custominds') {
+						document.getElementById('custom_exp').setAttribute('class', 'box box-default');
+						document.getElementById('custom_exp_btn').setAttribute('class', 'fa fa-minus');
+						for(var y = 0; y < jsonObj[jsonTypeList[x]].length; y++){
+							sequenceSetsBtn();
+							document.getElementById('custom_1_'+y).value = jsonObj[jsonTypeList[x]][y].FullPath;
+							document.getElementById('custom_2_'+y).value = jsonObj[jsonTypeList[x]][y].IndexPrefix;
+							document.getElementById('custom_3_'+y).value = jsonObj[jsonTypeList[x]][y].BowtieParams;
+							document.getElementById('custom_4_'+y).value = jsonObj[jsonTypeList[x]][y].Description;
+							document.getElementById('custom_5_'+y).value = jsonObj[jsonTypeList[x]][y]['Filter Out'];
+						}
+						document.getElementById('custom_exp_body').setAttribute('style', 'display: block');
+					}else{
+						//pipeline
+						document.getElementById(jsonTypeList[x]+'_exp').setAttribute('class', 'box box-default');
+						document.getElementById(jsonTypeList[x]+'_exp_btn').setAttribute('class', 'fa fa-minus');
+		
+						var splt1 = jsonObj[jsonTypeList[x]];
+						for (var i = 0; i < splt1.length; i++){
+							if (splt1[i].Type == pipelineDict[0]) {
+								//RSEM
+								additionalPipes();
+								document.getElementById('select_'+i).value = pipelineDict[0];
+								pipelineSelect(i);
+								document.getElementById('textarea_'+i).value = splt1[i].Params;
+								document.getElementById('select_1_'+i).value = splt1[i].IGVTDF;
+								document.getElementById('select_2_'+i).value = splt1[i].BAM2BW;
+								if (splt1[i].ExtFactor != '0' && splt1[i].ExtFactor != 0) {
+									IGVTDFSelection('select_1_'+i);
+									document.getElementById('textarea_2_'+i).value = splt1[i].ExtFactor;
+								}
+								if (splt1[i].RSeQC == 'yes') {
+									document.getElementById('checkbox_1_'+i).checked = true;
+								}
+								rsemSwitch = true;
+							}else if (splt1[i].Type == pipelineDict[1]) {
+								//Tophat
+								additionalPipes();
+								document.getElementById('select_'+i).value = pipelineDict[1];
+								pipelineSelect(i);
+								document.getElementById('textarea_'+i).value = splt1[i].Params;
+								document.getElementById('select_1_'+i).value = splt1[i].IGVTDF;
+								document.getElementById('select_2_'+i).value = splt1[i].BAM2BW;
+								if (splt1[i].ExtFactor != '0' && splt1[i].ExtFactor != 0) {
+									IGVTDFSelection('select_1_'+i);
+									document.getElementById('textarea_2_'+i).value = splt1[i].ExtFactor;
+								}
+								if (splt1[i].RSeQC == 'yes') {
+									document.getElementById('checkbox_1_'+i).checked = true;
+								}
+								if (splt1[i].CollectRnaSeqMetrics == 'yes') {
+									document.getElementById('checkbox_2_'+i).checked = true;
+								}
+								if (splt1[i].CollectMultipleMetrics == 'yes') {
+									document.getElementById('checkbox_3_'+i).checked = true;
+								}
+								if (splt1[i].MarkDuplicates == 'yes') {
+									document.getElementById('checkbox_4_'+i).checked = true;
+								}
+							}else if (splt1[i].Type == pipelineDict[2]){
+								//Chipseq
+								additionalPipes();
+								document.getElementById('select_'+i).value = pipelineDict[2];
+								pipelineSelect(i);
+								document.getElementById('textarea_'+i).value = splt1[i].ChipInput.replace(/__cr____cn__/g, "\n");
+								document.getElementById('text_1_'+i).value = splt1[i].MultiMapper;
+								document.getElementById('text_2_'+i).value = splt1[i].TagSize;
+								document.getElementById('select_1_'+i).value = splt1[i].BandWith;
+								document.getElementById('select_2_'+i).value = splt1[i].EffectiveGenome;
+								document.getElementById('select_3_'+i).value = splt1[i].IGVTDF;
+								document.getElementById('select_4_'+i).value = splt1[i].BAM2BW;
+								if (splt1[i].ExtFactor != '0' && splt1[i].ExtFactor != 0) {
+									IGVTDFSelection('select_3_'+i);
+									document.getElementById('textarea_2_'+i).value = splt1[i].ExtFactor;
+								}
+								if (splt1[i].CollectMultipleMetrics == 'yes') {
+									document.getElementById('checkbox_1_'+i).checked = true;
+								}
+								if (splt1[i].MarkDuplicates == 'yes') {
+									document.getElementById('checkbox_2_'+i).checked = true;
+								}
+							}else if (splt1[i].Type == pipelineDict[3]) {
+								//DESEQ
+								additionalPipes();
+								document.getElementById('select_'+i).value = pipelineDict[3];
+								pipelineSelect(i);
+								
+								//handle for multiple selections
+								document.getElementById('text_1_'+i).value = splt1[i].Name;
+								var select_values = [];
+								var select_locations = [];
+								if (splt1[i].Columns != undefined) {
+									select_values = splt1[i].Columns.split(",");
+									select_locations = splt1[i].Conditions.split(",");
+								}
+								var select1_values = [];
+								var select2_values = [];
+								for(var f = 0; f < select_locations.length; f++){
+									if (select_locations[f] == 'Cond1') {
+										select1_values.push(select_values[f]);
+									}else{
+										select2_values.push(select_values[f]);
+									}
+								}
+								
+								var select1 = document.getElementById('multi_select_1_'+i);
+								for(var h = 0; h < select1.options.length; h++){
+									if (select1_values.indexOf(select1.options[h].value) != -1) {
+										select1.options[h].selected = true;
+									}
+								}
+								var select2 = document.getElementById('multi_select_2_'+i);
+								for(var h = 0; h < select1.options.length; h++){
+									if (select2_values.indexOf(select2.options[h].value) != -1) {
+										select2.options[h].selected = true;
+									}
+								}
+								document.getElementById('select_3_'+i).value = splt1[i].FitType;
+								document.getElementById('select_4_'+i).value = splt1[i].HeatMap;
+								document.getElementById('text_2_'+i).value = splt1[i].padj;
+								document.getElementById('text_3_'+i).value = splt1[i].foldChange;
+								document.getElementById('select_5_'+i).value = splt1[i].DataType;
+							}else if (splt1[i].Type == pipelineDict[4]) {
+								//MMap
+								additionalPipes();
+								document.getElementById('select_'+i).value = pipelineDict[4];
+								pipelineSelect(i);
+								
+								document.getElementById('text_1_'+i).value = splt1[i].Digestion;
+								$("#" + i.toString() + "_" + splt1[i].BisulphiteType).iCheck('check');
+								if (splt1[i].BisulphiteType == 'WGBS') {
+									document.getElementById('text_1_'+i).disabled = true;
+								}
+								document.getElementById('textarea_1_'+i).value = splt1[i].BSMapParams;
+								document.getElementById('select_1_'+i).value = splt1[i].IGVTDF;
+								document.getElementById('select_2_'+i).value = splt1[i].BAM2BW;
+								if (splt1[i].ExtFactor != '0' && splt1[i].ExtFactor != 0) {
+									IGVTDFSelection('select_1_'+i);
+									document.getElementById('textarea_2_'+i).value = splt1[i].ExtFactor;
+								}
+								if (splt1[i].CollectMultipleMetrics == 'yes') {
+									document.getElementById('checkbox_2_'+i).checked = true;
+								}
+								if (splt1[i].MarkDuplicates == 'yes') {
+									document.getElementById('checkbox_3_'+i).checked = true;
+								}
+								
+								//MCall
+								//handle for multiple selections
+								if (splt1[i].MCallStep == 'yes') {
+									document.getElementById('checkbox_4_'+i).checked = true;
+								}
+								MCallSelection(i);
+								var select_values = [];
+								var select_locations = [];
+								if (splt1[i].Columns != undefined) {
+									select_values = splt1[i].Columns.split(",");
+									select_locations = splt1[i].Conditions.split(",");
+								}
+								var select1_values = [];
+								var select2_values = [];
+								for(var f = 0; f < select_locations.length; f++){
+									if (select_locations[f] == 'Cond1') {
+										select1_values.push(select_values[f]);
+									}else{
+										select2_values.push(select_values[f]);
+									}
+								}
+								
+								var select1 = document.getElementById('multi_select_1_'+i);
+								for(var h = 0; h < select1.options.length; h++){
+									if (select1_values.indexOf(select1.options[h].value) != -1) {
+										select1.options[h].selected = true;
+									}
+								}
+								var select2 = document.getElementById('multi_select_2_'+i);
+								for(var h = 0; h < select1.options.length; h++){
+									if (select2_values.indexOf(select2.options[h].value) != -1) {
+										select2.options[h].selected = true;
+									}
+								}
+								document.getElementById('textarea_3_'+i).value = splt1[i].MCallParams;
+								
+								//MComp
+								if (splt1[i].MCompStep == 'yes') {
+									document.getElementById('checkbox_5_'+i).checked = true;
+								}
+								MCompSelection(i);
+								document.getElementById('textarea_4_'+i).value = splt1[i].MCompParams;
+							}
+						}
+						document.getElementById(jsonTypeList[x]+'_exp_body').setAttribute('style', 'display: block');
 					}
-					document.getElementById(jsonTypeList[x]+'_exp_body').setAttribute('style', 'display: block');
 				}
 			}
 		}
-	}
-	document.getElementById('outdir').value = infoArray[1];
-	document.getElementById('run_name').value = infoArray[2];
-	document.getElementById('run_description').value = infoArray[3];
+		document.getElementById('outdir').value = infoArray[1];
+		document.getElementById('run_name').value = infoArray[2];
+		document.getElementById('run_description').value = infoArray[3];
+		var group_select = document.getElementById('groups').childNodes;
+		for(var z = 0; z < group_select.length; z++){
+			if (group_select[z].value == infoArray[4]) {
+				document.getElementById('groups').value = group_select[z].value;
+			}
+		}
+		var perms_select = document.getElementById('perms').childNodes;
+		console.log(perms_select);
+		for(var z = 0; z < perms_select.length; z++){
+			if (perms_select[z].value == infoArray[5]) {
+				document.getElementById('perms').value = perms_select[z].value;
+			}
+		}
 	}
 }
 
@@ -591,13 +604,13 @@ function submitPipeline(type) {
 		});
 		
 		//Expanding
-		var doAdapter = findRadioChecked("adapter");
+		var doAdapter = findRadioChecked("adapters");
 		var doQuality = findRadioChecked("quality");
 		var doTrimming = findRadioChecked("trim");
 		var doRNA = findRNAChecked(rnaList);
 		var doSplit = findRadioChecked("split");
 	
-		var adapter = findAdditionalInfoValues(doAdapter, ["adapter"]);
+		var adapter = findAdditionalInfoValues(doAdapter, ["adapters"]);
 
 		var adapterCheck = false;
 		if (adapter[0].match(/[bd-fh-sv-zBD-FH-SV-Z0-9\!\@\#\$\%\^\&\*\(\)\_\+\-\=\\\|\[\]\{\}\;\'\:\"\,\.\/\<\>\?\`\~]+/g)) {
@@ -640,10 +653,10 @@ function submitPipeline(type) {
 		
 		//adapter
 		if (doAdapter == "yes") {
-			previous = 'adapter';
-			JSON_OBJECT['adapter'] = adapter[0].toUpperCase().replace(/\r\n|\r|\n/g, "__cr____cn__").replace(/U/g, 'T');
+			previous = 'adapters';
+			JSON_OBJECT['adapters'] = adapter[0].toUpperCase().replace(/\r\n|\r|\n/g, "__cr____cn__").replace(/U/g, 'T');
 		}else{
-			JSON_OBJECT['adapter'] = 'none';
+			JSON_OBJECT['adapters'] = 'none';
 		}
 		//quality
 		var JSON_ARRAY_QUALITY = {};
