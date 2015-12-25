@@ -298,13 +298,14 @@ class Dolphin:
        if (runparams['pipeline']):
            for pipe in runparams['pipeline']:
              if (pipe['Type']=="RNASeqRSEM"):
-               paramsrsem=pipe['Params'] if (not pipe['Params']) else "NONE"
+               paramsrsem=pipe['Params'] if ('Params' in pipe and pipe['Params']!="") else "NONE"
                print >>fp, '@PARAMSRSEM=%s'%(self.parse_content(paramsrsem))
                print >>fp, '@TSIZE=50';
                print >>fp, '@PREVIOUSRSEM=%s'%(previoussplit)
     
              if (pipe['Type']=="Tophat"):
-               paramstophat=pipe['Params'] if (not pipe['Params']) else "NONE"
+               paramstophat=pipe['Params'] if ('Params' in pipe and pipe['Params']!="") else "NONE"
+               print >>fp, '@TSIZE=50';
                print >>fp, '@PARAMSTOPHAT=%s'%(self.parse_content(paramstophat))
                
              
@@ -333,6 +334,7 @@ class Dolphin:
 
              if (pipe['Type']=="BisulphiteMapping"):
                if (pipe['BSMapStep'] == "yes"):
+                 print >>fp, '@DIGESTION=%s'%(  str(pipe['Digestion']) if ('Digestion' in pipe) else 'NONE' )
                  self.writeInputParamLine(fp, pipe, "@BSMAPPARAM", 'BSMapParams', "BSMapStep")
                if (pipe['MCallStep']== "yes"):
                  self.writeInputParamLine(fp, pipe, "@MCONDS", 'Conditions', "MCallStep")
@@ -347,9 +349,10 @@ class Dolphin:
       except Exception, ex:
         self.stop_err('Error (line:%s)running writeInput\n%s'%(format(sys.exc_info()[-1].tb_lineno), str(ex)))
     
-    def prf(self, fp, str):
-        if (str!=None):
-           print >>fp, str
+    def prf(self, fp, text):
+        print "HERE:"+str(text)
+        if (str!=None and str(text).lower()!="none"):
+           print >>fp, text
            
     def writeVisualizationStr(self, fp, type, pipe, sep):
       try:
@@ -365,18 +368,22 @@ class Dolphin:
     
     def writeRSeQC ( self, fp, type, pipe, sep):
       try:
-        if ('RSeQC' in pipe and pipe['RSeQC'].lower()=="yes"):
+        if ('RSeQC' in pipe and pipe['RSeQC'].lower()=="yes" and type.lower().find("chip")<0):
             self.prf( fp, stepRSEQC % locals() )
             self.prf( fp, stepMergeRSEQC % locals() )
       except Exception, ex:
         self.stop_err('Error (line:%s)running writeRSeQC\n%s'%(format(sys.exc_info()[-1].tb_lineno), str(ex)))
             
     def writePicard (self, fp, type, pipe, sep):
+      initialtype=type
       try:
-        metrics = ("CollectRnaSeqMetrics", "CollectMultipleMetrics", "MarkDuplicates") 
+        metrics = ("MarkDuplicates", "CollectRnaSeqMetrics", "CollectMultipleMetrics") 
         for metric in metrics:
-            self.prf( fp, stepPicard % locals() )
-       
+          if( (metric=="CollectRnaSeqMetrics" and (type.lower().find("tophat")>1 or type.lower().find("rsem")>1  )) or metric != "CollectRnaSeqMetrics" ):
+            self.prf( fp, stepPicard % locals() if ((metric in pipe and pipe[metric].lower()=="yes")) else None )
+            if ("MarkDuplicates" in pipe):
+                type = "dup"+initialtype
+        
         self.prf( fp, stepMergePicard % locals() if (('CollectRnaSeqMetrics' in pipe and pipe['CollectRnaSeqMetrics'].lower()=="yes") or ('CollectMultipleMetrics' in pipe and pipe['CollectMultipleMetrics'].lower()=="yes")) else None )
      
       except Exception, ex:
@@ -429,7 +436,7 @@ class Dolphin:
                  for g_i in gis:
                    for t_e in tes:
                      self.prf( fp, stepRSEMCount % locals() )
-                     
+
                  self.writeVisualizationStr( fp, "RSEM", pipe, sep )
                  self.writeRSeQC ( fp, "RSEM", pipe, sep )
               
@@ -439,10 +446,15 @@ class Dolphin:
                  if ('split' in runparams and runparams['split'].lower() != 'none'):
                     self.prf( fp, '%s'%(stepMergeBAM % locals()) )
                     type="mergetophat"
-                 self.writeVisualizationStr( fp, "Tophat", pipe, sep )
-                 self.writeRSeQC ( fp, "Tophat", pipe, sep )
-                 self.writePicard (fp, "Tophat", pipe, sep )
-     
+
+                 self.writePicard (fp, type, pipe, sep )
+                 if ("MarkDuplicates" in pipe and pipe['MarkDuplicates'].lower()=="yes"):
+                    type="dup"+type
+
+                 self.writeVisualizationStr( fp, type, pipe, sep )
+                 self.writeRSeQC ( fp, type, pipe, sep )
+
+                    
               if (pipe['Type'] == "DESeq"):
                  deseq_name =( pipe['Name'] if ('Name' in pipe) else '' )
                  self.prf( fp, '%s'%(stepDESeq2 % locals()) )
@@ -452,30 +464,35 @@ class Dolphin:
                  indexname='Chip'
                  self.prf( fp, '%s'%(stepSeqMapping % locals()) )
 
+                 type="chip"
                  if ('split' in runparams and runparams['split'].lower() != 'none'):
                      self.prf( fp, '%s'%(stepMergeBAM % locals()) )
+                     type="mergechip"
 
+                 self.writePicard (fp, type, pipe, sep )
+                 if ("MarkDuplicates" in pipe and pipe['MarkDuplicates'].lower()=="yes"):
+                    type="dup"+type
+
+                 self.writeVisualizationStr( fp, type, pipe, sep )
+                                  
                  #Set running macs step
                  self.prf( fp, '%s'%(stepMACS % locals()) )
                  self.prf( fp, '%s'%(stepAggregation % locals()) )
      
-                 type="chip"
-                 if ('split' in runparams and runparams['split'].lower() != 'none'):
-                     type="mergechip"
-                 self.writeVisualizationStr( fp, type, pipe, sep )
-                 self.writePicard (fp, type, pipe, sep )
+
               if (pipe['Type'] == "BisulphiteMapping"):
-                 if (arr[1] == "1"):
-                    digestion=(runparams['digestion'] if ('digestion' in pipe) else '')
-                    self.prf( fp, '%s'% ( stepBSMap % locals() if ('BSMapStep' in pipe and pipe['BSMapStep'].lower=="yes") else None ) )
+                 self.prf( fp, '%s'% ( stepBSMap % locals() if ('BSMapStep' in pipe and pipe['BSMapStep'].lower()=="yes") else None ) )
                  
                  type="bsmap"
                  if ('split' in runparams and runparams['split'].lower() != 'none'):
                     self.prf( fp, '%s'%(stepMergeBAM % locals()) )
                     type="mergebsmap"
                     
-                 self.writeVisualizationStr( fp, type, pipe, sep )
                  self.writePicard (fp, type, pipe, sep )
+                 if ("MarkDuplicates" in pipe and pipe['MarkDuplicates'].lower()=="yes"):
+                    type="dup"+type 
+                 
+                 self.writeVisualizationStr( fp, type, pipe, sep )
                  
                  self.prf( fp, '%s'% ( stepMCall % locals() if ('MCallStep' in pipe and pipe['MCallStep'].lower()=="yes") else None ) )
                  self.prf( fp, '%s'% ( stepMComp % locals() if ('MCompStep' in pipe and pipe['MCompStep'].lower()=="yes") else None ) )

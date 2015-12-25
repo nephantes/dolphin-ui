@@ -110,7 +110,7 @@ class funcs
     }
     function runSQL($sql)
     {
-        sleep(1);
+        #sleep(1);
         $this->readINI();
         $link = new mysqli($this->dbhost, $this->dbuser, $this->dbpass, $this->db);
         // check connection
@@ -244,7 +244,7 @@ class funcs
         $sql      = "select j.service_id from jobs j, services s where s.service_id=j.service_id and s.servicename='$servicename' and j.wkey='$wkey'";
         #return $sql;
         $service_id   = $this->queryAVal($sql);
-        sleep(1); 
+        #sleep(1); 
         if ($service_id > 0) {
             $sql        = "select DISTINCT j.job_num job_num, j.jobname jobname, j.result jresult, s.username username from jobs j, services s where s.service_id=j.service_id and s.servicename='$servicename' and wkey='$wkey' and result<3";
             $res      = $this->runSQL($sql);
