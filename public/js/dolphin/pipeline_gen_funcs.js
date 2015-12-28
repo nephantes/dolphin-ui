@@ -12,6 +12,8 @@ var STORED_SAMPLE_DATA = [];
 var jsonTypeList = ['genomebuild', 'spaired', 'resume', 'barcodes', 'fastqc', 'adapters', 'submission', 'quality', 'trim', 'commonind', 'split', 'pipeline', 'advparams', 'custominds'];
 var radioTypeCheckList = ['pipeline', 'trimpaired', 'advparams', 'custom'];
 var currentChecked = "";
+var previousSelect = "";
+var previousSelectionCount = 0;
 var checklist_samples = [];
 var checklist_lanes = [];
 var checklist_experiment_series = [];
@@ -24,7 +26,6 @@ var qualityDict = ["window size","required quality","leading","trailing","minlen
 var trimmingDict = ["single or paired-end", "5 length 1", "3 length 1", "5 length 2", "3 length 2"];
 var currentPipelineID = [];
 var currentPipelineVal =[];
-var rsemSwitch = false;
 var deseqList = ['RSEM'];
 var valid_samples;
 var username;
@@ -165,7 +166,6 @@ function rerunLoad() {
 								if (splt1[i].RSeQC == 'yes') {
 									document.getElementById('checkbox_1_'+i).checked = true;
 								}
-								rsemSwitch = true;
 							}else if (splt1[i].Type == pipelineDict[1]) {
 								//Tophat
 								additionalPipes();
@@ -353,7 +353,7 @@ function pipelineSelect(num){
 	var pipeType = document.getElementById('select_'+num).value;
 	var divAdj = createElement('div', ['id', 'class', 'style'], ['select_child_'+num, 'input-group margin col-md-11', 'float:left']);
 	//Check for only one RSEM/DESeq dependencies
-	if (pipeType == pipelineDict[0] && rsemSwitch)
+	if (pipeType == pipelineDict[0] && currentPipelineVal.indexOf('RNASeqRSEM') > -1)
 	{
 		$('#errorModal').modal({
 			show: true
@@ -362,7 +362,7 @@ function pipelineSelect(num){
 		document.getElementById('errorAreas').innerHTML = '';
 		document.getElementById('select_'+num).value = currentPipelineVal[currentPipelineID.indexOf(num)];
 	}
-	else if (pipeType == pipelineDict[3] && !rsemSwitch) {
+	else if (pipeType == pipelineDict[3] && (currentPipelineVal.indexOf('RNASeqRSEM') == -1 || (previousSelect == 'RNASeqRSEM' && previousSelectionCount == num))) {
 		$('#errorModal').modal({
 			show: true
 		});
@@ -391,7 +391,6 @@ function pipelineSelect(num){
 		divAdj = mergeTidy(divAdj, 12,
 				[ [createElement('label', ['class','TEXTNODE'], ['box-title margin', 'RNA-Seq QC:']),
 				   createElement('input', ['id', 'type', 'class'], ['checkbox_1_'+num, 'checkbox', 'margin'])] ]);
-		rsemSwitch = true;
 	}else if (pipeType == pipelineDict[1]) {
 		//Tophat Pipeline
 		divAdj.appendChild( createElement('label', ['class','TEXTNODE'], ['box-title', 'Tophat parameters:']));
@@ -542,6 +541,9 @@ function pipelineSelect(num){
 				document.getElementById(num+'_2_'+sample_names[x]).innerHTML = sample_names[x]
 		}
 	}
+	//previous Selection
+	previousSelect = pipeType;
+	previousSelectionCount = num;
 	
 	//adjust global pipeline counter
 	if (currentPipelineID.indexOf(num) == -1) {
@@ -550,9 +552,6 @@ function pipelineSelect(num){
 	}
 	else if (currentPipelineID.indexOf(num) != -1 && currentPipelineVal.indexOf(currentPipelineID.indexOf(num)) != pipeType)
 	{
-		if (currentPipelineVal[currentPipelineID.indexOf(num)] == pipelineDict[0]) {
-		rsemSwitch = false;
-		}
 		currentPipelineVal[currentPipelineID.indexOf(num)] = pipeType;
 	}
 	}
@@ -1488,10 +1487,25 @@ function findRNAChecked(titles){
 function removePipes(num){
 	var div = document.getElementById('TESTBOXAREA_'+ num);
 	var index = currentPipelineID.indexOf(num);
-	div.parentNode.removeChild(div);
-	if (currentPipelineVal[index] == pipelineDict[0]) {
-		rsemSwitch = false;
+	if (currentPipelineVal[index] == 'RNASeqRSEM') {
+		console.log('RSEM REMOVAL');
+		for(var q = currentPipelineVal.length - 1; q > -1; q--){
+			if (currentPipelineVal[q] == 'DESeq') {
+				recursiveRemovePipes(q);
+			}
+		}
 	}
+	div.parentNode.removeChild(div);
+	if (index != -1) {
+		currentPipelineVal.splice(index,1);
+		currentPipelineID.splice(index,1);
+	}
+}
+
+function recursiveRemovePipes(num){
+	var div = document.getElementById('TESTBOXAREA_'+ num);
+	var index = currentPipelineID.indexOf(num);
+	div.parentNode.removeChild(div);
 	if (index != -1) {
 		currentPipelineVal.splice(index,1);
 		currentPipelineID.splice(index,1);
