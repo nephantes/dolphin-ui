@@ -58,6 +58,9 @@ foreach($runparams as $rp){
 	$json_new['submission'] = "0";
 	
 	//adapter
+	if(isset($json->adapter)){
+		$json_new['adapters'] = $json->adapter;
+	}
 	if(isset($json->adapters)){
 		$json_new['adapters'] = $json->adapters;
 	}
@@ -103,6 +106,9 @@ foreach($runparams as $rp){
 	//commonind
 	if(isset($json->commonind)){
 		$json_new['commonind'] = $json->commonind;
+		if(isset($json->advparams)){
+			$json_new['advparams'] = $json->advparams;
+		}
 	}
 	
 	//custominds
