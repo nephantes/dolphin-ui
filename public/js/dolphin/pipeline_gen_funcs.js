@@ -24,7 +24,6 @@ var qualityDict = ["window size","required quality","leading","trailing","minlen
 var trimmingDict = ["single or paired-end", "5 length 1", "3 length 1", "5 length 2", "3 length 2"];
 var currentPipelineID = [];
 var currentPipelineVal =[];
-var rsemSwitch = false;
 var deseqList = ['RSEM'];
 var valid_samples;
 var username;
@@ -165,7 +164,6 @@ function rerunLoad() {
 								if (splt1[i].RSeQC == 'yes') {
 									document.getElementById('checkbox_1_'+i).checked = true;
 								}
-								rsemSwitch = true;
 							}else if (splt1[i].Type == pipelineDict[1]) {
 								//Tophat
 								additionalPipes();
@@ -353,7 +351,7 @@ function pipelineSelect(num){
 	var pipeType = document.getElementById('select_'+num).value;
 	var divAdj = createElement('div', ['id', 'class', 'style'], ['select_child_'+num, 'input-group margin col-md-11', 'float:left']);
 	//Check for only one RSEM/DESeq dependencies
-	if (pipeType == pipelineDict[0] && rsemSwitch)
+	if (pipeType == pipelineDict[0] && currentPipelineVal.indexOf('RNASeqRSEM') > -1)
 	{
 		$('#errorModal').modal({
 			show: true
@@ -362,7 +360,7 @@ function pipelineSelect(num){
 		document.getElementById('errorAreas').innerHTML = '';
 		document.getElementById('select_'+num).value = currentPipelineVal[currentPipelineID.indexOf(num)];
 	}
-	else if (pipeType == pipelineDict[3] && !rsemSwitch) {
+	else if (pipeType == pipelineDict[3] && (currentPipelineVal.indexOf('RNASeqRSEM') == -1 || (currentPipelineVal[currentPipelineID.indexOf(num)] == 'RNASeqRSEM'))) {
 		$('#errorModal').modal({
 			show: true
 		});
@@ -379,6 +377,9 @@ function pipelineSelect(num){
 		var testText = createElement('textarea', ['id', 'class'], ['textarea_'+num,'form-control'])
 		testText.value = '--bowtie-e 70 --bowtie-chunkmbs 100';
 		divAdj.appendChild( testText );
+		divAdj = mergeTidy(divAdj, 12,
+				[ [createElement('label', ['class','TEXTNODE'], ['box-title margin', 'RNA-Seq QC:']),
+				   createElement('input', ['id', 'type', 'class'], ['checkbox_1_'+num, 'checkbox', 'margin'])] ]);
 		divAdj = mergeTidy(divAdj, 6,
 				[ [createElement('label', ['class','TEXTNODE'], ['box-title', 'IGV/TDF Conversion:']),
 				createElement('select', ['id','class','onChange','OPTION', 'OPTION'], ['select_1_'+num, 'form-control', 'IGVTDFSelection(this.id)','no', 'yes'])],
@@ -388,14 +389,20 @@ function pipelineSelect(num){
 		divAdj = mergeTidy(divAdj, 6,
 				[ [createElement('label', ['id', 'class', 'style', 'TEXTNODE'], ['label_1_'+num, 'box-title', 'display:none', 'extFactor']),
 				   createElement('input', ['id', 'class', 'type', 'style', 'value'], ['textarea_2_'+num, 'form-control', 'text', 'display:none', '0'])] ]);
-		divAdj = mergeTidy(divAdj, 12,
-				[ [createElement('label', ['class','TEXTNODE'], ['box-title margin', 'RNA-Seq QC:']),
-				   createElement('input', ['id', 'type', 'class'], ['checkbox_1_'+num, 'checkbox', 'margin'])] ]);
-		rsemSwitch = true;
 	}else if (pipeType == pipelineDict[1]) {
 		//Tophat Pipeline
 		divAdj.appendChild( createElement('label', ['class','TEXTNODE'], ['box-title', 'Tophat parameters:']));
 		divAdj.appendChild( createElement('textarea', ['id', 'class'], ['textarea_'+num, 'form-control']));
+		divAdj = mergeTidy(divAdj, 12,
+				[ [createElement('label', ['class','TEXTNODE'], ['margin', 'Mark Duplicates']),
+				createElement('input', ['id', 'type', 'class'], ['checkbox_4_'+num, 'checkbox', 'margin'])] ]);
+		divAdj = mergeTidy(divAdj, 12,
+				[ [createElement('label', ['class','TEXTNODE'], ['box-title margin', 'RNA-Seq QC:']),
+				createElement('input', ['id', 'type', 'class'], ['checkbox_1_'+num, 'checkbox', 'margin'])],
+				[createElement('label', ['class','TEXTNODE'], ['margin', 'Collect RNA Metrics']),
+				createElement('input', ['id', 'type', 'class'], ['checkbox_2_'+num, 'checkbox', 'margin'])],
+				[createElement('label', ['class','TEXTNODE'], ['margin', 'Collect Multiple Picard Metrics']),
+				createElement('input', ['id', 'type', 'class'], ['checkbox_3_'+num, 'checkbox', 'margin'])] ]);
 		divAdj = mergeTidy(divAdj, 6,
 				[ [createElement('label', ['class','TEXTNODE'], ['box-title', 'IGV/TDF Conversion:']),
 				createElement('select', ['id','class','onChange','OPTION', 'OPTION'], ['select_1_'+num, 'form-control', 'IGVTDFSelection(this.id)','no', 'yes'])],
@@ -404,16 +411,6 @@ function pipelineSelect(num){
 		divAdj = mergeTidy(divAdj, 6,
 				[ [createElement('label', ['id', 'class', 'style', 'TEXTNODE'], ['label_1_'+num, 'box-title', 'display:none', 'extFactor']),
 				   createElement('input', ['id', 'class', 'type', 'style', 'value'], ['textarea_2_'+num, 'form-control', 'text', 'display:none', '0'])] ]);
-		divAdj = mergeTidy(divAdj, 12,
-				[ [createElement('label', ['class','TEXTNODE'], ['box-title margin', 'RNA-Seq QC:']),
-				   createElement('input', ['id', 'type', 'class'], ['checkbox_1_'+num, 'checkbox', 'margin'])] ]);
-		divAdj = mergeTidy(divAdj, 12,
-				[ [createElement('label', ['class','TEXTNODE'], ['margin', 'Collect RNA Metrics']),
-				createElement('input', ['id', 'type', 'class'], ['checkbox_2_'+num, 'checkbox', 'margin'])],
-				[createElement('label', ['class','TEXTNODE'], ['margin', 'Collect Multiple Picard Metrics']),
-				createElement('input', ['id', 'type', 'class'], ['checkbox_3_'+num, 'checkbox', 'margin'])],
-				[createElement('label', ['class','TEXTNODE'], ['margin', 'Mark Duplicates']),
-				createElement('input', ['id', 'type', 'class'], ['checkbox_4_'+num, 'checkbox', 'margin'])] ]);
 	}else if (pipeType == pipelineDict[2]) {
 		//ChipSeq Pipeline
 		divAdj.appendChild( createElement('label', ['class','TEXTNODE'], ['box-title', 'Chip Input Definitions:']));
@@ -428,6 +425,11 @@ function pipelineSelect(num){
 				createElement('input', ['id', 'class', 'type', 'value'], ['select_1_'+num, 'form-control', 'text', '230'])],
 				[createElement('label', ['class','TEXTNODE'], ['box-title', 'Effective genome size(bp):']),
 				createElement('input', ['id', 'class', 'type', 'value'], ['select_2_'+num, 'form-control', 'text', '2700000000'])] ]);
+		divAdj = mergeTidy(divAdj, 12,
+				[ [createElement('label', ['class','TEXTNODE'], ['margin', 'Mark Duplicates:']),
+				createElement('input', ['id', 'type', 'class'], ['checkbox_2_'+num, 'checkbox', 'margin'])],
+				[createElement('label', ['class','TEXTNODE'], ['margin', 'Collect Multiple Picard Metrics:']),
+				createElement('input', ['id', 'type', 'class'], ['checkbox_1_'+num, 'checkbox', 'margin'])] ]);
 		divAdj = mergeTidy(divAdj, 6,
 				[ [createElement('label', ['class','TEXTNODE'], ['box-title', 'IGV/TDF Conversion:']),
 				createElement('select', ['id','class','onChange','OPTION', 'OPTION'], ['select_3_'+num, 'form-control', 'IGVTDFSelection(this.id)','no', 'yes'])],
@@ -436,11 +438,6 @@ function pipelineSelect(num){
 		divAdj = mergeTidy(divAdj, 6,
 				[ [createElement('label', ['id', 'class', 'style', 'TEXTNODE'], ['label_1_'+num, 'box-title', 'display:none', 'extFactor']),
 				   createElement('input', ['id', 'class', 'type', 'style', 'value'], ['textarea_2_'+num, 'form-control', 'text', 'display:none', '0'])] ]);
-		divAdj = mergeTidy(divAdj, 12,
-				[ [createElement('label', ['class','TEXTNODE'], ['margin', 'Collect Multiple Picard Metrics:']),
-				createElement('input', ['id', 'type', 'class'], ['checkbox_1_'+num, 'checkbox', 'margin'])],
-				[createElement('label', ['class','TEXTNODE'], ['margin', 'Mark Duplicates:']),
-				createElement('input', ['id', 'type', 'class'], ['checkbox_2_'+num, 'checkbox', 'margin'])] ]);
 	}else if (pipeType == pipelineDict[3]) {
 		//DESEQ
 		divAdj = mergeTidy(divAdj, 12,
@@ -482,6 +479,11 @@ function pipelineSelect(num){
 		labelDiv.appendChild( createElement('label', ['class','TEXTNODE'], ['box-title', 'Additional BSMap Parameters:']));
 		labelDiv.appendChild( createElement('textarea', ['id', 'class'], ['textarea_1_'+num, 'form-control']));
 		divAdj.appendChild(labelDiv);
+		divAdj = mergeTidy(divAdj, 12,
+				[ [createElement('label', ['class','TEXTNODE'], ['margin', 'Mark Duplicates:']),
+				createElement('input', ['id', 'type', 'class'], ['checkbox_3_'+num, 'checkbox', 'margin'])],
+				[createElement('label', ['class','TEXTNODE'], ['margin', 'Collect Multiple Picard Metrics:']),
+				createElement('input', ['id', 'type', 'class'], ['checkbox_2_'+num, 'checkbox', 'margin'])] ]);
 		divAdj = mergeTidy(divAdj, 6,
 				[ [createElement('label', ['class','TEXTNODE'], ['box-title', 'IGV/TDF Conversion:']),
 				createElement('select', ['id','class','onChange','OPTION', 'OPTION'], ['select_1_'+num, 'form-control', 'IGVTDFSelection(this.id)','no', 'yes'])],
@@ -490,12 +492,6 @@ function pipelineSelect(num){
 		divAdj = mergeTidy(divAdj, 6,
 				[ [createElement('label', ['id', 'class', 'style', 'TEXTNODE'], ['label_1_'+num, 'box-title', 'display:none', 'extFactor']),
 				   createElement('input', ['id', 'class', 'type', 'style', 'value'], ['textarea_2_'+num, 'form-control', 'text', 'display:none', '0'])] ]);
-		divAdj = mergeTidy(divAdj, 12,
-				[ [createElement('label', ['class','TEXTNODE'], ['margin', 'Collect Multiple Picard Metrics:']),
-				createElement('input', ['id', 'type', 'class'], ['checkbox_2_'+num, 'checkbox', 'margin'])],
-				[createElement('label', ['class','TEXTNODE'], ['margin', 'Mark Duplicates:']),
-				createElement('input', ['id', 'type', 'class'], ['checkbox_3_'+num, 'checkbox', 'margin'])] ]);
-		
 		//MCALL
 		labelDiv = createElement('div', ['class'], ['col-md-12 text-center']);
 		labelDiv.appendChild( createElement('label', ['class','TEXTNODE'], ['box-title margin', 'Run MCall:']));
@@ -550,9 +546,6 @@ function pipelineSelect(num){
 	}
 	else if (currentPipelineID.indexOf(num) != -1 && currentPipelineVal.indexOf(currentPipelineID.indexOf(num)) != pipeType)
 	{
-		if (currentPipelineVal[currentPipelineID.indexOf(num)] == pipelineDict[0]) {
-		rsemSwitch = false;
-		}
 		currentPipelineVal[currentPipelineID.indexOf(num)] = pipeType;
 	}
 	}
@@ -1488,10 +1481,24 @@ function findRNAChecked(titles){
 function removePipes(num){
 	var div = document.getElementById('TESTBOXAREA_'+ num);
 	var index = currentPipelineID.indexOf(num);
-	div.parentNode.removeChild(div);
-	if (currentPipelineVal[index] == pipelineDict[0]) {
-		rsemSwitch = false;
+	if (currentPipelineVal[index] == 'RNASeqRSEM') {
+		for(var q = currentPipelineVal.length - 1; q > -1; q--){
+			if (currentPipelineVal[q] == 'DESeq') {
+				recursiveRemovePipes(q);
+			}
+		}
 	}
+	div.parentNode.removeChild(div);
+	if (index != -1) {
+		currentPipelineVal.splice(index,1);
+		currentPipelineID.splice(index,1);
+	}
+}
+
+function recursiveRemovePipes(num){
+	var div = document.getElementById('TESTBOXAREA_'+ num);
+	var index = currentPipelineID.indexOf(num);
+	div.parentNode.removeChild(div);
 	if (index != -1) {
 		currentPipelineVal.splice(index,1);
 		currentPipelineID.splice(index,1);
@@ -1580,11 +1587,11 @@ function findAdditionalInfoValues(goWord, additionalArray){
 }
 /*##### GENERATE ADDITIONAL PIPELINE STR FOR JSON #####*/
 function findPipelineValues(){
-	var RSEM_JSON_DICT  = ['Params', 'IGVTDF', 'BAM2BW', 'ExtFactor',  'RSeQC'];
+	var RSEM_JSON_DICT  = ['Params', 'RSeQC', 'IGVTDF', 'BAM2BW', 'ExtFactor'];
 	var DESEQ_JSON_DICT = ['Name', 'Columns', 'Conditions', 'FitType', 'HeatMap', 'padj', 'foldChange', 'DataType'];
-	var CHIPSEQ_JSON_DICT = ['ChipInput', 'MultiMapper', 'TagSize', 'BandWith', 'EffectiveGenome', 'IGVTDF', 'BAM2BW', 'ExtFactor', 'CollectMultipleMetrics', 'MarkDuplicates'];
-	var TOPHAT_JSON_DICT = ['Params', 'IGVTDF', 'BAM2BW', 'ExtFactor', 'RSeQC', 'CollectRnaSeqMetrics', 'CollectMultipleMetrics', 'MarkDuplicates'];
-	var BISULPHITE_JSON_DICT = ['BSMapStep', 'BisulphiteType', 'Digestion', 'BSMapParams', 'IGVTDF', 'BAM2BW', 'ExtFactor', 'CollectMultipleMetrics', 'MarkDuplicates', 'MCallStep', 'Columns', 'Conditions', 'MCallParams', 'MCompStep', 'MCompParams'];
+	var CHIPSEQ_JSON_DICT = ['ChipInput', 'MultiMapper', 'TagSize', 'BandWith', 'EffectiveGenome', 'MarkDuplicates', 'CollectMultipleMetrics', 'IGVTDF', 'BAM2BW', 'ExtFactor'];
+	var TOPHAT_JSON_DICT = ['Params', 'MarkDuplicates', 'RSeQC', 'CollectRnaSeqMetrics', 'CollectMultipleMetrics', 'IGVTDF', 'BAM2BW', 'ExtFactor'];
+	var BISULPHITE_JSON_DICT = ['BSMapStep', 'BisulphiteType', 'Digestion', 'BSMapParams', 'CollectMultipleMetrics', 'IGVTDF', 'MarkDuplicates', 'BAM2BW', 'ExtFactor', 'MCallStep', 'Columns', 'Conditions', 'MCallParams', 'MCompStep', 'MCompParams'];
 	
 	var JSON_ARRAY =  [];
 	for (var y = 0; y < currentPipelineID.length; y++) {
