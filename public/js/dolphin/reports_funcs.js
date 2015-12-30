@@ -183,8 +183,18 @@ function showTable(type){
 				objList = s;
 			}
 	});
+	for(var d = 0; d < objList.length; d++){
+		var keys = obtainObjectKeys(objList[d]);
+		var newObj = {};
+		for(var c = 0; c < keys.length; c++){
+			if(!isNaN(parseFloat(keys[c][0])) && isFinite(keys[c][0])){
+				keys[c] = "_" + keys[c];
+			}
+			newObj[keys[c].replace(/\./g, "_")] = objList[d][keys[c]];
+		}
+		objList[d] = newObj
+	}
 	var keys = obtainObjectKeys(objList[0]);
-	console.log(keys);
 	
 	if(currentResultSelection.split(".")[currentResultSelection.split(".").length - 1] == "tsv" || type_dictionary.indexOf(currentResultSelection) > -1){
 		var masterDiv = document.getElementById(type+'_exp_body');
