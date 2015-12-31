@@ -205,7 +205,7 @@ class Dolphin:
 
     def writeInputParamLine(self, fp, jsonobj, input_str, input_object, itself, previous_str=None):
       try:
-       previous="NONE"
+       previous = ( previous_str if previous_str!=None else "NONE" )
 
        if (input_object in jsonobj and jsonobj[input_object].lower() != 'none' and jsonobj[input_object]!=''):
          print >>fp, '%s=%s'%(input_str, self.parse_content(jsonobj[input_object]))
