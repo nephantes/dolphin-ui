@@ -362,7 +362,6 @@ function obtainGroupFromName(name){
 			success: function(s)
 			{
 				group_id = s;
-				sendProcessData("1", 'group_selected');
 			}
 	});
 	return group_id;

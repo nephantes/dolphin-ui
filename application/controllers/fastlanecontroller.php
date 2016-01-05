@@ -35,6 +35,7 @@ class FastlaneController extends VanillaController {
 		if(isset($_SESSION['group_selected'])){$group_selected = $_SESSION['group_selected'];}
 		if(isset($_SESSION['fastlane_values'])){
 			if(isset($fastlane_values)){
+				$fastlane_values = str_replace("\n", ":", $fastlane_values);
 				$fastlane_array = explode(",",$fastlane_values);
 			}
 			if(isset($barcode_array)){
@@ -45,9 +46,6 @@ class FastlaneController extends VanillaController {
 			}
 			if(isset($bad_files)){
 				$bad_files_array = explode(",", $bad_files);
-			}
-			if(isset($group_selected)){
-				$fastlane_values = str_replace("\n", ":", $fastlane_values);
 			}
 		}
 		if($pass_fail_array != []){
