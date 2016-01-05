@@ -222,7 +222,7 @@ class Dolphin:
     def writeInput(self,  input_fn, data_dir, content, runparams) :
       try:
        commonind=''
-       if 'commonind' in runparams:
+       if ('commonind' in runparams and runparams['commonind'].lower() != "none"):
           commonind = re.sub('test', '', runparams['commonind'])
           gb=runparams['genomebuild'].split(',')
           commonind = re.sub('genome', str(gb[1]), commonind)
@@ -264,7 +264,7 @@ class Dolphin:
                runparams['trim']="%s:%s"%(str(pipe["5len1"]),str(pipe["3len1"]))
        previous=self.writeInputParamLine(fp, runparams, "@TRIM", 'trim', "TRIM", previous)
        
-       if ('commonind' in runparams):
+       if ('commonind' in runparams and  runparams['commonind'].lower() != "none"):
          arr=re.split(r'[,:]+', self.parse_content(commonind))
          for i in arr:
            print i
@@ -394,7 +394,7 @@ class Dolphin:
     def writeWorkflow(self,  file, gettotalreads, amazonupload, backupS3, runparamsid, runparams ):
       try:
         commonind=''
-        if 'commonind' in runparams:
+        if ('commonind' in runparams and  runparams['commonind'].lower() != "none"):
           commonind = re.sub('test', '', runparams['commonind'])
           gb=runparams['genomebuild'].split(',')
           commonind = re.sub('genome', str(gb[1]), commonind)
@@ -403,15 +403,15 @@ class Dolphin:
         resume = (runparams['resume'] if ('resume' in runparams) else "yes")
         self.prf(fp, stepCheck % locals() )
         self.prf(fp, stepBarcode % locals() if ('barcodes' in runparams and runparams['barcodes'].lower()!="none") else None )
-        self.prf(fp, stepGetTotalReads % locals() if ('gettotalreads' in runparams and runparams['gettotalreads'].lower()!="none") else None )
-        self.prf(fp, stepBackupS3 % locals() if ('backupS3' in runparams and runparams['backupS3'].lower()!="none") else None )
+        self.prf(fp, stepGetTotalReads % locals() if (gettotalreads.lower()!="none") else None )
+        self.prf(fp, stepBackupS3 % locals() if (backupS3.lower()!="none") else None )
         self.prf(fp, stepFastQC % locals() + "\n" + stepMergeFastQC % locals() if ('fastqc' in runparams and runparams['fastqc'].lower()=="yes") else None )
         self.prf(fp, stepAdapter % locals() if ('adapter' in runparams and runparams['adapter'].lower()!="none") else None )
         self.prf(fp, stepQuality % locals() if ('quality' in runparams and runparams['quality'].lower()!="none") else None )
         self.prf(fp, stepTrim % locals() if ('trim' in runparams and runparams['trim'].lower()!="none") else None  )
        
         countstep = False
-        if ('commonind' in runparams):
+        if ('commonind' in runparams and  runparams['commonind'].lower() != 'none'):
            arr=re.split(r'[,:]+', self.parse_content(commonind))
            for i in arr:
               countstep = True
