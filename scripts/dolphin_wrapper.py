@@ -339,6 +339,7 @@ class Dolphin:
                  self.writeInputParamLine(fp, pipe, "@BSMAPPARAM", 'BSMapParams', "BSMapStep")
                if (pipe['MCallStep']== "yes"):
                  self.writeInputParamLine(fp, pipe, "@MCONDS", 'Conditions', "MCallStep")
+                 self.writeInputParamLine(fp, pipe, "@MFIELDS", 'Columns', "MCallStep")
                  self.writeInputParamLine(fp, pipe, "@MCALLPARAM", 'MCallParams', "MCallStep")
                if (pipe['MCompStep'] == ""):
                  self.writeInputParamLine(fp, pipe, "@MCOMPPARAM", 'MCompParams', "MCompStep")
