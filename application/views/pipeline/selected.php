@@ -68,9 +68,6 @@
 																				<option>d_melanogaster,dm3</option>", 4)?>
 						<?php echo $html->getStaticSelectionBox("Mate-paired", "spaired", "<option>yes</option>
 																				<option>no</option>", 4)?>
-						<?php echo $html->getStaticSelectionBox("Resume Run", "resume", "<option>Fresh</option>
-																				<option>Resume</option>", 4)?>
-						<?php echo $html->getStaticSelectionBox("Output Directory", "outdir", "TEXT", 8)?>
 						<?php echo $html->getStaticSelectionBox("FastQC", "fastqc", "<option>yes</option>
 																			<option>no</option>", 4)?>
 						<?php echo $html->getStaticSelectionBox("Permissions", "perms", "<option value='3'>only me</option>
@@ -80,6 +77,8 @@
 						<?php echo $html->getStaticSelectionBox("Submission", "submission", "<option value='0'>None</option>
 																			<option value='1'>Encode</option>
 																			<option value='2'>Geo</option>", 4)?>
+						<div class="col-md-2"></div>
+						<?php echo $html->getStaticSelectionBox("Output Directory", "outdir", "TEXT", 8)?>
 					<?php echo $html->startExpandingSelectionBox(6)?>
 						<?php echo $html->getExpandingSelectionBox("Adapter Removal", "adapters", 1, 12, ["adapters"], [["TEXTBOX"]])?>
 						<?php echo $html->getExpandingSelectionBox("Split FastQ", "split", 1, 12, ["number of reads per file"], [["TEXT","5000000"]])?>
