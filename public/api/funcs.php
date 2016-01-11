@@ -80,13 +80,16 @@ class funcs
     function checkPermissions($params)
     {
          $this->username=$params['username'];
-         $this->readINI();         
-         $com = "mkdir -p  ".$params['outdir']." ; \
-            cd ".$params['outdir']." ; \
-            touch permstest.txt ; \
-            rm permstest.txt";
+         $this->readINI();
+         if ($params['outdir']!="")
+         {
+           $com = "mkdir -p ".$params['outdir'].";cd ".$params['outdir'].";touch permstest.txt;rm permstest.txt";
+         }
+         else
+         {
+           $com = "ls";
+         }
          $retval = $this->syscall($this->getCMDs($com));
-
          if (preg_match('/Permission denied/', $retval)) {
               return "{\"ERROR\": \"Permission denied: ".$params['outdir']."\"}";
          }
@@ -225,11 +228,11 @@ class funcs
        }
        if ($trial<4)
        {
-         $sql="update jobs set wkey='$wkey-$trial' where job_num='$jobnum' and jobname='$jobname' and wkey='$wkey'";
+         $sql="update jobs set wkey='$wkey-$trial', jobstatus=0 where job_num='$jobnum' and jobname='$jobname' and wkey='$wkey'";
          $this->runSQL($sql);
          if ($servicename!=$jobname)
          {
-           $sql="update jobs set wkey='$wkey-$trial' where jobname='$servicename' and wkey='$wkey'";
+           $sql="update jobs set wkey='$wkey-$trial', jobstatus=0 where jobname='$servicename' and wkey='$wkey'";
            $this->runSQL($sql);
          }
          return 1;
@@ -606,7 +609,7 @@ class funcs
         $workflow_id = $this->getWorkflowId($wkey);
         $service_id  = $this->getId("service", $username, $servicename, $wkey, "");
         $select      = "select count(job_id) c from jobs ";
-        $where1      = " where `username`= '$username' and `wkey`='$wkey' and `workflow_id`='$workflow_id' and `service_id`='$service_id'";
+        $where1      = " where `username`= '$username' and `wkey`='$wkey' and `workflow_id`='$workflow_id' and `service_id`='$service_id' and `jobstatus`=1";
         $where2      = " and `result`=3";
         $sql         = "select s1.c, s2.c from ( $select  $where1) s1,  ($select  $where1 $where2) s2";
         $result      = $this->runSQL($sql);
