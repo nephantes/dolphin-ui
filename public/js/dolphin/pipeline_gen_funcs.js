@@ -9,7 +9,7 @@ var ID_DICTIONARY = {};
 var STORED_SAMPLE_DATA = [];
 
 //GLOBAL VARIABLES
-var jsonTypeList = ['genomebuild', 'spaired', 'barcodes', 'fastqc', 'adapters', 'submission', 'quality', 'trim', 'commonind', 'split', 'pipeline', 'advparams', 'custominds'];
+var jsonTypeList = ['genomebuild', 'spaired', 'resume', 'barcodes', 'fastqc', 'adapters', 'submission', 'quality', 'trim', 'commonind', 'split', 'pipeline', 'advparams', 'custominds'];
 var radioTypeCheckList = ['pipeline', 'trimpaired', 'advparams', 'custom'];
 var currentChecked = "";
 var checklist_samples = [];
@@ -556,6 +556,7 @@ function submitPipeline(type) {
 	//Static
 	var genome = document.getElementById("genomebuild").value;
 	var matepair = document.getElementById("spaired").value;
+	var freshrun = document.getElementById("resume").value;
 	var outputdir = document.getElementById("outdir").value;
 	var fastqc = document.getElementById("fastqc").value;
 	var run_name = document.getElementById("run_name").value;
@@ -630,9 +631,14 @@ function submitPipeline(type) {
 		}else{
 			JSON_OBJECT['spaired'] = 'no';
 		}
-		JSON_OBJECT['resume'] = 'no';
-		previous = 'resume';
+		if (freshrun == "Fresh") {
+			JSON_OBJECT['resume'] = 'no';
+		}else{
+			JSON_OBJECT['resume'] = 'resume';
+			previous = 'resume';
+		}
 		JSON_OBJECT['fastqc'] = fastqc;
+	
 		JSON_OBJECT['barcodes'] = 'none';
 		
 		//submission check
