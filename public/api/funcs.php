@@ -291,7 +291,7 @@ class funcs
                     }
                 }
             } else {
-                    return "Service ended successfully ($servicename)!!!";
+                 return "DONE: Service ended successfully ($servicename)!!!";
             }
             return "RUNNING(1):[retval=$retval]:SERVICENAME:$servicename";
         }
