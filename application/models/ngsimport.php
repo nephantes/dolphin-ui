@@ -370,7 +370,7 @@ class Ngsimport extends VanillaModel {
 		 */
 		//	Experiment Name
 		if(isset($this->experiment_name)){
-			if(!$this->checkAlphaNumWithAddChars(' ', $this->experiment_name)){
+			if(!$this->checkAlphaNumWithAddChars('\s\_\-', $this->experiment_name)){
 				$text.= $this->errorText("title does not contain proper characters, please use alpha-numeric characters and spaces");
 				$this->final_check = false;
 				$meta_check = false;
@@ -492,7 +492,7 @@ class Ngsimport extends VanillaModel {
 			//	Lane Name
 			if($blank == 'false'){
 				if(isset($lane->name)){
-					if($this->checkAlphaNumWithAddChars('_-', $lane->name)){
+					if($this->checkAlphaNumWithAddChars('\s\_\-', $lane->name)){
 						$this->lane_arr[$lane->name]=$lane;
 					}else{
 						$text.= $this->errorText("Import name does not contain proper characters, please use alpha-numeric characters and underscores (row " . $i . ")");
@@ -735,7 +735,7 @@ class Ngsimport extends VanillaModel {
 				
 				//	Name
 				if(isset($samp->name)){
-					if($this->checkAlphaNumWithAddChars('_-', $samp->name)){
+					if($this->checkAlphaNumWithAddChars('\s\_\-', $samp->name)){
 						//	Need to check the database for similar names as well at a later date
 						if(isset($this->sample_arr[$samp->name])){
 							$text.= $this->errorText("Sample name already exists in that Import (row " . $i . ")");
@@ -1048,7 +1048,7 @@ class Ngsimport extends VanillaModel {
 			if($blank == 'false'){
 				//	Sample/Lane Name
 				if(isset($file->name)){
-					if($this->checkAlphaNumWithAddChars('_-', $file->name)){
+					if($this->checkAlphaNumWithAddChars('\s\_\-', $file->name)){
 						if(!(isset($this->sample_arr[$file->name])) & !(isset($this->lane_arr[$file->name]))){
 							$text.= $this->errorText("sample/import name does not match the samples/imports given (row " . $i . ")");
 							$this->final_check = false;
