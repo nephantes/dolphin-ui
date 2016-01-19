@@ -341,6 +341,10 @@ class Dolphin:
                  self.writeInputParamLine(fp, pipe, "@MCONDS", 'Conditions', "MCallStep")
                  self.writeInputParamLine(fp, pipe, "@MFIELDS", 'Columns', "MCallStep")
                  self.writeInputParamLine(fp, pipe, "@MCALLPARAM", 'MCallParams', "MCallStep")
+                 print >>fp, '@GBUILD=%s'%(gb[1])
+                 print >>fp, '@STRAND=none'
+                 print >>fp, '@TILE_SIZE=300'
+                 
                if (pipe['MCompStep'] == ""):
                  self.writeInputParamLine(fp, pipe, "@MCOMPPARAM", 'MCompParams', "MCompStep")
 
@@ -502,6 +506,8 @@ class Dolphin:
                  self.writeVisualizationStr( fp, type, pipe, sep )
                  
                  self.prf( fp, '%s'% ( stepMCall % locals() if ('MCallStep' in pipe and pipe['MCallStep'].lower()=="yes") else None ) )
+                 methylkit_name="exper"
+                 self.prf( fp, '%s'% ( stepMethylKit % locals() if ('MCallStep' in pipe and pipe['MCallStep'].lower()=="yes") else None ) )
                  self.prf( fp, '%s'% ( stepMComp % locals() if ('MCompStep' in pipe and pipe['MCompStep'].lower()=="yes") else None ) )
                  
 
