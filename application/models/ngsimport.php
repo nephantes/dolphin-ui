@@ -314,14 +314,14 @@ class Ngsimport extends VanillaModel {
 			
 			//	Fastq Directory
 			if($this->fastq_dir == null && $this->sheetData[$i]["A"]=="fastq directory"){
-				$text.= $this->errorText("fastq directory is required for submission");
+				$text.= $this->errorText("Fastq directory is required for submission");
 				$this->final_check = false;
 				$meta_check = false;
 			}
 			
 			//	Backup Directory
-			if($this->backup_dir == null && ($this->sheetData[$i]["A"]=="backup directory" || $this->sheetData[$i]["A"]=="temporary directory")){
-				$text.= $this->errorText("backup directory is required for submission");
+			if($this->backup_dir == null && ($this->sheetData[$i]["A"]=="backup directory" || $this->sheetData[$i]["A"]=="temporary directory" || $this->sheetData[$i]["A"]=="processed directory" || $this->sheetData[$i]["A"]=="process directory")){
+				$text.= $this->errorText("Processed directory is required for submission");
 				$this->final_check = false;
 				$meta_check = false;
 			}
@@ -349,7 +349,7 @@ class Ngsimport extends VanillaModel {
 				$request = API_PATH.'/api/service.php?func=checkPermissions&username='.$this->clustername;
 				$valid_fastq = json_decode('['.json_decode(file_get_contents($request)).']');
 				if(isset($valid_fastq[0]->ERROR)){
-					$text.= $this->errorText("Process Directory error (".$this->backup_dir."). ".$valid_fastq[0]->ERROR);
+					$text.= $this->errorText("Processed Directory error (".$this->backup_dir."). ".$valid_fastq[0]->ERROR);
 					$this->final_check = false;
 					$meta_check = false;
 				}
@@ -358,7 +358,7 @@ class Ngsimport extends VanillaModel {
 				$request = API_PATH.'/api/service.php?func=checkPermissions&username='.$this->clustername.'&outdir='.$this->backup_dir;
 				$valid_fastq = json_decode('['.json_decode(file_get_contents($request)).']');
 				if(isset($valid_fastq[0]->ERROR)){
-					$text.= $this->errorText("Process Directory error (".$this->backup_dir."). ".$valid_fastq[0]->ERROR);
+					$text.= $this->errorText("Processed Directory error (".$this->backup_dir."). ".$valid_fastq[0]->ERROR);
 					$this->final_check = false;
 					$meta_check = false;
 				}
