@@ -182,7 +182,7 @@ class funcs
        return "ssh -o ConnectTimeout=30  ". $this->username. "@" . $this->remotehost . " ";
     }
 
-    function checkJobInCluster($wkey, $job_num, $username)
+    function isJobRunning($wkey, $job_num, $username)
     {
         $this->job_num = $job_num; 
         $this->username = $username;
@@ -258,7 +258,8 @@ class funcs
                 while ($row = $res->fetch_assoc()) {
                     # If job is running, it turns 1 otherwise 0 and it needs to be restarted
                     # If it doesn't turn Error and if job is working it turns wkey to che
-                    $retval = $this->checkJobInCluster($wkey, $row['job_num'], $row['username']);
+                    $retval = $this->isJobRunning($wkey, $row['job_num'], $row['username']);
+
                     if ($retval != "")
                     {
                         $this->checkStartTime($wkey, $row['job_num'], $row['username']);
@@ -274,6 +275,10 @@ class funcs
                         $h2t =& new html2text($rowout['jobout']);
                         $jobout = $h2t->get_text();
                         return 'ERROR:' . $retval . "\n" . $rowout['jobname'] . " Failed\nCheck LSF output\n" . $jobout;
+                      }
+                      else
+                      {
+                        return "START:rerun";
                       }
                     }
                     if (preg_match('/DONE/', $retval)) {
@@ -476,22 +481,28 @@ class funcs
                 $sql = "INSERT INTO `service_run` (`service_id`, `wkey`, `input`,`result`, `start_time`) VALUES ('$service_id', '$wkey', '', '0', now())";
                 $this->runSQL($sql); 
              }
-             $command = $this->getCommand($servicename, $username, $inputcommand, $defaultparam);
-             $ipf = "";
-             if ($inputparam != "" && $inputparam != "None") 
-                 $ipf = "-i \"$inputparam\"";
-             $dpf = "";
-             if ($defaultparam != "" && $defaultparam != "None")
-                 $dpf = "-p $defaultparam";
+             
+             $sql = "SELECT max(job_id) FROM jobs where wkey='$wkey' and service_id='$service_id' and (result=1 or result=2);";
+             #If a job is still running for this service, the system won't start this service until all the jobs are finished or killed
+             $ajobisrunning = $this->queryAVal($sql);
+             
+             if ($ajobisrunning==0) {
+                $command = $this->getCommand($servicename, $username, $inputcommand, $defaultparam);
+                $ipf = "";
+                if ($inputparam != "" && $inputparam != "None") 
+                    $ipf = "-i \"$inputparam\"";
+                $dpf = "";
+                if ($defaultparam != "" && $defaultparam != "None")
+                    $dpf = "-p $defaultparam";
                     
-             $edir = $this->tool_path;
-             $com = $this->python . " " . $edir . "/runService.py -f ".$this->config." -d " . $this->dbhost . " $ipf $dpf -o $outdir -u $username -k $wkey -c \"$command\" -n $servicename -s $servicename";
-             $retval = $this->sysback($this->getCMDs($com));
-                  
+                $edir = $this->tool_path;
+                $com = $this->python . " " . $edir . "/runService.py -f ".$this->config." -d " . $this->dbhost . " $ipf $dpf -o $outdir -u $username -k $wkey -c \"$command\" -n $servicename -s $servicename";
+                $retval = $this->sysback($this->getCMDs($com));
+             }
              if (preg_match('/Error/', $retval)) {
                  return "ERROR: $retval";
              }
-             return "RUNNING(2):$inputcommand";
+             return "RUNNING(2):$inputcommand:$com";
         } else {
              return $wf;
         }
@@ -510,7 +521,7 @@ class funcs
             while ($row = $result->fetch_row()) {
                 $username = $row[0];
                 $jobnum   = $row[1];
-                $retval   = $this->checkJobInCluster($wkey, $jobnum, $username);
+                $retval   = $this->isJobRunning($wkey, $jobnum, $username);
                 if (preg_match('/^EXIT/', $retval)) {
                     $ret = 0;
                 }
@@ -724,7 +735,7 @@ class funcs
      function checkJob($params)
      {
           $jobname=$params['jobname'];
-          $wkey=$params['wkey']; 
+          $wkey=$params['wkey'];
          
           $res="DONE"; 
           $sql = "select job_num from jobs where wkey='$wkey' and jobname='$jobname'";
