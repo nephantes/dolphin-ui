@@ -109,6 +109,19 @@ function resumeSelected(run_id, groupID){
     location.reload();
 }
 
+function resetSelected(run_id, groupID){
+	$.ajax({ type: "POST",
+		url: BASE_PATH+"/public/ajax/ngsalterdb.php",
+		data: { p: "resetWKey", id: run_id },
+		async: false,
+		success : function(s)
+		{
+		}
+	});
+    
+    //   UPDATE THE PAGE
+    location.reload();
+}
 
 function confirmDeleteRunparams(run_id){
    $.ajax({

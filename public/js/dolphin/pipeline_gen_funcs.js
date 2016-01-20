@@ -18,7 +18,7 @@ var checklist_experiment_series = [];
 var pipelineNum = 0;
 var customSeqNum = 0;
 var customSeqNumCheck = [];
-var pipelineDict = ['RNASeqRSEM', 'Tophat', 'ChipSeq', 'DESeq', 'BisulphiteMapping'];
+var pipelineDict = ['RNASeqRSEM', 'Tophat', 'ChipSeq', 'DESeq', 'BisulphiteMapping', 'DiffMeth'];
 var rnaList = ["ercc","rRNA","miRNA","tRNA","piRNA","snRNA","rmsk","genome","change_params"];
 var qualityDict = ["window size","required quality","leading","trailing","minlen"];
 var trimmingDict = ["single or paired-end", "5 length 1", "3 length 1", "5 length 2", "3 length 2"];
@@ -149,6 +149,7 @@ function rerunLoad() {
 		
 						var splt1 = jsonObj[jsonTypeList[x]];
 						for (var i = 0; i < splt1.length; i++){
+							console.log(i);
 							if (splt1[i].Type == pipelineDict[0]) {
 								//RSEM
 								additionalPipes();
@@ -235,15 +236,20 @@ function rerunLoad() {
 								}
 								
 								var select1 = document.getElementById('multi_select_1_'+i);
+								var select2 = document.getElementById('multi_select_2_'+i);
 								for(var h = 0; h < select1.options.length; h++){
 									if (select1_values.indexOf(select1.options[h].value) != -1) {
 										select1.options[h].selected = true;
+										select2.options[h].disabled = true;
+										select2.options[h].setAttribute("style", "opacity: 0.4");
 									}
 								}
-								var select2 = document.getElementById('multi_select_2_'+i);
+								
 								for(var h = 0; h < select1.options.length; h++){
 									if (select2_values.indexOf(select2.options[h].value) != -1) {
 										select2.options[h].selected = true;
+										select1.options[h].disabled = true;
+										select1.options[h].setAttribute("style", "opacity: 0.4")
 									}
 								}
 								document.getElementById('select_3_'+i).value = splt1[i].FitType;
@@ -282,6 +288,15 @@ function rerunLoad() {
 									document.getElementById('checkbox_4_'+i).checked = true;
 								}
 								MCallSelection(i);
+								document.getElementById('textarea_3_'+i).value = splt1[i].MCallParams;
+							}else if (splt1[i].Type == pipelineDict[5]) {
+								//DiffMeth
+								additionalPipes();
+								document.getElementById('select_'+i).value = pipelineDict[5];
+								pipelineSelect(i);
+								
+								document.getElementById('text_1_'+i).value = splt1[i].Name;
+								//handle for multiple selections
 								var select_values = [];
 								var select_locations = [];
 								if (splt1[i].Columns != undefined) {
@@ -310,14 +325,13 @@ function rerunLoad() {
 										select2.options[h].selected = true;
 									}
 								}
-								document.getElementById('textarea_3_'+i).value = splt1[i].MCallParams;
-								
-								//MComp
-								if (splt1[i].MCompStep == 'yes') {
-									document.getElementById('checkbox_5_'+i).checked = true;
+								document.getElementById('text_2_'+i).value = splt1[i].TileSize;
+								document.getElementById('text_3_'+i).value = splt1[i].StepSize;
+								document.getElementById('text_4_'+i).value = splt1[i].MaxCoverage;
+								document.getElementById('text_5_'+i).value = splt1[i].TopN;
+								if (splt1[i].StrandSpecific == 'yes') {
+									document.getElementById('checkbox_1_'+i).checked = true;
 								}
-								MCompSelection(i);
-								document.getElementById('textarea_4_'+i).value = splt1[i].MCompParams;
 							}
 						}
 						document.getElementById(jsonTypeList[x]+'_exp_body').setAttribute('style', 'display: block');
@@ -349,14 +363,16 @@ function rerunLoad() {
 function pipelineSelect(num){
 	//Grab some useful variables
 	var pipeType = document.getElementById('select_'+num).value;
+	console.log(pipeType);
 	var divAdj = createElement('div', ['id', 'class', 'style'], ['select_child_'+num, 'input-group margin col-md-11', 'float:left']);
+	console.log(divAdj);
 	//Check for only one RSEM/DESeq dependencies
 	if (pipeType == pipelineDict[0] && currentPipelineVal.indexOf('RNASeqRSEM') > -1)
 	{
 		$('#errorModal').modal({
 			show: true
 		});
-		document.getElementById('errorLabel').innerHTML ='You cannot select more than one additional RSEM pipeline';
+		document.getElementById('errorLabel').innerHTML ='You cannot select more than one RSEM pipeline';
 		document.getElementById('errorAreas').innerHTML = '';
 		document.getElementById('select_'+num).value = currentPipelineVal[currentPipelineID.indexOf(num)];
 	}
@@ -365,6 +381,22 @@ function pipelineSelect(num){
 			show: true
 		});
 		document.getElementById('errorLabel').innerHTML ='You must first add a RSEM pipeline before running DESeq';
+		document.getElementById('errorAreas').innerHTML = '';
+		document.getElementById('select_'+num).value = currentPipelineVal[currentPipelineID.indexOf(num)];
+	}
+	else if (pipeType == pipelineDict[4] && currentPipelineVal.indexOf('BisulphiteMapping') > -1){
+		$('#errorModal').modal({
+			show: true
+		});
+		document.getElementById('errorLabel').innerHTML ='You cannot select more than one BisulphiteMapping pipeline';
+		document.getElementById('errorAreas').innerHTML = '';
+		document.getElementById('select_'+num).value = currentPipelineVal[currentPipelineID.indexOf(num)];
+	}
+	else if (pipeType == pipelineDict[5] && (currentPipelineVal.indexOf('BisulphiteMapping') == -1 || (currentPipelineVal[currentPipelineID.indexOf(num)] == 'BisulphiteMapping'))) {
+		$('#errorModal').modal({
+			show: true
+		});
+		document.getElementById('errorLabel').innerHTML ='You must first add a BisulphiteMapping pipeline before running DiffMeth';
 		document.getElementById('errorAreas').innerHTML = '';
 		document.getElementById('select_'+num).value = currentPipelineVal[currentPipelineID.indexOf(num)];
 	}
@@ -497,24 +529,33 @@ function pipelineSelect(num){
 		labelDiv.appendChild( createElement('label', ['class','TEXTNODE'], ['box-title margin', 'Run MCall:']));
 		labelDiv.appendChild( createElement('input', ['id', 'type', 'class', 'onClick'], ['checkbox_4_'+num, 'checkbox', 'margin', 'MCallSelection("'+num+'")']));
 		divAdj.appendChild(labelDiv);
+		labelDiv2 = createElement('div', ['class'], ['col-md-12']);
+		labelDiv2.appendChild( createElement('label', ['id', 'class', 'style', 'TEXTNODE'], ['label_4_'+num, 'box-title', 'display:none', 'Additional MCall Parameters:']));
+		labelDiv2.appendChild( createElement('textarea', ['id', 'class', 'style'], ['textarea_3_'+num, 'form-control', 'display:none']));
+		divAdj.appendChild(labelDiv2);
+	}else if (pipeType == pipelineDict[5]) {
+		//DiffMeth
+		divAdj = mergeTidy(divAdj, 12,
+				[ [createElement('label', ['class','TEXTNODE'], ['box-title', 'Name:']),
+				createElement('input', ['id', 'class', 'type', 'value'], ['text_1_'+num, 'form-control', 'text', ''])] ]);
 		divAdj = mergeTidy(divAdj, 6,
-				[ [createElement('label', ['id', 'class', 'style', 'TEXTNODE'], ['label_2_'+num, 'box-title', 'display:none', 'MCall Condition 1']),
-				createElement('select',['id', 'class', 'type', 'multiple', 'size', 'style', 'onchange'],['multi_select_1_'+num, 'form-control', 'select-multiple', 'multiple', '8', 'display:none', 'deselectCondition(1, '+num+')'])],
-				[createElement('label', ['id', 'class', 'style', 'TEXTNODE'], ['label_3_'+num, 'box-title', 'display:none', 'MCall Condition 2']),
-				createElement('select',['id', 'class', 'type', 'multiple', 'size', 'style', 'onchange'],['multi_select_2_'+num, 'form-control', 'select-multiple', 'multiple', '8', 'display:none', 'deselectCondition(2, '+num+')'])] ]);
-		labelDiv = createElement('div', ['class'], ['col-md-12']);
-		labelDiv.appendChild( createElement('label', ['id', 'class', 'style', 'TEXTNODE'], ['label_4_'+num, 'box-title', 'display:none', 'Additional MCall Parameters:']));
-		labelDiv.appendChild( createElement('textarea', ['id', 'class', 'style'], ['textarea_3_'+num, 'form-control', 'display:none']));
-		divAdj.appendChild(labelDiv);
-		
-		//MComp
+				[ [createElement('label', ['class','TEXTNODE'], ['box-title', 'Condition 1']),
+				createElement('select',['id', 'class', 'type', 'multiple', 'size', 'onchange'],['multi_select_1_'+num, 'form-control', 'select-multiple', 'multiple', '8', 'deselectCondition(1, '+num+')'])],
+				[createElement('label', ['class','TEXTNODE'], ['box-title', 'Condition 2']),
+				createElement('select',['id', 'class', 'type', 'multiple', 'size', 'onchange'],['multi_select_2_'+num, 'form-control', 'select-multiple', 'multiple', '8', 'deselectCondition(2, '+num+')'])] ]);
+		divAdj = mergeTidy(divAdj, 6,
+				[ [createElement('label', ['class','TEXTNODE'], ['box-title', 'Tile Size:']),
+				createElement('input', ['id', 'class', 'type', 'value'], ['text_2_'+num, 'form-control', 'text', '300'])],
+				[createElement('label', ['class','TEXTNODE'], ['box-title', 'Step Size:']),
+				createElement('input', ['id', 'class', 'type', 'value'], ['text_3_'+num, 'form-control', 'text', '300'])] ]);
+		divAdj = mergeTidy(divAdj, 6,
+				[ [createElement('label', ['class','TEXTNODE'], ['box-title', 'Max Coverage:']),
+				createElement('input', ['id', 'class', 'type', 'value'], ['text_4_'+num, 'form-control', 'text', '5'])],
+				[createElement('label', ['class','TEXTNODE'], ['box-title', 'Top N Regions:']),
+				createElement('input', ['id', 'class', 'type', 'value'], ['text_5_'+num, 'form-control', 'text', '2000'])] ]);
 		labelDiv = createElement('div', ['class'], ['col-md-12 text-center']);
-		labelDiv.appendChild( createElement('label', ['class','TEXTNODE'], ['box-title margin', 'Run MComp:']));
-		labelDiv.appendChild( createElement('input', ['id', 'type', 'class', 'onClick'], ['checkbox_5_'+num, 'checkbox', 'margin', 'MCompSelection("'+num+'")']));
-		divAdj.appendChild(labelDiv);
-		labelDiv = createElement('div', ['class'], ['col-md-12']);
-		labelDiv.appendChild( createElement('label', ['id', 'class', 'style', 'TEXTNODE'], ['label_5_'+num, 'box-title', 'display:none', 'Additional MComp Parameters:']));
-		labelDiv.appendChild( createElement('textarea', ['id', 'class', 'style'], ['textarea_4_'+num, 'form-control', 'display:none']));
+		labelDiv.appendChild( createElement('label', ['class','TEXTNODE'], ['box-title margin', 'Strand Specific Information:']));
+		labelDiv.appendChild( createElement('input', ['id', 'type', 'class'], ['checkbox_1_'+num, 'checkbox', 'margin']));
 		divAdj.appendChild(labelDiv);
 	}
 	//replace div
@@ -751,6 +792,25 @@ function submitPipeline(type) {
 			dir_tests = true;
 		}
 	
+		//Check empty multi_selections
+		var de_multi_error = false;
+		var meth_multi_error = false;
+		for(var z = 0; z < currentPipelineVal.length; z++){
+			if (currentPipelineVal[z] == 'DESeq') {
+				if (document.getElementById('multi_select_1_'+currentPipelineID[z]).value == "") {
+					de_multi_error = true;
+				}else if(document.getElementById('multi_select_2_'+currentPipelineID[z]).value == "" ){
+					de_multi_error = true;
+				}
+			}else if (currentPipelineVal[z] == 'DiffMeth') {
+				if (document.getElementById('multi_select_1_'+currentPipelineID[z]).value == "") {
+					meth_multi_error = true;
+				}else if(document.getElementById('multi_select_2_'+currentPipelineID[z]).value == "" ){
+					meth_multi_error = true;
+				}
+			}
+		}
+	
 		if (adapterCheck && doAdapter == 'yes') {
 			$('#errorModal').modal({
 				show: true
@@ -775,6 +835,18 @@ function submitPipeline(type) {
 				show: true
 			});
 			document.getElementById('errorLabel').innerHTML ='You do not have permissions or the file does not exist for the File:<br><br>'+custom_error
+			document.getElementById('errorAreas').innerHTML = '';
+		}else if(de_multi_error){
+			$('#errorModal').modal({
+				show: true
+			});
+			document.getElementById('errorLabel').innerHTML ='DESeq is missing selected conditions.<br><br>';
+			document.getElementById('errorAreas').innerHTML = '';
+		} else if (meth_multi_error){
+			$('#errorModal').modal({
+				show: true
+			});
+			document.getElementById('errorLabel').innerHTML ='DiffMeth is missing selected conditions.<br><br>';
 			document.getElementById('errorAreas').innerHTML = '';
 		}else{
 			//insert new values into ngs_runparams
@@ -1479,11 +1551,17 @@ function findRNAChecked(titles){
 
 /*##### REMOVE PIPELINES #####*/
 function removePipes(num){
-	var div = document.getElementById('TESTBOXAREA_'+ num);
+	var div = document.getElementById('BOXAREA_'+ num);
 	var index = currentPipelineID.indexOf(num);
 	if (currentPipelineVal[index] == 'RNASeqRSEM') {
 		for(var q = currentPipelineVal.length - 1; q > -1; q--){
 			if (currentPipelineVal[q] == 'DESeq') {
+				recursiveRemovePipes(q);
+			}
+		}
+	}else if (currentPipelineVal[index] == 'BisulphiteMapping') {
+		for(var q = currentPipelineVal.length - 1; q > -1; q--){
+			if (currentPipelineVal[q] == 'DiffMeth') {
 				recursiveRemovePipes(q);
 			}
 		}
@@ -1496,8 +1574,10 @@ function removePipes(num){
 }
 
 function recursiveRemovePipes(num){
-	var div = document.getElementById('TESTBOXAREA_'+ num);
+	var div = document.getElementById('BOXAREA_'+ num);
 	var index = currentPipelineID.indexOf(num);
+	console.log(index);
+	console.log(div);
 	div.parentNode.removeChild(div);
 	if (index != -1) {
 		currentPipelineVal.splice(index,1);
@@ -1510,13 +1590,13 @@ function additionalPipes(){
 	//find parent div
 	var master = document.getElementById('masterPipeline');
 	//create children divs/elements
-	var outerDiv = createElement('div', ['id', 'class', 'style'], ['TESTBOXAREA_'+pipelineNum, 'callout callout-info margin', 'display:""']);
+	var outerDiv = createElement('div', ['id', 'class', 'style'], ['BOXAREA_'+pipelineNum, 'callout callout-info margin', 'display:""']);
 	var innerDiv = document.createElement( 'div' );
 	//attach children to parent
 	innerDiv.appendChild( createElement('select',
-					['id', 'class', 'onchange', 'OPTION_DIS_SEL', 'OPTION', 'OPTION', 'OPTION', 'OPTION', 'OPTION'],
+					['id', 'class', 'onchange', 'OPTION_DIS_SEL', 'OPTION', 'OPTION', 'OPTION', 'OPTION', 'OPTION', 'OPTION'],
 					['select_'+pipelineNum, 'form-control', 'pipelineSelect('+pipelineNum+')', '--- Select a Pipeline ---',
-					pipelineDict[0], pipelineDict[1], pipelineDict[2], pipelineDict[3], pipelineDict[4]]));
+					pipelineDict[0], pipelineDict[1], pipelineDict[2], pipelineDict[3], pipelineDict[4], pipelineDict[5]]));
 	innerDiv.appendChild( createElement('div', ['id'], ['select_child_'+pipelineNum]));
 	outerDiv.appendChild( innerDiv );
 	outerDiv.appendChild( createElement('input', ['id', 'type', 'class', 'style', 'value', 'onclick'],
@@ -1591,7 +1671,8 @@ function findPipelineValues(){
 	var DESEQ_JSON_DICT = ['Name', 'Columns', 'Conditions', 'FitType', 'HeatMap', 'padj', 'foldChange', 'DataType'];
 	var CHIPSEQ_JSON_DICT = ['ChipInput', 'MultiMapper', 'TagSize', 'BandWith', 'EffectiveGenome', 'MarkDuplicates', 'CollectMultipleMetrics', 'IGVTDF', 'BAM2BW', 'ExtFactor'];
 	var TOPHAT_JSON_DICT = ['Params', 'MarkDuplicates', 'RSeQC', 'CollectRnaSeqMetrics', 'CollectMultipleMetrics', 'IGVTDF', 'BAM2BW', 'ExtFactor'];
-	var BISULPHITE_JSON_DICT = ['BSMapStep', 'BisulphiteType', 'Digestion', 'BSMapParams', 'CollectMultipleMetrics', 'IGVTDF', 'MarkDuplicates', 'BAM2BW', 'ExtFactor', 'MCallStep', 'Columns', 'Conditions', 'MCallParams', 'MCompStep', 'MCompParams'];
+	var BISULPHITE_JSON_DICT = ['BSMapStep', 'BisulphiteType', 'Digestion', 'BSMapParams', 'CollectMultipleMetrics', 'IGVTDF', 'MarkDuplicates', 'BAM2BW', 'ExtFactor', 'MCallStep', 'MCallParams'];
+	var DIFFMETH_JSON_DICT = [ 'Name', 'Columns', 'Conditions', 'TileSize', 'StepSize', 'MaxCoverage', 'TopN', 'StrandSpecific' ];
 	
 	var JSON_ARRAY =  [];
 	for (var y = 0; y < currentPipelineID.length; y++) {
@@ -1607,6 +1688,8 @@ function findPipelineValues(){
 			USED_DICT = TOPHAT_JSON_DICT;
 		}else if (currentPipelineVal[y] == 'BisulphiteMapping') {
 			USED_DICT = BISULPHITE_JSON_DICT;
+		}else if (currentPipelineVal[y] == 'DiffMeth') {
+			USED_DICT = DIFFMETH_JSON_DICT;
 		}
 		
 		var dict_counter = 0;
@@ -1806,17 +1889,9 @@ function IGVTDFSelection(id){
 function MCallSelection(id){
 	var check = document.getElementById('checkbox_4_'+id).checked;
 	if (check) {
-		document.getElementById('label_2_'+id).setAttribute("style", "display:show");
-		document.getElementById('multi_select_1_'+id).setAttribute("style", "display:show");
-		document.getElementById('label_3_'+id).setAttribute("style", "display:show");
-		document.getElementById('multi_select_2_'+id).setAttribute("style", "display:show");
 		document.getElementById('label_4_'+id).setAttribute("style", "display:show");
 		document.getElementById('textarea_3_'+id).setAttribute("style", "display:show");
 	}else{
-		document.getElementById('label_2_'+id).setAttribute("style", "display:none");
-		document.getElementById('multi_select_1_'+id).setAttribute("style", "display:none");
-		document.getElementById('label_3_'+id).setAttribute("style", "display:none");
-		document.getElementById('multi_select_2_'+id).setAttribute("style", "display:none");
 		document.getElementById('label_4_'+id).setAttribute("style", "display:none");
 		document.getElementById('textarea_3_'+id).setAttribute("style", "display:none");
 	}
