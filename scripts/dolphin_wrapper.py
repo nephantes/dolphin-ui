@@ -338,15 +338,18 @@ class Dolphin:
                  print >>fp, '@DIGESTION=%s'%(  str(pipe['Digestion']) if ('Digestion' in pipe) else 'NONE' )
                  self.writeInputParamLine(fp, pipe, "@BSMAPPARAM", 'BSMapParams', "BSMapStep")
                if (pipe['MCallStep']== "yes"):
-                 self.writeInputParamLine(fp, pipe, "@MCONDS", 'Conditions', "MCallStep")
-                 self.writeInputParamLine(fp, pipe, "@MFIELDS", 'Columns', "MCallStep")
                  self.writeInputParamLine(fp, pipe, "@MCALLPARAM", 'MCallParams', "MCallStep")
-                 print >>fp, '@GBUILD=%s'%(gb[1])
-                 print >>fp, '@STRAND=none'
-                 print >>fp, '@TILE_SIZE=300'
                  
-               if (pipe['MCompStep'] == ""):
-                 self.writeInputParamLine(fp, pipe, "@MCOMPPARAM", 'MCompParams', "MCompStep")
+             if (pipe['Type']=="DiffMeth"):
+               name = ( pipe['Name'] if ('Name' in pipe) else  "")
+               print >>fp, '@COLS%s=%s'%(name, self.remove_space(pipe['Columns']))
+               print >>fp, '@CONDS%s=%s'%(name, self.remove_space(pipe['Conditions']))
+               print >>fp, '@TILE_SIZE%s=%s'%(name, pipe['TileSize'])
+               print >>fp, '@STEP_SIZE%s=%s'%(name, pipe['StepSize'])
+               print >>fp, '@STRAND%s=%s'%(name, pipe['StrandSpecific'])
+               print >>fp, '@TOPN%s=%s'%(name, pipe['TopN'])
+               print >>fp, '@MAXCOVERAGE%s=%s'%(name, pipe['MaxCoverage'])
+               print >>fp, '@GBUILD%s=%s'%(name, gb[1])
 
        print >>fp, '@MAPNAMES=%s'%(mapnames)
        print >>fp, '@PREVIOUSPIPE=%s'%(previous)
@@ -506,10 +509,10 @@ class Dolphin:
                  self.writeVisualizationStr( fp, type, pipe, sep )
                  
                  self.prf( fp, '%s'% ( stepMCall % locals() if ('MCallStep' in pipe and pipe['MCallStep'].lower()=="yes") else None ) )
-                 methylkit_name="exper"
-                 self.prf( fp, '%s'% ( stepMethylKit % locals() if ('MCallStep' in pipe and pipe['MCallStep'].lower()=="yes") else None ) )
-                 self.prf( fp, '%s'% ( stepMComp % locals() if ('MCompStep' in pipe and pipe['MCompStep'].lower()=="yes") else None ) )
-                 
+             
+              if (pipe['Type'] == "DiffMeth"):
+                 methylkit_name =( pipe['Name'] if ('Name' in pipe) else '' )
+                 self.prf( fp, '%s'%(stepMethylKit % locals()) )             
 
         level = str(1 if ('clean' in runparams and runparams['clean'].lower() != 'none') else 0)
         print >>fp, '%s'%(stepClean % locals())
