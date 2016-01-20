@@ -94,6 +94,7 @@ $(function() {
 						'<ul class="dropdown-menu" role="menu">' +
 							disabled +
 							'<li><a href="#" id="'+s[i].id+'" name="'+s[i].run_group_id+'" onclick="resumeSelected(this.id, this.name)">Resume</a></li>' +
+							'<li><a href="#" id="'+s[i].id+'" name="'+s[i].run_group_id+'" onclick="resetSelected(this.id, this.name)">Reset</a></li>' +
 							'<li class="divider"></li>' +
 							'<li><a href="#" id="'+s[i].id+'" name="'+s[i].run_group_id+'" onClick="deleteRunparams(\''+s[i].id+'\')">Delete</a></li>' +
 						'</ul>' +
@@ -169,8 +170,9 @@ $(function() {
 						'</button>' +
 						'<ul class="dropdown-menu" role="menu">' +
 							disabled +
-							'<li><a href="#" id="'+s[i].id+'" name="'+s[i].run_group_id+'" onclick="rerunSelected(this.id, this.name)">Re-run</a></li>' +
+							'<li><a href="#" id="'+s[i].id+'" name="'+s[i].run_group_id+'" onclick="rerunSelected(this.id, this.name)">Rerun</a></li>' +
 							'<li><a href="#" id="'+s[i].id+'" name="'+s[i].run_group_id+'" onclick="resumeSelected(this.id, this.name)">Resume</a></li>' +
+							'<li><a href="#" id="'+s[i].id+'" name="'+s[i].run_group_id+'" onclick="resetSelected(this.id, this.name)">Reset</a></li>' +
 							'<li class="divider"></li>' +
 							'<li><a href="#" id="'+s[i].id+'" name="'+s[i].run_group_id+'" onClick="deleteRunparams(\''+s[i].id+'\')">Delete</a></li>' +
 						'</ul>' +
@@ -303,6 +305,7 @@ $(function() {
 							'<ul class="dropdown-menu" role="menu">' +
 								disabled +
 								'<li><a href="#" id="'+s[i].id+'" name="'+s[i].run_group_id+'" onclick="resumeSelected(this.id, this.name)">Resume</a></li>' +
+								'<li><a href="#" id="'+s[i].id+'" name="'+s[i].run_group_id+'" onclick="resetSelected(this.id, this.name)">Reset</a></li>' +
 								'<li class="divider"></li>' +
 								'<li><a href="#" id="'+s[i].id+'" name="'+s[i].run_group_id+'" onClick="deleteRunparams(\''+s[i].id+'\')">Delete</a></li>' +
 							'</ul>' +
