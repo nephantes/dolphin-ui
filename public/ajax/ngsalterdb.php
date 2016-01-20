@@ -84,12 +84,14 @@ if ($p == "submitPipeline" )
         $wkey=$table[0]->wkey;
         
         killPid($idKey, $query);
+		if($wkey != ''){
         $data=$query->runSQL("
-        INSERT INTO ngs_wkeylist
-        (run_id, wkey, wrapper_pid, workflow_pid, time_added)
-        VALUES
-        ($idKey, '$wkey', $wrapper_pid, $workflow_pid, now())
-        ");
+			INSERT INTO ngs_wkeylist
+			(run_id, wkey, wrapper_pid, workflow_pid, time_added)
+			VALUES
+			($idKey, '$wkey', $wrapper_pid, $workflow_pid, now())
+			");
+		}
         
         $data=$query->runSQL("
         UPDATE ngs_runparams
@@ -108,7 +110,6 @@ if ($p == "submitPipeline" )
         WHERE id = '$idKey'
         ");
 		
-		$wkey = "";
         runCmd($idKey, $query, $wkey);
         $data=$idKey;
     }else{
@@ -206,6 +207,27 @@ else if ($p == 'alterSecretKey')
     SET aws_secret_access_key = '".$s_key."'
     WHERE id = $id
     ");
+}
+else if ($p == 'resetWKey'){
+	if (isset($_POST['id'])){$id = $_POST['id'];}
+	$table=json_decode($query->queryTable("SELECT id,wrapper_pid,runworkflow_pid,wkey FROM ngs_runparams WHERE id = $id limit 1"));
+	$idKey=$table[0]->id;
+	$wrapper_pid=$table[0]->wrapper_pid;
+	$workflow_pid=$table[0]->runworkflow_pid;
+	$wkey=$table[0]->wkey;
+	
+	killPid($idKey, $query);
+	$data=$query->runSQL("
+	INSERT INTO ngs_wkeylist
+	(run_id, wkey, wrapper_pid, workflow_pid, time_added)
+	VALUES
+	($idKey, '$wkey', $wrapper_pid, $workflow_pid, now())
+	");
+	$data = $query->runSQL("
+	UPDATE ngs_runparams
+	SET wkey = ''
+	WHERE id = $id
+	");
 }
 
 //footer
