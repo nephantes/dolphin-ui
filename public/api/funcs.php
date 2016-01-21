@@ -811,11 +811,11 @@ class funcs
       
       function getFastqFileId($params)
       {
-         $file_id=$params['file_id'];
+         $sample_id=$params['sample_id'];
          $res=0;
-         if ($file_id>0)
+         if ($sample_id>0)
          {
-           $sql="select id from ngs_fastq_files where id=$file_id";
+           $sql="select sample_id from ngs_fastq_files where sample_id=$sample_id";
            $res = $this->queryTable($sql);
          }
          return $res;  
@@ -827,12 +827,11 @@ class funcs
          $md5sum=$params['md5sum'];
          $total_reads=$params['total_reads'];
          $owner_id=$params['owner_id'];
-         $fastq_id=$params['fastq_id'];
-         
+
          $res=0;
          if ($sample_id>0)
          {
-            $sql="update ngs_fastq_files set checksum='$md5sum', total_reads=$total_reads, date_modified=now(), last_modified_user=$owner_id where sample_id=$sample_id and id=$fastq_id";
+            $sql="update ngs_fastq_files set checksum='$md5sum', total_reads=$total_reads, date_modified=now(), last_modified_user=$owner_id where sample_id=$sample_id ";
             $res = $this->runSQL($sql);
          }
          return $res;
