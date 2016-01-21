@@ -496,7 +496,8 @@ class funcs
                     $dpf = "-p $defaultparam";
                     
                 $edir = $this->tool_path;
-                $com = $this->python . " " . $edir . "/runService.py -f ".$this->config." -d " . $this->dbhost . " $ipf $dpf -o $outdir -u $username -k $wkey -c \"$command\" -n $servicename -s $servicename";
+                $command=str_replace("\"", "\\\"", $command);
+                $com = $this->python . " " . $edir . "/runService.py -f ".$this->config." $ipf $dpf -o $outdir -u $username -k $wkey -c \"$command\" -n $servicename -s $servicename";
                 $retval = $this->sysback($this->getCMDs($com));
              }
              if (preg_match('/Error/', $retval)) {
@@ -536,36 +537,9 @@ class funcs
         $result = $this->runSQL($sql);
         $sql    = "update ngs_runparams set run_status='1' where wkey='$wkey'";
         $result = $this->runSQL($sql);
-        #return $sql;
         return "Success!!!";
-        $sql1    = "SELECT sum(w.result) from (SELECT result from workflow_services ws left join service_run s on ws.service_id=s.service_id where ws.workflow_id=(SELECT workflow_id FROM workflow_run wr where wkey='$wkey') and wkey='$wkey') w";
-        $result1 = $this->runSQL($sql1);
-        #Get how many service successfuly finished
-        if (is_object($result1) && $row1 = $result1->fetch_row()) {
-            #Get how many services exist in the workflow
-            $sql2    = "SELECT count(*) from workflow_services ws where workflow_id=(SELECT workflow_id FROM workflow_run wr where wkey='$wkey')";
-            $result2 = $this->runSQL($sql2);
-            if (is_object($result2) && $row2 = $result2->fetch_row()) {
-                
-                if ($row1[0] >= $row2[0]) {
-                    $sql    = "update workflow_run set result='1', end_time=now() where wkey='$wkey'";
-                    $result = $this->runSQL($sql);
-                    #return $sql;
-                    return "Success!!!";
-                } else {
-                    # if non of the last service jobs are running in the cluster.
-                    # exit and give an error
-                    if (!$this->checkLastServiceJobs($wkey)) {
-                        return "ERROR: Workflow couldn't sucessfully completed. Please check the results!!!\n";
-                    }
-                }
-            }
-            
-        }
-        #return "$sql1 :::: $sql2";
-        return "WRUNNING";
-        
     }
+    
     #Insert a job to the database
     function insertJob($params)
     {
@@ -607,7 +581,7 @@ class funcs
         $sql = "update jobs set `$field`=now(), `result`='$result' where `wkey`='$wkey' and `job_num`='$jobnum'";
         
         $res = $this->runSQL($sql);
-        return $res . ":" . $sql;
+        return $res;
     }
     
     #Check if all jobs are finished or not for a service
@@ -795,6 +769,119 @@ class funcs
           }
           return "cputime\":\"240\",\"maxmemory\":\"4096";
       }
+      
+      //For stepBackupS3 ######################
+      function getSampleList($params)
+      {
+          $runparamsid=$params['runparamsid'];
+          $barcode=$params['barcode'];
+
+          if (strtolower($barcode) != "none")
+          {
+             $sql = "SELECT DISTINCT ns.id sample_id, sf.id file_id, d.id dir_id, ns.lane_id, ns.samplename, sf.file_name, d.fastq_dir, d.backup_dir, d.amazon_bucket, ns.owner_id, ns.group_id, ns.perms FROM ngs_runlist nr, ngs_samples ns, ngs_temp_lane_files sf, ngs_dirs d where sf.lane_id=ns.lane_id and d.id=sf.dir_id and ns.id=nr.sample_id and nr.run_id='$runparamsid'";
+          }
+          else
+          {
+             $sql = "SELECT DISTINCT ns.id sample_id, sf.id file_id, d.id dir_id, ns.lane_id, ns.samplename, sf.file_name, d.fastq_dir, d.backup_dir, d.amazon_bucket, ns.owner_id, ns.group_id, ns.perms FROM ngs_runlist nr, ngs_samples ns, ngs_temp_sample_files sf, ngs_dirs d where sf.sample_id=ns.id and d.id=sf.dir_id and ns.id=nr.sample_id and nr.run_id='$runparamsid'";
+          }
+
+          return $this->queryTable($sql);
+      }
+      
+      function getAmazonCredentials($params)
+      {
+         $username=$params['username'];
+         $sql = "SELECT DISTINCT ac.* FROM amazon_credentials ac, group_amazon ga, users u where ac.id=ga.amazon_id and ga.group_id=u.group_id and (u.clusteruser='$username' or u.username='$username')";
+         return $this->queryTable($sql);
+      }
+      function updateInitialFileCounts($params)
+      {
+        $tablename=$params['tablename'];
+        $total_reads=$params['total_reads'];
+        $file_id=$params['file_id'];
+        $res=0;
+        if ($file_id>0)
+        {
+           $sql = "UPDATE $tablename set total_reads=$total_reads where id=$file_id";
+           $res = $this->runSQL($sql);
+        }
+
+         return $res;        
+      }
+      
+      function getFastqFileId($params)
+      {
+         $file_id=$params['file_id'];
+         $res=0;
+         if ($file_id>0)
+         {
+           $sql="select id from ngs_fastq_files where id=$file_id";
+           $res = $this->queryTable($sql);
+         }
+         return $res;  
+       }
+       
+       function upadateFastqFile($params)
+       {
+         $sample_id=$params['sample_id'];
+         $md5sum=$params['md5sum'];
+         $total_reads=$params['total_reads'];
+         $owner_id=$params['owner_id'];
+         $fastq_id=$params['fastq_id'];
+         
+         $res=0;
+         if ($sample_id>0)
+         {
+            $sql="update ngs_fastq_files set checksum='$md5sum', total_reads=$total_reads, date_modified=now(), last_modified_user=$owner_id where sample_id=$sample_id and id=$fastq_id";
+            $res = $this->runSQL($sql);
+         }
+         return $res;
+       }
+       
+      function insertFastqFile($params)
+      {
+         $filename=$params['filename'];
+         $total_reads=$params['total_reads'];
+         $checksum=$params['checksum'];
+         $sample_id=$params['sample_id'];
+         $lane_id=$params['lane_id'];
+         $dir_id=$params['dir_id'];  
+         $owner_id=$params['owner_id'];
+         $group_id=$params['group_id'];
+         $perms=$params['perms'];
+         
+         $res=0;
+         if ($sample_id>0)
+         {
+            $sql="INSERT INTO ngs_fastq_files ( `file_name`, `total_reads`, `checksum`, `sample_id`, `lane_id`,`dir_id`,`owner_id`, `group_id`,`perms`,`date_created`,`date_modified`,`last_modified_user`) VALUES('$filename', '$total_reads','$checksum','$sample_id','$lane_id','$dir_id','$owner_id', '$group_id', '$perms', now(), now(), '$owner_id')";
+            $res = $this->runSQL($sql);
+         }
+         return $res; 
+         
+      }
+      
+      function checkReadCounts($params)
+      {
+        $sample_id=$params['sample_id'];
+        $tablename=$params['tablename'];
+        
+        $sql="SELECT sum(total_reads) FROM $tablename where sample_id=$sample_id";
+        $temp_count=$this->queryAVal($sql);
+
+        $sql="SELECT total_reads FROM ngs_fastq_files where sample_id=$sample_id";
+        $merged_count=$this->queryAVal($sql);
+        
+        $res=0;
+        if ($temp_count==$merged_count)
+        {
+           $res=1;
+        }
+        
+        return "{'Result':$res, 'temp_count':$temp_count, 'merged_count':$merged_count}";
+      }
+
+
+      //#######################################
 
 }
 ?>
