@@ -25,6 +25,7 @@ class TablecreatorController extends VanillaController {
 		$this->set('uid', $_SESSION['uid']);
         $gids = $this->Tablecreator->getGroup($_SESSION['user']);
         $this->set('gids', $gids);
+		$this->set('groups', $this->Tablecreator->getGroups($_SESSION['user']));
 	}
     function afterAction() {
     }
