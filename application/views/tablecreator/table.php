@@ -30,8 +30,8 @@
 							</form>
 						</div>
 						<div class="col-md-2">
-							<button class="btn btn-primary pull-right" type="button" onclick="backToTableIndex()">Back</button>
 							<button class="btn btn-primary pull-right" type="button" onclick="saveTable()">Save Table</button>
+							<button class="btn btn-primary pull-right" type="button" onclick="toTableListing()">Tables List</button>
 						</div>
 					</div>
 					<div class="row">
