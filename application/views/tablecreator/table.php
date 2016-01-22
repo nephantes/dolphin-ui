@@ -19,15 +19,19 @@
 								<button id="generated_button" type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown" aria-expanded="true">Download Type  <span class="fa fa-caret-down"></span></button>
 							</div>
 						</div>
-						<div class="col-md-10">
+						<div class="col-md-8">
 							<form class="form-horizontal">
 								<div class="form-group">
-									<label class='col-sm-3 control-label'>Save Table As:</label>
-									<div class="col-sm-9">
+									<label class='col-sm-2 control-label'>Save Table As:</label>
+									<div class="col-sm-10">
 										<input type="text" class="form-control" id="input_table_name">
 									</div>
 								</div>
 							</form>
+						</div>
+						<div class="col-md-2">
+							<button class="btn btn-primary pull-right" type="button" onclick="backToTableIndex()">Back</button>
+							<button class="btn btn-primary pull-right" type="button" onclick="saveTable()">Save Table</button>
 						</div>
 					</div>
 					<div class="row">
@@ -38,10 +42,6 @@
 									echo $html->getRespBoxTableStream("Table Generated", "generated", [], []);
 									unset($_SESSION['tablecreatorcheck']);
 								?>
-							</div>
-							<div class="margin col-md-12">
-								<button class="btn btn-box-tool btn-primary margin pull-right" onclick="saveTable()">Save Table</button>
-								<button class="btn btn-box-tool btn-primary margin pull-right" onclick="backToTableIndex()">Back</button>
 							</div>
 						</div>
 					</div><!-- /.row -->
