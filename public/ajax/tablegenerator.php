@@ -173,6 +173,64 @@ else if ($p == 'removeTSV')
 	pclose($open);
 	$data = json_encode('deleted');
 }
+else if ($p == 'getAllUsers')
+{
+	if (isset($_GET['table'])){$table = $_GET['table'];}
+	$owner_check=$query->queryAVal("
+	SELECT owner_id
+	FROM ngs_createdtables
+	WHERE id = $table
+	");
+	if($owner_check == $_SESSION['uid']){
+		$data=$query->queryTable("
+		SELECT id, username
+		FROM users
+		");
+	}else{
+		$data=json_encode("");
+	}
+}
+else if ($p == 'changeDataGroupNames')
+{
+	if (isset($_GET['table'])){$table = $_GET['table'];}
+	$owner_check=$query->queryAVal("
+	SELECT owner_id
+	FROM ngs_createdtables
+	WHERE id = $table
+	");
+	if($owner_check == $_SESSION['uid']){
+		$data=$query->queryTable("
+		SELECT id,name
+		FROM groups
+		WHERE owner_id = " . $_SESSION['uid'] . "
+		");
+	}else{
+		$data=json_encode("");
+	}
+}
+else if ($p == 'getTablePerms')
+{
+	if (isset($_GET['table'])){$table = $_GET['table'];}
+	$data=$query->queryAVal("
+	SELECT perms
+	FROM ngs_runparams
+	WHERE id = $table
+	");
+}
+else if ($p == 'changeTableData'){
+	if (isset($_GET['table'])){$table = $_GET['table'];}
+	if (isset($_GET['owner_id'])){$owner_id = $_GET['owner_id'];}
+	if (isset($_GET['group_id'])){$group_id = $_GET['group_id'];}
+	if (isset($_GET['perms'])){$perms = $_GET['perms'];}
+	$data=$query->runSQL("
+	UPDATE ngs_createdtables
+	SET owner_id = $owner_id,
+	group_id = $group_id,
+	perms = $perms,
+	last_modified_user = ".$_SESSION['uid']."
+	WHERE id = $table
+	");
+}
 
 header('Cache-Control: no-cache, must-revalidate');
 header('Expires: Mon, 26 Jul 1997 05:00:00 GMT');

@@ -371,6 +371,103 @@ function optionChange(selector){
 	reportSelection();
 }
 
+function changeTableData(id){
+	//	Change Experiment Series Owner
+	document.getElementById('permsOwnerLabel').innerHTML = 'Which user should own this table?';
+	document.getElementById('permsOwnerSelect').innerHTML = '';
+	$.ajax({ type: "GET",
+		url: BASE_PATH+"/public/ajax/tablegenerator.php",
+		data: { p: 'getAllUsers', table: id },
+		async: false,
+		success : function(s)
+		{
+			console.log(s);
+			for(var x = 0; x < s.length; x++){
+				if (s[x].id == phpGrab.uid) {
+					document.getElementById('permsOwnerSelect').innerHTML += '<option value="' + s[x].id + '" selected="true">' + s[x].username + '</option>';
+				}else{
+					document.getElementById('permsOwnerSelect').innerHTML += '<option value="' + s[x].id + '">' + s[x].username + '</option>';
+				}
+			}
+		}
+	});
+	document.getElementById('permsGroupLabel').innerHTML = 'Which group should be able to view this table?';
+	document.getElementById('permsGroupSelect').innerHTML = '';
+	$.ajax({ type: "GET",
+			url: BASE_PATH+"/public/ajax/tablegenerator.php",
+			data: { p: 'changeDataGroupNames', table: id },
+			async: false,
+			success : function(s)
+			{
+				console.log(s);
+				for(var x = 0; x < s.length; x++){
+					if (s[x].id == phpGrab.uid) {
+						document.getElementById('permsGroupSelect').innerHTML += '<option value="' + s[x].id + '" selected="true">' + s[x].name + '</option>';
+					}else{
+						document.getElementById('permsGroupSelect').innerHTML += '<option value="' + s[x].id + '">' + s[x].name + '</option>';
+					}
+				}
+			}
+		});
+	var perms;
+	$.ajax({ type: "GET",
+		url: BASE_PATH+"/public/ajax/ngsquerydb.php",
+		data: { p: 'getTablePerms', table: id},
+		async: false,
+		success : function(s)
+		{
+			console.log(s);
+			perms = s;
+		}	
+	});
+	if (perms == 3) {
+		$('#only_me').iCheck('check');
+	}else if (perms == 15) {
+		$('#only_my_group').iCheck('check');
+	}else if (perms == 32) {
+		$('#everyone').iCheck('check');
+	}else if (perms == 63) {
+		$('#everyone').iCheck('check');
+	}else{
+		$('#only_me').iCheck('check');
+	}
+	
+	if (document.getElementById('permsOwnerSelect').innerHTML != '') {
+		document.getElementById('confirmTablePermsButton').setAttribute('style', 'display:show');
+		document.getElementById('cancelTablePermsButton').innerHTML = 'Cancel';
+		document.getElementById('confirmTablePermsButton').setAttribute('onclick', 'confirmTablePermsPressed(\''+id+'\')');
+	}else{
+		document.getElementById('permsLabel').innerHTML = 'You do not have permissions to change this table\'s permissions.';
+		document.getElementById('permsDiv').innerHTML = '';
+		document.getElementById('confirmTablePermsButton').setAttribute('style', 'display:none');
+		document.getElementById('cancelTablePermsButton').innerHTML = 'OK';
+	}
+	$('#permsModal').modal({
+		show: true
+	});
+}
+
+function confirmTablePermsPressed(id){
+	var owner_id = document.querySelector("#permsOwnerSelect").selectedOptions[0].value;
+	var group_id = document.querySelector("#permsGroupSelect").selectedOptions[0].value;
+	var perms = $('.checked')[0].children[0].value;
+	$.ajax({ type: "GET",
+		url: BASE_PATH+"/public/ajax/tablegenerator.php",
+		data: { p: 'changeTableData', table: id, owner_id: owner_id, group_id: group_id, perms: perms, },
+		async: false,
+		success : function(s)
+		{
+			console.log(s);
+		}
+	});
+	$('#permsModal').modal({
+		show: false
+	});
+	$('#permsConfirmModal').modal({
+		show: true
+	});
+}
+
 $(function() {
 	"use strict";
 	
@@ -454,16 +551,8 @@ $(function() {
 	}else if (window.location.href.split("/").indexOf('table') > -1){
 		var beforeFormat = window.location.href.split("/table/")[1].split('format=')[0];
 		var json_obj = '';
-		var export_table = document.getElementById('table_export_exp_body');
-		
-		//export_table.appendChild(createElement('textarea',['id','class','rows'],['generated_box','form-control','25']));
-		//document.getElementById('generated_box').innerHTML = json_obj;
-		
-		var div = createElement('div',['class'],['btn-group']);
-		var dropdown = createElement('button',['id','type','class','data-toggle','aria-expanded'],['generated_button','button','btn btn-primary dropdown-toggle','dropdown','false']);
-		dropdown.innerHTML = 'Download Type  <span class="fa fa-caret-down"></span>';
-		export_table.appendChild(dropdown);
-		
+		var export_table = document.getElementById('downloadOptions');
+
 		var ul = createElement('ul', ['class','role'],['dropdown-menu','menu']);
 		var li = '<li><a onclick="changeTableType(\'json\', \''+beforeFormat+'\')" style="cursor:pointer">JSON link</a></li>';
 		li += '<li><a onclick="changeTableType(\'json2\', \''+beforeFormat+'\')" style="cursor:pointer">JSON2 link</a></li>';
@@ -473,9 +562,7 @@ $(function() {
 		li += '<li><a value="Download TSV" onclick="downloadGeneratedTSV(\''+beforeFormat+'\')" style="cursor:pointer">Download TSV</a></li>';
 		
 		ul.innerHTML = li;
-		div.appendChild(dropdown);
-		div.appendChild(ul);
-		export_table.appendChild(div);
+		export_table.appendChild(ul);
 	}else{
 		var runparams = $('#jsontable_table_viewer').dataTable({
 			//"scrollX": true
@@ -508,6 +595,9 @@ $(function() {
 								'<ul class="dropdown-menu" role="menu">' + 
 									'<li><a href="'+BASE_PATH+'/public/tablecreator/table/'+s[x].parameters+'" id="' + s[x].id+'">View</a></li>' +
 									'<li><a id="' + s[x].id+'" onclick="sendTableToPlot(\''+s[x].file+'\')">Plot Table</a></li>' +
+									'<li class="divider"></li>' +
+									'<li><a id="' + s[x].id+'" onclick="changeTableData(this.id)">Change Table Permissions</a></li>' +
+									'<li class="divider"></li>' +
 									'<li><a href="" id="' + s[x].id+'" onclick="deleteTable(this.id)">Delete</a></li>' +
 								'</ul>'+
 							'</div>'
