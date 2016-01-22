@@ -267,6 +267,8 @@ function rerunSelected(link) {
 
 function saveTable() {
 	var name = document.getElementById('input_table_name').value;
+	var group = document.getElementById('groups').value;
+	var perms = document.getElementById('perms').value;
 	var parameters;
 	if (window.location.href.split("/").indexOf('table') > -1) {
 		parameters = window.location.href.split("/table/")[1];
@@ -281,7 +283,6 @@ function saveTable() {
 	}else{
 		beforeFormat = sendToTableGen().split('format=')[0];
 	}
-	
 	$.ajax({ type: "GET",
 			url: BASE_PATH+"/public/ajax/tablegenerator.php",
 			data: { p: "createTableFile", url: BASE_PATH+"/public/api/getsamplevals.php?" + beforeFormat + 'format=json2' },
@@ -294,7 +295,7 @@ function saveTable() {
 	console.log(file_name);
 	$.ajax({ type: "GET",
 				url: BASE_PATH+"/public/ajax/tablegenerator.php",
-				data: { p: "createNewTable", search: parameters, name: name, file: file_name },
+				data: { p: "createNewTable", search: parameters, name: name, file: file_name, group: group, perms: perms },
 				async: false,
 				success : function(s)
 				{
@@ -373,96 +374,111 @@ function optionChange(selector){
 
 function changeTableData(id){
 	//	Change Experiment Series Owner
-	document.getElementById('permsOwnerLabel').innerHTML = 'Which user should own this table?';
-	document.getElementById('permsOwnerSelect').innerHTML = '';
+	var owner = ''
 	$.ajax({ type: "GET",
 		url: BASE_PATH+"/public/ajax/tablegenerator.php",
-		data: { p: 'getAllUsers', table: id },
+		data: { p: 'getTableOwner', table: id },
 		async: false,
 		success : function(s)
 		{
+			owner = s;
 			console.log(s);
-			for(var x = 0; x < s.length; x++){
-				if (s[x].id == phpGrab.uid) {
-					document.getElementById('permsOwnerSelect').innerHTML += '<option value="' + s[x].id + '" selected="true">' + s[x].username + '</option>';
-				}else{
-					document.getElementById('permsOwnerSelect').innerHTML += '<option value="' + s[x].id + '">' + s[x].username + '</option>';
-				}
-			}
 		}
 	});
-	document.getElementById('permsGroupLabel').innerHTML = 'Which group should be able to view this table?';
-	document.getElementById('permsGroupSelect').innerHTML = '';
-	$.ajax({ type: "GET",
+	if (owner == phpGrab.uid) {
+		document.getElementById('permsOwnerLabel').innerHTML = 'Which user should own this table?';
+		document.getElementById('permsOwnerSelect').innerHTML = '';
+		$.ajax({ type: "GET",
 			url: BASE_PATH+"/public/ajax/tablegenerator.php",
-			data: { p: 'changeDataGroupNames', table: id },
+			data: { p: 'getAllUsers', table: id },
 			async: false,
 			success : function(s)
 			{
 				console.log(s);
 				for(var x = 0; x < s.length; x++){
 					if (s[x].id == phpGrab.uid) {
-						document.getElementById('permsGroupSelect').innerHTML += '<option value="' + s[x].id + '" selected="true">' + s[x].name + '</option>';
+						document.getElementById('permsOwnerSelect').innerHTML += '<option value="' + s[x].id + '" selected="true">' + s[x].username + '</option>';
 					}else{
-						document.getElementById('permsGroupSelect').innerHTML += '<option value="' + s[x].id + '">' + s[x].name + '</option>';
+						document.getElementById('permsOwnerSelect').innerHTML += '<option value="' + s[x].id + '">' + s[x].username + '</option>';
 					}
 				}
 			}
 		});
-	var perms;
-	$.ajax({ type: "GET",
-		url: BASE_PATH+"/public/ajax/ngsquerydb.php",
-		data: { p: 'getTablePerms', table: id},
-		async: false,
-		success : function(s)
-		{
-			console.log(s);
-			perms = s;
-		}	
-	});
-	if (perms == 3) {
-		$('#only_me').iCheck('check');
-	}else if (perms == 15) {
-		$('#only_my_group').iCheck('check');
-	}else if (perms == 32) {
-		$('#everyone').iCheck('check');
-	}else if (perms == 63) {
-		$('#everyone').iCheck('check');
+		document.getElementById('permsGroupLabel').innerHTML = 'Which group should be able to view this table?';
+		document.getElementById('permsGroupSelect').innerHTML = '';
+		$.ajax({ type: "GET",
+				url: BASE_PATH+"/public/ajax/tablegenerator.php",
+				data: { p: 'changeDataGroupNames', table: id },
+				async: false,
+				success : function(s)
+				{
+					console.log(s);
+					for(var x = 0; x < s.length; x++){
+						if (s[x].id == phpGrab.uid) {
+							document.getElementById('permsGroupSelect').innerHTML += '<option value="' + s[x].id + '" selected="true">' + s[x].name + '</option>';
+						}else{
+							document.getElementById('permsGroupSelect').innerHTML += '<option value="' + s[x].id + '">' + s[x].name + '</option>';
+						}
+					}
+				}
+			});
+		var perms;
+		$.ajax({ type: "GET",
+			url: BASE_PATH+"/public/ajax/ngsquerydb.php",
+			data: { p: 'getTablePerms', table: id},
+			async: false,
+			success : function(s)
+			{
+				console.log(s);
+				perms = s;
+			}	
+		});
+		if (perms == 3) {
+			$('#only_me').iCheck('check');
+		}else if (perms == 15) {
+			$('#only_my_group').iCheck('check');
+		}else if (perms == 32) {
+			$('#everyone').iCheck('check');
+		}else if (perms == 63) {
+			$('#everyone').iCheck('check');
+		}else{
+			$('#only_me').iCheck('check');
+		}
+		
+		if (document.getElementById('permsOwnerSelect').innerHTML != '') {
+			document.getElementById('confirmTablePermsButton').setAttribute('style', 'display:show');
+			document.getElementById('cancelTablePermsButton').innerHTML = 'Cancel';
+			document.getElementById('confirmTablePermsButton').setAttribute('onclick', 'confirmTablePermsPressed(\''+id+'\', \'confirm\')');
+		}
+		$('#permsModal').modal({
+			show: true
+		});
 	}else{
-		$('#only_me').iCheck('check');
+		confirmTablePermsPressed(0, 'fail');
 	}
-	
-	if (document.getElementById('permsOwnerSelect').innerHTML != '') {
-		document.getElementById('confirmTablePermsButton').setAttribute('style', 'display:show');
-		document.getElementById('cancelTablePermsButton').innerHTML = 'Cancel';
-		document.getElementById('confirmTablePermsButton').setAttribute('onclick', 'confirmTablePermsPressed(\''+id+'\')');
-	}else{
-		document.getElementById('permsLabel').innerHTML = 'You do not have permissions to change this table\'s permissions.';
-		document.getElementById('permsDiv').innerHTML = '';
-		document.getElementById('confirmTablePermsButton').setAttribute('style', 'display:none');
-		document.getElementById('cancelTablePermsButton').innerHTML = 'OK';
-	}
-	$('#permsModal').modal({
-		show: true
-	});
 }
 
-function confirmTablePermsPressed(id){
-	var owner_id = document.querySelector("#permsOwnerSelect").selectedOptions[0].value;
-	var group_id = document.querySelector("#permsGroupSelect").selectedOptions[0].value;
-	var perms = $('.checked')[0].children[0].value;
-	$.ajax({ type: "GET",
-		url: BASE_PATH+"/public/ajax/tablegenerator.php",
-		data: { p: 'changeTableData', table: id, owner_id: owner_id, group_id: group_id, perms: perms, },
-		async: false,
-		success : function(s)
-		{
-			console.log(s);
-		}
-	});
-	$('#permsModal').modal({
-		show: false
-	});
+function confirmTablePermsPressed(id, command){
+	if (command == 'confirm') {
+		document.getElementById('permsConfirmLabel').innerHTML = 'Table\'s permissions have been changed!';
+		var owner_id = document.querySelector("#permsOwnerSelect").selectedOptions[0].value;
+		var group_id = document.querySelector("#permsGroupSelect").selectedOptions[0].value;
+		var perms = $('.checked')[0].children[0].value;
+		$.ajax({ type: "GET",
+			url: BASE_PATH+"/public/ajax/tablegenerator.php",
+			data: { p: 'changeTableData', table: id, owner_id: owner_id, group_id: group_id, perms: perms, },
+			async: false,
+			success : function(s)
+			{
+				console.log(s);
+			}
+		});
+		$('#permsModal').modal({
+			show: false
+		});
+	}else{
+		document.getElementById('permsConfirmLabel').innerHTML = 'You do not have permissions to edit this table\'s permissions';
+	}
 	$('#permsConfirmModal').modal({
 		show: true
 	});
@@ -569,10 +585,11 @@ $(function() {
 		});
 		$.ajax({ type: "GET",
 				url: BASE_PATH+"/public/ajax/tablegenerator.php",
-				data: { p: "getCreatedTables" },
+				data: { p: "getCreatedTables", gids: phpGrab.gids},
 				async: false,
 				success : function(s)
 				{
+					console.log(s);
 					runparams.fnClearTable();
 					for(var x = 0; x < s.length; x++){
 						var splitParameters = s[x].parameters.split('&');

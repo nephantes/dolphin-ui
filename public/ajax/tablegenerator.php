@@ -76,18 +76,24 @@ else if ($p == 'samplesWithRuns')
 		");
 }
 else if ($p == 'getCreatedTables')
-{	
+{
+	if (isset($_GET['gids'])){$gids = $_GET['gids'];}
 	$data=$query->queryTable("
 		SELECT *
 		FROM ngs_createdtables
-		WHERE owner_id = " . $_SESSION['uid']
-		);
+		WHERE owner_id = " . $_SESSION['uid'] . "
+		OR
+		(group_id in ( $gids )
+		AND perms > 3)
+		");
 }
 else if ($p == 'createNewTable')
 {
 	if (isset($_GET['search'])){$search = $_GET['search'];}
 	if (isset($_GET['name'])){$name = $_GET['name'];}
 	if (isset($_GET['file'])){$file = $_GET['file'];}
+	if (isset($_GET['group'])){$group = $_GET['group'];}
+	if (isset($_GET['perms'])){$perms = $_GET['perms'];}
 	
 	$current_tables=json_decode($query->queryTable("
 		SELECT *
@@ -107,9 +113,9 @@ else if ($p == 'createNewTable')
 	if($table_check == false){
 		$data=$query->runSQL("
 		INSERT ngs_createdtables
-		(`name`,`parameters`,`file`,`owner_id`,`perms`,`date_created`,`date_modified`,`last_modified_user`)
+		(`name`,`parameters`,`file`,`owner_id`,`group_id`,`perms`,`date_created`,`date_modified`,`last_modified_user`)
 		VALUES
-		( '$name', '$search','$file', ".$_SESSION['uid'].",3,NOW(),NOW(), ".$_SESSION['uid'].")"
+		( '$name', '$search','$file', ".$_SESSION['uid'].",$group,$perms,NOW(),NOW(), ".$_SESSION['uid'].")"
 		);
 	}else{
 		$data=$query->runSQL("
@@ -202,10 +208,27 @@ else if ($p == 'changeDataGroupNames')
 		$data=$query->queryTable("
 		SELECT id,name
 		FROM groups
-		WHERE owner_id = " . $_SESSION['uid'] . "
+		WHERE id in (
+			SELECT g_id
+			FROM user_group
+			WHERE u_id = ".$_SESSION['uid']."
+			)
+		OR id = (
+			SELECT group_id
+			FROM ngs_createdtables
+			WHERE id = $table
+			)
 		");
 	}else{
-		$data=json_encode("");
+		$data=$data=$query->queryTable("
+		SELECT id,name
+		FROM groups
+		WHERE id = (
+			SELECT group_id
+			FROM ngs_createdtables
+			WHERE id = $table
+			)
+		");
 	}
 }
 else if ($p == 'getTablePerms')
@@ -228,6 +251,15 @@ else if ($p == 'changeTableData'){
 	group_id = $group_id,
 	perms = $perms,
 	last_modified_user = ".$_SESSION['uid']."
+	WHERE id = $table
+	");
+}
+else if ($p == 'getTableOwner')
+{
+	if (isset($_GET['table'])){$table = $_GET['table'];}
+	$data=$query->queryAVal("
+	SELECT owner_id
+	FROM ngs_createdtables
 	WHERE id = $table
 	");
 }

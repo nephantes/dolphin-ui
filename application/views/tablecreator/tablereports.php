@@ -59,7 +59,7 @@
 							<div class="modal-body">
 								<fieldset>
 									<div class="form-group">
-										<label id="permsOwnerLabel">Table's permissions have been changed!</label>
+										<label id="permsConfirmLabel">Table's permissions have been changed!</label>
 										<br>
 									</div>
 								</fieldset>   
