@@ -36,16 +36,6 @@
 					</div>
 					<div class="row">
 						<div class="col-md-12">
-							<div id='permissions_group' class="margin col-md-12">
-								<?php echo $html->getStaticSelectionBox("Group Selection", "groups", $html->groupSelectionOptions($groups), 6)?>
-								<?php echo $html->getStaticSelectionBox("Permissions", "perms", "<option value='3'>only me</option>
-																		<option value='15'>only my group</option>
-																		<option value='32'>everyone</option>", 6)?>
-							</div>
-						</div>
-					</div>
-					<div class="row">
-						<div class="col-md-12">
 							<div id="generated_table" class="margin col-md-12">
 								<?php
 									$_SESSION['tablecreatorcheck'] = true;
@@ -55,5 +45,15 @@
 							</div>
 						</div>
 					</div><!-- /.row -->
+					<div class="row">
+						<div class="col-md-12">
+							<div id='permissions_group' class="margin col-md-12">
+								<?php echo $html->getStaticSelectionBox("Group Selection", "groups", $html->groupSelectionOptions($groups), 6)?>
+								<?php echo $html->getStaticSelectionBox("Permissions", "perms", "<option value='3'>only me</option>
+																		<option value='15'>only my group</option>
+																		<option value='32'>everyone</option>", 6)?>
+							</div>
+						</div>
+					</div>
 				</section><!-- /.content -->
 
