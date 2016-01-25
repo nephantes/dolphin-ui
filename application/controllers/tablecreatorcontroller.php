@@ -19,7 +19,7 @@ class TablecreatorController extends VanillaController {
         $this->set('gids', $gids);
 	}
 	
-	function table($params){
+	function table(){
 		$this->set('field', "Table Viewer");
 		
 		$this->set('uid', $_SESSION['uid']);

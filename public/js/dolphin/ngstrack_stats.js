@@ -6,6 +6,7 @@
  **/
 
 var basket_info = getBasketInfo();
+var table_params = '';
 
 function generateStreamTable(type, queryData, queryType, qvar, rvar, seg, theSearch, uid, gids, basket_info){
 	var keys = [];
@@ -14,8 +15,7 @@ function generateStreamTable(type, queryData, queryType, qvar, rvar, seg, theSea
 		keys = queryData.title;
 		delete queryData.title;
 		var new_header = '<tr>';
-		var summary_check = window.location.href.split("/table/")[1];
-		var picard_summary_check = summary_check.indexOf('picard.alignment_summary');
+		var picard_summary_check = table_params.parameters.indexOf('picard.alignment_summary');
 		console.log(picard_summary_check);
 		console.log(queryData);
 		console.log(keys);
@@ -23,7 +23,7 @@ function generateStreamTable(type, queryData, queryType, qvar, rvar, seg, theSea
 			delete queryData['CATEGORY'];
 		}
 		for (var y = 0; y < keys.length; y++) {
-			if (summary_check.indexOf('.summary.') > -1) {
+			if (table_params.parameters.indexOf('.summary.') > -1) {
 				if (!queryData[Object.keys(queryData)[0]][keys[y]].match(/[^$,.\d]/)) {
 					new_header += '<th data-sort="'+keys[y].replace(/ /g,"_").replace(/>/g,"_")+'::number" onclick="shiftColumns(this)">'+
 								keys[y]+'<i id="'+y+'" class="pull-right fa fa-unsorted"></i></th>';
@@ -552,10 +552,20 @@ $(function() {
 	}
 	
 	if (phpGrab.theSegment == 'generated') {
-		var json_obj;
-		console.log(BASE_PATH +"/public/api/getsamplevals.php?" + window.location.href.split("/table/")[1]);
 		$.ajax({ type: "GET",
-			url: BASE_PATH +"/public/api/getsamplevals.php?" + window.location.href.split("/table/")[1],
+			url: BASE_PATH +"/public/ajax/tablegenerator.php?",
+			data: { p: "getGeneratedTable"},
+			async: false,
+			success : function(s)
+			{
+				console.log(s);
+				table_params = s;
+			}
+		});
+		var json_obj;
+		console.log(BASE_PATH +"/public/api/getsamplevals.php?" + table_params.parameters);
+		$.ajax({ type: "GET",
+			url: BASE_PATH +"/public/api/getsamplevals.php?" + table_params.parameters,
 			async: false,
 			success : function(s)
 			{
