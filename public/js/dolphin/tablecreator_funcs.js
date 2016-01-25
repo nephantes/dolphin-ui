@@ -238,14 +238,21 @@ function tableCreatorPage(){
 		document.getElementById('errorLabel').innerHTML ='Multple file selection is under development.<br>Please select only one file for report generation.';
 		document.getElementById('errorAreas').innerHTML = '';
 	}else{
-		window.location.href = BASE_PATH + '/tablecreator/table/' + sendToTableGen();
+		$.ajax({ type: "GET",
+			url: BASE_PATH+"/public/ajax/tablegenerator.php",
+			data: { p: 'createCustomTable', params: sendToTableGen() },
+			async: false,
+			success : function(s)
+			{
+				window.location.href = BASE_PATH + '/tablecreator/table';
+			}
+		});
 	}
 }
 
 function changeTableType(format, query){
 	var json_obj;
-	var beforeFormat = window.location.href.split("/table/")[1].split('format=')[0];
-	var URL = BASE_PATH+"/public/api/getsamplevals.php?" + beforeFormat + 'format=' + format;
+	var URL = BASE_PATH+"/public/api/getsamplevals.php?" + query + 'format=' + format;
 	window.open(URL);
 }
 
@@ -484,6 +491,20 @@ function confirmTablePermsPressed(id, command){
 	});
 }
 
+function sendToSavedTable(id){
+	console.log('test');
+	$.ajax({ type: "GET",
+			url: BASE_PATH+"/public/ajax/tablegenerator.php",
+			data: { p: "sendToGeneratedTable", table_id: id },
+			async: false,
+			success : function(s)
+			{
+				console.log(s);
+				window.location.href = BASE_PATH+'/public/tablecreator/table';
+			}
+	});
+}
+
 $(function() {
 	"use strict";
 	
@@ -565,7 +586,18 @@ $(function() {
 		checkCheckedList();
 		reportSelection();
 	}else if (window.location.href.split("/").indexOf('table') > -1){
-		var beforeFormat = window.location.href.split("/table/")[1].split('format=')[0];
+		var table_params;
+		$.ajax({ type: "GET",
+			url: BASE_PATH +"/public/ajax/tablegenerator.php?",
+			data: { p: "getGeneratedTable"},
+			async: false,
+			success : function(s)
+			{
+				console.log(s);
+				table_params = s;
+			}
+		});
+		var beforeFormat = table_params.parameters.split('format=')[0];
 		var json_obj = '';
 		var export_table = document.getElementById('downloadOptions');
 
@@ -579,6 +611,12 @@ $(function() {
 		
 		ul.innerHTML = li;
 		export_table.appendChild(ul);
+		
+		if (table_params.from_table_list == 'true') {
+			document.getElementById('permissions_group').remove();
+			document.getElementById('save_table').remove();
+			document.getElementById('save_table_button').remove();
+		}
 	}else{
 		var runparams = $('#jsontable_table_viewer').dataTable({
 			//"scrollX": true
@@ -610,7 +648,7 @@ $(function() {
 							'<div class="btn-group pull-right">' +
 								'<button type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown" aria-expanded="true">Options <span class="fa fa-caret-down"></span></button>' +
 								'<ul class="dropdown-menu" role="menu">' + 
-									'<li><a href="'+BASE_PATH+'/public/tablecreator/table/'+s[x].parameters+'" id="' + s[x].id+'">View</a></li>' +
+									'<li><a id="' + s[x].id+'" onclick="sendToSavedTable(this.id)">View</a></li>' +
 									'<li><a id="' + s[x].id+'" onclick="sendTableToPlot(\''+s[x].file+'\')">Plot Table</a></li>' +
 									'<li class="divider"></li>' +
 									'<li><a id="' + s[x].id+'" onclick="changeTableData(this.id)">Change Table Permissions</a></li>' +

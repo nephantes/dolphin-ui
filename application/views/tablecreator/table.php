@@ -21,7 +21,7 @@
 						</div>
 						<div class="col-md-8">
 							<form class="form-horizontal">
-								<div class="form-group">
+								<div id="save_table" class="form-group">
 									<label class='col-sm-2 control-label'>Save Table As:</label>
 									<div class="col-sm-10">
 										<input type="text" class="form-control" id="input_table_name">
@@ -30,7 +30,7 @@
 							</form>
 						</div>
 						<div class="col-md-2">
-							<button class="btn btn-primary pull-right" type="button" onclick="saveTable()">Save Table</button>
+							<button id="save_table_button" class="btn btn-primary pull-right" type="button" onclick="saveTable()">Save Table</button>
 							<button class="btn btn-primary pull-right" type="button" onclick="toTableListing()">Tables List</button>
 						</div>
 					</div>
