@@ -278,18 +278,23 @@ function saveTable() {
 	var perms = document.getElementById('perms').value;
 	var parameters;
 	if (window.location.href.split("/").indexOf('table') > -1) {
-		parameters = window.location.href.split("/table/")[1];
+		$.ajax({ type: "GET",
+			url: BASE_PATH +"/public/ajax/tablegenerator.php?",
+			data: { p: "getGeneratedTable"},
+			async: false,
+			success : function(s)
+			{
+				console.log(s);
+				parameters = s.parameters;
+			}
+		});
 	}else{
 		parameters = sendToTableGen();
 	}
 	var pass = false;
 	var file_name = '';
-	var beforeFormat = '';
-	if (window.location.href.split('/').indexOf('table') > -1) {
-		beforeFormat = window.location.href.split("/table/")[1].split('format=')[0];
-	}else{
-		beforeFormat = sendToTableGen().split('format=')[0];
-	}
+	var beforeFormat = parameters.split('format=')[0];
+		
 	$.ajax({ type: "GET",
 			url: BASE_PATH+"/public/ajax/tablegenerator.php",
 			data: { p: "createTableFile", url: BASE_PATH+"/public/api/getsamplevals.php?" + beforeFormat + 'format=json2' },
