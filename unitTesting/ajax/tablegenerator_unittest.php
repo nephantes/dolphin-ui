@@ -72,6 +72,14 @@ class tablegenerator_unittest extends PHPUnit_Framework_TestCase
 		$_GET['perms'] = '15';
 		include('tablegenerator.php');
 		$this->assertEquals(json_decode($data),'true');
+		$_GET['p'] = 'createNewTable';
+		$_GET['search'] = 'samples=1,2,3,4,5,6:3&file=rsem/genes_expression_tpm.tsv&common=gene,transcript&key=gene&format=json';
+		$_GET['name'] = 'test_table2';
+		$_GET['file'] = $file;
+		$_GET['group'] = '1';
+		$_GET['perms'] = '15';
+		include('tablegenerator.php');
+		$this->assertEquals(json_decode($data),'true');
 		ob_end_clean();
 	}
 	
@@ -85,13 +93,12 @@ class tablegenerator_unittest extends PHPUnit_Framework_TestCase
 	}
 	
 	public function testDeleteTable(){
-		#ob_start();
+		ob_start();
 		$_GET['p'] = 'deleteTable';
-		$_GET['id'] = '1';
+		$_GET['id'] = '2';
 		include('tablegenerator.php');
-		var_dump($data);
 		$this->assertEquals(json_decode($data),'1');
-		#ob_end_clean();
+		ob_end_clean();
 	}
 	/*
 	public function testConvertToTSV(){
