@@ -28,7 +28,7 @@ function postInsertRunparams(JSON_OBJECT, outputdir, name, description, perms, g
 			outdir_check = r;
 		}
 	});
-   if(window.location.href.split("/")[window.location.href.split("/").length - 2] == 'fastlane'){
+   if(window.location.href.split("/").indexOf('fastlane') > -1){
 		//if from fastlane
        runGroupID = 'new';
    }else if (outdir_check != 0) {

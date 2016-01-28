@@ -5,7 +5,7 @@
  **/
 
 $(function() {
-	if (typeof(initialSubmission) != undefined && window.location.href.split("/")[window.location.href.split("/").length -1] == 'process') {
+	if (typeof(initialSubmission) != undefined && window.location.href.split("/").indexOf('process') > -1) {
 		console.log(initialSubmission);
 		var initial_split = initialSubmission.split(",");
 		var outdir;
@@ -18,7 +18,7 @@ $(function() {
 		var JSON_OBJECT = {};
 
 		//	Create the Json object
-		if (window.location.href.split("/")[window.location.href.split("/").length - 2] == 'fastlane') {
+		if (window.location.href.split("/").indexOf('fastlane') > -1) {
 			runname = 'Fastlane Initial Run';
 			rundesc = 'Fastlane Initial Run within import: ' + initial_split[5];
 			outdir = initial_split[8] + '/initial_run';
@@ -203,7 +203,7 @@ $(function() {
 				var runparamsInsert = postInsertRunparams(JSON_OBJECT, outdir, runname, rundesc, perms, group);
 				console.log(runparamsInsert);
 				console.log(names_to_ids);
-				if (window.location.href.split("/")[window.location.href.split("/").length - 2] != 'fastlane') {
+				if (window.location.href.split("/").indexOf('fastlane') == -1) {
 					$.ajax({
 						type: 	'GET',
 						url: 	BASE_PATH+'/public/ajax/initialmappingdb.php',
