@@ -180,6 +180,47 @@ class funcs_unittest extends PHPUnit_Framework_TestCase
 		$this->assertEquals($funcs->getID($name, $username, $val, $wkey, $defaultparam), '1');
 		ob_end_clean();
 	}
+	
+	public function testGetWorkflowInformation(){
+		ob_start();
+		$funcs  = new funcs();
+		$wkey = 'Od1HnRuJ0BJAeMpHOTwsH9rqxBDiD';
+		$this->assertEquals($funcs->getWorkflowInformation($wkey), '1');
+		ob_end_clean();
+	}
+	
+	public function testUpdateInputParam(){
+		ob_start();
+		$funcs  = new funcs();
+		$wkey = 'Od1HnRuJ0BJAeMpHOTwsH9rqxBDiD';
+		$username = 'kucukura';
+		$inputparam = '{"genomebuild":"human,hg19","spaired":"paired","resume":"resume","fastqc":"yes","barcodes":"none","submission":"0","adapters":"none","quality":"none","trim":"none","split":"none","commonind":"none","pipeline":[{"Type":"RNASeqRSEM","Params":"--bowtie-e 70 --bowtie-chunkmbs 100","RSeQC":"no","IGVTDF":"no","BAM2BW":"no","ExtFactor":"0"},{"Type":"DESeq","Name":"","Conditions":"Cond1,Cond1,Cond2,Cond2","Columns":"control_rep2_encode,control_rep3_encode,exper_rep1_encode,exper_rep2_encode","FitType":"parametric","HeatMap":"Yes","padj":"0.01","foldChange":"2","DataType":"RSEM"}]}';
+		$this->assertEquals($funcs->updateInputParam($wkey, $username, $inputparam), '{"genomebuild":"human,hg19","spaired":"paired","resume":"resume","fastqc":"yes","barcodes":"none","submission":"0","adapters":"none","quality":"none","trim":"none","split":"none","commonind":"none","pipeline":[{"Type":"RNASeqRSEM","Params":"--bowtie-e 70 --bowtie-chunkmbs 100","RSeQC":"no","IGVTDF":"no","BAM2BW":"no","ExtFactor":"0"},{"Type":"DESeq","Name":"","Conditions":"Cond1,Cond1,Cond2,Cond2","Columns":"control_rep2_encode,control_rep3_encode,exper_rep1_encode,exper_rep2_encode","FitType":"parametric","HeatMap":"Yes","padj":"0.01","foldChange":"2","DataType":"RSEM"}]}');
+		ob_end_clean();
+	}
+	
+	/*	Does not return anything
+	public function testUpdateDefaultParam(){
+		ob_start();
+		$funcs  = new funcs();
+		$workflowname = 'seqmapping_workflow';
+		$username = 'kucukura';
+		$defaultparam = '/usr/local/share/dolphin_tools/default_params/Dolphin_v1.3_Docker.txt';
+		$this->assertEquals($funcs->updateDefaultParam($workflowname, $username, $defaultparam), '1');
+		ob_end_clean();
+	}
+	*/
+	
+	public function testGetCommand(){
+		ob_start();
+		$funcs  = new funcs();
+		$servicename = 'stepCheck';
+		$username = 'kucukura';
+		$inputcommand = '@RUNCLEAN -c @CONFIG -l 0 -u @USERNAME -p @PUBDIR -w @WKEY -d @DBCOMMCMD  -o @OUTDIR';
+		$defaultparam = '/usr/local/share/dolphin_tools/default_params/Dolphin_v1.3_Docker.txt';
+		$this->assertEquals($funcs->getCommand($servicename, $username, $inputcommand, $defaultparam), '1');
+		ob_end_clean();
+	}
 }
 
 ?>
