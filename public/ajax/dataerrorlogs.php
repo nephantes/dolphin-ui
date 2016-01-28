@@ -51,6 +51,7 @@ if($p == 'getStdOut'){
 	}
 
 	array_push($data, $pids[0]->wkey);
+	$data = json_decode($data);
 }else if ($p == 'errorCheck'){
 	$pids = json_decode($query->queryTable("
 	SELECT wrapper_pid, runworkflow_pid, wkey, run_status
