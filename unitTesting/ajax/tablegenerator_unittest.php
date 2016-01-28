@@ -76,22 +76,22 @@ class tablegenerator_unittest extends PHPUnit_Framework_TestCase
 	}
 	
 	public function testGetCreatedTables(){
-		#ob_start();
+		ob_start();
 		$_GET['p'] = 'getCreatedTables';
 		$_GET['gids'] = '1';
 		include('tablegenerator.php');
-		var_dump($data);
 		$this->assertEquals(json_decode($data)[0]->name,'test_table');
-		#ob_end_clean();
+		ob_end_clean();
 	}
 	
 	public function testDeleteTable(){
-		ob_start();
+		#ob_start();
 		$_GET['p'] = 'deleteTable';
 		$_GET['id'] = '1';
 		include('tablegenerator.php');
+		var_dump($data);
 		$this->assertEquals(json_decode($data),'1');
-		ob_end_clean();
+		#ob_end_clean();
 	}
 	/*
 	public function testConvertToTSV(){
