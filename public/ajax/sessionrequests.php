@@ -167,5 +167,5 @@ else if ($p == 'changeRunType')
 	}
 }
 
-exit;
+#exit;
 ?>

@@ -15,8 +15,8 @@ where j.wkey=jo.wkey and j.job_num=jo.jobnum and j.job_id='.$id
 );
 
 
-header('Cache-Control: no-cache, must-revalidate');
-header('Expires: Mon, 26 Jul 1997 05:00:00 GMT');
-header('Content-type: application/json');
+#header('Cache-Control: no-cache, must-revalidate');
+#header('Expires: Mon, 26 Jul 1997 05:00:00 GMT');
+#header('Content-type: application/json');
 echo json_encode($data);
-exit;
+#exit;
