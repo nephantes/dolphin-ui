@@ -91,7 +91,7 @@ class ngsquerydb_unittest extends PHPUnit_Framework_TestCase
 		ob_start();
 		$_GET['p'] = 'getCustomTSV';
 		include("ngsquerydb.php");
-		$this->assertEquals(json_decode($data)[0]->name,'test_table');
+		$this->assertEquals(json_decode($data),array());
 		ob_end_clean();
 	}
 	
