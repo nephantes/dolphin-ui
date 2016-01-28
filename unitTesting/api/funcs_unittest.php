@@ -221,6 +221,20 @@ class funcs_unittest extends PHPUnit_Framework_TestCase
 		$this->assertEquals($funcs->getCommand($servicename, $username, $inputcommand, $defaultparam), '1');
 		ob_end_clean();
 	}
+	
+	public function testStartWorkflow(){
+		ob_start();
+		$funcs  = new funcs();
+		$params['inputparam'];
+        $params['defaultparam'];
+        $params['workflow'];
+        $params['username'];
+        $params['status'];
+        $params['outdir'];
+        $params['services'];
+		$this->assertEquals($funcs->startWorkflow($params), '1');
+		ob_end_clean();
+	}
 }
 
 ?>
