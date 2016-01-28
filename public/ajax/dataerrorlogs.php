@@ -98,3 +98,4 @@ if (!headers_sent()) {
 }else{
    echo $data;
 }
+?>
