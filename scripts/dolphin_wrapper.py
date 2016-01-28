@@ -245,7 +245,7 @@ class Dolphin:
        print >>fp, '@SPAIRED=%s'%runparams['spaired']
        previous="NONE" 
        previous=self.writeInputParamLine(fp, runparams, "@BARCODES", 'barcodes', "BARCODE")
-       previous=self.writeInputParamLine(fp, runparams, "@ADAPTER", 'adapter', "ADAPTER", previous )
+       previous=self.writeInputParamLine(fp, runparams, "@ADAPTER", 'adapters', "ADAPTER", previous )
        
        if ( 'quality' in runparams and type(runparams['quality']) is list):
             pipe=runparams['quality'][0]
@@ -414,7 +414,7 @@ class Dolphin:
         self.prf(fp, stepGetTotalReads % locals() if (gettotalreads and gettotalreads.lower()!="none") else None )
         self.prf(fp, stepBackupS3 % locals() if (backupS3 and backupS3.lower()!="none") else None )
         self.prf(fp, stepFastQC % locals() + "\n" + stepMergeFastQC % locals() if ('fastqc' in runparams and runparams['fastqc'].lower()=="yes") else None )
-        self.prf(fp, stepAdapter % locals() if ('adapter' in runparams and runparams['adapter'].lower()!="none") else None )
+        self.prf(fp, stepAdapter % locals() if ('adapters' in runparams and runparams['adapters'].lower()!="none") else None )
         self.prf(fp, stepQuality % locals() if ('quality' in runparams and runparams['quality'].lower()!="none") else None )
         self.prf(fp, stepTrim % locals() if ('trim' in runparams and runparams['trim'].lower()!="none") else None  )
        
