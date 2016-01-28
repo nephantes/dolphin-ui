@@ -472,7 +472,7 @@ $(function() {
 	"use strict";
 	
 	//Rerun Check
-	if (window.location.href.split("/")[5] == 'selected' || window.location.href.split("/")[5] == 'rerun') {
+	if (window.location.href.split("/").indexOf('selected') > -1 || window.location.href.split("/").indexOf('rerun') > -1) {
 		rerunLoad();
 	}
 	
@@ -584,7 +584,7 @@ $(function() {
 		var samplesType = "";
 		if (segment == 'selected') {
 			samplesType = "getSelectedSamples";
-			if (window.location.href.split("/")[4] == 'tablecreator') {
+			if (window.location.href.split("/").indexOf('tablecreator') > -1) {
 				theSearch = basket_info;
 				qvar = "getTableSamples";
 			}
@@ -648,7 +648,7 @@ $(function() {
 				lane_data = s;
 				var type = 'lanes';
 				var queryType = "getLanes";
-				if (window.location.href.split("/")[4] == 'search') {
+				if (window.location.href.split("/").indexOf('search') > -1) {
 					generateStreamTable(type, s, queryType, qvar, rvar, segment, theSearch, uid, gids);
 				}
 			}
@@ -666,7 +666,7 @@ $(function() {
 				experiment_series_data = s;
 				var type = 'experiments';
 				var queryType = "getExperimentSeries";
-				if (window.location.href.split("/")[4] == 'search') {
+				if (window.location.href.split("/").indexOf('search') > -1) {
 					generateStreamTable(type, s, queryType, qvar, rvar, segment, theSearch, uid, gids);
 				}
 			}

@@ -492,7 +492,6 @@ function numberWithCommas(x) {
 $(function() {
 	"use strict";
 	if (phpGrab.theSegment == 'report') {
-		var hrefSplit = window.location.href.split("/");
 		var run_id = '0';
 		var samples = [];
 		$.ajax({ type: "GET",

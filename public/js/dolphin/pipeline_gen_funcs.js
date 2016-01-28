@@ -31,7 +31,7 @@ var username;
 /*##### FILL A RERUN PIPELINE WITH PREVIOUS SELECTIONS #####*/
 function rerunLoad() {
 	var hrefSplit = window.location.href.split("/");
-	if (hrefSplit[4] == 'search') {
+	if (hrefSplit.indexOf('search') > -1) {
 		document.getElementById('dolphin_basket').parentNode.setAttribute('style','overflow:scroll');
 		var basket = $('#dolphin_basket').dataTable( {
 			//"bFilter":	false,
