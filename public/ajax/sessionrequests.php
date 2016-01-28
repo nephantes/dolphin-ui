@@ -166,6 +166,4 @@ else if ($p == 'changeRunType')
 		echo ',';
 	}
 }
-
-#exit;
 ?>
