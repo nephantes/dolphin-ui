@@ -12,7 +12,7 @@ class dataerrorlogs_unittest extends PHPUnit_Framework_TestCase
 		$_GET['p'] = 'getStdOut';
         $_GET['run_id'] = '1';
 		include("dataerrorlogs.php");
-		$this->assertEquals($data[0],'Traceback (most recent call last):<br>');
+		$this->assertEquals(json_decode($data)[0],'Traceback (most recent call last):<br>');
 		ob_end_clean();
     }
     
@@ -21,9 +21,9 @@ class dataerrorlogs_unittest extends PHPUnit_Framework_TestCase
 		$_GET['p'] = 'checkQueued';
         $_GET['run_id'] = '1';
 		include("dataerrorlogs.php");
-		$this->assertEquals($data[0],'0');
-		$this->assertEquals($data[1],'0');
-		$this->assertEquals($data[2],'J98Oe0bSZ18fBx9pPuDnsD8ITRVPGV');
+		$this->assertEquals(json_decode($data)[0],'0');
+		$this->assertEquals(json_decode($data)[1],'0');
+		$this->assertEquals(json_decode($data)[2],'J98Oe0bSZ18fBx9pPuDnsD8ITRVPGV');
 		ob_end_clean();
     }
     
