@@ -151,21 +151,21 @@ class funcs_unittest extends PHPUnit_Framework_TestCase
 		$funcs  = new funcs();
 		$params['servicename'] = 'stepCheck';
         $params['wkey'] = 'Od1HnRuJ0BJAeMpHOTwsH9rqxBDiD';
-		$this->assertEquals($funcs->checkStatus($params), 'START');
+		$this->assertEquals($funcs->checkStatus($params), 'DONE: Service ended successfully (stepCheck)!!!');
 		ob_end_clean();
 	}
 	
 	public function testGetServiceOrder(){
 		ob_start();
 		$funcs  = new funcs();
-		$this->assertEquals($funcs->getServiceOrder('1','1','Od1HnRuJ0BJAeMpHOTwsH9rqxBDiD'), '');
+		$this->assertEquals($funcs->getServiceOrder('1','1','Od1HnRuJ0BJAeMpHOTwsH9rqxBDiD'), '-1');
 		ob_end_clean();
 	}
 	
 	public function testGetWorkflowID(){
 		ob_start();
 		$funcs  = new funcs();
-		$this->assertEquals($funcs->getWorkflowID('Od1HnRuJ0BJAeMpHOTwsH9rqxBDiD'), '');
+		$this->assertEquals($funcs->getWorkflowID('Od1HnRuJ0BJAeMpHOTwsH9rqxBDiD'), '1');
 		ob_end_clean();
 	}
 	
