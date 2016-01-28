@@ -167,6 +167,7 @@ else if ($p == 'deleteRunparams')
     
 	$query->runSQL("DELETE FROM ngs_runlist WHERE run_id = $run_id");
 	$query->runSQL("DELETE FROM ngs_runparams WHERE id = $run_id");
+	$data = '';
 }
 else if ($p == 'noAddedParamsRerun')
 {
