@@ -138,7 +138,7 @@ else if ($p == 'deleteTable')
 		");
 	$data=json_decode($file);
 	
-	$handle = popen('rm ../tmp/files/'.$file[0]->file, "r");
+	$handle = popen('rm ../tmp/files/'.$data[0]->file, "r");
 	pclose($handle);
 	
 	$data=$query->runSQL("

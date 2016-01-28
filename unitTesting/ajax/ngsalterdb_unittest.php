@@ -67,7 +67,7 @@ class ngsalterdb_unittest extends PHPUnit_Framework_TestCase
 		$_POST['p'] = 'deleteRunparams';
 		$_POST['run_id'] = '3';
 		include("ngsalterdb.php");
-		$this->assertEquals(json_decode($data),'1');
+		$this->assertEquals(json_decode($data),null);
 		ob_end_clean();
 	}
 	
@@ -76,7 +76,7 @@ class ngsalterdb_unittest extends PHPUnit_Framework_TestCase
 		$_POST['p'] = 'updateProfile';
 		$_POST['img'] = 'test_img.png';
 		include("ngsalterdb.php");
-		$this->assertEquals(json_decode($data),'');
+		$this->assertEquals(json_decode($data),1);
 		ob_end_clean();
 	}
 	
