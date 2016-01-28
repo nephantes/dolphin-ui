@@ -88,14 +88,14 @@ class tablegenerator_unittest extends PHPUnit_Framework_TestCase
 		$_GET['p'] = 'getCreatedTables';
 		$_GET['gids'] = '1';
 		include('tablegenerator.php');
-		$this->assertEquals(json_decode($data)[0]->name,'test_table');
+		$this->assertEquals(json_decode($data)[0]->name,'test_table2');
 		ob_end_clean();
 	}
 	
 	public function testDeleteTable(){
 		ob_start();
 		$_GET['p'] = 'deleteTable';
-		$_GET['id'] = '2';
+		$_GET['id'] = '1';
 		include('tablegenerator.php');
 		$this->assertEquals(json_decode($data),'1');
 		ob_end_clean();
