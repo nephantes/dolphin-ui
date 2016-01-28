@@ -11,7 +11,7 @@ if (isset($_GET['run_id'])){$id = $_GET['run_id'];}
 $query = new dbfuncs();
 
 if($p == 'getStdOut'){
-	$data = array_slice(str_replace("\n", "<br>", file('../../tmp/logs/run'.$id.'/run.'.$id.'.wrapper.std')), -21);
+	$data = json_encode(array_slice(str_replace("\n", "<br>", file('../../tmp/logs/run'.$id.'/run.'.$id.'.wrapper.std')), -21));
 }else if($p == 'checkQueued'){
 	$data = [];
 	$pids = json_decode($query->queryTable("
@@ -51,6 +51,7 @@ if($p == 'getStdOut'){
 	}
 
 	array_push($data, $pids[0]->wkey);
+	$data = json_encode($data);
 }else if ($p == 'errorCheck'){
 	$pids = json_decode($query->queryTable("
 	SELECT wrapper_pid, runworkflow_pid, wkey, run_status
