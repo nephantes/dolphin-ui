@@ -236,6 +236,45 @@ class funcs_unittest extends PHPUnit_Framework_TestCase
 		$this->assertEquals($funcs->startWorkflow($params), '3pl8cmzYJ4ezgX2a9RevZxHmihpOA');
 		ob_end_clean();
 	}
+	
+	public function testStartService(){
+		ob_start();
+		$funcs  = new funcs();
+        $params['servicename'] = 'stepCheck';
+        $params['wkey'] = '3pl8cmzYJ4ezgX2a9RevZxHmihpOA';
+		$params['command'] = '@RUNCLEAN -c @CONFIG -l 0 -u @USERNAME -p @PUBDIR -w @WKEY -d @DBCOMMCMD  -o @OUTDIR';
+		$this->assertEquals($funcs->startService($params), '');
+		ob_end_clean();
+	}
+	
+	public function testCheckLastServiceJobs(){
+		ob_start();
+		$funcs  = new funcs();
+		$this->assertEquals($funcs->checkLastServiceJobs('3pl8cmzYJ4ezgX2a9RevZxHmihpOA'), '');
+		ob_end_clean();
+	}
+	
+	public function testEndWorkflow(){
+		ob_start();
+		$funcs  = new funcs();
+        $params['wkey'] = '3pl8cmzYJ4ezgX2a9RevZxHmihpOA';
+		$this->assertEquals($funcs->endWorkFlow($params), '');
+		ob_end_clean();
+	}
+	
+	public function testInsertJob(){
+		ob_start();
+		$funcs  = new funcs();
+        $params['username']; 
+        $params['wkey'];
+        $params['com'];
+        $params['jobname'];
+        $params['servicename']; 
+        $params['jobnum'];
+        $params['result'];
+		$this->assertEquals($funcs->endWorkFlow($params), '');
+		ob_end_clean();
+	}
 }
 
 ?>
