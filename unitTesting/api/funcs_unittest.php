@@ -233,7 +233,7 @@ class funcs_unittest extends PHPUnit_Framework_TestCase
         $params['outdir'] = '/export/barcodetest';
         $params['services'] = '15';
 		$params['wkey'] = '3pl8cmzYJ4ezgX2a9RevZxHmihpOA';
-		$this->assertEquals($funcs->startWorkflow($params), '1');
+		$this->assertEquals($funcs->startWorkflow($params), '3pl8cmzYJ4ezgX2a9RevZxHmihpOA');
 		ob_end_clean();
 	}
 }
