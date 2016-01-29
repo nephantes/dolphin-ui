@@ -57,7 +57,7 @@
 								</fieldset>   
 							</div>
 							<div class="modal-footer">
-							  <button type="button" class="btn btn-default" data-dismiss="modal">OK</button>
+							  <button id="finalAWSButton" type="button" class="btn btn-default" data-dismiss="modal" onclick="window.location.reload()">OK</button>
 							</div>
 						</form>
 					  </div>
