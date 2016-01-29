@@ -227,7 +227,7 @@ class funcs_unittest extends PHPUnit_Framework_TestCase
 		$funcs  = new funcs();
 		$params['inputparam'] = '{"genomebuild":"human,hg19","spaired":"paired","resume":"resume","fastqc":"yes","barcodes":"none","submission":"0","adapters":"none","quality":"none","trim":"none","split":"none","commonind":"none","pipeline":[{"Type":"RNASeqRSEM","Params":"--bowtie-e 70 --bowtie-chunkmbs 100","RSeQC":"no","IGVTDF":"no","BAM2BW":"no","ExtFactor":"0"},{"Type":"DESeq","Name":"","Conditions":"Cond1,Cond1,Cond2,Cond2","Columns":"control_rep2_encode,control_rep3_encode,exper_rep1_encode,exper_rep2_encode","FitType":"parametric","HeatMap":"Yes","padj":"0.01","foldChange":"2","DataType":"RSEM"}]}';
         $params['defaultparam'] = '/usr/local/share/dolphin_tools/default_params/Dolphin_v1.3_default.txt';
-        $params['workflow'] 'workflow';
+        $params['workflow'] = 'workflow';
         $params['username'] = 'galaxy';
         $params['status'] = '0';
         $params['outdir'] = '/export/barcodetest';
