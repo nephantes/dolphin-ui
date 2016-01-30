@@ -653,6 +653,8 @@ $(function() {
 				}
 			}
 		}else{
+			document.getElementById('empty_div').innerHTML = '<h3 class="text-center">Your results have not been generated yet.  If your run has errored out, please contact your Dolphin Admin.' +
+					'  If your run is currently running or queued, please be paitient as the data is being generated.</h3>';
 			document.getElementById('send_to_plots').disabled = true;
 			document.getElementById('initial_mapping_exp').remove();
 		}
