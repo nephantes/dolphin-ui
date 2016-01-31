@@ -113,7 +113,7 @@ class funcs
     }
     function runSQL($sql)
     {
-        sleep(1);
+        #sleep(1);
         $this->readINI();
         $link = new mysqli($this->dbhost, $this->dbuser, $this->dbpass, $this->db);
         // check connection
@@ -550,13 +550,27 @@ class funcs
         $servicename=$params['servicename']; 
         $jobnum=$params['jobnum'];
         $result=$params['result'];
+        $resources=$params['resources'];
  
         $workflow_id = $this->getWorkflowId($wkey);
         $service_id  = $this->getId("service", $username, $servicename, $wkey, "");
+        $sql="select job_id from jobs where `wkey`='$wkey' and `jobname`='$jobname' and jobstatus=1";
+        $previous_jobs = $this->queryTable($sql);
+
+        $job_ids="";
+        foreach($previous_jobs as $job){
+           $job_ids.=$job['job_id'].",";
+        }
+        $job_ids=rtrim($job_ids, ",");
         
-        $sql = "insert into jobs(`username`, `wkey`, `run_script`, `jobname`, `workflow_id`, `service_id`, `result`, `submit_time`, `job_num`) values ('$username','$wkey','$com','$jobname','$workflow_id','$service_id', '$result', now(), '$jobnum')";
-        
+        $sql = "insert into jobs(`username`, `wkey`, `run_script`, `jobname`, `workflow_id`, `service_id`, `resources`, `result`, `submit_time`, `job_num`) values ('$username','$wkey','$com','$jobname','$workflow_id','$service_id', '$resources', '$result', now(), '$jobnum')";
+
         $res = $this->runSQL($sql);
+        if ($res && $job_ids!="")
+        {
+            $sql="update jobs set jobstatus=0 where job_id in ($job_ids)";
+            $res = $this->runSQL($sql);
+        }
         
         return $res;
     }
