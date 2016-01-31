@@ -188,7 +188,7 @@ class funcs
         $this->username = $username;
         $this->readINI();
         $retval = $this->syscall($this->checkjob_cmd);
-
+        
         if ($retval == "") {
             $ret = $this->checkJobInDB($wkey, $job_num, $username);
             if ($ret == 0) {
@@ -711,16 +711,31 @@ class funcs
           $jobname=$params['jobname'];
           $wkey=$params['wkey'];
          
-          $res="DONE"; 
-          $sql = "select job_num from jobs where wkey='$wkey' and jobname='$jobname'";
-          $jobnum = $this->queryAVal($sql);
-          if ($jobnum == 0) # This job is most likely running. Just check if it is real running or not.
+          $result="DONE"; 
+          $sql = "select job_num, result, username from jobs where wkey='$wkey' and jobname='$jobname'";
+          $res = $this->queryTable($sql); 
+          if (isset($res[0]))
           {
-             $res="START";
+            $jobnum=$res[0]['job_num'];
+            $jobres=$res[0]['result'];
+            $username=$res[0]['username'];
+            
+            if($jobres<3)
+            {
+              $retval   = $this->isJobRunning($wkey, $jobnum, $username);
+              #$result=$retval;
+              if (preg_match('/^EXIT/', $retval)) {
+                 $result="START";
+              }
+            }
+          }
+          else
+          {
+             $result="START";
           }
 
-          $res = '{"Result":"'.$res.'"}'; 
-          return $res;
+          $result = '{"Result":"'.$result.'"}'; 
+          return $result;
      
      }
 
