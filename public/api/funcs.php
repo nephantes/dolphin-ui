@@ -113,7 +113,7 @@ class funcs
     }
     function runSQL($sql)
     {
-        #sleep(1);
+        sleep(1);
         $this->readINI();
         $link = new mysqli($this->dbhost, $this->dbuser, $this->dbpass, $this->db);
         // check connection
@@ -216,30 +216,27 @@ class funcs
         }
         return 0;
     }
+
     function rerunJob($servicename, $jobname, $jobnum, $wkey)
     {
-       $sql="select max(wkey) wkey from jobs where jobname='$jobname' and wkey like '$wkey-%'";
-       $wkey_trial=$this->queryAVal($sql);
-       $trial=1;
-       if (strlen($wkey_trial) > 10)
+       $sql="select count(wkey) count, run_script from jobs where jobname='$jobname' and wkey = '$wkey' group by run_script";
+
+       $res=$this->queryTable($sql);
+       
+       if (isset($res[0]))
        {
-         $tarr=explode('-', $wkey_trial, 2);
-         $trial=$tarr[1]+1;
-       }
-       if ($trial<4)
-       {
-         $sql="update jobs set wkey='$wkey-$trial', jobstatus=0 where job_num='$jobnum' and jobname='$jobname' and wkey='$wkey'";
-         $this->runSQL($sql);
-         if ($servicename!=$jobname)
+         $count=$res[0]['count'];
+         $run_script=$res[0]['run_script'];
+         if ($count < 4) 
          {
-           $sql="update jobs set wkey='$wkey-$trial', jobstatus=0 where jobname='$servicename' and wkey='$wkey'";
-           $this->runSQL($sql);
+            $com = $this->getCMDs( $this->python . " " . $run_script); 
+            $retval = $this->sysback($com);
+            return 1;
          }
-         return 1;
        }
        return 0;
     }
-    
+ 
     function checkStatus($params)
     {
         $servicename = $params['servicename'];
@@ -259,11 +256,8 @@ class funcs
                     # If job is running, it turns 1 otherwise 0 and it needs to be restarted
                     # If it doesn't turn Error and if job is working it turns wkey to che
                     $retval = $this->isJobRunning($wkey, $row['job_num'], $row['username']);
+                    $this->checkStartTime($wkey, $row['job_num'], $row['username']);
 
-                    if ($retval != "")
-                    {
-                        $this->checkStartTime($wkey, $row['job_num'], $row['username']);
-                    }
                     if (preg_match('/^EXIT/', $retval)) {
                       if (!$sqlstr=$this->rerunJob( $servicename, $row['jobname'], $row['job_num'], $wkey ) )
                       {
@@ -275,10 +269,6 @@ class funcs
                         $h2t =& new html2text($rowout['jobout']);
                         $jobout = $h2t->get_text();
                         return 'ERROR:' . $retval . "\n" . $rowout['jobname'] . " Failed\nCheck LSF output\n" . $jobout;
-                      }
-                      else
-                      {
-                        return "START:rerun";
                       }
                     }
                     if (preg_match('/DONE/', $retval)) {
@@ -298,7 +288,7 @@ class funcs
             } else {
                  return "DONE: Service ended successfully ($servicename)!!!";
             }
-            return "RUNNING(1):[retval=$retval]:SERVICENAME:$servicename";
+            return "RUNNING(1):[retval=$retval]:SERVICENAME:$servicename:[sqlstr=$sqlstr]";
         }
         return 'START';
     }
@@ -458,6 +448,7 @@ class funcs
      $servicename  = $params['servicename'];
      $wkey         = $params['wkey'];
      $inputcommand = $params['command'];
+     
 
      $result_stat = $this->checkStatus($params);
      if ( preg_match('/START/', $result_stat)) # Job hasn't started yet 
@@ -497,8 +488,10 @@ class funcs
                     
                 $edir = $this->tool_path;
                 $command=str_replace("\"", "\\\"", $command);
+                $command=str_replace("\\\"", "\\\\\"", $command);
                 $com = $this->python . " " . $edir . "/runService.py -f ".$this->config." $ipf $dpf -o $outdir -u $username -k $wkey -c \"$command\" -n $servicename -s $servicename";
-                $retval = $this->sysback($this->getCMDs($com));
+                $com=$this->getCMDs($com);
+                $retval = $this->sysback($com);
              }
              if (preg_match('/Error/', $retval)) {
                  return "ERROR: $retval";
@@ -562,7 +555,6 @@ class funcs
            $job_ids.=$job['job_id'].",";
         }
         $job_ids=rtrim($job_ids, ",");
-        
         $sql = "insert into jobs(`username`, `wkey`, `run_script`, `jobname`, `workflow_id`, `service_id`, `resources`, `result`, `submit_time`, `job_num`) values ('$username','$wkey','$com','$jobname','$workflow_id','$service_id', '$resources', '$result', now(), '$jobnum')";
 
         $res = $this->runSQL($sql);
@@ -726,7 +718,7 @@ class funcs
           $wkey=$params['wkey'];
          
           $result="DONE"; 
-          $sql = "select job_num, result, username from jobs where wkey='$wkey' and jobname='$jobname'";
+          $sql = "select job_num, result, username from jobs where wkey='$wkey' and jobname='$jobname' and jobstatus=1";
           $res = $this->queryTable($sql); 
           if (isset($res[0]))
           {
