@@ -347,7 +347,7 @@ class funcs_unittest extends PHPUnit_Framework_TestCase
 		$funcs  = new funcs();
         $params['wkey'] = '3pl8cmzYJ4ezgX2a9RevZxHmihpOA';
 		
-		$this->assertEquals($funcs->getJobNums($params)[0], array());
+		$this->assertEquals($funcs->getJobNums($params)[0]['jobnum'], '25863');
 		ob_end_clean();
 	}
 	
@@ -365,9 +365,28 @@ class funcs_unittest extends PHPUnit_Framework_TestCase
 		$funcs  = new funcs();
         $params['version'] = 'kucukura';
         $params['wkey'] = '3pl8cmzYJ4ezgX2a9RevZxHmihpOA';
-        $params['type'] = '99998';
-		$params['file'] = 'blob-output';
+        $params['type'] = '';
+		$params['file'] = '';
 		$this->assertEquals($funcs->insertReportTable($params), 1);
+		ob_end_clean();
+	}
+	
+	public function testCheckJob(){
+		ob_start();
+		$funcs  = new funcs();
+        $params['jobname'] = 'stepCheck';
+        $params['wkey'] = '3pl8cmzYJ4ezgX2a9RevZxHmihpOA';
+		$this->assertEquals($funcs->insertReportTable($params), '{"Result":"START"}');
+		ob_end_clean();
+	}
+	
+	public function testGetJobParams(){
+		ob_start();
+		$funcs  = new funcs();
+        $params['name'] = 'stepCheck';
+        $params['wkey'] = '3pl8cmzYJ4ezgX2a9RevZxHmihpOA';
+		$params['servicename'] = 'stepCheck';
+		$this->assertEquals($funcs->insertReportTable($params), '');
 		ob_end_clean();
 	}
 }
