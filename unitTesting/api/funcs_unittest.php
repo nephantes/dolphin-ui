@@ -322,8 +322,9 @@ class funcs_unittest extends PHPUnit_Framework_TestCase
 		ob_end_clean();
 	}
 	
+	/*
 	public function testInsertJobStats(){
-		#ob_start();
+		ob_start();
 		$funcs  = new funcs();
         $params['username'] = 'kucukura';
         $params['wkey'] = '3pl8cmzYJ4ezgX2a9RevZxHmihpOA';
@@ -336,16 +337,17 @@ class funcs_unittest extends PHPUnit_Framework_TestCase
 		$stats['Max Threads'] = '10';
 		$stats['Delta Memory'] = '1';
 		$params['stats'] = json_encode($stats);
-		var_dump($params['stats']);
 		$this->assertEquals($funcs->insertJobStats($params), 1);
-		#ob_end_clean();
+		ob_end_clean();
 	}
+	*/
 	
 	public function testGetJobNums(){
 		ob_start();
 		$funcs  = new funcs();
         $params['wkey'] = '3pl8cmzYJ4ezgX2a9RevZxHmihpOA';
-		$this->assertEquals($funcs->getJobNums($params)[0], '');
+		
+		$this->assertEquals($funcs->getJobNums($params)[0], array());
 		ob_end_clean();
 	}
 	
@@ -359,7 +361,14 @@ class funcs_unittest extends PHPUnit_Framework_TestCase
 	}
 	
 	public function testInsertReportTable(){
-		
+		ob_start();
+		$funcs  = new funcs();
+        $params['version'] = 'kucukura';
+        $params['wkey'] = '3pl8cmzYJ4ezgX2a9RevZxHmihpOA';
+        $params['type'] = '99998';
+		$params['file'] = 'blob-output';
+		$this->assertEquals($funcs->insertReportTable($params), 1);
+		ob_end_clean();
 	}
 }
 

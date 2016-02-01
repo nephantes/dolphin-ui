@@ -72,6 +72,7 @@ script:
   - phpunit unitTesting/api/funcs_unittest.php
 
 after_script:
+  - mysql -e "use biocore; show tables;" -uroot
   - mysql -e "use biocore; SELECT * FROM ngs_samples;" -uroot
   - mysql -e "use biocore; SELECT * FROM ngs_lanes;" -uroot
   - mysql -e "use biocore; SELECT * FROM ngs_experiment_series;" -uroot
