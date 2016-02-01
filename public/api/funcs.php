@@ -56,7 +56,7 @@ class funcs
         
         if($this->schedular == "LSF" || $this->schedular == "SGE")
         {
-            $com=str_replace("\"", "\\\\\"", $com);
+            $com=str_replace("\"", "\\\"", $com);
             $com=$this->getSSH() . " \"" . $com . "\"";
         } 
         return $com;
@@ -484,6 +484,10 @@ class funcs
                     
                 $edir = $this->tool_path;
                 $command=str_replace("\"", "\\\"", $command);
+                if($this->schedular == "LSF" || $this->schedular == "SGE")
+                {
+                   $command=str_replace("\\\"", "\\\\\"", $command);
+                }
                 $com = $this->python . " " . $edir . "/runService.py -f ".$this->config." $ipf $dpf -o $outdir -u $username -k $wkey -c \"$command\" -n $servicename -s $servicename";
                 $com=$this->getCMDs($com);
                 $retval = $this->sysback($com);
