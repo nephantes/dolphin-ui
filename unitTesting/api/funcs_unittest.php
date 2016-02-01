@@ -431,14 +431,14 @@ class funcs_unittest extends PHPUnit_Framework_TestCase
 		ob_end_clean();
 	}
 	
-	public function testUpdateFastqFile(){
+	public function testUpadateFastqFile(){
 		ob_start();
 		$funcs  = new funcs();
         $params['sample_id'] = '1';
         $params['md5sum'] = 'test_md5sum';
 		$params['total_reads'] = '10000';
 		$params['owner_id'] = '1';
-		$this->assertEquals($funcs->updateFastqFile($params), '1');
+		$this->assertEquals($funcs->upadateFastqFile($params), '1');
 		ob_end_clean();
 	}
 }
