@@ -404,6 +404,43 @@ class funcs_unittest extends PHPUnit_Framework_TestCase
 		$this->assertEquals($funcs->getSampleList($params)[0]['sample_id'], '1');
 		ob_end_clean();
 	}
+	
+	public function testGetAmazonCredentials(){
+		ob_start();
+		$funcs  = new funcs();
+        $params['username'] = 'kucukura';
+		$this->assertEquals($funcs->getAmazonCredentials($params)[0]['id'], '1');
+		ob_end_clean();
+	}
+	
+	public function testUpdateInitialFileCounts(){
+		ob_start();
+		$funcs  = new funcs();
+        $params['tablename'] = 'ngs_temp_sample_files';
+        $params['total_reads'] = '9999';
+		$params['file_id'] = '1';
+		$this->assertEquals($funcs->updateInitialFileCounts($params), '1');
+		ob_end_clean();
+	}
+	
+	public function testGetFastqFileId(){
+		ob_start();
+		$funcs  = new funcs();
+		$params['sample_id'] = '1';
+		$this->assertEquals($funcs->getFastqFileId($params)[0]['sample_id'], '1');
+		ob_end_clean();
+	}
+	
+	public function testUpdateFastqFile(){
+		ob_start();
+		$funcs  = new funcs();
+        $params['sample_id'] = '1';
+        $params['md5sum'] = 'test_md5sum';
+		$params['total_reads'] = '10000';
+		$params['owner_id'] = '1';
+		$this->assertEquals($funcs->updateFastqFile($params), '1');
+		ob_end_clean();
+	}
 }
 
 ?>
