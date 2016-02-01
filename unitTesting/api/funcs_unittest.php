@@ -376,7 +376,7 @@ class funcs_unittest extends PHPUnit_Framework_TestCase
 		$funcs  = new funcs();
         $params['jobname'] = 'stepCheck';
         $params['wkey'] = '3pl8cmzYJ4ezgX2a9RevZxHmihpOA';
-		$this->assertEquals($funcs->checkJob($params), '{"Result":"START"}');
+		$this->assertEquals($funcs->checkJob($params), '{"Result":"DONE"}');
 		ob_end_clean();
 	}
 	
@@ -399,7 +399,7 @@ class funcs_unittest extends PHPUnit_Framework_TestCase
 	public function testGetSampleList(){
 		ob_start();
 		$funcs  = new funcs();
-        $params['barcode'] = '0';
+        $params['barcode'] = 'none';
         $params['runparamsid'] = '1';
 		$this->assertEquals($funcs->getSampleList($params)[0]->sample_id, '1');
 		ob_end_clean();
