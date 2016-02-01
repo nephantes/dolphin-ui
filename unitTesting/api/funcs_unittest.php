@@ -347,7 +347,7 @@ class funcs_unittest extends PHPUnit_Framework_TestCase
 		$funcs  = new funcs();
         $params['wkey'] = '3pl8cmzYJ4ezgX2a9RevZxHmihpOA';
 		$params['jobnum'] = '99998';
-		$this->assertEquals($funcs->getJobNums($params)[0]['jobnum'], '25863');
+		$this->assertEquals($funcs->getJobNums($params)[0]->jobnum, '25863');
 		ob_end_clean();
 	}
 	
@@ -380,6 +380,7 @@ class funcs_unittest extends PHPUnit_Framework_TestCase
 		ob_end_clean();
 	}
 	
+	/*
 	public function testGetJobParams(){
 		ob_start();
 		$funcs  = new funcs();
@@ -387,6 +388,20 @@ class funcs_unittest extends PHPUnit_Framework_TestCase
         $params['wkey'] = '3pl8cmzYJ4ezgX2a9RevZxHmihpOA';
 		$params['servicename'] = 'stepCheck';
 		$this->assertEquals($funcs->getJobParams($params), '');
+		ob_end_clean();
+	}
+	
+	public function testGetPredValues(){
+		
+	}
+	*/
+	
+	public function testGetSampleList(){
+		ob_start();
+		$funcs  = new funcs();
+        $params['barcode'] = '0';
+        $params['runparamsid'] = '1';
+		$this->assertEquals($funcs->getSampleList($params)[0]->sample_id, '1');
 		ob_end_clean();
 	}
 }
