@@ -347,7 +347,7 @@ class funcs_unittest extends PHPUnit_Framework_TestCase
 		$funcs  = new funcs();
         $params['wkey'] = '3pl8cmzYJ4ezgX2a9RevZxHmihpOA';
 		$params['jobnum'] = '99998';
-		$this->assertEquals($funcs->getJobNums($params)[0], '25863');
+		$this->assertEquals($funcs->getJobNums($params)[0], array());
 		ob_end_clean();
 	}
 	
@@ -401,7 +401,7 @@ class funcs_unittest extends PHPUnit_Framework_TestCase
 		$funcs  = new funcs();
         $params['barcode'] = 'none';
         $params['runparamsid'] = '1';
-		$this->assertEquals($funcs->getSampleList($params), '1');
+		$this->assertEquals($funcs->getSampleList($params)[0], array());
 		ob_end_clean();
 	}
 	
