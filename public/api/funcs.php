@@ -246,7 +246,7 @@ class funcs
         $service_id   = $this->queryAVal($sql);
         #sleep(1); 
         if ($service_id > 0) {
-            $sql        = "select DISTINCT j.job_num job_num, j.jobname jobname, j.result jresult, s.username username from jobs j, services s where s.service_id=j.service_id and s.servicename='$servicename' and wkey='$wkey' and result<3";
+            $sql        = "select DISTINCT j.job_num job_num, j.jobname jobname, j.result jresult, s.username username from jobs j, services s where s.service_id=j.service_id and s.servicename='$servicename' and wkey='$wkey' and result<3 and jobstatus=1";
             $res      = $this->runSQL($sql);
             $num_rows = $res->num_rows;
             
@@ -261,7 +261,7 @@ class funcs
                     if (preg_match('/^EXIT/', $retval)) {
                       if (!$sqlstr=$this->rerunJob( $servicename, $row['jobname'], $row['job_num'], $wkey ) )
                       {
-                        $sql    = "SELECT j.jobname, jo.jobout FROM jobs j, jobsout jo where j.wkey=jo.wkey and j.job_num=jo.jobnum and j.job_num=" . $row['job_num'] . " and jo.wkey='$wkey'";
+                        $sql    = "SELECT j.jobname, jo.jobout FROM jobs j, jobsout jo where j.wkey=jo.wkey and j.job_num=jo.jobnum and j.job_num=" . $row['job_num'] . " and jo.wkey='$wkey' and jobstatus=1";
                         $resout = $this->runSQL($sql);
                         $rowout = $resout->fetch_assoc();
                         require_once('class.html2text.inc');
@@ -273,22 +273,18 @@ class funcs
                     }
                     if (preg_match('/DONE/', $retval)) {
                         $jn     = rtrim(substr($retval, 5));
-                        $sql    = "select * from jobs where result=3 and job_num='" . $jn . "' and wkey='$wkey'";
+                        $sql    = "select * from jobs where result=3 and job_num='" . $jn . "' and wkey='$wkey' and jobstatus=1";
                         $result = $this->runSQL($sql);
                         if (is_object($result)) {
                             $sql    = "UPDATE jobs set result='3', end_time=now() where job_num='" . $jn . "' and wkey='$wkey'";
                             $result = $this->runSQL($sql);
-                        } else {
-                            $sql = "insert into jobs(`username`, `wkey`, `jobname`, `service_id`, `result`, `submit_time`, `start_time`,`end_time`,`job_num`) values ('" . $row['username'] . "', '$wkey', '$servicename', '$service_id', '3', now(), now(), now(),  '$jn' )";
-                            
-                            $result = $this->runSQL($sql);
-                        }
+                        } 
                     }
                 }
             } else {
                  return "DONE: Service ended successfully ($servicename)!!!";
             }
-            return "RUNNING(1):[retval=$retval]:SERVICENAME:$servicename:[sqlstr=$sqlstr]";
+            return "RUNNING(1):[retval=$retval]:SERVICENAME:$servicename";
         }
         return 'START';
     }
