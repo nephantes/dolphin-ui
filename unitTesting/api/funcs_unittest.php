@@ -345,7 +345,7 @@ class funcs_unittest extends PHPUnit_Framework_TestCase
 		ob_start();
 		$funcs  = new funcs();
         $params['wkey'] = '3pl8cmzYJ4ezgX2a9RevZxHmihpOA';
-		$this->assertEquals($funcs->getJobNums($params), array());
+		$this->assertEquals($funcs->getJobNums($params)[0], '');
 		ob_end_clean();
 	}
 	
@@ -358,6 +358,9 @@ class funcs_unittest extends PHPUnit_Framework_TestCase
 		ob_end_clean();
 	}
 	
+	public function testInsertReportTable(){
+		
+	}
 }
 
 ?>
