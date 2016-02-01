@@ -346,7 +346,7 @@ class funcs_unittest extends PHPUnit_Framework_TestCase
 		ob_start();
 		$funcs  = new funcs();
         $params['wkey'] = '3pl8cmzYJ4ezgX2a9RevZxHmihpOA';
-		
+		$params['jobnum'] = '99998';
 		$this->assertEquals($funcs->getJobNums($params)[0]['jobnum'], '25863');
 		ob_end_clean();
 	}
@@ -363,7 +363,7 @@ class funcs_unittest extends PHPUnit_Framework_TestCase
 	public function testInsertReportTable(){
 		ob_start();
 		$funcs  = new funcs();
-        $params['version'] = 'kucukura';
+        $params['version'] = '1';
         $params['wkey'] = '3pl8cmzYJ4ezgX2a9RevZxHmihpOA';
         $params['type'] = '';
 		$params['file'] = '';
@@ -376,7 +376,7 @@ class funcs_unittest extends PHPUnit_Framework_TestCase
 		$funcs  = new funcs();
         $params['jobname'] = 'stepCheck';
         $params['wkey'] = '3pl8cmzYJ4ezgX2a9RevZxHmihpOA';
-		$this->assertEquals($funcs->insertReportTable($params), '{"Result":"START"}');
+		$this->assertEquals($funcs->checkJob($params), '{"Result":"START"}');
 		ob_end_clean();
 	}
 	
@@ -386,7 +386,7 @@ class funcs_unittest extends PHPUnit_Framework_TestCase
         $params['name'] = 'stepCheck';
         $params['wkey'] = '3pl8cmzYJ4ezgX2a9RevZxHmihpOA';
 		$params['servicename'] = 'stepCheck';
-		$this->assertEquals($funcs->insertReportTable($params), '');
+		$this->assertEquals($funcs->getJobParams($params), '');
 		ob_end_clean();
 	}
 }
