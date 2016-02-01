@@ -297,7 +297,7 @@ class funcs_unittest extends PHPUnit_Framework_TestCase
         $params['username'] = 'kucukura';
         $params['wkey'] = '3pl8cmzYJ4ezgX2a9RevZxHmihpOA';
         $params['servicename'] = 'stepCheck';
-		$this->assertEquals($funcs->checkAllJobsFinished($params), 'Should be still running 1 [1:0]\n[select s1.c, s2.c from ( select count(job_id) c from jobs    where `username`= \'kucukura\' and `wkey`=\'3pl8cmzYJ4ezgX2a9RevZxHmihpOA\' and `workflow_id`=\'1\' and `service_id`=\'19\' and `jobstatus`=1) s1,  (select count(job_id) c from jobs    where `username`= \'kucukura\' and `wkey`=\'3pl8cmzYJ4ezgX2a9RevZxHmihpOA\' and `workflow_id`=\'1\' and `service_id`=\'19\' and `jobstatus`=1  and `result`=3) s2]');
+		$this->assertEquals(explode("\n", $funcs->checkAllJobsFinished($params))[0], 'Should be still running 1 [1:0]');
 		ob_end_clean();
 	}
 	
@@ -323,7 +323,7 @@ class funcs_unittest extends PHPUnit_Framework_TestCase
 	}
 	
 	public function testInsertJobStats(){
-		ob_start();
+		#ob_start();
 		$funcs  = new funcs();
         $params['username'] = 'kucukura';
         $params['wkey'] = '3pl8cmzYJ4ezgX2a9RevZxHmihpOA';
@@ -335,16 +335,17 @@ class funcs_unittest extends PHPUnit_Framework_TestCase
 		$stats['Total Requested Memory'] = '2';
 		$stats['Max Threads'] = '10';
 		$stats['Delta Memory'] = '1';
-		$params['stats'] = json_decode($stats);
+		$params['stats'] = json_encode($stats);
+		var_dump($params['stats']);
 		$this->assertEquals($funcs->insertJobStats($params), 1);
-		ob_end_clean();
+		#ob_end_clean();
 	}
 	
 	public function testGetJobNums(){
 		ob_start();
 		$funcs  = new funcs();
         $params['wkey'] = '3pl8cmzYJ4ezgX2a9RevZxHmihpOA';
-		$this->assertEquals($funcs->getJobNums($params), '1');
+		$this->assertEquals($funcs->getJobNums($params), array());
 		ob_end_clean();
 	}
 	
