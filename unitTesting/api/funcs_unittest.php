@@ -441,6 +441,31 @@ class funcs_unittest extends PHPUnit_Framework_TestCase
 		$this->assertEquals($funcs->upadateFastqFile($params), '1');
 		ob_end_clean();
 	}
+	
+	public function testInsertFastqFile(){
+		ob_start();
+		$funcs  = new funcs();
+        $params['filename'] = 'test_file_name_insertFastqFile';
+        $params['total_reads'] = '9999';
+		$params['checksum'] = 'test_checksum_1';
+		$params['sample_id'] = '100';
+		$params['lane_id'] = '1';
+		$params['dir_id'] = '1';
+		$params['owner_id'] = '1';
+		$params['group_id'] = '1';
+		$params['perms'] = '32';
+		$this->assertEquals($funcs->insertFastqFile($params), '1');
+		ob_end_clean();
+	}
+	
+	public function CheckReadCounts(){
+		ob_start();
+		$funcs  = new funcs();
+        $params['sample_id'] = '1';
+        $params['tablename'] = 'ngs_temp_sample_files';
+		$this->assertEquals($funcs->upadateFastqFile($params), '1');
+		ob_end_clean();
+	}
 }
 
 ?>
