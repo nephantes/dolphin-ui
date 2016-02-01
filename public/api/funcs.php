@@ -347,7 +347,7 @@ class funcs
             
             $sql    = "insert into " . $name . "s(`" . $name . "name`, `description`, `username`, `defaultparam`) values('" . $val . "', 'Service description', '$username', '$defaultparam')";
             $result = $this->runSQL($sql);
-            $id     = $this->getId($name, $username, $val, $key, $defaultparam);
+            $id     = $this->getId($name, $username, $val, $wkey, $defaultparam);
         }
         
         if ($name == "service") {

@@ -283,6 +283,7 @@ class funcs_unittest extends PHPUnit_Framework_TestCase
         $params['wkey'] = '3pl8cmzYJ4ezgX2a9RevZxHmihpOA';
         $params['com'] = '/home/ak97w/outTophat6/tmp/src/stepFastQC.submit.bash';
         $params['jobname'] = 'stepCheck';
+		$params['field'] = ''; 
         $params['servicename'] = 'stepCheck';
         $params['jobnum'] = '99999';
         $params['result'] = 0;
@@ -303,11 +304,56 @@ class funcs_unittest extends PHPUnit_Framework_TestCase
 	public function testUpdateService(){
 		ob_start();
 		$funcs  = new funcs();
+        $wkey = '3pl8cmzYJ4ezgX2a9RevZxHmihpOA';
+		$service_id = '99999';
+        $result = '3';
+		$this->assertEquals($funcs->updateService($wkey, $service_id, $result), 1);
+		ob_end_clean();
+	}
+	
+	public function testInsertJobOut(){
+		ob_start();
+		$funcs  = new funcs();
         $params['username'] = 'kucukura';
         $params['wkey'] = '3pl8cmzYJ4ezgX2a9RevZxHmihpOA';
-        $params['jobnum'] = '99999';
-		$params['jobout'] = 'blob-test';
-		$this->assertEquals($funcs->updateService($params), 1);
+        $params['jobnum'] = '99998';
+		$params['jobout'] = 'blob-output';
+		$this->assertEquals($funcs->insertJobOut($params), 1);
+		ob_end_clean();
+	}
+	
+	public function testInsertJobStats(){
+		ob_start();
+		$funcs  = new funcs();
+        $params['username'] = 'kucukura';
+        $params['wkey'] = '3pl8cmzYJ4ezgX2a9RevZxHmihpOA';
+        $params['jobnum'] = '99998';
+		$stats['CPU time'] = '1';
+		$stats['Average Memory'] = '1';
+		$stats['Max Processes'] = '1';
+		$stats['Max Memory'] = '1';
+		$stats['Total Requested Memory'] = '2';
+		$stats['Max Threads'] = '10';
+		$stats['Delta Memory'] = '1';
+		$params['stats'] = $stats;
+		$this->assertEquals($funcs->insertJobStats($params), 1);
+		ob_end_clean();
+	}
+	
+	public function testGetJobNums(){
+		ob_start();
+		$funcs  = new funcs();
+        $params['wkey'] = '3pl8cmzYJ4ezgX2a9RevZxHmihpOA';
+		$this->assertEquals($funcs->insertJobOut($params), '1');
+		ob_end_clean();
+	}
+	
+	public function testUpdateRunParams(){
+		ob_start();
+		$funcs  = new funcs();
+        $params['wkey'] = '3pl8cmzYJ4ezgX2a9RevZxHmihpOA';
+        $params['runparamsid'] = '1';
+		$this->assertEquals($funcs->insertJobOut($params), 1);
 		ob_end_clean();
 	}
 	
