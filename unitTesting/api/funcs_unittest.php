@@ -243,14 +243,14 @@ class funcs_unittest extends PHPUnit_Framework_TestCase
         $params['servicename'] = 'stepCheck';
         $params['wkey'] = '3pl8cmzYJ4ezgX2a9RevZxHmihpOA';
 		$params['command'] = '@RUNCLEAN -c @CONFIG -l 0 -u @USERNAME -p @PUBDIR -w @WKEY -d @DBCOMMCMD  -o @OUTDIR';
-		$this->assertEquals($funcs->startService($params), '');
+		$this->assertEquals($funcs->startService($params), 'DONE: Service ended successfully (stepCheck)!!!');
 		ob_end_clean();
 	}
 	
 	public function testCheckLastServiceJobs(){
 		ob_start();
 		$funcs  = new funcs();
-		$this->assertEquals($funcs->checkLastServiceJobs('3pl8cmzYJ4ezgX2a9RevZxHmihpOA'), '');
+		$this->assertEquals($funcs->checkLastServiceJobs('3pl8cmzYJ4ezgX2a9RevZxHmihpOA'), 1);
 		ob_end_clean();
 	}
 	
@@ -258,23 +258,59 @@ class funcs_unittest extends PHPUnit_Framework_TestCase
 		ob_start();
 		$funcs  = new funcs();
         $params['wkey'] = '3pl8cmzYJ4ezgX2a9RevZxHmihpOA';
-		$this->assertEquals($funcs->endWorkFlow($params), '');
+		$this->assertEquals($funcs->endWorkFlow($params), 'Success!!!');
 		ob_end_clean();
 	}
 	
 	public function testInsertJob(){
 		ob_start();
 		$funcs  = new funcs();
-        $params['username']; 
-        $params['wkey'];
-        $params['com'];
-        $params['jobname'];
-        $params['servicename']; 
-        $params['jobnum'];
-        $params['result'];
-		$this->assertEquals($funcs->endWorkFlow($params), '');
+        $params['username'] = 'kucukura';
+        $params['wkey'] = '3pl8cmzYJ4ezgX2a9RevZxHmihpOA';
+        $params['com'] = '/home/ak97w/outTophat6/tmp/src/stepFastQC.submit.bash';
+        $params['jobname'] = 'stepCheck';
+        $params['servicename'] = 'stepCheck';
+        $params['jobnum'] = '99999';
+        $params['result'] = 0;
+		$this->assertEquals($funcs->insertJob($params), 1);
 		ob_end_clean();
 	}
+	
+	public function testUpdateJob(){
+		ob_start();
+		$funcs  = new funcs();
+        $params['username'] = 'kucukura';
+        $params['wkey'] = '3pl8cmzYJ4ezgX2a9RevZxHmihpOA';
+        $params['com'] = '/home/ak97w/outTophat6/tmp/src/stepFastQC.submit.bash';
+        $params['jobname'] = 'stepCheck';
+        $params['servicename'] = 'stepCheck';
+        $params['jobnum'] = '99999';
+        $params['result'] = 0;
+		$this->assertEquals($funcs->updateJob($params), 1);
+		ob_end_clean();
+	}
+	
+	public function testCheckAllJobsFinished(){
+		ob_start();
+		$funcs  = new funcs();
+        $params['username'] = 'kucukura';
+        $params['wkey'] = '3pl8cmzYJ4ezgX2a9RevZxHmihpOA';
+        $params['servicename'] = 'stepCheck';
+		$this->assertEquals($funcs->checkAllJobsFinished($params), 1);
+		ob_end_clean();
+	}
+	
+	public function testUpdateService(){
+		ob_start();
+		$funcs  = new funcs();
+        $params['username'] = 'kucukura';
+        $params['wkey'] = '3pl8cmzYJ4ezgX2a9RevZxHmihpOA';
+        $params['jobnum'] = '99999';
+		$params['jobout'] = 'blob-test';
+		$this->assertEquals($funcs->updateService($params), 1);
+		ob_end_clean();
+	}
+	
 }
 
 ?>
