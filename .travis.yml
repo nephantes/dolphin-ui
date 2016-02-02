@@ -88,6 +88,7 @@ after_script:
   - mysql -e "use biocore; SELECT * FROM ngs_organism;" -uroot
   - mysql -e "use biocore; SELECT * FROM ngs_fastq_files" -uroot
   - mysql -e "use biocore; SELECT * FROM galaxy_runs" -uroot
+  - mysql -e "use biocore; SELECT * FROM users" -uroot
   - mysql -e "use biocore; SELECT * FROM jobs" -uroot
   - mysql -e "use biocore; SELECT * FROM services" -uroot
   - mysql -e "use biocore; SELECT * FROM workflow_run" -uroot

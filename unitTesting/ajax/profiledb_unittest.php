@@ -37,28 +37,30 @@ class profiledb_unittest extends PHPUnit_Framework_TestCase
 	}
 	
 	public function testCheckAmazonPermissions(){
-		#ob_start();
+		ob_start();
 		$_GET['p'] = 'checkAmazonPermissions';
 		$_GET['a_id'] = '1';
 		include("profiledb.php");
 		$this->assertEquals(json_decode($data)[0]->id,'1');
-		#ob_end_clean();
+		ob_end_clean();
 	}
 	
 	public function testObtainAmazonKeys(){
-		#ob_start();
+		ob_start();
 		$_GET['p'] = 'obtainAmazonKeys';
 		include("profiledb.php");
 		$this->assertEquals(json_decode($data)[0]->id,'1');
-		#ob_end_clean();
+		$this->assertEquals(json_decode($data)[0]->aws_access_key_id,'access_key');
+		$this->assertEquals(json_decode($data)[0]->aws_secret_access_key,'secret_key');
+		ob_end_clean();
 	}
 	
 	public function testProfileLoad(){
-		#ob_start();
+		ob_start();
 		$_GET['p'] = 'profileLoad';
 		include("profiledb.php");
 		$this->assertEquals(json_decode($data)[0]->photo_loc,'test.img');
-		#ob_end_clean();
+		ob_end_clean();
 	}
 	
 	public function testObtainGroups(){
@@ -66,6 +68,9 @@ class profiledb_unittest extends PHPUnit_Framework_TestCase
 		$_GET['p'] = 'obtainGroups';
 		include("profiledb.php");
 		$this->assertEquals(json_decode($data)[0]->id,'1');
+		$this->assertEquals(json_decode($data)[0]->name,'umw_biocore');
+		$this->assertEquals(json_decode($data)[0]->owner_id,'1');
+		$this->assertEquals(json_decode($data)[0]->u_id,'1');
 		#ob_end_clean();
 	}
 	
