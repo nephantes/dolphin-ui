@@ -31,7 +31,7 @@ class ngsquerydb_unittest extends PHPUnit_Framework_TestCase
 		$this->assertEquals(json_decode($data)[0]->json_parameters,'{"genomebuild":"mousetest,mm10","spaired":"paired","resume":"resume","fastqc":"yes","barcodes":"distance,1:format,5 end read 1","adapter":"none","quality":"none","trim":"none","split":"none","commonind":"rRNA,miRNA,tRNA","pipeline":["RNASeqRSEM:--bowtie-e 70 --bowtie-chunkmbs 100:no:no"]}');
 		$this->assertEquals(json_decode($data)[0]->run_name,'barcode test');
 		$this->assertEquals(json_decode($data)[0]->run_description,'barcode test');
-		$this->assertEquals(json_decode($data)[0]->group_id,'null');
+		$this->assertEquals(json_decode($data)[0]->group_id,null);
 		$this->assertEquals(json_decode($data)[0]->perms,'3');
 		ob_end_clean();
 	}
@@ -71,10 +71,10 @@ class ngsquerydb_unittest extends PHPUnit_Framework_TestCase
 		$this->assertEquals(json_decode($data)[3]->id,'4');
 		$this->assertEquals(json_decode($data)[4]->id,'5');
 		$this->assertEquals(json_decode($data)[5]->id,'6');
-		$this->assertEquals(json_decode($data)[1]->id,'7');
-		$this->assertEquals(json_decode($data)[1]->id,'8');
-		$this->assertEquals(json_decode($data)[1]->id,'9');
-		$this->assertEquals(json_decode($data)[1]->id,'10');
+		$this->assertEquals(json_decode($data)[6]->id,'7');
+		$this->assertEquals(json_decode($data)[7]->id,'8');
+		$this->assertEquals(json_decode($data)[8]->id,'9');
+		$this->assertEquals(json_decode($data)[9]->id,'10');
 		ob_end_clean();
 	}
 	
@@ -138,7 +138,7 @@ class ngsquerydb_unittest extends PHPUnit_Framework_TestCase
 		$_GET['experiment'] = '1';
 		include("ngsquerydb.php");
 		$this->assertEquals(json_decode($data)[0]->id,'1');
-		$this->assertEquals(json_decode($data)[0]->name,'kucukura');
+		$this->assertEquals(json_decode($data)[0]->name,'umw_biocore');
 		ob_end_clean();
 	}
 	
