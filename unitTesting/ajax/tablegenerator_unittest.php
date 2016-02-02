@@ -8,43 +8,47 @@ chdir('public/ajax/');
 class tablegenerator_unittest extends PHPUnit_Framework_TestCase
 {
 	public function testGetTableSamples() {
-		#ob_start();
+		ob_start();
 		$_GET['p'] = 'getTableSamples';
 		$_GET['search'] = 7;
 		include('tablegenerator.php');
+		$this->assertEquals(json_decode($data)[0]->id,'7');
 		$this->assertEquals(json_decode($data)[0]->samplename,'example_sample_1');
-		#ob_end_clean();
+		ob_end_clean();
 	}
 	
 	public function testGetTableRuns() {
-		#ob_start();
+		ob_start();
 		$_GET['p'] = 'getTableRuns';
 		$_GET['search'] = 1;
 		include('tablegenerator.php');
-		$this->assertEquals(json_decode($data)[0]->sample_id,1);
-		#ob_end_clean();
+		$this->assertEquals(json_decode($data)[0]->sample_id,'1');
+		$this->assertEquals(json_decode($data)[0]->run_id,'1');
+		$this->assertEquals(json_decode($data)[0]->run_name,'barcode test');
+		$this->assertEquals(json_decode($data)[0]->wkey,'J98Oe0bSZ18fBx9pPuDnsD8ITRVPGV');
+		ob_end_clean();
 	}
 	
 	//find wkey example
 	public function testGetTableReportsList() {
-		ob_start();
+		#ob_start();
 		$_GET['p'] = 'getTableReportsList';
 		$_GET['wkey'] = '3pl8cmzYJ4ezgX2a9RevZxHmihpOA';
 		include('tablegenerator.php');
 		$this->assertEquals(json_decode($data)[0]->file,'rsem/genes_expression_tpm.tsv');
-		ob_end_clean();
+		#ob_end_clean();
 	}
 	
 	public function testSamplesWithRuns() {
-		ob_start();
+		#ob_start();
 		$_GET['p'] = 'samplesWithRuns';
 		include('tablegenerator.php');
 		$this->assertEquals(json_decode($data)[0]->sample_id,1);
-		ob_end_clean();
+		#ob_end_clean();
 	}
 	
 	public function testCreateTableFile(){
-		ob_start();
+		#ob_start();
 		$_GET['p'] = 'createTableFile';
 		$_GET['url'] = '/home/travis/build/Rhaknam/dolphin-ui/public/api/getsamplevals.php';
 		$_GET['samples'] = 'samples=1,2,3,4,5,6:3';
@@ -55,7 +59,7 @@ class tablegenerator_unittest extends PHPUnit_Framework_TestCase
 		include('tablegenerator.php');
 		$file = json_decode($data);
 		$this->assertEquals(json_decode($data),$file);
-		ob_end_clean();
+		#ob_end_clean();
 		return $file;
 	}
 	
