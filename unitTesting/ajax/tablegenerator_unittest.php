@@ -106,7 +106,7 @@ class tablegenerator_unittest extends PHPUnit_Framework_TestCase
 	}
 	/*
 	public function testConvertToTSV(){
-	ob_start();
+		ob_start();
 		$_GET['p'] = 'convertToTSV';
 		$_GET['url'] = '/home/travis/build/Rhaknam/dolphin-ui/public/api/getsamplevals.php';
 		$_GET['samples'] = 'samples=1,2,3,4,5,6:3';
