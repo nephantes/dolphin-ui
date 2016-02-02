@@ -135,7 +135,7 @@ class funcs_unittest extends PHPUnit_Framework_TestCase
 		ob_start();
 		$funcs  = new funcs();
 		$date=$funcs->queryAVal('SELECT start_time FROM jobs WHERE wkey = \'test_wkey\'');
-		$this->assertEquals(strpos('20') > -1, true );
+		$this->assertEquals(strpos($date,'20') > -1, true );
 		ob_end_clean();
 	}
 	
