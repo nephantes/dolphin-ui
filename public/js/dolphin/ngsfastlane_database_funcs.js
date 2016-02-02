@@ -142,7 +142,7 @@ function checkFastlaneInput(info_array){
 					}
 				});
 				var dir_check_2;
-				if (info_array[x].substring(0,1) != '/') {
+				if (info_array[x].substring(0,1) != '/'  && info_array[x].indexOf('/') > -1) {
 					info_array[x] = '/' + info_array[x];
 				}
 				$.ajax({

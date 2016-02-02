@@ -79,7 +79,7 @@ class Ngsimport extends VanillaModel {
     }
 	
 	function directoryCheck($directory){
-		if(substr($directory, 0, 1) != '/'){
+		if(substr($directory, 0, 1) != '/' && strpos($directory, '/') > -1){
  			$directory = "/" . $directory;
  		}
 		return $directory;
