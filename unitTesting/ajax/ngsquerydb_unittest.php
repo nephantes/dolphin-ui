@@ -8,32 +8,43 @@ chdir('public/ajax/');
 class ngsquerydb_unittest extends PHPUnit_Framework_TestCase
 {
 	public function testGetRunSamples(){
-		#ob_start();
+		ob_start();
 		$_GET['p'] = 'getRunSamples';
 		$_GET['gids'] = '1';
 		$_GET['runID'] = '1';
 		include("ngsquerydb.php");
 		$this->assertEquals(json_decode($data)[0]->sample_id,'1');
-		#ob_end_clean();
+		$this->assertEquals(json_decode($data)[1]->sample_id,'2');
+		$this->assertEquals(json_decode($data)[2]->sample_id,'3');
+		$this->assertEquals(json_decode($data)[3]->sample_id,'4');
+		$this->assertEquals(json_decode($data)[4]->sample_id,'5');
+		$this->assertEquals(json_decode($data)[5]->sample_id,'6');
+		ob_end_clean();
 	}
 	
 	public function testGrabReload(){
-		#ob_start();
+		ob_start();
 		$_GET['p'] = 'grabReload';
 		$_GET['groupID'] = '1';
 		include("ngsquerydb.php");
 		$this->assertEquals(json_decode($data)[0]->outdir,'/export/barcodetest');
-		#ob_end_clean();
+		$this->assertEquals(json_decode($data)[0]->json_parameters,'{\"genomebuild\":\"mousetest,mm10\",\"spaired\":\"paired\",\"resume\":\"resume\",\"fastqc\":\"yes\",\"barcodes\":\"distance,1:format,5 end read 1\",\"adapter\":\"none\",\"quality\":\"none\",\"trim\":\"none\",\"split\":\"none\",\"commonind\":\"rRNA,miRNA,tRNA\",\"pipeline\":[\"RNASeqRSEM:--bowtie-e 70 --bowtie-chunkmbs 100:no:no\"]}');
+		$this->assertEquals(json_decode($data)[0]->run_name,'barcode test');
+		$this->assertEquals(json_decode($data)[0]->run_description,'barcode test');
+		$this->assertEquals(json_decode($data)[0]->group_id,'null');
+		$this->assertEquals(json_decode($data)[0]->perms,'3');
+		ob_end_clean();
 	}
 	
 	public function testGetReportNames(){
-		#ob_start();
+		ob_start();
 		$_GET['p'] = 'getReportNames';
 		$_GET['runid'] = '1';
 		$_GET['samp'] = '1,2,3';
 		include("ngsquerydb.php");
+		$this->assertEquals(json_decode($data)[0]->file_name,'control_rep3.1.fastq.gz,control_rep3.2.fastq.gz');
 		$this->assertEquals(json_decode($data)[0]->outdir,'/export/barcodetest');
-		#ob_end_clean();
+		ob_end_clean();
 	}
 	
 	public function testLanesToSamples(){
@@ -42,6 +53,11 @@ class ngsquerydb_unittest extends PHPUnit_Framework_TestCase
 		$_GET['lane'] = '1';
 		include("ngsquerydb.php");
 		$this->assertEquals(json_decode($data)[0]->id,'1');
+		$this->assertEquals(json_decode($data)[1]->id,'2');
+		$this->assertEquals(json_decode($data)[2]->id,'3');
+		$this->assertEquals(json_decode($data)[3]->id,'4');
+		$this->assertEquals(json_decode($data)[4]->id,'5');
+		$this->assertEquals(json_decode($data)[5]->id,'6');
 		ob_end_clean();
 	}
 	

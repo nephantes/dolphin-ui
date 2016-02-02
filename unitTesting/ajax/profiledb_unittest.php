@@ -8,65 +8,65 @@ chdir('public/ajax/');
 class profiledb_unittest extends PHPUnit_Framework_TestCase
 {
 	public function testAlterAccessKey(){
-		#ob_start();
+		ob_start();
 		$_GET['p'] = 'alterAccessKey';
 		$_GET['id'] = '1';
 		$_GET['a_key'] = 'access_key';
 		include("profiledb.php");
-		$this->assertEquals(json_decode($data),1);
-		#ob_end_clean();
+		$this->assertEquals(json_decode($data),'1');
+		ob_end_clean();
 	}
 	
 	public function testAlterSecretKey(){
-		#ob_start();
+		ob_start();
 		$_GET['p'] = 'alterSecretKey';
 		$_GET['id'] = '1';
 		$_GET['s_key'] = 'secret_key';
 		include("profiledb.php");
-		$this->assertEquals(json_decode($data),1);
-		#ob_end_clean();
+		$this->assertEquals(json_decode($data),'1');
+		ob_end_clean();
 	}
 	
 	public function testUpdateProfile(){
-		#ob_start();
+		ob_start();
 		$_GET['p'] = 'updateProfile';
 		$_GET['img'] = 'test.img';
 		include("profiledb.php");
-		$this->assertEquals(json_decode($data),1);
-		#ob_end_clean();
+		$this->assertEquals(json_decode($data),'1');
+		ob_end_clean();
 	}
 	
 	public function testCheckAmazonPermissions(){
-		ob_start();
+		#ob_start();
 		$_GET['p'] = 'checkAmazonPermissions';
 		$_GET['a_id'] = '1';
 		include("profiledb.php");
 		$this->assertEquals(json_decode($data)[0]->id,'1');
-		ob_end_clean();
+		#ob_end_clean();
 	}
 	
 	public function testObtainAmazonKeys(){
-		ob_start();
+		#ob_start();
 		$_GET['p'] = 'obtainAmazonKeys';
 		include("profiledb.php");
 		$this->assertEquals(json_decode($data)[0]->id,'1');
-		ob_end_clean();
+		#ob_end_clean();
 	}
 	
 	public function testProfileLoad(){
-		ob_start();
+		#ob_start();
 		$_GET['p'] = 'profileLoad';
 		include("profiledb.php");
 		$this->assertEquals(json_decode($data)[0]->photo_loc,'test.img');
-		ob_end_clean();
+		#ob_end_clean();
 	}
 	
 	public function testObtainGroups(){
-		ob_start();
+		#ob_start();
 		$_GET['p'] = 'obtainGroups';
 		include("profiledb.php");
 		$this->assertEquals(json_decode($data)[0]->id,'1');
-		ob_end_clean();
+		#ob_end_clean();
 	}
 	
 	public function testObtainProfileInfo(){

@@ -8,7 +8,7 @@ chdir('public/ajax/');
 class ngs_tables_unittest extends PHPUnit_Framework_TestCase
 {
 	public function testGetStatus(){
-		ob_start();
+		#ob_start();
 		$_GET['p'] = 'getStatus';
 		$_GET['q'] = '';
 		$_GET['r'] = '';
@@ -19,11 +19,11 @@ class ngs_tables_unittest extends PHPUnit_Framework_TestCase
 		$_SESSION['run_type'] = 0;
 		include("ngs_tables.php");
 		$this->assertEquals(json_decode($data)[0]->id,'1');
-		ob_end_clean();
+		#ob_end_clean();
 	}
 	
 	public function testGetSelectedSamples(){
-		ob_start();
+		#ob_start();
 		$_GET['p'] = 'getSelectedSamples';
 		$_GET['q'] = '';
 		$_GET['r'] = '';
@@ -33,11 +33,11 @@ class ngs_tables_unittest extends PHPUnit_Framework_TestCase
 		$_GET['gids'] = '1';
 		include("ngs_tables.php");
 		$this->assertEquals(json_decode($data)[0]->id,'1');
-		ob_end_clean();
+		#ob_end_clean();
 	}
 	
 	public function testBrowseGetSamples(){
-		ob_start();
+		#ob_start();
 		$_GET['p'] = 'getSamples';
 		$_GET['q'] = 'Organism';
 		$_GET['r'] = 'human';
@@ -47,11 +47,11 @@ class ngs_tables_unittest extends PHPUnit_Framework_TestCase
 		$_GET['gids'] = '1';
 		include("ngs_tables.php");
 		$this->assertEquals(json_decode($data)[0]->id,'1');
-		ob_end_clean();
+		#ob_end_clean();
 	}
 	
 	public function testBrowseGetLanes(){
-		ob_start();
+		#ob_start();
 		$_GET['p'] = 'getLanes';
 		$_GET['q'] = 'Organism';
 		$_GET['r'] = 'human';
@@ -61,7 +61,7 @@ class ngs_tables_unittest extends PHPUnit_Framework_TestCase
 		$_GET['gids'] = '1';
 		include("ngs_tables.php");
 		$this->assertEquals(json_decode($data)[0]->id,'1');
-		ob_end_clean();
+		#ob_end_clean();
 	}
 	
 	public function testBrowseGetExperimentSeries(){

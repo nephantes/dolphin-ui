@@ -8,32 +8,32 @@ chdir('public/ajax/');
 class initialmappingdb_unittest extends PHPUnit_Framework_TestCase
 {
     public function testSampleChecking(){
-        ob_start();
+        #ob_start();
         $_GET['p'] = 'sampleChecking';
         $_SESSION['uid'] = '1';
         $_GET['gids'] = '1';
         include("initialmappingdb.php");
         $this->assertEquals(json_decode($data)[0]->id,'1');
-        ob_end_clean();
+        #ob_end_clean();
     }
     
     public function testLaneChecking(){
-        ob_start();
+        #ob_start();
         $_GET['p'] = 'laneChecking';
         $_GET['uid'] = '1';
         $_GET['gids'] = '1';
         include("initialmappingdb.php");
         $this->assertEquals(json_decode($data)[0]->lane_id,'1');
-        ob_end_clean();
+        #ob_end_clean();
     }
     
     public function testLaneToSampleChecking(){
-        ob_start();
+        #ob_start();
         $_GET['p'] = 'laneToSampleChecking';
         $_GET['sample_ids'] = '1';
         include("initialmappingdb.php");
         $this->assertEquals(json_decode($data)[0]->sample_id,'1');
-        ob_end_clean();
+        #ob_end_clean();
     }
     
     public function testGetCounts(){

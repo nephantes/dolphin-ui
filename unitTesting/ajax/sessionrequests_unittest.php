@@ -8,30 +8,30 @@ chdir('public/ajax/');
 class sessionrequests_unittest extends PHPUnit_Framework_TestCase
 {
 	public function testSessionTest(){
-		#ob_start();
+		ob_start();
 		$_GET['p'] = 'sessionTest';
 		include('sessionrequests.php');
-		$this->assertEquals(1,1);
-		#ob_end_clean();
+		$this->assertEquals(json_decode($data),'1');
+		ob_end_clean();
 	}
 	
 	public function testSendBasketInfo(){
-		#ob_start();
+		ob_start();
 		$_GET['p'] = 'sendBasketInfo';
 		$_POST['id'] = '2';
 		$_SESSION['basket'] = '1';
 		include('sessionrequests.php');
 		$this->assertEquals($_SESSION['basket'],'1,2');
-		#ob_end_clean();
+		ob_end_clean();
 	}
 	
 	public function testGetBasketInfo(){
-		#ob_start();
+		ob_start();
 		$_GET['p'] = 'getBasketInfo';
 		$_SESSION['basket'] = '1';
 		include('sessionrequests.php');
 		$this->assertEquals($_SESSION['basket'],'1');
-		#ob_end_clean();
+		ob_end_clean();
 	}
 	
 	public function testRemoveBasketInfo(){
