@@ -28,7 +28,7 @@ class ngsquerydb_unittest extends PHPUnit_Framework_TestCase
 		$_GET['groupID'] = '1';
 		include("ngsquerydb.php");
 		$this->assertEquals(json_decode($data)[0]->outdir,'/export/barcodetest');
-		$this->assertEquals(json_decode($data)[0]->json_parameters,'{\"genomebuild\":\"mousetest,mm10\",\"spaired\":\"paired\",\"resume\":\"resume\",\"fastqc\":\"yes\",\"barcodes\":\"distance,1:format,5 end read 1\",\"adapter\":\"none\",\"quality\":\"none\",\"trim\":\"none\",\"split\":\"none\",\"commonind\":\"rRNA,miRNA,tRNA\",\"pipeline\":[\"RNASeqRSEM:--bowtie-e 70 --bowtie-chunkmbs 100:no:no\"]}');
+		$this->assertEquals(json_decode($data)[0]->json_parameters,'{"genomebuild":"mousetest,mm10","spaired":"paired","resume":"resume","fastqc":"yes","barcodes":"distance,1:format,5 end read 1","adapter":"none","quality":"none","trim":"none","split":"none","commonind":"rRNA,miRNA,tRNA","pipeline":["RNASeqRSEM:--bowtie-e 70 --bowtie-chunkmbs 100:no:no"]}');
 		$this->assertEquals(json_decode($data)[0]->run_name,'barcode test');
 		$this->assertEquals(json_decode($data)[0]->run_description,'barcode test');
 		$this->assertEquals(json_decode($data)[0]->group_id,'null');
@@ -42,7 +42,7 @@ class ngsquerydb_unittest extends PHPUnit_Framework_TestCase
 		$_GET['runid'] = '1';
 		$_GET['samp'] = '1,2,3';
 		include("ngsquerydb.php");
-		$this->assertEquals(json_decode($data)[0]->file_name,'control_rep3.1.fastq.gz,control_rep3.2.fastq.gz');
+		$this->assertEquals(json_decode($data)[0]->file_name,'control_rep1.1.fastq.gz,control_rep1.2.fastq.gz');
 		$this->assertEquals(json_decode($data)[0]->outdir,'/export/barcodetest');
 		ob_end_clean();
 	}
@@ -62,27 +62,39 @@ class ngsquerydb_unittest extends PHPUnit_Framework_TestCase
 	}
 	
 	public function testGetAllSampleIds(){
-		#ob_start();
+		ob_start();
 		$_GET['p'] = 'getAllSampleIds';
 		include("ngsquerydb.php");
 		$this->assertEquals(json_decode($data)[0]->id,'1');
-		#ob_end_clean();
+		$this->assertEquals(json_decode($data)[1]->id,'2');
+		$this->assertEquals(json_decode($data)[2]->id,'3');
+		$this->assertEquals(json_decode($data)[3]->id,'4');
+		$this->assertEquals(json_decode($data)[4]->id,'5');
+		$this->assertEquals(json_decode($data)[5]->id,'6');
+		$this->assertEquals(json_decode($data)[1]->id,'7');
+		$this->assertEquals(json_decode($data)[1]->id,'8');
+		$this->assertEquals(json_decode($data)[1]->id,'9');
+		$this->assertEquals(json_decode($data)[1]->id,'10');
+		ob_end_clean();
 	}
 	
 	public function testGetAllLaneIds(){
-		#ob_start();
+		ob_start();
 		$_GET['p'] = 'getAllLaneIds';
 		include("ngsquerydb.php");
 		$this->assertEquals(json_decode($data)[0]->id,'1');
-		#ob_end_clean();
+		$this->assertEquals(json_decode($data)[1]->id,'2');
+		$this->assertEquals(json_decode($data)[2]->id,'3');
+		ob_end_clean();
 	}
 	
 	public function testGetAllExperimentIds(){
-		#ob_start();
+		ob_start();
 		$_GET['p'] = 'getAllExperimentIds';
 		include("ngsquerydb.php");
 		$this->assertEquals(json_decode($data)[0]->id,'1');
-		#ob_end_clean();
+		$this->assertEquals(json_decode($data)[1]->id,'2');
+		ob_end_clean();
 	}
 	
 	public function testGetLaneIdFromSample(){
@@ -126,6 +138,7 @@ class ngsquerydb_unittest extends PHPUnit_Framework_TestCase
 		$_GET['experiment'] = '1';
 		include("ngsquerydb.php");
 		$this->assertEquals(json_decode($data)[0]->id,'1');
+		$this->assertEquals(json_decode($data)[0]->name,'kucukura');
 		ob_end_clean();
 	}
 	
@@ -153,6 +166,7 @@ class ngsquerydb_unittest extends PHPUnit_Framework_TestCase
 		$_GET['p'] = 'getGroups';
 		include("ngsquerydb.php");
 		$this->assertEquals(json_decode($data)[0]->id,'1');
+		$this->assertEquals(json_decode($data)[0]->name,'umw_biocore');
 		ob_end_clean();
 	}
 	
@@ -191,6 +205,7 @@ class ngsquerydb_unittest extends PHPUnit_Framework_TestCase
 		$_GET['experiment'] = '1';
 		include("ngsquerydb.php");
 		$this->assertEquals(json_decode($data)[0]->id,'1');
+		$this->assertEquals(json_decode($data)[0]->username,'kucukura');
 		ob_end_clean();
 	}
 	

@@ -7,14 +7,6 @@ chdir('public/ajax/');
 
 class sessionrequests_unittest extends PHPUnit_Framework_TestCase
 {
-	public function testSessionTest(){
-		ob_start();
-		$_GET['p'] = 'sessionTest';
-		include('sessionrequests.php');
-		$this->assertEquals(json_decode($data),'1');
-		ob_end_clean();
-	}
-	
 	public function testSendBasketInfo(){
 		ob_start();
 		$_GET['p'] = 'sendBasketInfo';
