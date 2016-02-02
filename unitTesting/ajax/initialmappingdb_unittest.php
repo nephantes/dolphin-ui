@@ -99,7 +99,7 @@ class initialmappingdb_unittest extends PHPUnit_Framework_TestCase
         $_GET['run_id'] = '1';
         $_GET['sample_ids'] = '1';
         include("initialmappingdb.php");
-        $this->assertEquals(json_decode($ids),'1');
+        $this->assertEquals($ids,'1');
         ob_end_clean();
     }
 }

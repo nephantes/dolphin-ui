@@ -24,11 +24,11 @@ class admindashboardquerydb_unittest extends PHPUnit_Framework_TestCase
     }
     
     public function testGetMonthlyJobs(){
-        ob_start();
+        #ob_start();
 		$_GET['p'] = 'getMonthlyJobs';
 		include("admindashboardquerydb.php");
 		$this->assertEquals(json_decode($data)[0]->countSucess,'178');
-		ob_end_clean();
+		#ob_end_clean();
     }
 }
 

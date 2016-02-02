@@ -8,11 +8,11 @@ chdir('public/ajax/');
 class dolphinfuncs_unittest extends PHPUnit_Framework_TestCase
 {
     public function testGetFileList(){
-        ob_start();
+        #ob_start();
 		$_GET['p'] = 'getFileList';
 		include("dolphinfuncs.php");
 		$this->assertEquals(json_decode($data)[0]->file_name,'control_rep1.1.fastq.gz,control_rep1.2.fastq.gz');
-		ob_end_clean();
+		#ob_end_clean();
     }
     
     public function testUpdateHashBackup(){
