@@ -8,33 +8,33 @@ chdir('public/ajax/');
 class ngsfastlanddb_unittest extends PHPUnit_Framework_TestCase
 {
 	public function testExperimentSeriesCheck(){
-		#ob_start();
+		ob_start();
 		$_GET['p'] = 'experimentSeriesCheck';
 		$_GET['name'] = 'Barcode Sep Test ';
 		include("ngsfastlanedb.php");
 		$this->assertEquals(json_decode($data),'1');
-		#ob_end_clean();
+		ob_end_clean();
 	}
 	
 	public function testLaneCheck(){
-		#ob_start();
+		ob_start();
 		$_GET['p'] = 'laneCheck';
 		$_GET['experiment'] = '1';
 		$_GET['lane'] = 'New Lane';
 		include("ngsfastlanedb.php");
 		$this->assertEquals(json_decode($data),'1');
-		#ob_end_clean();
+		ob_end_clean();
 	}
 	
 	public function testSampleCheck(){
-		#ob_start();
+		ob_start();
 		$_GET['p'] = 'sampleCheck';
 		$_GET['experiment'] = '1';
 		$_GET['lane'] = '1';
 		$_GET['sample'] = 'control_rep1';
 		include("ngsfastlanedb.php");
 		$this->assertEquals(json_decode($data),'1');
-		#ob_end_clean();
+		ob_end_clean();
 	}
 	
 	public function testDirectoryCheck(){
@@ -149,6 +149,7 @@ class ngsfastlanddb_unittest extends PHPUnit_Framework_TestCase
 		$_GET['p'] = 'getClusterName';
 		include("ngsfastlanedb.php");
 		$this->assertEquals(json_decode($data)[0]->username,'kucukura');
+		$this->assertEquals(json_decode($data)[0]->clusteruser,'ak97w');
 		ob_end_clean();
 	}
 }

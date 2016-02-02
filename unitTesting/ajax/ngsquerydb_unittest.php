@@ -62,27 +62,27 @@ class ngsquerydb_unittest extends PHPUnit_Framework_TestCase
 	}
 	
 	public function testGetAllSampleIds(){
-		ob_start();
+		#ob_start();
 		$_GET['p'] = 'getAllSampleIds';
 		include("ngsquerydb.php");
 		$this->assertEquals(json_decode($data)[0]->id,'1');
-		ob_end_clean();
+		#ob_end_clean();
 	}
 	
 	public function testGetAllLaneIds(){
-		ob_start();
+		#ob_start();
 		$_GET['p'] = 'getAllLaneIds';
 		include("ngsquerydb.php");
 		$this->assertEquals(json_decode($data)[0]->id,'1');
-		ob_end_clean();
+		#ob_end_clean();
 	}
 	
 	public function testGetAllExperimentIds(){
-		ob_start();
+		#ob_start();
 		$_GET['p'] = 'getAllExperimentIds';
 		include("ngsquerydb.php");
 		$this->assertEquals(json_decode($data)[0]->id,'1');
-		ob_end_clean();
+		#ob_end_clean();
 	}
 	
 	public function testGetLaneIdFromSample(){
