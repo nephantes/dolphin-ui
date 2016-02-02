@@ -137,7 +137,7 @@ class ngsquerydb_unittest extends PHPUnit_Framework_TestCase
 		$_GET['p'] = 'changeDataGroupNames';
 		$_GET['experiment'] = '1';
 		include("ngsquerydb.php");
-		$this->assertEquals(json_decode($data),'1');
+		$this->assertEquals(json_decode($data),array());
 		ob_end_clean();
 	}
 	

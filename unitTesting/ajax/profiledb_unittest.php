@@ -64,14 +64,14 @@ class profiledb_unittest extends PHPUnit_Framework_TestCase
 	}
 	
 	public function testObtainGroups(){
-		#ob_start();
+		ob_start();
 		$_GET['p'] = 'obtainGroups';
 		include("profiledb.php");
 		$this->assertEquals(json_decode($data)[0]->id,'1');
 		$this->assertEquals(json_decode($data)[0]->name,'umw_biocore');
 		$this->assertEquals(json_decode($data)[0]->owner_id,'1');
 		$this->assertEquals(json_decode($data)[0]->u_id,'1');
-		#ob_end_clean();
+		ob_end_clean();
 	}
 	
 	public function testObtainProfileInfo(){

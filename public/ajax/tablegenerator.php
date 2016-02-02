@@ -123,9 +123,6 @@ else if ($p == 'createNewTable')
 		SET name = '$name'
 		WHERE id = $id
 		");
-		
-		$handle = popen('rm ../tmp/files/'.$file, "r");
-		pclose($handle);
 	}
 	$data = json_encode('true');
 }
