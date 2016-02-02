@@ -207,7 +207,7 @@ class funcs_unittest extends PHPUnit_Framework_TestCase
 	}
 	
 	public function testUpdateDefaultParam(){
-		ob_start();
+		#ob_start();
 		$funcs  = new funcs();
 		$workflowname = 'seqmapping_workflow';
 		$username = 'kucukura';
@@ -215,8 +215,9 @@ class funcs_unittest extends PHPUnit_Framework_TestCase
 		$funcs->updateDefaultParam($workflowname, $username, $defaultparam);
 		$workflow=$funcs->queryTable('SELECT defaultparam FROM workflows WHERE workflowname = \'' . $workflowname . '\'');
 		$location=array_search($defaultparam, $workflow);
+		var_dump($workflow);
 		$this->assertEquals($defaultparam, $workflow[$location] );
-		ob_end_clean();
+		#ob_end_clean();
 	}
 	
 	public function testGetCommand(){
