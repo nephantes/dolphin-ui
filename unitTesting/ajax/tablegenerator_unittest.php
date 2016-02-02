@@ -8,21 +8,21 @@ chdir('public/ajax/');
 class tablegenerator_unittest extends PHPUnit_Framework_TestCase
 {
 	public function testGetTableSamples() {
-		ob_start();
+		#ob_start();
 		$_GET['p'] = 'getTableSamples';
 		$_GET['search'] = 7;
 		include('tablegenerator.php');
 		$this->assertEquals(json_decode($data)[0]->samplename,'example_sample_1');
-		ob_end_clean();
+		#ob_end_clean();
 	}
 	
 	public function testGetTableRuns() {
-		ob_start();
+		#ob_start();
 		$_GET['p'] = 'getTableRuns';
 		$_GET['search'] = 1;
 		include('tablegenerator.php');
 		$this->assertEquals(json_decode($data)[0]->sample_id,1);
-		ob_end_clean();
+		#ob_end_clean();
 	}
 	
 	//find wkey example
