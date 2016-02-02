@@ -213,8 +213,9 @@ class funcs_unittest extends PHPUnit_Framework_TestCase
 		$username = 'kucukura';
 		$defaultparam = '/usr/local/share/dolphin_tools/default_params/Dolphin_v1.3_Docker.txt';
 		$funcs->updateDefaultParam($workflowname, $username, $defaultparam);
-		$workflow=$funcs->queryAVal('SELECT defaultparam FROM workflows WHERE workflowname = \'' . $workflowname . '\'');
-		$this->assertEquals($defaultparam, $workflow );
+		$workflow=$funcs->queryTable('SELECT defaultparam FROM workflows WHERE workflowname = \'' . $workflowname . '\'');
+		$location=array_search($defaultparam, $workflow);
+		$this->assertEquals($defaultparam, $workflow[$location] );
 		ob_end_clean();
 	}
 	
@@ -421,8 +422,8 @@ class funcs_unittest extends PHPUnit_Framework_TestCase
 		$funcs  = new funcs();
         $params['username'] = 'kucukura';
 		$this->assertEquals($funcs->getAmazonCredentials($params)[0]['id'], '1');
-		$this->assertEquals($funcs->getAmazonCredentials($params)[0]['aws_access_key_id'], 'access_key');
-		$this->assertEquals($funcs->getAmazonCredentials($params)[0]['aws_secret_access_key'], 'secret_key');
+		$this->assertEquals($funcs->getAmazonCredentials($params)[0]['aws_access_key_id'], 'ngsalterdb new key');
+		$this->assertEquals($funcs->getAmazonCredentials($params)[0]['aws_secret_access_key'], 'ngsalterdb new secret key');
 		ob_end_clean();
 	}
 	
