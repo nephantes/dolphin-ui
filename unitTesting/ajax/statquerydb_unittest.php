@@ -8,29 +8,29 @@ chdir('public/ajax/');
 class statquerydb_unittest extends PHPUnit_Framework_TestCase
 {
 	public function testGetDailyRuns(){
-		#ob_start();
+		ob_start();
 		$_GET['p'] = 'getDailyRuns';
 		include('statquerydb.php');
-		$this->assertEquals(1,1);
-		#ob_end_clean();
+		$this->assertEquals(json_decode($data),array());
+		ob_end_clean();
 	}
 	
 	public function testGetTopUsers(){
-		#ob_start();
+		ob_start();
 		$_GET['p'] = 'getTopUsers';
 		$_GET['type'] = 'Dolphin';
 		include('statquerydb.php');
-		$this->assertEquals(1,1);
-		#ob_end_clean();
+		$this->assertEquals(json_decode($data),array());
+		ob_end_clean();
 	}
 	
 	public function testGetTopUsersTime(){
-		#ob_start();
+		ob_start();
 		$_GET['p'] = 'getTopUsersTime';
 		$_GET['type'] = 'Dolphin';
 		include('statquerydb.php');
-		$this->assertEquals(1,1);
-		#ob_end_clean();
+		$this->assertEquals(json_decode($data),array());
+		ob_end_clean();
 	}
 	
 	public function testGetUsersTime(){
@@ -38,7 +38,7 @@ class statquerydb_unittest extends PHPUnit_Framework_TestCase
 		$_GET['p'] = 'getUsersTime';
 		$_GET['type'] = 'Dolphin';
 		include('statquerydb.php');
-		$this->assertEquals(1,1);
+		$this->assertEquals(json_decode($data),array());
 		ob_end_clean();
 	}
 	
@@ -47,7 +47,7 @@ class statquerydb_unittest extends PHPUnit_Framework_TestCase
 		$_GET['p'] = 'getLabsTime';
 		$_GET['type'] = 'Dolphin';
 		include('statquerydb.php');
-		$this->assertEquals(1,1);
+		$this->assertEquals(json_decode($data),array());
 		ob_end_clean();
 	}
 	
@@ -56,7 +56,7 @@ class statquerydb_unittest extends PHPUnit_Framework_TestCase
 		$_GET['p'] = 'getToolTime';
 		$_GET['type'] = 'Dolphin';
 		include('statquerydb.php');
-		$this->assertEquals(1,1);
+		$this->assertEquals(json_decode($data),array());
 		ob_end_clean();
 	}
 	
@@ -64,7 +64,7 @@ class statquerydb_unittest extends PHPUnit_Framework_TestCase
 		ob_start();
 		$_GET['p'] = 'getJobTime';
 		include('statquerydb.php');
-		$this->assertEquals(1,1);
+		$this->assertEquals(json_decode($data),array());
 		ob_end_clean();
 	}
 }
