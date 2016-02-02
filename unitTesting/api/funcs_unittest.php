@@ -207,16 +207,15 @@ class funcs_unittest extends PHPUnit_Framework_TestCase
 	}
 	
 	public function testUpdateDefaultParam(){
-		#ob_start();
+		ob_start();
 		$funcs  = new funcs();
 		$workflowname = 'seqmapping_workflow';
-		$username = 'kucukura';
+		$username = 'galaxy';
 		$defaultparam = '/usr/local/share/dolphin_tools/default_params/Dolphin_v1.3_Docker.txt';
 		$funcs->updateDefaultParam($workflowname, $username, $defaultparam);
 		$workflow=$funcs->queryAVal('SELECT defaultparam FROM workflows WHERE workflowname = \'' . $workflowname . '\' AND username = \'' . $username . '\'');
-		var_dump($workflow);
 		$this->assertEquals($defaultparam, $workflow);
-		#ob_end_clean();
+		ob_end_clean();
 	}
 	
 	public function testGetCommand(){
