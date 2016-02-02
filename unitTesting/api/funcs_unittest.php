@@ -128,15 +128,14 @@ class funcs_unittest extends PHPUnit_Framework_TestCase
 		ob_start();
 		$funcs  = new funcs();
 		$this->assertEquals($funcs->isJobRunning('test_wkey', '99999', 'root'), 'EXIT');
-		$date=$funcs->queryAVal('SELECT start_time FROM jobs WHERE wkey = \'test_wkey\'');
-		$this->assertEquals(strpos('20') > -1, true );
 		ob_end_clean();
 	}
 	
 	public function testCheckStartTime(){
 		ob_start();
 		$funcs  = new funcs();
-		$funcs->checkStartTime('test_wkey', '99999', 'root');
+		$date=$funcs->queryAVal('SELECT start_time FROM jobs WHERE wkey = \'test_wkey\'');
+		$this->assertEquals(strpos('20') > -1, true );
 		ob_end_clean();
 	}
 	
