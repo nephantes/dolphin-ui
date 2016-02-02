@@ -78,6 +78,13 @@ class Ngsimport extends VanillaModel {
         return rtrim($group_str, ",");
     }
 	
+	function directoryCheck($directory){
+		if(substr($directory, 0, 1) != '/' && strpos($directory, '/') > -1){
+ 			$directory = "/" . $directory;
+ 		}
+		return $directory;
+	}
+	
 	function createSampleName($sample){
 		$samplename = '';
 		$underscore_mark = true;
@@ -292,16 +299,16 @@ class Ngsimport extends VanillaModel {
 			if($this->sheetData[$i]["A"]=="grant"){$this->grant=trim($this->esc($this->sheetData[$i]["B"]));}
 			if($this->sheetData[$i]["A"]=="contributor"){array_push($this->conts, trim($this->esc($this->sheetData[$i]["B"])));}
 			if($this->sheetData[$i]["A"]=="fastq directory"){
-				$this->fastq_dir=trim($this->esc($this->sheetData[$i]["B"]));
+				$this->fastq_dir=$this->directoryCheck(trim($this->esc($this->sheetData[$i]["B"])));
 			}elseif($this->sheetData[$i]["A"]=="input directory"){
-				$this->fastq_dir=trim($this->esc($this->sheetData[$i]["B"]));
+				$this->fastq_dir=$this->directoryCheck(trim($this->esc($this->sheetData[$i]["B"])));
 			}
 			if($this->sheetData[$i]["A"]=="backup directory"){
-				$this->backup_dir=trim($this->esc($this->sheetData[$i]["B"]));
+				$this->backup_dir=$this->directoryCheck(trim($this->esc($this->sheetData[$i]["B"])));
 			}elseif($this->sheetData[$i]["A"]=="processed directory"){
-				$this->backup_dir=trim($this->esc($this->sheetData[$i]["B"]));
+				$this->backup_dir=$this->directoryCheck(trim($this->esc($this->sheetData[$i]["B"])));
 			}elseif($this->sheetData[$i]["A"]=="process directory"){
-				$this->backup_dir=trim($this->esc($this->sheetData[$i]["B"]));
+				$this->backup_dir=$this->directoryCheck(trim($this->esc($this->sheetData[$i]["B"])));
 			}
 			if($this->sheetData[$i]["A"]=="amazon bucket"){$this->amazon_bucket=trim($this->esc($this->sheetData[$i]["B"]));}
 			
@@ -309,7 +316,7 @@ class Ngsimport extends VanillaModel {
 				array_push($this->initialSubmission, trim($this->esc($this->sheetData[$i]["B"])));
 			}
 			if($this->sheetData[$i]["A"]=="backup directory" || $this->sheetData[$i]["A"]=="processed directory" || $this->sheetData[$i]["A"]=="process directory"){
-				array_push($this->initialSubmission, trim($this->esc($this->sheetData[$i]["B"])));
+				array_push($this->initialSubmission, $this->directoryCheck(trim($this->esc($this->sheetData[$i]["B"]))));
 			}
 			
 			//	Fastq Directory
@@ -897,13 +904,13 @@ class Ngsimport extends VanillaModel {
 			{
 				if($this->sheetData[3][$j]=="Directory ID"){$dir->dir_tag= trim($this->esc($this->sheetData[$i][$j]));}
 				if($this->sheetData[3][$j]=="Fastq directory"){
-					$dir->fastq_dir= trim($this->esc($this->sheetData[$i][$j]));
+					$dir->fastq_dir= $this->directoryCheck(trim($this->esc($this->sheetData[$i][$j])));
 				}elseif($this->sheetData[3][$j]=="Processed directory"){
-					$dir->fastq_dir= trim($this->esc($this->sheetData[$i][$j]));
+					$dir->fastq_dir= $this->directoryCheck(trim($this->esc($this->sheetData[$i][$j])));
 				}elseif($this->sheetData[3][$j]=="Process directory"){
-					$dir->fastq_dir= trim($this->esc($this->sheetData[$i][$j]));
+					$dir->fastq_dir= $this->directoryCheck(trim($this->esc($this->sheetData[$i][$j])));
 				}elseif($this->sheetData[3][$j]=="Input directory"){
-					$dir->fastq_dir= trim($this->esc($this->sheetData[$i][$j]));
+					$dir->fastq_dir= $this->directoryCheck(trim($this->esc($this->sheetData[$i][$j])));
 				}
 			}
 			$blank = 'true';
