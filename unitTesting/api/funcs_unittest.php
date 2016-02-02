@@ -134,7 +134,7 @@ class funcs_unittest extends PHPUnit_Framework_TestCase
 	public function testCheckStartTime(){
 		ob_start();
 		$funcs  = new funcs();
-		$date=$funcs->queryAVal('SELECT start_time FROM jobs WHERE wkey = \'test_wkey\'');
+		$date=$funcs->queryAVal('SELECT start_time FROM jobs WHERE wkey = \'Od1HnRuJ0BJAeMpHOTwsH9rqxBDiD\'');
 		$this->assertEquals(strpos($date,'20') > -1, true );
 		ob_end_clean();
 	}
@@ -206,17 +206,17 @@ class funcs_unittest extends PHPUnit_Framework_TestCase
 		ob_end_clean();
 	}
 	
-	/*	Does not return anything
 	public function testUpdateDefaultParam(){
 		ob_start();
 		$funcs  = new funcs();
 		$workflowname = 'seqmapping_workflow';
 		$username = 'kucukura';
 		$defaultparam = '/usr/local/share/dolphin_tools/default_params/Dolphin_v1.3_Docker.txt';
-		$this->assertEquals($funcs->updateDefaultParam($workflowname, $username, $defaultparam), '1');
+		$funcs->updateDefaultParam($workflowname, $username, $defaultparam);
+		$workflow=$funcs->queryAVal('SELECT defaultparam FROM workflows WHERE workflowname = \'' . $workflowname . '\'');
+		$this->assertEquals($defaultparam > -1, $workflow );
 		ob_end_clean();
 	}
-	*/
 	
 	public function testGetCommand(){
 		ob_start();
@@ -330,6 +330,8 @@ class funcs_unittest extends PHPUnit_Framework_TestCase
 	}
 	
 	/*
+	 *
+	#	Tables have not been created?
 	public function testInsertJobStats(){
 		ob_start();
 		$funcs  = new funcs();
@@ -419,6 +421,8 @@ class funcs_unittest extends PHPUnit_Framework_TestCase
 		$funcs  = new funcs();
         $params['username'] = 'kucukura';
 		$this->assertEquals($funcs->getAmazonCredentials($params)[0]['id'], '1');
+		$this->assertEquals($funcs->getAmazonCredentials($params)[0]['aws_access_key_id'], 'access_key');
+		$this->assertEquals($funcs->getAmazonCredentials($params)[0]['aws_secret_access_key'], 'secret_key');
 		ob_end_clean();
 	}
 	
