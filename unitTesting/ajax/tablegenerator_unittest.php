@@ -40,15 +40,15 @@ class tablegenerator_unittest extends PHPUnit_Framework_TestCase
 	}
 	
 	public function testSamplesWithRuns() {
-		#ob_start();
+		ob_start();
 		$_GET['p'] = 'samplesWithRuns';
 		include('tablegenerator.php');
-		$this->assertEquals(json_decode($data)[0]->sample_id,1);
-		#ob_end_clean();
+		$this->assertEquals(json_decode($data)[0]->sample_id,'1');
+		ob_end_clean();
 	}
 	
 	public function testCreateTableFile(){
-		#ob_start();
+		ob_start();
 		$_GET['p'] = 'createTableFile';
 		$_GET['url'] = '/home/travis/build/Rhaknam/dolphin-ui/public/api/getsamplevals.php';
 		$_GET['samples'] = 'samples=1,2,3,4,5,6:3';
@@ -59,7 +59,7 @@ class tablegenerator_unittest extends PHPUnit_Framework_TestCase
 		include('tablegenerator.php');
 		$file = json_decode($data);
 		$this->assertEquals(json_decode($data),$file);
-		#ob_end_clean();
+		ob_end_clean();
 		return $file;
 	}
 	
@@ -88,12 +88,12 @@ class tablegenerator_unittest extends PHPUnit_Framework_TestCase
 	}
 	
 	public function testGetCreatedTables(){
-		ob_start();
+		#ob_start();
 		$_GET['p'] = 'getCreatedTables';
 		$_GET['gids'] = '1';
 		include('tablegenerator.php');
 		$this->assertEquals(json_decode($data)[0]->name,'test_table2');
-		ob_end_clean();
+		#ob_end_clean();
 	}
 	
 	public function testDeleteTable(){

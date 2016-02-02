@@ -8,29 +8,29 @@ chdir('public/ajax/');
 class statquerydb_unittest extends PHPUnit_Framework_TestCase
 {
 	public function testGetDailyRuns(){
-		ob_start();
+		#ob_start();
 		$_GET['p'] = 'getDailyRuns';
 		include('statquerydb.php');
 		$this->assertEquals(1,1);
-		ob_end_clean();
+		#ob_end_clean();
 	}
 	
 	public function testGetTopUsers(){
-		ob_start();
+		#ob_start();
 		$_GET['p'] = 'getTopUsers';
 		$_GET['type'] = 'Dolphin';
 		include('statquerydb.php');
 		$this->assertEquals(1,1);
-		ob_end_clean();
+		#ob_end_clean();
 	}
 	
 	public function testGetTopUsersTime(){
-		ob_start();
+		#ob_start();
 		$_GET['p'] = 'getTopUsersTime';
 		$_GET['type'] = 'Dolphin';
 		include('statquerydb.php');
 		$this->assertEquals(1,1);
-		ob_end_clean();
+		#ob_end_clean();
 	}
 	
 	public function testGetUsersTime(){
