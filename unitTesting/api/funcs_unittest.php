@@ -213,10 +213,9 @@ class funcs_unittest extends PHPUnit_Framework_TestCase
 		$username = 'kucukura';
 		$defaultparam = '/usr/local/share/dolphin_tools/default_params/Dolphin_v1.3_Docker.txt';
 		$funcs->updateDefaultParam($workflowname, $username, $defaultparam);
-		$workflow=$funcs->queryTable('SELECT defaultparam FROM workflows WHERE workflowname = \'' . $workflowname . '\'');
-		$location=array_search($defaultparam, $workflow);
+		$workflow=$funcs->queryAVal('SELECT defaultparam FROM workflows WHERE workflowname = \'' . $workflowname . '\' AND username = \'' . $username . '\'');
 		var_dump($workflow);
-		$this->assertEquals($defaultparam, $workflow[$location] );
+		$this->assertEquals($defaultparam, $workflow);
 		#ob_end_clean();
 	}
 	
