@@ -150,6 +150,7 @@ class ngs_tables_unittest extends PHPUnit_Framework_TestCase
 		$_GET['gids'] = '1';
 		include("ngs_tables.php");
 		$this->assertEquals(json_decode($data)[0]->id,'1');
+		$this->assertEquals(json_decode($data)[1]->id,'2');
 		ob_end_clean();
 	}
 	
@@ -164,6 +165,7 @@ class ngs_tables_unittest extends PHPUnit_Framework_TestCase
 		$_GET['gids'] = '1';
 		include("ngs_tables.php");
 		$this->assertEquals(json_decode($data)[0]->id,'1');
+		$this->assertEquals(json_decode($data)[1]->id,'2');
 		ob_end_clean();
 	}
 	
@@ -234,6 +236,15 @@ class ngs_tables_unittest extends PHPUnit_Framework_TestCase
 		$_GET['gids'] = '1';
 		include("ngs_tables.php");
 		$this->assertEquals(json_decode($data)[0]->id,'1');
+		$this->assertEquals(json_decode($data)[1]->id,'2');
+		$this->assertEquals(json_decode($data)[2]->id,'3');
+		$this->assertEquals(json_decode($data)[3]->id,'4');
+		$this->assertEquals(json_decode($data)[4]->id,'5');
+		$this->assertEquals(json_decode($data)[5]->id,'6');
+		$this->assertEquals(json_decode($data)[6]->id,'7');
+		$this->assertEquals(json_decode($data)[7]->id,'8');
+		$this->assertEquals(json_decode($data)[8]->id,'9');
+		$this->assertEquals(json_decode($data)[9]->id,'10');
 		ob_end_clean();
 	}
 	
@@ -248,6 +259,8 @@ class ngs_tables_unittest extends PHPUnit_Framework_TestCase
 		$_GET['gids'] = '1';
 		include("ngs_tables.php");
 		$this->assertEquals(json_decode($data)[0]->id,'1');
+		$this->assertEquals(json_decode($data)[1]->id,'2');
+		$this->assertEquals(json_decode($data)[2]->id,'3');
 		ob_end_clean();
 	}
 	
