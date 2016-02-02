@@ -36,13 +36,14 @@ before_script:
   - mysql -u root -e "GRANT ALL PRIVILEGES ON *.* TO 'myproject'@'localhost' WITH GRANT OPTION;"
   # update database
   - gzip -d db/biocoredb.sql.gz
-  - mysql < db/biocoredb.sql
-  - mysql < db/2015_07_22_consolidated_1.sql
-  - mysql < db/2015_08_31_wkeylist.sql
-  - mysql < db/2015_10_16_ngs_createtables.sql
-  - mysql < db/2015_10_27_tablegen_sidebar.sql
-  - mysql < db/2015_11_05_user_group_requests.sql
+  - mysql -e "CREATE DATABASE biocore;" -uroot
   - mysql -e "CREATE USER 'bioinfo'@'localhost' IDENTIFIED BY 'bioinfo2013'; GRANT ALL ON *.* TO 'bioinfo'@'localhost';" -uroot
+  - mysql --user=bioinfo --password=bioinfo2013 biocore < db/biocoredb.sql
+  - mysql --user=bioinfo --password=bioinfo2013 biocore < db/2015_07_22_consolidated_1.sql
+  - mysql --user=bioinfo --password=bioinfo2013 biocore < db/2015_08_31_wkeylist.sql
+  - mysql --user=bioinfo --password=bioinfo2013 biocore < db/2015_10_16_ngs_createtables.sql
+  - mysql --user=bioinfo --password=bioinfo2013 biocore < db/2015_10_27_tablegen_sidebar.sql
+  - mysql --user=bioinfo --password=bioinfo2013 biocore < db/2015_11_05_user_group_requests.sql
   - mysql -e "use biocore; UPDATE ngs_samples set samplename = name;" -uroot
   - mysql -e "use biocore; INSERT INTO amazon_credentials ( aws_access_key_id, aws_secret_access_key, bucket ) VALUES ( 'test_access', 'test_secret', 'test_bucket' );" -uroot
   - mysql -e "use biocore; INSERT INTO ngs_organism (organism) VALUES ('human'); UPDATE ngs_samples SET organism_id = 1;" -uroot
@@ -72,6 +73,7 @@ script:
   - phpunit unitTesting/api/funcs_unittest.php
 
 after_script:
+  - mysql -e "show databases;" -uroot
   - mysql -e "use biocore; show tables;" -uroot
   - mysql -e "use biocore; SELECT * FROM ngs_samples;" -uroot
   - mysql -e "use biocore; SELECT * FROM ngs_lanes;" -uroot
