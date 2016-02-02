@@ -119,17 +119,61 @@ class profiledb_unittest extends PHPUnit_Framework_TestCase
 		include("profiledb.php");
 		$this->assertEquals(json_decode($data)[0]->id,'1');
 		$this->assertEquals(json_decode($data)[0]->username,'kucukura');
-		$this->assertEquals(json_decode($data)[0]->clusteruser,'ak97w');
-		$this->assertEquals(json_decode($data)[0]->role,'Software Architect');
-		$this->assertEquals(json_decode($data)[0]->name,'Kucukural,Alper');
-		$this->assertEquals(json_decode($data)[0]->email,'alper.kucukural@umassmed.edu');
-		$this->assertEquals(json_decode($data)[0]->institute,'UMassMed');
-		$this->assertEquals(json_decode($data)[0]->lab,'umw_biocore');
-		$this->assertEquals(json_decode($data)[0]->photo_loc,'test_img.png');
-		$this->assertEquals(json_decode($data)[0]->owner_id,'1');
-		$this->assertEquals(json_decode($data)[0]->group_id,'1');
-		$this->assertEquals(json_decode($data)[0]->perms,'1');
-		$this->assertEquals(json_decode($data)[0]->last_modified_user,'1');
+		ob_end_clean();
+	}
+	
+	public function testDeleteGroup(){
+		ob_start();
+		$_GET['p'] = 'deleteGroup';
+		$_GET['group_id'] = '2';
+		include("profiledb.php");
+		$this->assertEquals(json_decode($data),'pass');
+		ob_end_clean();
+	}
+	
+	public function testGetGroupMemberAdd(){
+		ob_start();
+		$_GET['p'] = 'getGroupMemberAdd';
+		$_GET['group_id'] = '1';
+		include("profiledb.php");
+		$this->assertEquals(json_decode($data),array());
+		ob_end_clean();
+	}
+	
+	public function testAddGroupMember(){
+		ob_start();
+		$_GET['p'] = 'addGroupMember';
+		$_GET['group_id'] = '1';
+		$_GET['user_id'] = '3';
+		include("profiledb.php");
+		$this->assertEquals(json_decode($data),'1');
+		ob_end_clean();
+	}
+	
+	public function testGetMemberAdd(){
+		ob_start();
+		$_GET['p'] = 'getMemberAdd';
+		$_GET['group_id'] = '1';
+		include("profiledb.php");
+		$this->assertEquals(json_decode($data),array());
+		ob_end_clean();
+	}
+	
+	public function testTransferOwner(){
+		ob_start();
+		$_GET['p'] = 'transferOwner';
+		$_GET['group_id'] = '1';
+		$_GET['user_id'] = '3';
+		include("profiledb.php");
+		$this->assertEquals(json_decode($data),'pass');
+		ob_end_clean();
+	}
+	
+	public function testGetUID(){
+		ob_start();
+		$_GET['p'] = 'getUID';
+		include("profiledb.php");
+		$this->assertEquals(json_decode($data),'1');
 		ob_end_clean();
 	}
 }

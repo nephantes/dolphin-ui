@@ -381,6 +381,8 @@ class funcs_unittest extends PHPUnit_Framework_TestCase
 	}
 	
 	/*
+	 *
+	#	Tables have not been created?
 	public function testGetJobParams(){
 		ob_start();
 		$funcs  = new funcs();
