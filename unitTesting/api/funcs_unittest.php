@@ -63,7 +63,6 @@ class funcs_unittest extends PHPUnit_Framework_TestCase
 		$funcs  = new funcs();
 		$params['username'] = 'root';
 		$params['file'] = 'funcs.php';
-		var_dump($params);
 		$this->assertEquals($funcs->checkFile($params),"{\"Result\":\"Ok\"}");
 		$params['username'] = 'root';
 		$params['file'] = 'does_not_exist.php';

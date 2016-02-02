@@ -11,7 +11,7 @@ class dolphinfuncs_unittest extends PHPUnit_Framework_TestCase
         ob_start();
 		$_GET['p'] = 'getFileList';
 		include("dolphinfuncs.php");
-		$this->assertEquals(json_decode($data)[0]->fasqt_dir,'/export/genome_data/mousetest/mm10/barcodetest');
+		$this->assertEquals(json_decode($data)[0]->fastq_dir,'/export/genome_data/mousetest/mm10/barcodetest');
 		$this->assertEquals(json_decode($data)[0]->file_name,'control_rep1.1.fastq.gz,control_rep1.2.fastq.gz');
 		$this->assertEquals(json_decode($data)[0]->amazon_bucket,'s3');
 		ob_end_clean();
