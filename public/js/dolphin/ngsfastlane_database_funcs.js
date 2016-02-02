@@ -142,6 +142,9 @@ function checkFastlaneInput(info_array){
 					}
 				});
 				var dir_check_2;
+				if (info_array[x].substring(0,1) != '/') {
+					info_array[x] = '/' + info_array[x];
+				}
 				$.ajax({
 					type: 	'GET',
 					url: 	BASE_PATH+'/public/api/service.php?func=checkPermissions&username='+username.clusteruser+'&outdir=' + info_array[x],
