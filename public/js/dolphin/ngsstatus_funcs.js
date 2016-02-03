@@ -52,7 +52,7 @@ function selectService(id){
 			 success : function(s)
 			 {
 				runparams.fnClearTable();
-				var parsed = JSON.parse(s);
+				var parsed = s;
 				for(var i = 0; i < parsed.length; i++) {
 					runparams.fnAddData([
 						parsed[i].title,

@@ -131,7 +131,7 @@ $(function() {
 			 success : function(s)
 			 {
 				runparams.fnClearTable();
-				var parsed = JSON.parse(s);
+				var parsed = s;
 				for(var i = 0; i < parsed.length; i++) {
 					if (parsed[i].result == 1) {
 						var bartype = 'success';
@@ -248,7 +248,7 @@ $(function() {
 					 success : function(s)
 					 {
 						runparams.fnClearTable();
-						var parsed = JSON.parse(s);
+						var parsed = s;
 						for(var i = 0; i < parsed.length; i++) {
 							if (parsed[i].result == 1) {
 								var bartype = 'success';
@@ -280,7 +280,7 @@ $(function() {
 						 success : function(s)
 						 {
 							runjob.fnClearTable();
-							var parsed = JSON.parse(s);
+							var parsed = s;
 							for(var i = 0; i < parsed.length; i++) {
 								runjob.fnAddData([
 									parsed[i].title,
