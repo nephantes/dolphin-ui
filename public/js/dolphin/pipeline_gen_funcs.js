@@ -773,6 +773,9 @@ function submitPipeline(type) {
 			}
 		});
 		var dir_check_2;
+		if (outputdir.substring(0,1) != '/'  && outputdir.indexOf('/') > -1) {
+			outputdir = '/' + outputdir;
+		}
 		$.ajax({
 			type: 	'GET',
 			url: 	BASE_PATH+'/public/api/service.php?func=checkPermissions&username='+username.clusteruser+'&outdir=' + outputdir,
