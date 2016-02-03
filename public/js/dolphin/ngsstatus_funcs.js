@@ -77,7 +77,7 @@ function selectJob(id){
 			async: false,
 			success : function(s)
 			{
-				var parsed = JSON.parse(s);
+				var parsed = s;
 				joboutDataModal(parsed[0].jobname, parsed[0].jobout);
 			}
 		});
