@@ -51,7 +51,7 @@ class tablegenerator_unittest extends PHPUnit_Framework_TestCase
 	public function testCreateTableFile(){
 		ob_start();
 		$_GET['p'] = 'createTableFile';
-		$_GET['url'] = substr(getcwd(), 0, count(getcwd())) . 'getsamplevals.php';
+		$_GET['url'] = substr(getcwd(), 0, count_chars(getcwd()) - 11) . 'getsamplevals.php';
 		$_GET['samples'] = 'samples=1,2,3,4,5,6:3';
 		$_GET['file'] = 'file=rsem/genes_expression_tpm.tsv';
 		$_GET['common'] = 'common=gene,transcript';
