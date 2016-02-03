@@ -98,4 +98,3 @@ after_script:
   - mysql -e "use biocore; SELECT * FROM service_run" -uroot
   - mysql -e "use biocore; SELECT * FROM jobstats" -uroot
   
-  
