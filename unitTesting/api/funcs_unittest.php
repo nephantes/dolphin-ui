@@ -387,7 +387,7 @@ class funcs_unittest extends PHPUnit_Framework_TestCase
 		$funcs  = new funcs();
         $params['jobname'] = 'stepCheck';
         $params['wkey'] = '3pl8cmzYJ4ezgX2a9RevZxHmihpOA';
-		$this->assertEquals($funcs->checkJob($params), '{"Result":"DONE"}');
+		$this->assertEquals($funcs->checkJob($params), '{"Result":"START"}');
 		ob_end_clean();
 	}
 	
