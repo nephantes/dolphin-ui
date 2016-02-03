@@ -582,6 +582,10 @@ class funcs
         }
         $workflow_id = $this->getWorkflowId($wkey);
         $service_id  = $this->getId("service", $username, $servicename, $wkey, "");
+        if ($field=="end_time")
+        {
+               $this->checkStartTime($wkey, $job_num, $username);
+        }
         
         $sql = "update jobs set `$field`=now(), `result`='$result' where `wkey`='$wkey' and `job_num`='$jobnum'";
         
