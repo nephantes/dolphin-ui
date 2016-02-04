@@ -353,7 +353,7 @@ class Dolphin:
                print >>fp, '@STEP_SIZE%s=%s'%(name, pipe['StepSize'])
                print >>fp, '@STRAND%s=%s'%(name, pipe['StrandSpecific'])
                print >>fp, '@TOPN%s=%s'%(name, pipe['TopN'])
-               print >>fp, '@MAXCOVERAGE%s=%s'%(name, pipe['MaxCoverage'])
+               print >>fp, '@MINCOVERAGE%s=%s'%(name, pipe['MinCoverage'])
                print >>fp, '@GBUILD%s=%s'%(name, gb[1])
 
        print >>fp, '@MAPNAMES=%s'%(mapnames)
