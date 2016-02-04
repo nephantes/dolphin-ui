@@ -171,12 +171,12 @@ class Dolphin:
       try:
         tablename="ngs_fastq_files"
         fields='d.backup_dir dir, tl.file_name'
-        sql = "SELECT DISTINCT %(fields)s FROM ngs_runlist nrl, ngs_runparams nrp, ngs_samples s, %(tablename)s tl where nrl.run_id=nrp.id and s.lane_id = tl.lane_id and s.id=nrl.sample_id and nrp.id='"+str(runparamsid)+"';"
-    
+        sql = "SELECT DISTINCT %(fields)s FROM ngs_runlist nrl, ngs_dirs d, ngs_runparams nrp, ngs_samples s, %(tablename)s tl where nrl.run_id=nrp.id and d.id=tl.dir_id and s.lane_id = tl.lane_id and s.id=nrl.sample_id and nrp.id='"+str(runparamsid)+"';"
         result=self.runSQL(sql%locals())
         if (not result):
             tablename="ngs_temp_lane_files"
             fields='d.fastq_dir dir, tl.file_name'
+            print sql%locals()
             result=self.runSQL(sql%locals())
     
         inputparams=""
@@ -195,8 +195,7 @@ class Dolphin:
         if (not result):
             tablename="ngs_fastq_files"
             result=self.runSQL(sql%locals())
-    
-        barcode="Distance,1:Format,5"
+        barcode="" 
         for row in result:
             barcode=barcode+":"+row[0]+","+row[1]
         return (spaired, inputparams, barcode)
@@ -206,7 +205,6 @@ class Dolphin:
     def writeInputParamLine(self, fp, jsonobj, input_str, input_object, itself, previous_str=None):
       try:
        previous = ( previous_str if previous_str!=None else "NONE" )
-
        if (input_object in jsonobj and jsonobj[input_object].lower() != 'none' and jsonobj[input_object]!=''):
          print >>fp, '%s=%s'%(input_str, self.parse_content(jsonobj[input_object]))
          if (previous_str):
@@ -219,7 +217,7 @@ class Dolphin:
         self.stop_err('Error (line:%s)running writeInputParamLine\n%s'%(format(sys.exc_info()[-1].tb_lineno), str(ex)))
        
          
-    def writeInput(self,  input_fn, data_dir, content, runparams) :
+    def writeInput(self,  input_fn, data_dir, content, runparams, barcodes) :
       try:
        commonind=''
        if ('commonind' in runparams and runparams['commonind'].lower() != "none"):
@@ -244,7 +242,14 @@ class Dolphin:
        print >>fp, '@GENOMEBUILD=%s,%s'%(gb[0],gb[1])
        print >>fp, '@SPAIRED=%s'%runparams['spaired']
        previous="NONE" 
-       previous=self.writeInputParamLine(fp, runparams, "@BARCODES", 'barcodes', "BARCODE")
+       #u'barcodes': [{u'distance': u'1', u'format': u'5 end read 1'}]
+       if ('barcodes' in runparams and barcodes):
+          pipe=runparams['barcodes'][0]
+          barcode="Distance,%s:Format,%s%s"%(str(pipe['distance']), str(pipe['format'][0]),barcodes)
+          print >>fp, '@BARCODES=%s'%barcode
+          previous="BARCODES"
+       else:
+          print >>fp, '@BARCODES=NONE'
        previous=self.writeInputParamLine(fp, runparams, "@ADAPTER", 'adapters', "ADAPTER", previous )
        
        if ( 'quality' in runparams and type(runparams['quality']) is list):
@@ -410,7 +415,7 @@ class Dolphin:
         sep='\t'          
         resume = (runparams['resume'] if ('resume' in runparams) else "yes")
         self.prf(fp, stepCheck % locals() )
-        self.prf(fp, stepBarcode % locals() if ('barcodes' in runparams and runparams['barcodes'].lower()!="none") else None )
+        self.prf(fp, stepBarcode % locals() if ('barcodes' in runparams and str(runparams['barcodes']).lower()!="none") else None )
         self.prf(fp, stepGetTotalReads % locals() if (gettotalreads and gettotalreads.lower()!="none") else None )
         self.prf(fp, stepBackupS3 % locals() if (backupS3 and backupS3.lower()!="none") else None )
         self.prf(fp, stepFastQC % locals() + "\n" + stepMergeFastQC % locals() if ('fastqc' in runparams and runparams['fastqc'].lower()=="yes") else None )
@@ -636,7 +641,7 @@ def main():
 
            content = dolphin.parse_content( inputparams )
           
-           dolphin.writeInput(input_fn, inputdir, content, runparams)
+           dolphin.writeInput(input_fn, inputdir, content, runparams, barcodes)
 
            workflow = logdir+'/run'+str(rpid)+'/seqmapping_workflow.'+str(rpid)+'.'+str(os.getpid())+'.txt'
 
