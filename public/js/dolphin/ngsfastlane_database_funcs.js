@@ -109,7 +109,7 @@ function checkFastlaneInput(info_array){
 							async:	false,
 							success: function(s)
 							{
-								var file_check = s;
+								var file_check = JSON.parse(s);
 								console.log(file_check);
 								if (file_check.Result != 'Ok' ){
 									input_bool_check = false;
@@ -138,7 +138,7 @@ function checkFastlaneInput(info_array){
 					success: function(s)
 					{
 						console.log(s);
-						dir_check_1 = s;
+						dir_check_1 = JSON.parse(s);
 					}
 				});
 				var dir_check_2;
@@ -152,7 +152,7 @@ function checkFastlaneInput(info_array){
 					success: function(s)
 					{
 						console.log(s);
-						dir_check_2 = s;
+						dir_check_2 = JSON.parse(s);
 					}
 				});
 				
