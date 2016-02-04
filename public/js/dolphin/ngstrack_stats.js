@@ -430,6 +430,7 @@ function exportExcel(){
 				success : function(s)
 				{
 					var ES = JSON.parse(s);
+					console.log(ES);
 					if (ES.length == 1) {
 						var file_path;
 						$.ajax({ type: "GET",
