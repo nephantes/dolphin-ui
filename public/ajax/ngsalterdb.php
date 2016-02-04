@@ -111,7 +111,7 @@ if ($p == "submitPipeline" )
 		group_id = $group,
 		perms = $perms,
         date_modified = now(),
-        last_modified_user = $uid,
+        last_modified_user = $uid
         WHERE id = '$idKey'
         ");
 		
