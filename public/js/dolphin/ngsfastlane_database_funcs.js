@@ -23,7 +23,7 @@ function checkFastlaneInput(info_array){
 		async:	false,
 		success: function(s)
 		{
-			username = JSON.parse(s)[0];
+			username = s[0];
 		}
 	});
 	
