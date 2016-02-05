@@ -40,7 +40,7 @@ if(!function_exists('killPid')){
 		$wrapper_pid = $pids[0]->wrapper_pid;
 		$wkey = $pids[0]->wkey;
 	
-		if($workflow_pid != NULL && $wrapper_pid != NULL){
+		if($workflow_pid != NULL && $wrapper_pid != NULL && $workflow_pid != 0 && $wrapper_pid != 0){
 			$grep_check_workflow = "ps -ef | grep '[".substr($workflow_pid, 0, 1)."]".substr($workflow_pid,1)."'";
 			$grep_check_wrapper = "ps -ef | grep '[".substr($wrapper_pid, 0, 1)."]".substr($wrapper_pid,1)."'";
 			

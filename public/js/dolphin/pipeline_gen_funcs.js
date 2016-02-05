@@ -327,7 +327,7 @@ function rerunLoad() {
 								}
 								document.getElementById('text_2_'+i).value = splt1[i].TileSize;
 								document.getElementById('text_3_'+i).value = splt1[i].StepSize;
-								document.getElementById('text_4_'+i).value = splt1[i].MaxCoverage;
+								document.getElementById('text_4_'+i).value = splt1[i].MinCoverage;
 								document.getElementById('text_5_'+i).value = splt1[i].TopN;
 								if (splt1[i].StrandSpecific == 'yes') {
 									document.getElementById('checkbox_1_'+i).checked = true;
@@ -549,7 +549,7 @@ function pipelineSelect(num){
 				[createElement('label', ['class','TEXTNODE'], ['box-title', 'Step Size:']),
 				createElement('input', ['id', 'class', 'type', 'value'], ['text_3_'+num, 'form-control', 'text', '300'])] ]);
 		divAdj = mergeTidy(divAdj, 6,
-				[ [createElement('label', ['class','TEXTNODE'], ['box-title', 'Max Coverage:']),
+				[ [createElement('label', ['class','TEXTNODE'], ['box-title', 'Min Coverage:']),
 				createElement('input', ['id', 'class', 'type', 'value'], ['text_4_'+num, 'form-control', 'text', '5'])],
 				[createElement('label', ['class','TEXTNODE'], ['box-title', 'Top N Regions:']),
 				createElement('input', ['id', 'class', 'type', 'value'], ['text_5_'+num, 'form-control', 'text', '2000'])] ]);
@@ -1675,7 +1675,7 @@ function findPipelineValues(){
 	var CHIPSEQ_JSON_DICT = ['ChipInput', 'MultiMapper', 'TagSize', 'BandWith', 'EffectiveGenome', 'MarkDuplicates', 'CollectMultipleMetrics', 'IGVTDF', 'BAM2BW', 'ExtFactor'];
 	var TOPHAT_JSON_DICT = ['Params', 'MarkDuplicates', 'RSeQC', 'CollectRnaSeqMetrics', 'CollectMultipleMetrics', 'IGVTDF', 'BAM2BW', 'ExtFactor'];
 	var BISULPHITE_JSON_DICT = ['BSMapStep', 'BisulphiteType', 'Digestion', 'BSMapParams', 'CollectMultipleMetrics', 'IGVTDF', 'MarkDuplicates', 'BAM2BW', 'ExtFactor', 'MCallStep', 'MCallParams'];
-	var DIFFMETH_JSON_DICT = [ 'Name', 'Columns', 'Conditions', 'TileSize', 'StepSize', 'MaxCoverage', 'TopN', 'StrandSpecific' ];
+	var DIFFMETH_JSON_DICT = [ 'Name', 'Columns', 'Conditions', 'TileSize', 'StepSize', 'MinCoverage', 'TopN', 'StrandSpecific' ];
 	
 	var JSON_ARRAY =  [];
 	for (var y = 0; y < currentPipelineID.length; y++) {
