@@ -568,9 +568,9 @@ class Dolphin:
         print(email_check);
         if (email_check[0][2] == 1):
             sender = 'biocore@umassmed.edu'
-            receiver = email_check[0][1]
             if (email_type == '3'):
                 receiver = 'biocore@umassmed.edu'
+                receiver = email_check[0][1]
                 subject = 'There has been an error in run: %s' % run_id
                 body = 'Run %s has ended with an error' % run_id;
             if (email_type == '1'):
