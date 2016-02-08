@@ -687,8 +687,8 @@ def main():
               p.stdout.flush()
               if (re.search('failed\n', line) or re.search('Err\n', line) ):
                  logging.info("failed")
-                 dolphin.stop_err("failed")
                  dolphin.send_email('3', 'merowskn', '127.0.0.1:25', runparamsids[0][0]);
+                 dolphin.stop_err("failed")
         dolphin.send_email('1', 'merowskn', '127.0.0.1:25', runparamsids[0][0]);
    except Exception, ex:
         dolphin.stop_err('Error (line:%s)running dolphin_wrapper.py\n%s'%(format(sys.exc_info()[-1].tb_lineno), str(ex)))
