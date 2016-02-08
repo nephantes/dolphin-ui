@@ -562,7 +562,7 @@ class Dolphin:
         sys.exit(2)
         
     # email
-    def send_email(self, email_type, username, host):
+    def send_email(self, email_type, username, host, run_id):
         sql = "SELECT name, email, email_toggle FROM users where username = '%s';"%username
         email_check=self.runSQL(sql%locals())
         print(email_check);
@@ -570,14 +570,16 @@ class Dolphin:
             sender = 'biocore@umassmed.edu'
             receiver = email_check[0][1]
             if (email_type == '3'):
-                subject = 'ERROR'
-                body = 'ERROR';
+                receiver = 'biocore@umassmed.edu'
+                subject = 'There has been an error in run: %s' % run_id
+                body = 'Run %s has ended with an error' % run_id;
             if (email_type == '1'):
-                subject = 'COMPLETE'
-                body = 'COMPLETE';
+                receiver = email_check[0][1]
+                subject = 'Your Dolphin run has completed!'
+                body = 'Your Dolphin run #%s has completed successfully!' % run_id;
             p = os.popen("%s -t" % "/usr/sbin/sendmail", "w")
             p.write("From: %s\n" % "biocore@umassmed.edu")
-            p.write("To: %s\n" % email_check[0][1])
+            p.write("To: %s\n" % receiver)
             p.write("Subject: %s\n" % subject)
             p.write("\n") # blank line separating headers from body
             p.write("%s" % body)
@@ -620,11 +622,10 @@ def main():
         runidstr=" -r "+str(rpid)
         
         dolphin.config.read("../config/config.ini")
-        dolphin.send_email('1', 'merowskn', '127.0.0.1:25');
         print dolphin.params_section
         logging.info(dolphin.params_section)
         runparamsids=dolphin.getRunParamsID(rpid)
-        
+        dolphin.send_email('1', 'merowskn', '127.0.0.1:25', runparamsid[0][0]);
         for runparams_arr in runparamsids:
            runparamsid=runparams_arr[0]
            username=runparams_arr[1]
