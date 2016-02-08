@@ -133,14 +133,14 @@ else if($p == 'deleteSelected')
 	foreach($workflow_pids as $wp){
 		$cmd = "ps -ef | grep '[".substr($wp->runworkflow_pid, 0, 1)."]".substr($wp->runworkflow_pid, 1)."'";
 		$pid_check = pclose(popen( $cmd, "r" ) );
-		if($pid_check > 0){
+		if($pid_check > 0 && $pid_check != NULL){
 			pclose(popen( "kill -9 ".$wp->runworkflow_pid, "r" ) );
 		}
 	}
 	foreach($wrapper_pids as $wp){
 		$cmd = "ps -ef | grep '[".substr($wp->wrapper_pid, 0, 1)."]".substr($wp->wrapper_pid, 1)."'";
 		$pid_check = pclose(popen( $cmd, "r" ) );
-		if($pid_check > 0){
+		if($pid_check > 0 && $pid_check != NULL){
 			pclose(popen( "kill -9 ".$wp->wrapper_pid, "r" ) );
 		}
 	}
