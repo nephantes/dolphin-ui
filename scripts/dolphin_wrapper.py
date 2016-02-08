@@ -625,7 +625,7 @@ def main():
         print dolphin.params_section
         logging.info(dolphin.params_section)
         runparamsids=dolphin.getRunParamsID(rpid)
-        dolphin.send_email('1', 'merowskn', '127.0.0.1:25', runparamsid[0][0]);
+        dolphin.send_email('1', 'merowskn', '127.0.0.1:25', runparamsids[0][0]);
         for runparams_arr in runparamsids:
            runparamsid=runparams_arr[0]
            username=runparams_arr[1]
