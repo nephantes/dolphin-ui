@@ -566,26 +566,23 @@ class Dolphin:
         sql = "SELECT name, email, email_toggle FROM users where username = '%s';"%username
         email_check=self.runSQL(sql%locals())
         print(email_check);
-        if (email_check[0][2] == 1):
-            sender = 'biocore@umassmed.edu'
-            if (email_type == '3'):
-                receiver = 'biocore@umassmed.edu'
-                receiver = email_check[0][1]
-                subject = 'There has been an error in run: %s' % run_id
-                body = 'Run %s has ended with an error' % run_id;
-            if (email_type == '1'):
-                receiver = email_check[0][1]
-                subject = 'Your Dolphin run has completed!'
-                body = 'Your Dolphin run #%s has completed successfully!' % run_id;
-            p = os.popen("%s -t" % "/usr/sbin/sendmail", "w")
-            p.write("From: %s\n" % "biocore@umassmed.edu")
-            p.write("To: %s\n" % receiver)
-            p.write("Subject: %s\n" % subject)
-            p.write("\n") # blank line separating headers from body
-            p.write("%s" % body)
-            status = p.close()
-            if status != 0:
-                print "Sendmail exit status", status
+        sender = 'biocore@umassmed.edu'
+        if (email_type == '3'):
+            receiver = 'biocore@umassmed.edu'
+            receiver = email_check[0][1]
+            subject = 'There has been an error in run: %s' % run_id
+            body = 'Run %s has ended with an error' % run_id;
+        if (email_type == '1' and email_check[0][2] == 1):
+            receiver = email_check[0][1]
+            subject = 'Your Dolphin run has completed!'
+            body = 'Your Dolphin run #%s has completed successfully!' % run_id;
+        p = os.popen("%s -t" % "/usr/sbin/sendmail", "w")
+        p.write("From: %s\n" % "biocore@umassmed.edu")
+        p.write("To: %s\n" % receiver)
+        p.write("Subject: %s\n" % subject)
+        p.write("\n") # blank line separating headers from body
+        p.write("%s" % body)
+        status = p.close()
 
 # main
 def main():
