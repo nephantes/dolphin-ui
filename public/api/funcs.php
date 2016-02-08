@@ -199,6 +199,15 @@ class funcs
         }
         return $retval;
     }
+
+
+    function updateStartTime($wkey)
+    {
+        $sql = "update jobs set start_time=submit_time where wkey='$wkey' and start_time=0 ";
+        $this->runSQL($sql);
+    }
+
+
     function checkStartTime($wkey, $job_num,$username)
     {
         $sql = "update jobs set start_time=now() where wkey='$wkey' and job_num='$job_num'  and start_time=0 and username='$username'";
@@ -282,7 +291,10 @@ class funcs
                     }
                 }
             } else {
-                 return "DONE: Service ended successfully ($servicename)!!!";
+                 if ($this->checkAllJobsFinished($params)){
+                    $this->updateStartTime($wkey);
+                    return "DONE: Service ended successfully ($servicename)!!!";
+                 }
             }
             return "RUNNING(1):[retval=$retval]:SERVICENAME:$servicename";
         }
@@ -614,11 +626,14 @@ class funcs
             
             if ($s1 == $s2) {
                 $res = $this->updateService($wkey, $service_id, 1);
+                $res=1;
             } else {
-                $res = "Should be still running 1 [$s1:$s2]\n[$sql]";
+                $res = "Should be still running 1 [$s1:$s2]\n";
+                $res=0;           
             }
         } else {
-            $res = "Should be still running 2 \n [$sql]";
+            $res = "Should be still running 2 \n ";
+            $res=0;
         }
         return $res;
     }
