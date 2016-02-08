@@ -16,6 +16,7 @@ from subprocess import Popen, PIPE
 import json
 import ConfigParser
 import time
+import smtplib
 
 warnings.filterwarnings('ignore', '.*the sets module is deprecated.*',
          DeprecationWarning, 'MySQLdb')
@@ -559,6 +560,34 @@ class Dolphin:
     def stop_err(self, msg ):
         sys.stderr.write( "%s\n" % msg )
         sys.exit(2)
+        
+    # email
+    def send_email(self, email_type, username, host):
+        sql = "SELECT name, email, email_toggle FROM users where username = '%s';"%username
+        email_check=self.runSQL(sql%locals())
+        print(email_check);
+        if (email_check[0][2] == 1):
+            sender = 'biocore@umassmed.edu'
+            receiver = email_check[0][1]
+            if (email_type == '3'):
+                subject = 'ERROR'
+                body = 'ERROR';
+            if (email_type == '1'):
+                subject = 'COMPLETE'
+                body = 'COMPLETE';
+            message =   """From: Biocore <biocore@umassmed.edu>
+                            To: %s <%s>
+                            Subject: %s
+                            
+                            %s
+                            """ % (email_check[0][0], email_check[0][1], subject, body)
+            try:
+                s = smtplib.SMTP(host)
+                s.sendmail(sender, [receiver], message)
+                s.quit()
+            except smtplib.SMTPException:
+                print "Error: unable to send email"
+        
 
 # main
 def main():
@@ -568,7 +597,7 @@ def main():
    try:
         tmpdir = '../tmp/files'
         logdir = '../tmp/logs'
-
+        
         if not os.path.exists(tmpdir):
            os.makedirs(tmpdir)
         if not os.path.exists(logdir):
@@ -588,7 +617,6 @@ def main():
         params_section = options.config        
         
         dolphin=Dolphin(params_section)
-
         logging.basicConfig(filename=logdir+'/run'+str(rpid)+'/run.'+str(rpid)+'.'+str(os.getpid())+'.log', filemode='w',format='%(asctime)s %(message)s', datefmt='%m/%d/%Y %I:%M:%S %p', level=logging.DEBUG)
 
         if (not rpid):
@@ -596,7 +624,7 @@ def main():
         runidstr=" -r "+str(rpid)
         
         dolphin.config.read("../config/config.ini")
-    
+        dolphin.send_email('1', 'merowskn', 'localhost');
         print dolphin.params_section
         logging.info(dolphin.params_section)
         runparamsids=dolphin.getRunParamsID(rpid)
