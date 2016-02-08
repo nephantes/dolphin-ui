@@ -582,7 +582,7 @@ class Dolphin:
                             %s
                             """ % (email_check[0][0], email_check[0][1], subject, body)
             try:
-                s = smtplib.SMTP(self.config.get(self.params_section, "base_path"))
+                s = smtplib.SMTP(host)
                 s.sendmail(sender, [receiver], message)
                 s.quit()
             except smtplib.SMTPException:
