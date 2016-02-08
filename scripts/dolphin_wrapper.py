@@ -624,7 +624,7 @@ def main():
         runidstr=" -r "+str(rpid)
         
         dolphin.config.read("../config/config.ini")
-        dolphin.send_email('1', 'merowskn', 'localhost');
+        dolphin.send_email('1', 'merowskn', '127.0.0.1:25');
         print dolphin.params_section
         logging.info(dolphin.params_section)
         runparamsids=dolphin.getRunParamsID(rpid)
