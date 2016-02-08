@@ -625,7 +625,6 @@ def main():
         print dolphin.params_section
         logging.info(dolphin.params_section)
         runparamsids=dolphin.getRunParamsID(rpid)
-        dolphin.send_email('1', 'merowskn', '127.0.0.1:25', runparamsids[0][0]);
         for runparams_arr in runparamsids:
            runparamsid=runparams_arr[0]
            username=runparams_arr[1]
@@ -689,8 +688,10 @@ def main():
               if (re.search('failed\n', line) or re.search('Err\n', line) ):
                  logging.info("failed")
                  dolphin.stop_err("failed")
+        dolphin.send_email('1', 'merowskn', '127.0.0.1:25', runparamsids[0][0]);
    except Exception, ex:
         dolphin.stop_err('Error (line:%s)running dolphin_wrapper.py\n%s'%(format(sys.exc_info()[-1].tb_lineno), str(ex)))
+        dolphin.send_email('3', 'merowskn', '127.0.0.1:25', runparamsids[0][0]);
 
    sys.exit(0)
 
