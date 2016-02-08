@@ -575,7 +575,7 @@ class Dolphin:
             subject = 'Your Dolphin run has completed!'
             body = 'Your Dolphin run #%s has completed successfully!' % run_id;
         p = os.popen("%s -t" % "/usr/sbin/sendmail", "w")
-        p.write("From: %s\n" % "biocore@umassmed.edu")
+        p.write("From: %s\n" % sender)
         p.write("To: %s\n" % receiver)
         p.write("Subject: %s\n" % subject)
         p.write("\n") # blank line separating headers from body
