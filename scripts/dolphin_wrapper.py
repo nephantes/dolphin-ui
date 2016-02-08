@@ -16,7 +16,6 @@ from subprocess import Popen, PIPE
 import json
 import ConfigParser
 import time
-import smtplib
 
 warnings.filterwarnings('ignore', '.*the sets module is deprecated.*',
          DeprecationWarning, 'MySQLdb')
