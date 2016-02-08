@@ -157,6 +157,7 @@ class funcs_unittest extends PHPUnit_Framework_TestCase
 		ob_start();
 		$funcs  = new funcs();
 		$params['servicename'] = 'stepCheck';
+		$params['username'] = 'ak97w';
         $params['wkey'] = 'Od1HnRuJ0BJAeMpHOTwsH9rqxBDiD';
 		$this->assertEquals($funcs->checkStatus($params), 'DONE: Service ended successfully (stepCheck)!!!');
 		ob_end_clean();
