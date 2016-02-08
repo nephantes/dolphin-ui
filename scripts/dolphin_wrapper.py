@@ -575,19 +575,15 @@ class Dolphin:
             if (email_type == '1'):
                 subject = 'COMPLETE'
                 body = 'COMPLETE';
-            message =   """From: Biocore <biocore@umassmed.edu>
-                            To: %s <%s>
-                            Subject: %s
-                            
-                            %s
-                            """ % (email_check[0][0], email_check[0][1], subject, body)
-            try:
-                s = smtplib.SMTP(host)
-                s.sendmail(sender, [receiver], message)
-                s.quit()
-            except smtplib.SMTPException:
-                print "Error: unable to send email"
-        
+            p = os.popen("%s -t" % "/usr/sbin/sendmail", "w")
+            p.write("From: %s\n" % "biocore@umassmed.edu")
+            p.write("To: %s\n" % email_check[0][1])
+            p.write("Subject: %s\n" % subject)
+            p.write("\n") # blank line separating headers from body
+            p.write("%s" % body)
+            status = p.close()
+            if status != 0:
+                print "Sendmail exit status", status
 
 # main
 def main():
