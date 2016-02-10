@@ -683,18 +683,16 @@ def main():
               if (re.search('failed\n', line) or re.search('Err\n', line) ):
                  logging.info("failed")
                  dolphin.stop_err("failed")
+            #Send email when finished
+           sql = "SELECT run_status FROM ngs_runparams where id = %s;"%runparamsids[0][0]
+           end_email_check=self.runSQL(sql%locals())
+           email_sender=dolphin.config.get(dolphin.params_section, "email_sender")
+           email_err_receiver=dolphin.config.get(dolphin.params_section, "email_err_receiver")
+           mail_server_address=dolphin.config.get(dolphin.params_section, "mail_server_address")
+           dolphin.send_email(end_email_check[0][0], runparamsids[0][1], mail_server_address, runparamsids[0][0], email_sender, email_err_receiver);
+           sys.exit(0)
    except Exception, ex:
         dolphin.stop_err('Error (line:%s)running dolphin_wrapper.py\n%s'%(format(sys.exc_info()[-1].tb_lineno), str(ex)))
-
-   #Send email when finished
-   sql = "SELECT run_status FROM ngs_runparams where id = %s;"%runparamsids[0][0]
-   end_email_check=self.runSQL(sql%locals())
-   email_sender=dolphin.config.get(dolphin.params_section, "email_sender")
-   email_err_receiver=dolphin.config.get(dolphin.params_section, "email_err_receiver")
-   mail_server_address=dolphin.config.get(dolphin.params_section, "mail_server_address")
-   dolphin.send_email(end_email_check[0][0], runparamsids[0][1], mail_server_address, runparamsids[0][0], email_sender, email_err_receiver);
-   sys.exit(0)
-
 
 
 if __name__ == "__main__":
