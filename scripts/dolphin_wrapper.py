@@ -686,7 +686,8 @@ def main():
         #Send email when finished
         sql = "SELECT run_status FROM ngs_runparams where id = %s;"%runparamsids[0][0]
         end_email_check=self.runSQL(sql%locals())
-        logging.info(end_email_check[0][0])
+        print end_email_check
+        logging.info(end_email_check)
         email_sender=dolphin.config.get(dolphin.params_section, "email_sender")
         email_err_receiver=dolphin.config.get(dolphin.params_section, "email_err_receiver")
         mail_server_address=dolphin.config.get(dolphin.params_section, "mail_server_address")
