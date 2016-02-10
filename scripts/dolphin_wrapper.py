@@ -561,11 +561,13 @@ class Dolphin:
         sys.exit(2)
         
     # email
-    def send_email(self, run_result, username, host, run_id, email_sender, email_err_receiver):
-        sql = "SELECT name, email, email_toggle FROM users where username = '%s';"%username
-        email_check=self.runSQL(sql%locals())
-        print(email_check);
-        sender = email_sender
+    def send_email(self, run_result, username, run_id):
+        email_sender=dolphin.config.get(self.dolphin.params_section, "email_sender")
+        email_err_receiver=dolphin.config.get(self.dolphin.params_section, "email_err_receiver")
+        run_sql = "SELECT run_status FROM ngs_runparams where id = %s;"%run_id
+        end_email_check=self.runSQL(run_sql%locals())
+        user_sql = "SELECT name, email, email_toggle FROM users where username = '%s';"%username
+        email_check=self.runSQL(user_sql%locals())
         if (run_result == '1' and email_check[0][2] == 1):
             receiver = email_check[0][1]
             subject = 'Your Dolphin run has completed!'
@@ -575,7 +577,7 @@ class Dolphin:
             subject = 'There has been an error in run: %s' % run_id
             body = 'Run %s has ended with an error' % run_id;
         p = os.popen("%s -t" % "/usr/sbin/sendmail", "w")
-        p.write("From: %s\n" % sender)
+        p.write("From: %s\n" % email_sender)
         p.write("To: %s\n" % receiver)
         p.write("Subject: %s\n" % subject)
         p.write("\n") # blank line separating headers from body
@@ -682,16 +684,10 @@ def main():
               p.stdout.flush()
               if (re.search('failed\n', line) or re.search('Err\n', line) ):
                  logging.info("failed")
+                 dolphin.send_email(end_email_check[0][0], runparamsids[0][1], runparamsids[0][0]);
                  dolphin.stop_err("failed")
         #Send email when finished
-        sql = "SELECT run_status FROM ngs_runparams where id = %s;"%runparamsids[0][0]
-        end_email_check=runSQL(sql%locals())
-        print end_email_check
-        logging.info(end_email_check)
-        email_sender=dolphin.config.get(dolphin.params_section, "email_sender")
-        email_err_receiver=dolphin.config.get(dolphin.params_section, "email_err_receiver")
-        mail_server_address=dolphin.config.get(dolphin.params_section, "mail_server_address")
-        dolphin.send_email(end_email_check[0][0], runparamsids[0][1], mail_server_address, runparamsids[0][0], email_sender, email_err_receiver);
+        dolphin.send_email(end_email_check[0][0], runparamsids[0][1], runparamsids[0][0]);
    except Exception, ex:
         dolphin.stop_err('Error (line:%s)running dolphin_wrapper.py\n%s'%(format(sys.exc_info()[-1].tb_lineno), str(ex)))
 
