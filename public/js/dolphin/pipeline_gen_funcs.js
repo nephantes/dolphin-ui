@@ -162,7 +162,7 @@ function rerunLoad() {
 									IGVTDFSelection('select_1_'+i);
 									document.getElementById('textarea_2_'+i).value = splt1[i].ExtFactor;
 								}
-								if (splt1[i].RSeQC == 'yes') {
+								if (splt1[i].RSeQC == 'yes' || splt1[i].RSeQC == '1') {
 									document.getElementById('checkbox_1_'+i).checked = true;
 								}
 							}else if (splt1[i].Type == pipelineDict[1]) {
@@ -177,16 +177,16 @@ function rerunLoad() {
 									IGVTDFSelection('select_1_'+i);
 									document.getElementById('textarea_2_'+i).value = splt1[i].ExtFactor;
 								}
-								if (splt1[i].RSeQC == 'yes') {
+								if (splt1[i].RSeQC == 'yes' || (splt1[i].RSeQC == '1') {
 									document.getElementById('checkbox_1_'+i).checked = true;
 								}
-								if (splt1[i].CollectRnaSeqMetrics == 'yes') {
+								if (splt1[i].CollectRnaSeqMetrics == 'yes' || splt1[i].CollectRnaSeqMetrics == '1') {
 									document.getElementById('checkbox_2_'+i).checked = true;
 								}
-								if (splt1[i].CollectMultipleMetrics == 'yes') {
+								if (splt1[i].CollectMultipleMetrics == 'yes' || splt1[i].CollectMultipleMetrics == '1') {
 									document.getElementById('checkbox_3_'+i).checked = true;
 								}
-								if (splt1[i].MarkDuplicates == 'yes') {
+								if (splt1[i].MarkDuplicates == 'yes' || splt1[i].MarkDuplicates == '1') {
 									document.getElementById('checkbox_4_'+i).checked = true;
 								}
 							}else if (splt1[i].Type == pipelineDict[2]){
@@ -205,10 +205,10 @@ function rerunLoad() {
 									IGVTDFSelection('select_3_'+i);
 									document.getElementById('textarea_2_'+i).value = splt1[i].ExtFactor;
 								}
-								if (splt1[i].CollectMultipleMetrics == 'yes') {
+								if (splt1[i].CollectMultipleMetrics == 'yes' || splt1[i].CollectMultipleMetrics == '1') {
 									document.getElementById('checkbox_1_'+i).checked = true;
 								}
-								if (splt1[i].MarkDuplicates == 'yes') {
+								if (splt1[i].MarkDuplicates == 'yes' || splt1[i].MarkDuplicates == '1') {
 									document.getElementById('checkbox_2_'+i).checked = true;
 								}
 							}else if (splt1[i].Type == pipelineDict[3]) {
@@ -275,16 +275,16 @@ function rerunLoad() {
 									IGVTDFSelection('select_1_'+i);
 									document.getElementById('textarea_2_'+i).value = splt1[i].ExtFactor;
 								}
-								if (splt1[i].CollectMultipleMetrics == 'yes') {
+								if (splt1[i].CollectMultipleMetrics == 'yes' || splt1[i].CollectMultipleMetrics == '1') {
 									document.getElementById('checkbox_2_'+i).checked = true;
 								}
-								if (splt1[i].MarkDuplicates == 'yes') {
+								if (splt1[i].MarkDuplicates == 'yes' || splt1[i].MarkDuplicates == '1') {
 									document.getElementById('checkbox_3_'+i).checked = true;
 								}
 								
 								//MCall
 								//handle for multiple selections
-								if (splt1[i].MCallStep == 'yes') {
+								if (splt1[i].MCallStep == 'yes' || splt1[i].MCallStep == '1') {
 									document.getElementById('checkbox_4_'+i).checked = true;
 								}
 								MCallSelection(i);
@@ -329,7 +329,7 @@ function rerunLoad() {
 								document.getElementById('text_3_'+i).value = splt1[i].StepSize;
 								document.getElementById('text_4_'+i).value = splt1[i].MinCoverage;
 								document.getElementById('text_5_'+i).value = splt1[i].TopN;
-								if (splt1[i].StrandSpecific == 'yes') {
+								if (splt1[i].StrandSpecific == 'yes' || splt1[i].StrandSpecific == '1') {
 									document.getElementById('checkbox_1_'+i).checked = true;
 								}
 							}
