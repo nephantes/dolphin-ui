@@ -685,7 +685,7 @@ def main():
                  dolphin.stop_err("failed")
         #Send email when finished
         sql = "SELECT run_status FROM ngs_runparams where id = %s;"%runparamsids[0][0]
-        end_email_check=self.runSQL(sql%locals())
+        end_email_check=runSQL(sql%locals())
         print end_email_check
         logging.info(end_email_check)
         email_sender=dolphin.config.get(dolphin.params_section, "email_sender")
