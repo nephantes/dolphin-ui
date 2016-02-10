@@ -562,8 +562,8 @@ class Dolphin:
         
     # email
     def send_email(self, username, run_id):
-        email_sender=dolphin.config.get(self.dolphin.params_section, "email_sender")
-        email_err_receiver=dolphin.config.get(self.dolphin.params_section, "email_err_receiver")
+        email_sender=self.config.get(self.params_section, "email_sender")
+        email_err_receiver=self.config.get(self.params_section, "email_err_receiver")
         run_sql = "SELECT run_status FROM ngs_runparams where id = %s;"%run_id
         end_email_check=self.runSQL(run_sql%locals())
         user_sql = "SELECT name, email, email_toggle FROM users where username = '%s';"%username
