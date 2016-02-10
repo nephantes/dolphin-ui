@@ -676,14 +676,7 @@ def main():
            p = subprocess.Popen(dolphin.cmd % locals(), shell=True, stdout=subprocess.PIPE)
            dolphin.updatePID(runparamsid, p.pid)
 
-           for line in p.stdout:
-              print(str(line.rstrip()))
-              logging.info(str(line.rstrip()))
-              p.stdout.flush()
-              if (re.search('failed\n', line) or re.search('Err\n', line) ):
-                 logging.info("failed")
-                 dolphin.stop_err("failed")
-            #Send email when finished
+           #Send email when finished
            sql = "SELECT run_status FROM ngs_runparams where id = %s;"%runparamsids[0][0]
            end_email_check=self.runSQL(sql%locals())
            logging.info(end_email_check[0][0])
@@ -691,7 +684,22 @@ def main():
            email_err_receiver=dolphin.config.get(dolphin.params_section, "email_err_receiver")
            mail_server_address=dolphin.config.get(dolphin.params_section, "mail_server_address")
            dolphin.send_email(end_email_check[0][0], runparamsids[0][1], mail_server_address, runparamsids[0][0], email_sender, email_err_receiver);
-           sys.exit(0)
+
+           for line in p.stdout:
+              print(str(line.rstrip()))
+              logging.info(str(line.rstrip()))
+              p.stdout.flush()
+              if (re.search('failed\n', line) or re.search('Err\n', line) ):
+                 logging.info("failed")
+                 dolphin.stop_err("failed")
+           #Send email when finished
+           sql = "SELECT run_status FROM ngs_runparams where id = %s;"%runparamsids[0][0]
+           end_email_check=self.runSQL(sql%locals())
+           logging.info(end_email_check[0][0])
+           email_sender=dolphin.config.get(dolphin.params_section, "email_sender")
+           email_err_receiver=dolphin.config.get(dolphin.params_section, "email_err_receiver")
+           mail_server_address=dolphin.config.get(dolphin.params_section, "mail_server_address")
+           dolphin.send_email(end_email_check[0][0], runparamsids[0][1], mail_server_address, runparamsids[0][0], email_sender, email_err_receiver);
    except Exception, ex:
         dolphin.stop_err('Error (line:%s)running dolphin_wrapper.py\n%s'%(format(sys.exc_info()[-1].tb_lineno), str(ex)))
 
