@@ -639,7 +639,7 @@ class funcs
     }
     function updateService($wkey, $service_id, $result)
     {
-        $sql = "update service_run set `end_time`=now(), `result`='$result' where `wkey`='$wkey' and `service_id`='$service_id'";
+        $sql = "update service_run set `end_time`=now(), `result`='$result' where `wkey`='$wkey' and `service_id`='$service_id' and end_time=0";
         $res = $this->runSQL($sql);
         
         return $res;
