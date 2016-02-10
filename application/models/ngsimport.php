@@ -486,11 +486,11 @@ class Ngsimport extends VanillaModel {
 				$permCheck = $this->checkUserPermissions($this->clustername);
 				$dirCheck = $this->checkDirPermissions($this->backup_dir, $this->clustername);
 				if($permCheck != 'pass'){
-					$text.= $this->errorText("Fastq Directory error (".$this->fastq_dir."). ".$permCheck);
+					$text.= $this->errorText("Fastq Directory error (".$this->backup_dir."). ".$permCheck);
 					$meta_check = false;
 				}
 				if($dirCheck != 'pass'){
-					$text.= $this->errorText("Fastq Directory error (".$this->fastq_dir."). ".$dirCheck);
+					$text.= $this->errorText("Fastq Directory error (".$this->backup_dir."). ".$dirCheck);
 					$meta_check = false;
 				}
 			}
