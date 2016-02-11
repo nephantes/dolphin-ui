@@ -453,10 +453,10 @@ function pipelineSelect(num){
 				[ [createElement('label', ['class','TEXTNODE'], ['box-title margin', 'Custom Options']),
 				createElement('input', ['id', 'type', 'class', 'onClick'], ['checkbox_5_'+num, 'checkbox', 'margin', 'tophatCustomOptions('+num+')'])] ]);
 		divAdj = mergeTidy(divAdj, 12,
-				[ [createElement('label', ['id', 'class', 'style', 'TEXTNODE'], ['label_3_'+num, 'box-title', 'display:none', 'Custom Genome Index']),
+				[ [createElement('label', ['id', 'class', 'style', 'TEXTNODE'], ['label_3_'+num, 'box-title', 'display:none', 'Custom Genome Index Directory']),
 				   createElement('input', ['id', 'class', 'type', 'style', 'value'], ['textarea_3_'+num, 'form-control', 'text', 'display:none', 'None'])] ]);
 		divAdj = mergeTidy(divAdj, 12,
-				[ [createElement('label', ['id', 'class', 'style', 'TEXTNODE'], ['label_4_'+num, 'box-title', 'display:none', 'Custom Genome Annotation']),
+				[ [createElement('label', ['id', 'class', 'style', 'TEXTNODE'], ['label_4_'+num, 'box-title', 'display:none', 'Custom Genome Annotation File']),
 				   createElement('input', ['id', 'class', 'type', 'style', 'value'], ['textarea_4_'+num, 'form-control', 'text', 'display:none', 'None'])] ]);
 		
 	}else if (pipeType == pipelineDict[2]) {
@@ -815,6 +815,8 @@ function submitPipeline(type) {
 		var de_multi_error = false;
 		var meth_multi_error = false;
 		var name_error = false;
+		var tophatCheckIndex = false;
+		var tophatCheckAnnotation = false;
 		for(var z = 0; z < currentPipelineVal.length; z++){
 			if (currentPipelineVal[z] == 'DESeq') {
 				if (document.getElementById('multi_select_1_'+currentPipelineID[z]).value == "") {
@@ -835,6 +837,38 @@ function submitPipeline(type) {
 			if (JSON_OBJECT['pipeline'][i].Type == 'DESeq' || JSON_OBJECT['pipeline'][i].Type == 'DiffMeth') {
 				if (JSON_OBJECT['pipeline'][i].Name == "") {
 					name_error = true;
+				}
+			}else if (JSON_OBJECT['pipeline'][i].Type == 'Tophat') {
+				if(JSON_OBJECT['pipeline'][i].CustomGenomeIndex != 'None' || JSON_OBJECT['pipeline'][i].CustomGenomeAnnotation != 'None'){
+					$.ajax({
+						type: 	'GET',
+						url: 	BASE_PATH+'/public/api/service.php?func=checkFile&username='+username.clusteruser+'&file='+JSON_OBJECT['pipeline'][i].CustomGenomeIndex+'/*',
+						async:	false,
+						success: function(s)
+						{
+							console.log(s);
+							jsonCheck = JSON.parse(s);
+							if (jsonCheck.Result != 'Ok') {
+								tophatCheckIndex = true;
+							}
+						}
+					});
+					if (outputdir.substring(0,1) != '/'  && outputdir.indexOf('/') > -1) {
+						outputdir = '/' + outputdir;
+					}
+					$.ajax({
+						type: 	'GET',
+						url: 	BASE_PATH+'/public/api/service.php?func=checkPermissions&username='+username.clusteruser+'&file=' + JSON_OBJECT['pipeline'][i].CustomGenomeAnnotation,
+						async:	false,
+						success: function(s)
+						{
+							console.log(s);
+							jsonCheck = JSON.parse(s);
+							if (jsonCheck.Result != 'Ok') {
+								tophatCheckAnnotation = true;
+							}
+						}
+					});
 				}
 			}
 		}
@@ -881,6 +915,12 @@ function submitPipeline(type) {
 				show: true
 			});
 			document.getElementById('errorLabel').innerHTML ='DESeq/DiffMeth require a name in order to run the pipeline.<br><br>';
+			document.getElementById('errorAreas').innerHTML = '';
+		}else if(tophatCheckIndex || tophatCheckAnnotation){
+			$('#errorModal').modal({
+				show: true
+			});
+			document.getElementById('errorLabel').innerHTML ='Tophat Custom index/annotation error.  Permissions are required for these files.<br><br>';
 			document.getElementById('errorAreas').innerHTML = '';
 		}else{
 			//insert new values into ngs_runparams
