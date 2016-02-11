@@ -189,6 +189,12 @@ function rerunLoad() {
 								if (splt1[i].MarkDuplicates == 'yes' || splt1[i].MarkDuplicates == '1') {
 									document.getElementById('checkbox_4_'+i).checked = true;
 								}
+								if (splt1[i].CustomGenomeIndex != 'None' || splt1[i].CustomGenomeAnnotation != 'None') {
+									tophatCustomOptions(i);
+									document.getElementById('checkbox_5_'+i).checked = true;
+									document.getElementById('textarea_3_'+i).value = splt1[i].CustomGenomeIndex;
+									document.getElementById('textarea_4_'+i).value = splt1[i].CustomGenomeAnnotation;
+								}
 							}else if (splt1[i].Type == pipelineDict[2]){
 								//Chipseq
 								additionalPipes();
@@ -443,6 +449,16 @@ function pipelineSelect(num){
 		divAdj = mergeTidy(divAdj, 6,
 				[ [createElement('label', ['id', 'class', 'style', 'TEXTNODE'], ['label_1_'+num, 'box-title', 'display:none', 'extFactor']),
 				   createElement('input', ['id', 'class', 'type', 'style', 'value'], ['textarea_2_'+num, 'form-control', 'text', 'display:none', '0'])] ]);
+		divAdj = mergeTidy(divAdj, 12,
+				[ [createElement('label', ['class','TEXTNODE'], ['box-title margin', 'Custom Options']),
+				createElement('input', ['id', 'type', 'class', 'onClick'], ['checkbox_5_'+num, 'checkbox', 'margin', 'tophatCustomOptions('+num+')'])] ]);
+		divAdj = mergeTidy(divAdj, 12,
+				[ [createElement('label', ['id', 'class', 'style', 'TEXTNODE'], ['label_3_'+num, 'box-title', 'display:none', 'Custom Genome File Path and Index']),
+				   createElement('input', ['id', 'class', 'type', 'style', 'value'], ['textarea_3_'+num, 'form-control', 'text', 'display:none', 'None'])] ]);
+		divAdj = mergeTidy(divAdj, 12,
+				[ [createElement('label', ['id', 'class', 'style', 'TEXTNODE'], ['label_4_'+num, 'box-title', 'display:none', 'Custom Genome Annotation File (Full Path)']),
+				   createElement('input', ['id', 'class', 'type', 'style', 'value'], ['textarea_4_'+num, 'form-control', 'text', 'display:none', 'None'])] ]);
+		
 	}else if (pipeType == pipelineDict[2]) {
 		//ChipSeq Pipeline
 		divAdj.appendChild( createElement('label', ['class','TEXTNODE'], ['box-title', 'Chip Input Definitions:']));
@@ -798,6 +814,9 @@ function submitPipeline(type) {
 		//Check empty multi_selections
 		var de_multi_error = false;
 		var meth_multi_error = false;
+		var name_error = false;
+		var tophatCheckIndex = false;
+		var tophatCheckAnnotation = false;
 		for(var z = 0; z < currentPipelineVal.length; z++){
 			if (currentPipelineVal[z] == 'DESeq') {
 				if (document.getElementById('multi_select_1_'+currentPipelineID[z]).value == "") {
@@ -814,6 +833,46 @@ function submitPipeline(type) {
 			}
 		}
 	
+		for( var i = 0; i < JSON_OBJECT['pipeline'].length; i++){
+			if (JSON_OBJECT['pipeline'][i].Type == 'DESeq' || JSON_OBJECT['pipeline'][i].Type == 'DiffMeth') {
+				if (JSON_OBJECT['pipeline'][i].Name == "") {
+					name_error = true;
+				}
+			}else if (JSON_OBJECT['pipeline'][i].Type == 'Tophat') {
+				if(JSON_OBJECT['pipeline'][i].CustomGenomeIndex != 'None' || JSON_OBJECT['pipeline'][i].CustomGenomeAnnotation != 'None'){
+					$.ajax({
+						type: 	'GET',
+						url: 	BASE_PATH+'/public/api/service.php?func=checkFile&username='+username.clusteruser+'&file='+JSON_OBJECT['pipeline'][i].CustomGenomeIndex+'*',
+						async:	false,
+						success: function(s)
+						{
+							console.log(s);
+							jsonCheck = JSON.parse(s);
+							if (jsonCheck.Result != 'Ok') {
+								tophatCheckIndex = true;
+							}
+						}
+					});
+					if (outputdir.substring(0,1) != '/'  && outputdir.indexOf('/') > -1) {
+						outputdir = '/' + outputdir;
+					}
+					$.ajax({
+						type: 	'GET',
+						url: 	BASE_PATH+'/public/api/service.php?func=checkPermissions&username='+username.clusteruser+'&file=' + JSON_OBJECT['pipeline'][i].CustomGenomeAnnotation,
+						async:	false,
+						success: function(s)
+						{
+							console.log(s);
+							jsonCheck = JSON.parse(s);
+							if (jsonCheck.Result != 'Ok') {
+								tophatCheckAnnotation = true;
+							}
+						}
+					});
+				}
+			}
+		}
+		
 		if (adapterCheck && doAdapter == 'yes') {
 			$('#errorModal').modal({
 				show: true
@@ -845,11 +904,23 @@ function submitPipeline(type) {
 			});
 			document.getElementById('errorLabel').innerHTML ='DESeq is missing selected conditions.<br><br>';
 			document.getElementById('errorAreas').innerHTML = '';
-		} else if (meth_multi_error){
+		}else if (meth_multi_error){
 			$('#errorModal').modal({
 				show: true
 			});
 			document.getElementById('errorLabel').innerHTML ='DiffMeth is missing selected conditions.<br><br>';
+			document.getElementById('errorAreas').innerHTML = '';
+		}else if(name_error){
+			$('#errorModal').modal({
+				show: true
+			});
+			document.getElementById('errorLabel').innerHTML ='DESeq/DiffMeth require a name in order to run the pipeline.<br><br>';
+			document.getElementById('errorAreas').innerHTML = '';
+		}else if(tophatCheckIndex || tophatCheckAnnotation){
+			$('#errorModal').modal({
+				show: true
+			});
+			document.getElementById('errorLabel').innerHTML ='Tophat Custom index/annotation error.  Permissions are required for these files.<br><br>';
 			document.getElementById('errorAreas').innerHTML = '';
 		}else{
 			//insert new values into ngs_runparams
@@ -1673,7 +1744,7 @@ function findPipelineValues(){
 	var RSEM_JSON_DICT  = ['Params', 'RSeQC', 'IGVTDF', 'BAM2BW', 'ExtFactor'];
 	var DESEQ_JSON_DICT = ['Name', 'Columns', 'Conditions', 'FitType', 'HeatMap', 'padj', 'foldChange', 'DataType'];
 	var CHIPSEQ_JSON_DICT = ['ChipInput', 'MultiMapper', 'TagSize', 'BandWith', 'EffectiveGenome', 'MarkDuplicates', 'CollectMultipleMetrics', 'IGVTDF', 'BAM2BW', 'ExtFactor'];
-	var TOPHAT_JSON_DICT = ['Params', 'MarkDuplicates', 'RSeQC', 'CollectRnaSeqMetrics', 'CollectMultipleMetrics', 'IGVTDF', 'BAM2BW', 'ExtFactor'];
+	var TOPHAT_JSON_DICT = ['Params', 'MarkDuplicates', 'RSeQC', 'CollectRnaSeqMetrics', 'CollectMultipleMetrics', 'IGVTDF', 'BAM2BW', 'ExtFactor', 'Custom', 'CustomGenomeIndex', 'CustomGenomeAnnotation'];
 	var BISULPHITE_JSON_DICT = ['BSMapStep', 'BisulphiteType', 'Digestion', 'BSMapParams', 'CollectMultipleMetrics', 'IGVTDF', 'MarkDuplicates', 'BAM2BW', 'ExtFactor', 'MCallStep', 'MCallParams'];
 	var DIFFMETH_JSON_DICT = [ 'Name', 'Columns', 'Conditions', 'TileSize', 'StepSize', 'MinCoverage', 'TopN', 'StrandSpecific' ];
 	
@@ -1959,5 +2030,21 @@ function bisulphiteSelect(id, num){
 		var dig_site = document.getElementById('text_1_'+num);
 		dig_site.disabled = true;
 		dig_site.value = '';
+	}
+}
+
+function tophatCustomOptions(num){
+	if (document.getElementById('label_3_'+num).style.display == 'none') {
+		document.getElementById('label_3_'+num).style.display = 'block';
+		document.getElementById('textarea_3_'+num).style.display = 'block';
+		document.getElementById('label_4_'+num).style.display = 'block';
+		document.getElementById('textarea_4_'+num).style.display = 'block';
+	}else{
+		document.getElementById('label_3_'+num).style.display = 'none';
+		document.getElementById('textarea_3_'+num).style.display = 'none';
+		document.getElementById('textarea_3_'+num).value = 'None';
+		document.getElementById('label_4_'+num).style.display = 'none';
+		document.getElementById('textarea_4_'+num).style.display = 'none';
+		document.getElementById('textarea_4_'+num).value = 'None';
 	}
 }
