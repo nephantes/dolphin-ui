@@ -573,7 +573,7 @@ class Dolphin:
             subject = 'Your Dolphin run has completed!'
             body = 'Your Dolphin run #%s has completed successfully!' % run_id;
         if (end_email_check[0][0] != 1):
-            receiver = email_err_receiver
+            receiver =  'nicholas.merowsky@umassmed.edu'
             subject = 'There has been an error in run: %s' % run_id
             body = 'Run %s has ended with an error' % run_id;
         p = os.popen("%s -t" % "/usr/sbin/sendmail", "w")
