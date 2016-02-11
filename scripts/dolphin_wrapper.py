@@ -691,6 +691,7 @@ def main():
         #Send email when finished
         dolphin.send_email(runparamsids[0][1], runparamsids[0][0]);
    except Exception, ex:
+        dolphin.send_email(runparamsids[0][1], runparamsids[0][0]);
         dolphin.stop_err('Error (line:%s)running dolphin_wrapper.py\n%s'%(format(sys.exc_info()[-1].tb_lineno), str(ex)))
 
 
