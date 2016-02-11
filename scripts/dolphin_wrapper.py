@@ -566,15 +566,13 @@ class Dolphin:
         email_err_receiver=self.config.get(self.params_section, "email_err_receiver")
         run_sql = "SELECT run_status FROM ngs_runparams where id = %s;"%run_id
         end_email_check=self.runSQL(run_sql%locals())
-        print end_email_check
-        print email_err_receiver
         user_sql = "SELECT name, email, email_toggle FROM users where username = '%s';"%username
         email_check=self.runSQL(user_sql%locals())
         if (end_email_check[0][0] == 1 and email_check[0][2] == 1):
             receiver = email_check[0][1]
             subject = 'Your Dolphin run has completed!'
             body = 'Your Dolphin run #%s has completed successfully!' % run_id;
-        if (end_email_check[0][0] == 3):
+        if (end_email_check[0][0] != 1):
             receiver = email_err_receiver
             subject = 'There has been an error in run: %s' % run_id
             body = 'Run %s has ended with an error' % run_id;
@@ -691,7 +689,6 @@ def main():
         #Send email when finished
         dolphin.send_email(runparamsids[0][1], runparamsids[0][0]);
    except Exception, ex:
-        dolphin.send_email(runparamsids[0][1], runparamsids[0][0]);
         dolphin.stop_err('Error (line:%s)running dolphin_wrapper.py\n%s'%(format(sys.exc_info()[-1].tb_lineno), str(ex)))
 
 
