@@ -566,7 +566,6 @@ class Dolphin:
         email_err_receiver=self.config.get(self.params_section, "email_err_receiver")
         run_sql = "SELECT run_status FROM ngs_runparams where id = %s;"%run_id
         end_email_check=self.runSQL(run_sql%locals())
-        print end_email_check
         user_sql = "SELECT name, email, email_toggle FROM users where username = '%s';"%username
         email_check=self.runSQL(user_sql%locals())
         if (end_email_check[0][0] == 1 and email_check[0][2] == 1):
