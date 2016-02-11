@@ -189,6 +189,12 @@ function rerunLoad() {
 								if (splt1[i].MarkDuplicates == 'yes' || splt1[i].MarkDuplicates == '1') {
 									document.getElementById('checkbox_4_'+i).checked = true;
 								}
+								if (splt1[i].CustomGenomeIndex != 'None' || splt1[i].CustomGenomeAnnotation != 'None') {
+									tophatCustomOptions(i);
+									document.getElementById('checkbox_5_'+i).checked = true;
+									document.getElementById('textarea_3_'+i).value = splt1[i].CustomGenomeIndex;
+									document.getElementById('textarea_4_'+i).value = splt1[i].CustomGenomeAnnotation;
+								}
 							}else if (splt1[i].Type == pipelineDict[2]){
 								//Chipseq
 								additionalPipes();
@@ -443,6 +449,16 @@ function pipelineSelect(num){
 		divAdj = mergeTidy(divAdj, 6,
 				[ [createElement('label', ['id', 'class', 'style', 'TEXTNODE'], ['label_1_'+num, 'box-title', 'display:none', 'extFactor']),
 				   createElement('input', ['id', 'class', 'type', 'style', 'value'], ['textarea_2_'+num, 'form-control', 'text', 'display:none', '0'])] ]);
+		divAdj = mergeTidy(divAdj, 12,
+				[ [createElement('label', ['class','TEXTNODE'], ['box-title margin', 'Custom Options']),
+				createElement('input', ['id', 'type', 'class', 'onClick'], ['checkbox_5_'+num, 'checkbox', 'margin', 'tophatCustomOptions('+num+')'])] ]);
+		divAdj = mergeTidy(divAdj, 12,
+				[ [createElement('label', ['id', 'class', 'style', 'TEXTNODE'], ['label_3_'+num, 'box-title', 'display:none', 'Custom Genome Index']),
+				   createElement('input', ['id', 'class', 'type', 'style', 'value'], ['textarea_3_'+num, 'form-control', 'text', 'display:none', 'None'])] ]);
+		divAdj = mergeTidy(divAdj, 12,
+				[ [createElement('label', ['id', 'class', 'style', 'TEXTNODE'], ['label_4_'+num, 'box-title', 'display:none', 'Custom Genome Annotation']),
+				   createElement('input', ['id', 'class', 'type', 'style', 'value'], ['textarea_4_'+num, 'form-control', 'text', 'display:none', 'None'])] ]);
+		
 	}else if (pipeType == pipelineDict[2]) {
 		//ChipSeq Pipeline
 		divAdj.appendChild( createElement('label', ['class','TEXTNODE'], ['box-title', 'Chip Input Definitions:']));
@@ -1688,7 +1704,7 @@ function findPipelineValues(){
 	var RSEM_JSON_DICT  = ['Params', 'RSeQC', 'IGVTDF', 'BAM2BW', 'ExtFactor'];
 	var DESEQ_JSON_DICT = ['Name', 'Columns', 'Conditions', 'FitType', 'HeatMap', 'padj', 'foldChange', 'DataType'];
 	var CHIPSEQ_JSON_DICT = ['ChipInput', 'MultiMapper', 'TagSize', 'BandWith', 'EffectiveGenome', 'MarkDuplicates', 'CollectMultipleMetrics', 'IGVTDF', 'BAM2BW', 'ExtFactor'];
-	var TOPHAT_JSON_DICT = ['Params', 'MarkDuplicates', 'RSeQC', 'CollectRnaSeqMetrics', 'CollectMultipleMetrics', 'IGVTDF', 'BAM2BW', 'ExtFactor'];
+	var TOPHAT_JSON_DICT = ['Params', 'MarkDuplicates', 'RSeQC', 'CollectRnaSeqMetrics', 'CollectMultipleMetrics', 'IGVTDF', 'BAM2BW', 'ExtFactor', 'Custom', 'CustomGenomeIndex', 'CustomGenomeAnnotation'];
 	var BISULPHITE_JSON_DICT = ['BSMapStep', 'BisulphiteType', 'Digestion', 'BSMapParams', 'CollectMultipleMetrics', 'IGVTDF', 'MarkDuplicates', 'BAM2BW', 'ExtFactor', 'MCallStep', 'MCallParams'];
 	var DIFFMETH_JSON_DICT = [ 'Name', 'Columns', 'Conditions', 'TileSize', 'StepSize', 'MinCoverage', 'TopN', 'StrandSpecific' ];
 	
@@ -1974,5 +1990,21 @@ function bisulphiteSelect(id, num){
 		var dig_site = document.getElementById('text_1_'+num);
 		dig_site.disabled = true;
 		dig_site.value = '';
+	}
+}
+
+function tophatCustomOptions(num){
+	if (document.getElementById('label_3_'+num).style.display == 'none') {
+		document.getElementById('label_3_'+num).style.display = 'block';
+		document.getElementById('textarea_3_'+num).style.display = 'block';
+		document.getElementById('label_4_'+num).style.display = 'block';
+		document.getElementById('textarea_4_'+num).style.display = 'block';
+	}else{
+		document.getElementById('label_3_'+num).style.display = 'none';
+		document.getElementById('textarea_3_'+num).style.display = 'none';
+		document.getElementById('textarea_3_'+num).value = 'None';
+		document.getElementById('label_4_'+num).style.display = 'none';
+		document.getElementById('textarea_4_'+num).style.display = 'none';
+		document.getElementById('textarea_4_'+num).value = 'None';
 	}
 }
