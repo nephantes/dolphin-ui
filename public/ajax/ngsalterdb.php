@@ -34,8 +34,10 @@ if(!function_exists('waitRun')){
 				SET run_status = 5
 				WHERE id = '$idKey'
 				");
+				return false;
 			}
 		}
+		return true;
 	}
 }
 
@@ -146,8 +148,10 @@ if ($p == "submitPipeline" )
         last_modified_user = $uid
         WHERE id = '$idKey'
         ");
-		waitRun($ids, $idKey, $query);
-        runCmd($idKey, $query, $wkey);
+		$checkWait = waitRun($ids, $idKey, $query);
+        if($checkWait){
+			runCmd($idKey, $query, $wkey);
+		}
         $data=$idKey;
     }else{
         //run_group_id set to -1 as a placeholder.Cannot grab primary key as it's being made, so a placeholder is needed.
@@ -159,8 +163,10 @@ if ($p == "submitPipeline" )
         //need to grab the id for runlist insertion
         $idKey=$query->queryAVal("SELECT id FROM ngs_runparams WHERE run_group_id = -1 and run_name = '$name' order by id desc limit 1");
         $wkey="";
-		waitRun($ids, $idKey, $query);
-		runCmd($idKey, $query, $wkey);
+		$checkWait = waitRun($ids, $idKey, $query);
+        if($checkWait){
+			runCmd($idKey, $query, $wkey);
+		}
         //update required to make run_group_id equal to it's primary key "id".Replace the arbitrary -1 with the id
         if( $runGroupID == 'new'){
             $data=$query->runSQL("UPDATE ngs_runparams SET run_group_id = id WHERE run_group_id = -1");
