@@ -571,7 +571,7 @@ class Dolphin:
         if (end_email_check[0][0] == 1 and email_check[0][2] == 1):
             receiver = email_check[0][1]
             subject = 'Your Dolphin run has completed!'
-            body = 'Your Dolphin run #%s has completed successfully!' % run_id;
+            body = 'Your Dolphin run #%s has completed successfully! within %s' % run_id, self.params_section;
         elif (end_email_check[0][0] != 1):
             receiver =  email_err_receiver
             subject = 'There has been an error in run: %s' % run_id
