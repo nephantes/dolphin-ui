@@ -842,7 +842,7 @@ function submitPipeline(type) {
 				if(JSON_OBJECT['pipeline'][i].CustomGenomeIndex != 'None' || JSON_OBJECT['pipeline'][i].CustomGenomeAnnotation != 'None'){
 					$.ajax({
 						type: 	'GET',
-						url: 	BASE_PATH+'/public/api/service.php?func=checkFile&username='+username.clusteruser+'&file='+JSON_OBJECT['pipeline'][i].CustomGenomeIndex+'/*',
+						url: 	BASE_PATH+'/public/api/service.php?func=checkFile&username='+username.clusteruser+'&file='+JSON_OBJECT['pipeline'][i].CustomGenomeIndex+'*',
 						async:	false,
 						success: function(s)
 						{
