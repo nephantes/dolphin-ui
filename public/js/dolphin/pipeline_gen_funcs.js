@@ -453,10 +453,10 @@ function pipelineSelect(num){
 				[ [createElement('label', ['class','TEXTNODE'], ['box-title margin', 'Custom Options']),
 				createElement('input', ['id', 'type', 'class', 'onClick'], ['checkbox_5_'+num, 'checkbox', 'margin', 'tophatCustomOptions('+num+')'])] ]);
 		divAdj = mergeTidy(divAdj, 12,
-				[ [createElement('label', ['id', 'class', 'style', 'TEXTNODE'], ['label_3_'+num, 'box-title', 'display:none', 'Custom Genome File path/Index']),
+				[ [createElement('label', ['id', 'class', 'style', 'TEXTNODE'], ['label_3_'+num, 'box-title', 'display:none', 'Custom Genome File Path and Index']),
 				   createElement('input', ['id', 'class', 'type', 'style', 'value'], ['textarea_3_'+num, 'form-control', 'text', 'display:none', 'None'])] ]);
 		divAdj = mergeTidy(divAdj, 12,
-				[ [createElement('label', ['id', 'class', 'style', 'TEXTNODE'], ['label_4_'+num, 'box-title', 'display:none', 'Custom Genome Annotation File']),
+				[ [createElement('label', ['id', 'class', 'style', 'TEXTNODE'], ['label_4_'+num, 'box-title', 'display:none', 'Custom Genome Annotation File (Full Path)']),
 				   createElement('input', ['id', 'class', 'type', 'style', 'value'], ['textarea_4_'+num, 'form-control', 'text', 'display:none', 'None'])] ]);
 		
 	}else if (pipeType == pipelineDict[2]) {
