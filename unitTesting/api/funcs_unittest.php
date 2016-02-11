@@ -66,7 +66,7 @@ class funcs_unittest extends PHPUnit_Framework_TestCase
 		$this->assertEquals($funcs->checkFile($params),"{\"Result\":\"Ok\"}");
 		$params['username'] = 'root';
 		$params['file'] = 'does_not_exist.php';
-		$this->assertEquals($funcs->checkFile($params),"{\"ERROR\": \"No such file or directory: ".$params['file']."\"}");
+		$this->assertEquals($funcs->checkFile($params),"{\"ERROR\": \"ls: cannot access ".$params['file'].": No such file or directory\"}");
 		ob_end_clean();
 	}
 	
