@@ -832,43 +832,44 @@ function submitPipeline(type) {
 				}
 			}
 		}
-	
-		for( var i = 0; i < JSON_OBJECT['pipeline'].length; i++){
-			if (JSON_OBJECT['pipeline'][i].Type == 'DESeq' || JSON_OBJECT['pipeline'][i].Type == 'DiffMeth') {
-				if (JSON_OBJECT['pipeline'][i].Name == "") {
-					name_error = true;
-				}
-			}else if (JSON_OBJECT['pipeline'][i].Type == 'Tophat') {
-				if(JSON_OBJECT['pipeline'][i].CustomGenomeIndex != 'None' || JSON_OBJECT['pipeline'][i].CustomGenomeAnnotation != 'None'){
-					$.ajax({
-						type: 	'GET',
-						url: 	BASE_PATH+'/public/api/service.php?func=checkFile&username='+username.clusteruser+'&file='+JSON_OBJECT['pipeline'][i].CustomGenomeIndex+'*',
-						async:	false,
-						success: function(s)
-						{
-							console.log(s);
-							jsonCheck = JSON.parse(s);
-							if (jsonCheck.Result != 'Ok') {
-								tophatCheckIndex = true;
-							}
-						}
-					});
-					if (outputdir.substring(0,1) != '/'  && outputdir.indexOf('/') > -1) {
-						outputdir = '/' + outputdir;
+		if (JSON_OBJECT['pipeline'] != null) {
+			for( var i = 0; i < JSON_OBJECT['pipeline'].length; i++){
+				if (JSON_OBJECT['pipeline'][i].Type == 'DESeq' || JSON_OBJECT['pipeline'][i].Type == 'DiffMeth') {
+					if (JSON_OBJECT['pipeline'][i].Name == "") {
+						name_error = true;
 					}
-					$.ajax({
-						type: 	'GET',
-						url: 	BASE_PATH+'/public/api/service.php?func=checkPermissions&username='+username.clusteruser+'&file=' + JSON_OBJECT['pipeline'][i].CustomGenomeAnnotation,
-						async:	false,
-						success: function(s)
-						{
-							console.log(s);
-							jsonCheck = JSON.parse(s);
-							if (jsonCheck.Result != 'Ok') {
-								tophatCheckAnnotation = true;
+				}else if (JSON_OBJECT['pipeline'][i].Type == 'Tophat') {
+					if(JSON_OBJECT['pipeline'][i].CustomGenomeIndex != 'None' || JSON_OBJECT['pipeline'][i].CustomGenomeAnnotation != 'None'){
+						$.ajax({
+							type: 	'GET',
+							url: 	BASE_PATH+'/public/api/service.php?func=checkFile&username='+username.clusteruser+'&file='+JSON_OBJECT['pipeline'][i].CustomGenomeIndex+'*',
+							async:	false,
+							success: function(s)
+							{
+								console.log(s);
+								jsonCheck = JSON.parse(s);
+								if (jsonCheck.Result != 'Ok') {
+									tophatCheckIndex = true;
+								}
 							}
+						});
+						if (outputdir.substring(0,1) != '/'  && outputdir.indexOf('/') > -1) {
+							outputdir = '/' + outputdir;
 						}
-					});
+						$.ajax({
+							type: 	'GET',
+							url: 	BASE_PATH+'/public/api/service.php?func=checkPermissions&username='+username.clusteruser+'&file=' + JSON_OBJECT['pipeline'][i].CustomGenomeAnnotation,
+							async:	false,
+							success: function(s)
+							{
+								console.log(s);
+								jsonCheck = JSON.parse(s);
+								if (jsonCheck.Result != 'Ok') {
+									tophatCheckAnnotation = true;
+								}
+							}
+						});
+					}
 				}
 			}
 		}
