@@ -575,7 +575,7 @@ class Dolphin:
         elif (end_email_check[0][0] != 1):
             receiver =  email_err_receiver
             subject = 'There has been an error in run: %s' % run_id
-            body = 'Run %s has ended with an error' % run_id;
+            body = 'Run %s has ended with an error within %s' % run_id, self.params_section;
         p = os.popen("%s -t" % "/usr/sbin/sendmail", "w")
         p.write("From: %s\n" % email_sender)
         p.write("To: %s\n" % receiver)
