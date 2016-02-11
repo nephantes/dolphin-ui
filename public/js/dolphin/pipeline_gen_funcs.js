@@ -798,6 +798,7 @@ function submitPipeline(type) {
 		//Check empty multi_selections
 		var de_multi_error = false;
 		var meth_multi_error = false;
+		var name_error = false;
 		for(var z = 0; z < currentPipelineVal.length; z++){
 			if (currentPipelineVal[z] == 'DESeq') {
 				if (document.getElementById('multi_select_1_'+currentPipelineID[z]).value == "") {
@@ -814,6 +815,14 @@ function submitPipeline(type) {
 			}
 		}
 	
+		for( var i = 0; i < JSON_OBJECT['pipeline'].length; i++){
+			if (JSON_OBJECT['pipeline'][i].Type == 'DESeq' || JSON_OBJECT['pipeline'][i].Type == 'DiffMeth') {
+				if (JSON_OBJECT['pipeline'][i].Name == "") {
+					name_error = true;
+				}
+			}
+		}
+		
 		if (adapterCheck && doAdapter == 'yes') {
 			$('#errorModal').modal({
 				show: true
@@ -845,11 +854,17 @@ function submitPipeline(type) {
 			});
 			document.getElementById('errorLabel').innerHTML ='DESeq is missing selected conditions.<br><br>';
 			document.getElementById('errorAreas').innerHTML = '';
-		} else if (meth_multi_error){
+		}else if (meth_multi_error){
 			$('#errorModal').modal({
 				show: true
 			});
 			document.getElementById('errorLabel').innerHTML ='DiffMeth is missing selected conditions.<br><br>';
+			document.getElementById('errorAreas').innerHTML = '';
+		}else if(name_error){
+			$('#errorModal').modal({
+				show: true
+			});
+			document.getElementById('errorLabel').innerHTML ='DESeq/DiffMeth require a name in order to run the pipeline.<br><br>';
 			document.getElementById('errorAreas').innerHTML = '';
 		}else{
 			//insert new values into ngs_runparams
