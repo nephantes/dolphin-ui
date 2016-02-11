@@ -568,10 +568,11 @@ class Dolphin:
         end_email_check=self.runSQL(run_sql%locals())
         user_sql = "SELECT name, email, email_toggle FROM users where username = '%s';"%username
         email_check=self.runSQL(user_sql%locals())
+        print self.params_section
         if (end_email_check[0][0] == 1 and email_check[0][2] == 1):
             receiver = email_check[0][1]
             subject = 'Your Dolphin run has completed!'
-            body = 'Your Dolphin run #%s has completed successfully! within %s' % run_id, self.params_section;
+            body = 'Your Dolphin run #%s has completed successfully!' % run_id
         elif (end_email_check[0][0] != 1):
             receiver =  email_err_receiver
             subject = 'There has been an error in run: %s' % run_id
