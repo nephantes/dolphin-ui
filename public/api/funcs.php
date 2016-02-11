@@ -64,36 +64,37 @@ class funcs
 
     function checkFile($params)
     {
-         $this->username=$params['username'];
-         $this->readINI();         
-         $com = "ls ".$params['file'];
-         $retval = $this->syscall($this->getCMDs($com));
-         
-         if (preg_match('/No such file or directory/', $retval)) {
-              return "{\"ERROR\": \"No such file or directory: ".$params['file']."\"}";
-         }
-         if (preg_match('/Permission denied/', $retval)) {
-              return "{\"ERROR\": \"Permission denied: ".$params['file']."\"}";
-         }
-         return "{\"Result\":\"Ok\"}";
+        $this->username=$params['username'];
+        $this->readINI();
+        $file_array = explode(",",$params['file']);
+        $com = 'ls ';
+        foreach($file_array as $fa){
+            $com .= $fa . " ";
+        }
+        $com .= " | grep XXXXXXXXXXX";
+        $retval = $this->syscall($this->getCMDs($com));
+        if (preg_match('/No such file or directory/', $retval)) {
+             return "{\"ERROR\": \"".trim($retval)."\"}";
+        }
+        if (preg_match('/Permission denied/', $retval)) {
+             return "{\"ERROR\": \"".trim($retval)."\"}";
+        }
+        return "{\"Result\":\"Ok\"}";
     }
     function checkPermissions($params)
     {
-         $this->username=$params['username'];
-         $this->readINI();
-         if ($params['outdir']!="")
-         {
-           $com = "mkdir -p ".$params['outdir'].";cd ".$params['outdir'].";touch permstest.txt;rm permstest.txt";
-         }
-         else
-         {
-           $com = "ls";
-         }
-         $retval = $this->syscall($this->getCMDs($com));
-         if (preg_match('/Permission denied/', $retval)) {
-              return "{\"ERROR\": \"Permission denied: ".$params['outdir']."\"}";
-         }
-         return "{\"Result\":\"Ok\"}";
+        $this->username=$params['username'];
+        $this->readINI();
+        if (isset($params['outdir'])){
+          $com = "mkdir -p ".$params['outdir'].";cd ".$params['outdir'].";touch permstest.txt;rm permstest.txt";
+        }else{
+          $com = "ls";
+        }
+        $retval = $this->syscall($this->getCMDs($com));
+        if (preg_match('/Permission denied/', $retval)) {
+             return "{\"ERROR\": \"Permission denied: ".$params['outdir']."\"}";
+        }
+        return "{\"Result\":\"Ok\"}";
     }
      
     function getKey()
