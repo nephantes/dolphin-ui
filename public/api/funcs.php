@@ -597,7 +597,7 @@ class funcs
         $service_id  = $this->getId("service", $username, $servicename, $wkey, "");
         if ($field=="end_time")
         {
-               $this->checkStartTime($wkey, $job_num, $username);
+               $this->checkStartTime($wkey, $jobnum, $username);
         }
         
         $sql = "update jobs set `$field`=now(), `result`='$result' where `wkey`='$wkey' and `job_num`='$jobnum'";
@@ -640,7 +640,7 @@ class funcs
     }
     function updateService($wkey, $service_id, $result)
     {
-        $sql = "update service_run set `end_time`=now(), `result`='$result' where `wkey`='$wkey' and `service_id`='$service_id'";
+        $sql = "update service_run set `end_time`=now(), `result`='$result' where `wkey`='$wkey' and `service_id`='$service_id' and end_time=0";
         $res = $this->runSQL($sql);
         
         return $res;
