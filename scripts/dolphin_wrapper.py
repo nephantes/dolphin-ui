@@ -684,7 +684,7 @@ def main():
               p.stdout.flush()
               if (re.search('failed\n', line) or re.search('Err\n', line) ):
                  logging.info("failed")
-                 dolphin.send_email(end_email_check[0][0], runparamsids[0][1], runparamsids[0][0]);
+                 dolphin.send_email(runparamsids[0][1], runparamsids[0][0]);
                  dolphin.stop_err("failed")
         #Send email when finished
         dolphin.send_email(runparamsids[0][1], runparamsids[0][0]);
