@@ -853,7 +853,7 @@ function submitPipeline(type) {
 			document.getElementById('errorAreas').innerHTML = '';
 		}else{
 			//insert new values into ngs_runparams
-			var runparamsInsert = postInsertRunparams(JSON_OBJECT, outputdir, run_name, description, perms, group);
+			var runparamsInsert = postInsertRunparams(JSON_OBJECT, outputdir, run_name, description, perms, group, ids.toString());
 			//insert new values into ngs_runlist
 			console.log(runparamsInsert);
 			console.log(ids);
@@ -1467,9 +1467,7 @@ function confirmOwnerPressed(){
 /*##### SEND TO PIPELINE WITH SELECTION #####*/
 function submitSelected(){
 	if (selectionTest()) {
-		if (initialRunTest()) {
-			window.location.href = BASE_PATH+"/pipeline/selected/" + checklist_samples + "$";
-		}
+		window.location.href = BASE_PATH+"/pipeline/selected/" + checklist_samples + "$";
 	}
 }
 
@@ -1483,44 +1481,6 @@ function selectionTest(){
 		document.getElementById('myModalLabel').innerHTML = 'Selection error';
 		document.getElementById('deleteLabel').innerHTML ='No samples/imports selected.  Please select samples/imports in order to send them to the pipeline';
 		document.getElementById('deleteAreas').innerHTML = '';
-			
-		document.getElementById('cancelDeleteButton').innerHTML = "OK";
-		document.getElementById('confirmDeleteButton').setAttribute('style', 'display:none');
-		return false;
-	}
-}
-
-function initialRunTest(){
-	var valid_samples = [];
-	$.ajax({ type: "GET",
-				url: BASE_PATH+"/public/ajax/browse_edit.php",
-				data: { p: 'intialRunCheck', samples: checklist_samples.toString()},
-				async: false,
-				success : function(r)
-				{
-					console.log(r);
-					for (var x = 0; x < r.length; x++) {
-						valid_samples.push(r[x].sample_id);
-					}
-				}
-			});
-	if (valid_samples.length == checklist_samples.length) {
-		return true;
-	}else{
-		$('#deleteModal').modal({
-			show: true
-		});
-		
-		var spliced_samples = checklist_samples.slice(0);
-		for(var x = 0; x < valid_samples.length; x++){
-			var loc = spliced_samples.indexOf(parseInt(valid_samples[x]));
-			spliced_samples.splice(loc, 1);
-		}
-		
-		document.getElementById('myModalLabel').innerHTML = 'Selection error';
-		document.getElementById('deleteLabel').innerHTML ='Some samples/imports selected have not finished their initial processing.';
-		document.getElementById('deleteAreas').innerHTML = 'You cannot use these sample(s) within the pipeline until they finish their initial processing:' +
-			'<br><br>Sample id(s): ' + spliced_samples.join(", ");
 			
 		document.getElementById('cancelDeleteButton').innerHTML = "OK";
 		document.getElementById('confirmDeleteButton').setAttribute('style', 'display:none');

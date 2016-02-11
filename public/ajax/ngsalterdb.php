@@ -8,6 +8,37 @@ require_once("../../includes/dbfuncs.php");
 
 $query = new dbfuncs();
 
+if(!function_exists('waitRun')){
+	function waitRun($ids, $idKey, $query){
+		if($ids != ''){
+			$initial_check=$query->queryTable("
+				SELECT id
+				FROM ngs_fastq_files
+				WHERE sample_id in (".$ids.")
+				AND total_reads NOT NULL
+				AND total_reads > 0
+				");
+			$wait_check_error = false;
+			if($initial_check == '[]'){
+				$wait_check_error = true;
+			}else{
+				foreach($initial_check as $ic){
+					if (!in_array($ic->id, implode(",",$ids))){
+						$wait_check_error = true;
+					}
+				}
+			}
+			if($wait_check_error){
+				$query->runSQL("
+				UPDATE ngs_runparams
+				SET run_status = 5
+				WHERE id = '$idKey'
+				");
+			}
+		}
+	}
+}
+
 if(!function_exists('runCmd')){
 	function runCmd($idKey, $query, $wkey)
 	{
@@ -78,7 +109,8 @@ if ($p == "submitPipeline" )
     if (isset($_POST['uid'])){$uid = $_POST['uid'];}
     if (isset($_POST['group'])){$group = $_POST['group'];}
 	if (isset($_POST['perms'])){$perms = $_POST['perms'];}
-    
+    if (isset($_POST['ids'])){$ids = $_POST['ids'];}
+	
     $outdir_check = $query->queryAVal("SELECT outdir FROM ngs_runparams WHERE outdir = '$outdir'");
     
     if($outdir_check == $outdir){
@@ -114,7 +146,7 @@ if ($p == "submitPipeline" )
         last_modified_user = $uid
         WHERE id = '$idKey'
         ");
-		
+		waitRun($ids, $idKey, $query);
         runCmd($idKey, $query, $wkey);
         $data=$idKey;
     }else{
@@ -127,6 +159,7 @@ if ($p == "submitPipeline" )
         //need to grab the id for runlist insertion
         $idKey=$query->queryAVal("SELECT id FROM ngs_runparams WHERE run_group_id = -1 and run_name = '$name' order by id desc limit 1");
         $wkey="";
+		waitRun($ids, $idKey, $query);
 		runCmd($idKey, $query, $wkey);
         //update required to make run_group_id equal to it's primary key "id".Replace the arbitrary -1 with the id
         if( $runGroupID == 'new'){
