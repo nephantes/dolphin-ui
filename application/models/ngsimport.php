@@ -115,7 +115,7 @@ class Ngsimport extends VanillaModel {
 	/*
 	* createSampleName
 	*
-	* Returns a specifically formatted samplename based on donor, source symbol, condition symbol, time, and replicas
+	* Returns a specifically formatted samplename based on donor, source symbol, antibody target, condition symbol, time, and replicas
 	* Otherwise just returns the samples given name
 	*
 	* @param sample $sample sample object containing the correct information
@@ -140,6 +140,18 @@ class Ngsimport extends VanillaModel {
 					$samplename.="_";
 				}
 				$samplename.= $sample->source_symbol;
+				if($underscore_mark){
+					$underscore_mark = false;
+				}
+			}
+		}
+		//	Antibody Target
+		if(isset($sample->target)){
+			if($sample->target != NULL && $sample->target != '' && $sample->target != null && $sample->target != 'null'){
+				if(!$underscore_mark){
+					$samplename.="_";
+				}
+				$samplename.= $sample->target;
 				if($underscore_mark){
 					$underscore_mark = false;
 				}
@@ -171,18 +183,6 @@ class Ngsimport extends VanillaModel {
 				}else{
 					$samplename.= floor($sample->time/60)."h";
 				}
-				if($underscore_mark){
-					$underscore_mark = false;
-				}
-			}
-		}
-		//	Antibody Targets
-		if(isset($sample->target)){
-			if($sample->target != NULL && $sample->target != '' && $sample->target != null && $sample->target != 'null'){
-				if(!$underscore_mark){
-					$samplename.="_";
-				}
-				$samplename.= $sample->target;
 				if($underscore_mark){
 					$underscore_mark = false;
 				}
@@ -264,6 +264,7 @@ class Ngsimport extends VanillaModel {
 		}
 		
 		//	Process Data
+		$this->final_check = true;
 		$parseArray = [$this->final_check, $text];
 		return $parseArray;
 	}
@@ -1879,12 +1880,12 @@ class samples extends main{
 				$check_result = json_decode($this->model->query($check));
 				if($check_result == array()){
 					//	Empty
-					$this->model->query("INSERT INTO `ngs_antibody_target` (`target_symbol`) VALUES ('".$sample->target."')");
-					$id = json_decode($this->model->query("SELECT `id` FROM `ngs_antibody_target` WHERE target_symbol = '".$sample->target."'"));
+					$this->model->query("INSERT INTO `ngs_antibody_target` (`target`) VALUES ('".$sample->target."')");
+					$id = json_decode($this->model->query("SELECT `id` FROM `ngs_antibody_target` WHERE target = '".$sample->target."'"));
 					$this->model->query("UPDATE `ngs_samples` SET `target_id` = ".$id[0]->id." WHERE `id` = $sample_id");
 				}else{
 					//	Exists
-					$id = json_decode($this->model->query("SELECT `id` FROM `ngs_antibody_target` WHERE target_symbol = '".$sample->target."'"));
+					$id = json_decode($this->model->query("SELECT `id` FROM `ngs_antibody_target` WHERE target = '".$sample->target."'"));
 					$this->model->query("UPDATE `ngs_samples` SET `target_id` = ".$id[0]->id." WHERE `id` = $sample_id");
 				}
 			}
