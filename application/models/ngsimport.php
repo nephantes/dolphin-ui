@@ -264,7 +264,6 @@ class Ngsimport extends VanillaModel {
 		}
 		
 		//	Process Data
-		$this->final_check = true;
 		$parseArray = [$this->final_check, $text];
 		return $parseArray;
 	}
@@ -1874,9 +1873,9 @@ class samples extends main{
 		//	Antibody Target
 		if($sample->target != NULL){
 			if($sample->target != NULL && $sample->target != '' && $sample->target != null && $sample->target != 'null'){
-				$check = "SELECT `id`, `target_symbol`
+				$check = "SELECT `id`, `target`
 							FROM ngs_antibody_target
-							WHERE `target_symbol` = '".$sample->target."'";
+							WHERE `target` = '".$sample->target."'";
 				$check_result = json_decode($this->model->query($check));
 				if($check_result == array()){
 					//	Empty
@@ -2033,18 +2032,18 @@ class samples extends main{
 		//	Antibody Target
 		if($sample->target != NULL){
 			if($sample->target != NULL && $sample->target != '' && $sample->target != null && $sample->target != 'null'){
-				$check = "SELECT `id`, `target_symbol`
+				$check = "SELECT `id`, `target`
 							FROM ngs_antibody_target
-							WHERE `target_symbol` = '".$sample->target."'";
+							WHERE `target` = '".$sample->target."'";
 				$check_result = json_decode($this->model->query($check));
 				if($check_result == array()){
 					//	Empty
-					$this->model->query("INSERT INTO `ngs_antibody_target` (`target_symbol`) VALUES ('".$sample->target."')");
-					$id = json_decode($this->model->query("SELECT `id` FROM `ngs_antibody_target` WHERE target_symbol = '".$sample->target."'"));
+					$this->model->query("INSERT INTO `ngs_antibody_target` (`target`) VALUES ('".$sample->target."')");
+					$id = json_decode($this->model->query("SELECT `id` FROM `ngs_antibody_target` WHERE target = '".$sample->target."'"));
 					$this->model->query("UPDATE `ngs_samples` SET `target_id` = ".$id[0]->id." WHERE `id` = $sample_id");
 				}else{
 					//	Exists
-					$id = json_decode($this->model->query("SELECT `id` FROM `ngs_antibody_target` WHERE target_symbol = '".$sample->target."'"));
+					$id = json_decode($this->model->query("SELECT `id` FROM `ngs_antibody_target` WHERE target = '".$sample->target."'"));
 					$this->model->query("UPDATE `ngs_samples` SET `target_id` = ".$id[0]->id." WHERE `id` = $sample_id");
 				}
 			}
