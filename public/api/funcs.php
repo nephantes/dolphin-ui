@@ -251,7 +251,7 @@ class funcs
     {
         $servicename = $params['servicename'];
         $wkey        = $params['wkey'];
-        $sql      = "select j.service_id from jobs j, services s where s.service_id=j.service_id and s.servicename='$servicename' and j.wkey='$wkey'";
+        $sql      = "select DISTINCT j.service_id from jobs j, services s where s.service_id=j.service_id and j.jobname='$servicename' and j.wkey='$wkey'";
         #return $sql;
         $service_id   = $this->queryAVal($sql);
         #sleep(1); 
@@ -506,7 +506,7 @@ class funcs
                 $retval = $this->sysback($com);
              }
              if (preg_match('/Error/', $retval)) {
-                 return "ERROR: $retval";
+                 return "ERROR: $retval: : $com";
              }
              return "RUNNING(2):$inputcommand:$com";
         } else {

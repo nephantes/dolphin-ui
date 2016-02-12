@@ -460,6 +460,8 @@ class Dolphin:
                  self.writeRSeQC ( fp, "RSEM", pipe, sep )
               
               if (pipe['Type']=="Tophat"):
+                 gtf = (pipe['CustomGenomeAnnotation'] if ('CustomGenomeAnnotation' in pipe and pipe['CustomGenomeAnnotation'].lower()!="none") else "@GTF" )
+                 bowtie2index = (pipe['CustomGenomeIndex'] if ('CustomGenomeIndex' in pipe and pipe['CustomGenomeIndex'].lower()!="none") else "@BOWTIE2INDEX" )
                  self.prf( fp, stepTophat % locals() )
                  type="tophat"
                  if ('split' in runparams and runparams['split'].lower() != 'none'):
