@@ -15,15 +15,14 @@ if(!function_exists('waitRun')){
 				SELECT id
 				FROM ngs_fastq_files
 				WHERE sample_id in (".$ids.")
-				AND total_reads NOT NULL
 				AND total_reads > 0
 				");
 			$wait_check_error = false;
 			if($initial_check == '[]'){
 				$wait_check_error = true;
 			}else{
-				foreach($initial_check as $ic){
-					if (!in_array($ic->id, implode(",",$ids))){
+				foreach(json_decode($initial_check) as $ic){
+					if (!in_array($ic->id, explode(",",$ids))){
 						$wait_check_error = true;
 					}
 				}
