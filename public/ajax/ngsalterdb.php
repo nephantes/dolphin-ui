@@ -21,7 +21,7 @@ if(!function_exists('waitRun')){
 			if($initial_check == '[]'){
 				$wait_check_error = true;
 			}else{
-				foreach($initial_check as $ic){
+				foreach(json_decode($initial_check) as $ic){
 					if (!in_array($ic->id, explode(",",$ids))){
 						$wait_check_error = true;
 					}
