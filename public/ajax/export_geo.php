@@ -6,14 +6,6 @@ ini_set('report_errors','on');
 require_once("../../config/config.php");
 require_once("../../includes/dbfuncs.php");
 require_once("../../includes/excel/Classes/PHPExcel.php");
-//header
-
-function num2alpha($n){
-		for($r = ""; $n >= 0; $n = intval($n / 26) - 1){
-			$r = chr($n%26 + 0x41) . $r;
-		}
-		return $r;
-}
 
 $query = new dbfuncs();
 
@@ -24,23 +16,22 @@ if($p == 'exportGeo')
     $user = $_SESSION['user'];
 	//	Change directory and obtain empty template name
 	$inputFileName = "../tmp/files/Blank_Excel_Geo.xls";
-	
+
 	//	Load in the empty excel template
 	$objPHPExcel = PHPExcel_IOFactory::load($inputFileName);
-	$objPHPExcel->setActiveSheetIndex(3);
 	
 	//	Change values within the Excel file
 	if (isset($_GET['samples'])){$samples = $_GET['samples'];}
-	
+		
 	//	Samples and data gathering
 	$sample_data = json_decode($query->queryTable(
 		"SELECT ngs_samples.id, ngs_samples.series_id, ngs_samples.protocol_id, ngs_samples.lane_id,
 		ngs_samples.name, ngs_samples.samplename, ngs_samples.barcode, ngs_samples.title, ngs_samples.batch_id,
 		ngs_samples.description, ngs_samples.avg_insert_size, ngs_samples.read_length, ngs_samples.concentration,
 		ngs_samples.time, ngs_samples.biological_replica, ngs_samples.technical_replica, ngs_samples.spike_ins,
-		source, source_symbol, organism, genotype, molecule, library_type, donor, biosample_type, instrument_model,
+		ngs_source.source, ngs_source.source_symbol, organism, genotype, molecule, library_type, donor, biosample_type, instrument_model,
 		treatment_manufacturer, ngs_samples.adapter, ngs_samples.notebook_ref, ngs_samples.notes, ngs_lanes.name as l_name,
-		ngs_protocols.name as p_name, target
+		ngs_protocols.name as p_name, target, file_name, checksum
 		FROM ngs_samples
 		LEFT JOIN ngs_lanes
 		ON ngs_samples.lane_id = ngs_lanes.id
@@ -66,9 +57,10 @@ if($p == 'exportGeo')
 		ON ngs_samples.treatment_manufacturer_id = ngs_treatment_manufacturer.id
 		LEFT JOIN ngs_antibody_target
 		ON ngs_samples.target_id = ngs_antibody_target.id
-		WHERE ngs_samples.id IN (".implode(",", $samples).")
+		LEFT JOIN ngs_fastq_files
+		ON ngs_samples.id = ngs_fastq_files.sample_id
+		WHERE ngs_samples.id IN (".$samples.")
 		"));
-	
 	$experiment_series = $sample_data[0]->series_id;
 	$experiment_data = json_decode($query->queryTable(
 		"SELECT ngs_experiment_series.experiment_name, ngs_experiment_series.summary,
@@ -85,38 +77,31 @@ if($p == 'exportGeo')
 		SELECT contributor
 		FROM ngs_contributors
 		WHERE series_id = $experiment_series
-		"))
-	
+		"));
+	//	SERIES
 	$objPHPExcel->getActiveSheet()->setCellValue('B9', $experiment_data[0]->experiment_name);
 	$objPHPExcel->getActiveSheet()->setCellValue('B10', $experiment_data[0]->summary);
 	$objPHPExcel->getActiveSheet()->setCellValue('B11', $experiment_data[0]->design);
 	$count = 12;
 	foreach($contributors as $c){
 		if($count < 14){
-		    $objPHPExcel->getActiveSheet()->setCellValue('B'.$count, $c);
+		    $objPHPExcel->getActiveSheet()->setCellValue('B'.$count, $c->contributor);
 			$count++;
 		}else{
-		    $objWorksheet->insertNewRowBefore($count, 1);
+		    $objPHPExcel->getActiveSheet()->insertNewRowBefore($count, 1);
 			$objPHPExcel->getActiveSheet()->setCellValue('A'.$count, 'contributor');
-			$objPHPExcel->getActiveSheet()->setCellValue('B'.$count, $c);
+			$objPHPExcel->getActiveSheet()->setCellValue('B'.$count, $c->contributor);
 			$count++;
 		}
 	}
-	
-	$count = $count+8;
-	
-	$fastq_files = json_decode($query->queryTable("
-		SELECT *
-		FROM ngs_fastq_files
-		WHERE sample_id in (".implode(",", $samples).")
-		");
-	
-	$sample_bench = $count + 3;
+	$count = $count+7;
+	$sample_bench = $count + 4;
+	//	SAMPLES
 	foreach($sample_data as $sd){
 		if($count >= $sample_bench){
-			$objWorksheet->insertNewRowBefore($count, 1);	
+			$objPHPExcel->getActiveSheet()->insertNewRowBefore($count, 1);	
 		}
-		$objPHPExcel->getActiveSheet()->setCellValue('A'.$count, $sd->sample_name);
+		$objPHPExcel->getActiveSheet()->setCellValue('A'.$count, $sd->samplename);
 		$objPHPExcel->getActiveSheet()->setCellValue('B'.$count, $sd->title);
 		$objPHPExcel->getActiveSheet()->setCellValue('C'.$count, $sd->source);
 		$objPHPExcel->getActiveSheet()->setCellValue('D'.$count, $sd->organism);
@@ -129,15 +114,86 @@ if($p == 'exportGeo')
 		if($sd->molecule != null){
 				$objPHPExcel->getActiveSheet()->setCellValue('G'.$count, $sd->molecule);
 		}
-		
+		$count++;
+	}
+	if($count < $sample_bench){
+		$count = $count + ($sample_bench - $count) + 3;
+	}else{
+		$count = $count + 2;
 	}
 	
-	$lane_ids = array();
-	$protocol_ids = array();
-	$col_number = 4;
+	//	PROTOCOLS
+	if($sample_data[0]->protocol_id != null){
+		$protocols = json_decode($query->queryTable("
+				SELECT *
+				FROM ngs_protocols
+				LEFT JOIN ngs_library_strategy
+				ON ngs_protocols.library_strategy_id = ngs_library_strategy.id
+				WHERE id = ".$sample_data[0]->protocol_id."
+				"));
+		$objPHPExcel->getActiveSheet()->setCellValue('B'.$count, $protocols[0]->growth);
+		$objPHPExcel->getActiveSheet()->setCellValue('B'.($count+1), $protocols[0]->treatment);
+		$objPHPExcel->getActiveSheet()->setCellValue('B'.($count+2), $protocols[0]->extraction);
+		$objPHPExcel->getActiveSheet()->setCellValue('B'.($count+3), $protocols[0]->library_construction);
+		$objPHPExcel->getActiveSheet()->setCellValue('B'.($count+4), $protocols[0]->library_strategy);
+	}
+	$count = $count + 10;
 	
+	//	DATA PROCESSING PIPELINE
+	if($sample_data[0]->organism_symbol != null){
+		$objPHPExcel->getActiveSheet()->setCellValue('B'.($count+5), $sample_data[0]->organism_symbol);
+	}
+	$count = $count + 17;
+	//	PROCESSED DATA FILES
 	
+	//	RAW FILES
+	$fastq_bench = $count + 2;
+	foreach($sample_data as $sd){
+		$paired_end_check = explode(",", $sd->file_name);
+		$pe_count = 0;
+		foreach($paired_end_check as $pec){
+				if($count >= $fastq_bench){
+						$objPHPExcel->getActiveSheet()->insertNewRowBefore($count, 1);	
+				}
+				$objPHPExcel->getActiveSheet()->setCellValue('A'.$count, $pec);
+				$objPHPExcel->getActiveSheet()->setCellValue('B'.$count, 'fastq');
+				$objPHPExcel->getActiveSheet()->setCellValue('C'.$count, explode(",", $sd->checksum)[$pe_count]);
+				if($sd->instrument_model != null){
+					$objPHPExcel->getActiveSheet()->setCellValue('D'.$count, $sd->instrument_model);	
+				}
+				if($sd->read_length != null){
+					$objPHPExcel->getActiveSheet()->setCellValue('E'.$count, $sd->read_length);	
+				}
+				if(count($paired_end_check) == 2){
+						$objPHPExcel->getActiveSheet()->setCellValue('F'.$count, 'paired');		
+				}else{
+						$objPHPExcel->getActiveSheet()->setCellValue('F'.$count,'single');	
+				}
+				$pe_count++;
+				$count++;
+		}
+	}
+	if($count < $fastq_bench){
+		$count = $count + ($fastq_bench - $count) + 5;
+	}else{
+		$count = $count + 4;
+	}
+	//	PAIRED_END_READS
+	foreach($sample_data as $sd){
+		$paired_end_check = explode(",", $sd->file_name);
+		if(count($paired_end_check) == 2){
+				$objPHPExcel->getActiveSheet()->setCellValue('A'.$count, $paired_end_check[0]);
+				$objPHPExcel->getActiveSheet()->setCellValue('B'.$count, $paired_end_check[1]);
+				$objPHPExcel->getActiveSheet()->setCellValue('C'.$count, $sd->avg_insert_size);
+				$count++;
+		}
+	}
 	
+	//	Save the file to be downloaded
+	$objWriter = new PHPExcel_Writer_Excel2007($objPHPExcel);
+	$name = "/tmp/files/".$user."_Geo.xls";
+	$objWriter->save("..".$name);
+	echo $name;
 }
 
 ?>
