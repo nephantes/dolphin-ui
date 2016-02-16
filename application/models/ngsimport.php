@@ -346,7 +346,7 @@ class Ngsimport extends VanillaModel {
 	/*
 	* checkAlphaNumWithAddChars
 	*
-	* Returns the html version for the error color
+	* Checks string for alpha-numeric characters and any other extra characters specified
 	*
 	* @param string $extraChars extra characters to allow within the match
 	* @param string $data string to check matching characters against
@@ -354,6 +354,18 @@ class Ngsimport extends VanillaModel {
 	*/
 	function checkAlphaNumWithAddChars($extraChars, $data){
 		return preg_match('/^[a-zA-Z0-9' . $extraChars . ']+$/', $data);
+	}
+	
+	/*
+	* checkNumeric
+	*
+	* Checks string for numeric characters only
+	*
+	* @param string $data string to check
+	* @return bool
+	*/
+	function checkNumeric($data){
+		return preg_match('/^[0-9]+$/', $data);
 	}
 	
 	
@@ -973,7 +985,7 @@ class Ngsimport extends VanillaModel {
 			if(!isset($samp->time)){
 				$samp->time = NULL;
 			}else{
-				if(!$this->checkAlphaNumWithAddChars('', $samp->time) && $samp->time != NULL){
+				if(!$this->checkNumeric($samp->time) && $samp->time != NULL){
 					$text.= $this->errorText("Time bust me an integer expressed in minutes (row " . $i . ")");
 					$this->final_check = false;
 					$samp_check = false;
@@ -984,7 +996,7 @@ class Ngsimport extends VanillaModel {
 			if(!isset($samp->biological_replica)){
 				$samp->biological_replica = NULL;
 			}else{
-				if(!$this->checkAlphaNumWithAddChars('', $samp->biological_replica) && $samp->biological_replica != NULL){
+				if(!$this->checkNumeric($samp->biological_replica) && $samp->biological_replica != NULL){
 					$text.= $this->errorText("Biological Replica bust me an integer expressed in minutes (row " . $i . ")");
 					$this->final_check = false;
 					$samp_check = false;
@@ -995,7 +1007,7 @@ class Ngsimport extends VanillaModel {
 			if(!isset($samp->technical_replica)){
 				$samp->technical_replica = NULL;
 			}else{
-				if(!$this->checkAlphaNumWithAddChars('', $samp->technical_replica) && $samp->technical_replica != NULL){
+				if(!$this->checkNumeric($samp->technical_replica) && $samp->technical_replica != NULL){
 					$text.= $this->errorText("Technical Replica bust me an integer (row " . $i . ")");
 					$this->final_check = false;
 					$samp_check = false;
