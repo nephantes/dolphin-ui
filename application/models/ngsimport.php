@@ -178,7 +178,7 @@ class Ngsimport extends VanillaModel {
 				if(!$underscore_mark){
 					$samplename.="_";
 				}
-				if($sample->time < 60){
+				if($sample->time < 60 && $sample->time > 0){
 					$samplename.= $sample->time."m";
 				}else{
 					$samplename.= floor($sample->time/60)."h";
@@ -841,8 +841,8 @@ class Ngsimport extends VanillaModel {
 			}
 			
 			//	Name
-			if(isset($samp->name)){
-				if($this->checkAlphaNumWithAddChars('\s\_\-', $samp->name)){
+			if(isset($samp->samplename)){
+				if($this->checkAlphaNumWithAddChars('\s\_\-', $samp->samplename)){
 					//	Need to check the database for similar names as well at a later date
 					if(isset($this->sample_arr[$samp->name])){
 						$text.= $this->errorText("Sample name already exists in that Import (row " . $i . ")");
@@ -895,8 +895,8 @@ class Ngsimport extends VanillaModel {
 			//	Protocol Name
 			if(!isset($this->prot_arr[$samp->protocol_name])){
 				$text.= $this->errorText("Protocol name does not match any protocol given in the excel file (row " . $i . ")");
-					$this->final_check = false;
-					$samp_check = false;
+				$this->final_check = false;
+				$samp_check = false;
 			}
 			
 			//	Batch ID
@@ -907,12 +907,43 @@ class Ngsimport extends VanillaModel {
 			//	Source Symbol
 			if(!isset($samp->source_symbol)){
 				$samp->source_symbol = NULL;
+			}else{
+				if(!$this->checkAlphaNumWithAddChars('\s\_\-\,', $samp->source_symbol) && $samp->source_symbol != NULL){
+					$text.= $this->errorText("Source symbol does not contain proper characters, please use alpha-numeric characters and underscores (row " . $i . ")");
+					$this->final_check = false;
+					$samp_check = false;
+				}
 			}
 			
 			//	Condition Symbol
 			if(!isset($samp->condition_symbol)){
 				$samp->condition_symbol = NULL;
+			}else{
+				if(!$this->checkAlphaNumWithAddChars('\s\_\-\,', $samp->condition_symbol) && $samp->condition_symbol != NULL){
+					$text.= $this->errorText("Condition symbol does not contain proper characters, please use alpha-numeric characters and underscores (row " . $i . ")");
+					$this->final_check = false;
+					$samp_check = false;
+				}
 			}
+			
+			//	Condition
+			if(!isset($samp->condition)){
+				$samp->condition = NULL;
+			}else{
+				if(!$this->checkAlphaNumWithAddChars('\s\_\-\,', $samp->condition) && $samp->condition != NULL){
+					$text.= $this->errorText("Condition does not contain proper characters, please use alpha-numeric characters and underscores and separate multiple conditions with , (row " . $i . ")");
+					$this->final_check = false;
+					$samp_check = false;
+				}
+			}
+			if(isset($samp->condition)){
+				if(!$this->checkAlphaNumWithAddChars('\s\_\-\,', $samp->condition)){
+					echo $samp->condition;
+				}else{
+					echo $samp->condition;
+				}
+			}
+			
 			
 			//	Concentration
 			if(!isset($samp->concentration)){
@@ -932,21 +963,43 @@ class Ngsimport extends VanillaModel {
 			//	Donor
 			if(!isset($samp->donor)){
 				$samp->donor = NULL;
+			}elseif(!$this->checkAlphaNumWithAddChars('\s\_\-\,', $samp->donor) && $samp->donor != NULL){
+				$text.= $this->errorText("Donor does not contain proper characters, please use alpha-numeric characters and underscores (row " . $i . ")");
+				$this->final_check = false;
+				$samp_check = false;
 			}
 			
 			//	Time
 			if(!isset($samp->time)){
 				$samp->time = NULL;
+			}else{
+				if(!$this->checkAlphaNumWithAddChars('', $samp->time) && $samp->time != NULL){
+					$text.= $this->errorText("Time bust me an integer expressed in minutes (row " . $i . ")");
+					$this->final_check = false;
+					$samp_check = false;
+				}
 			}
 			
 			//	Biological Replica
 			if(!isset($samp->biological_replica)){
 				$samp->biological_replica = NULL;
+			}else{
+				if(!$this->checkAlphaNumWithAddChars('', $samp->biological_replica) && $samp->biological_replica != NULL){
+					$text.= $this->errorText("Biological Replica bust me an integer expressed in minutes (row " . $i . ")");
+					$this->final_check = false;
+					$samp_check = false;
+				}
 			}
 			
 			//	Technical Replica
 			if(!isset($samp->technical_replica)){
 				$samp->technical_replica = NULL;
+			}else{
+				if(!$this->checkAlphaNumWithAddChars('', $samp->technical_replica) && $samp->technical_replica != NULL){
+					$text.= $this->errorText("Technical Replica bust me an integer (row " . $i . ")");
+					$this->final_check = false;
+					$samp_check = false;
+				}
 			}
 			
 			//	Spikeins
@@ -962,6 +1015,10 @@ class Ngsimport extends VanillaModel {
 			//	Antibody Target
 			if(!isset($samp->target)){
 				$samp->target = NULL;
+			}elseif($this->checkAlphaNumWithAddChars('\s\_\-\,', $samp->target)){
+				$text.= $this->errorText("Target does not contain proper characters, please use alpha-numeric characters and underscores (row " . $i . ")");
+				$this->final_check = false;
+				$samp_check = false;
 			}
 		}
 		if($samp_check){
