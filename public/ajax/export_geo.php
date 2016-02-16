@@ -117,7 +117,7 @@ if($p == 'exportGeo')
 		$count++;
 	}
 	if($count < $sample_bench){
-		$count = $count + ($sample_bench - $count) + 3;
+		$count = $count + ($sample_bench - $count) + 2;
 	}else{
 		$count = $count + 2;
 	}
