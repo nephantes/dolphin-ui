@@ -9,6 +9,17 @@ require_once("../../includes/excel/Classes/PHPExcel.php");
 
 $query = new dbfuncs();
 
+function checkDirectory($directory){
+		$command = 'ls ' . $directory;
+        if ($proc = popen("($command)2>&1", "r")) {
+				$result = fgets($proc, 1000);
+				pclose($proc);
+				return $result;
+        } else {
+				return "ERROR 104: Cannot run $command!";
+        }
+}
+
 if (isset($_GET['p'])){$p = $_GET['p'];}
 
 if($p == 'exportGeo')
@@ -140,12 +151,18 @@ if($p == 'exportGeo')
 	$count = $count + 10;
 	
 	//	DATA PROCESSING PIPELINE
+	//	Obtain directories for samples
+	
+	//	Check to see if certain directories exist
+	
+	//	Detail appropriate pipeline
 	if($sample_data[0]->organism_symbol != null){
 		$objPHPExcel->getActiveSheet()->setCellValue('B'.($count+5), $sample_data[0]->organism_symbol);
 	}
+	//	Create out directory
+	
 	$count = $count + 17;
 	//	PROCESSED DATA FILES
-	
 	//	RAW FILES
 	$fastq_bench = $count + 2;
 	foreach($sample_data as $sd){
