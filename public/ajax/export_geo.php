@@ -22,6 +22,18 @@ function checkDirectory($directory){
         }
 }
 
+function reportCheckSum($path){
+		$command = 'md5sum ' . $path;
+		$result = '';
+        if ($proc = popen($command, "r")) {
+				$result = implode('\t', fgets($proc, 1000))[0];
+				pclose($proc);
+				return $result;
+        } else {
+				return "ERROR 104: Cannot run $command!";
+        }
+}
+
 if (isset($_GET['p'])){$p = $_GET['p'];}
 
 if($p == 'exportGeo')
@@ -42,7 +54,7 @@ if($p == 'exportGeo')
 		ngs_samples.name, ngs_samples.samplename, ngs_samples.barcode, ngs_samples.title, ngs_samples.batch_id,
 		ngs_samples.description, ngs_samples.avg_insert_size, ngs_samples.read_length, ngs_samples.concentration,
 		ngs_samples.time, ngs_samples.biological_replica, ngs_samples.technical_replica, ngs_samples.spike_ins,
-		ngs_source.source, ngs_source.source_symbol, organism, genotype, molecule, library_type, donor, biosample_type, instrument_model,
+		ngs_source.source, ngs_source.source_symbol, organism, organism_symbol, genotype, molecule, library_type, donor, biosample_type, instrument_model,
 		treatment_manufacturer, ngs_samples.adapter, ngs_samples.notebook_ref, ngs_samples.notes, ngs_lanes.name as l_name,
 		ngs_protocols.name as p_name, target, file_name, checksum, fastq_dir, backup_dir
 		FROM ngs_samples
@@ -93,6 +105,10 @@ if($p == 'exportGeo')
 		FROM ngs_contributors
 		WHERE series_id = $experiment_series
 		"));
+	$sample_names = array();
+	foreach($sample_data as $sd){
+		array_push($sample_names, $sd->samplename);
+	}
 	//	SERIES
 	$objPHPExcel->getActiveSheet()->setCellValue('B9', $experiment_data[0]->experiment_name);
 	$objPHPExcel->getActiveSheet()->setCellValue('B10', $experiment_data[0]->summary);
@@ -167,14 +183,76 @@ if($p == 'exportGeo')
 				AND json_parameters LIKE '%submission\":\"2%'
 				"));
 	//	Check to see if certain directories exist
-	$directories = checkDirectory($output_dir[0]->outdir);
-	//	Detail appropriate pipeline
-	if($sample_data[0]->organism_symbol != null){
-		$objPHPExcel->getActiveSheet()->setCellValue('B'.($count+5), $sample_data[0]->organism_symbol);
+    $directories = checkDirectory($output_dir[0]->outdir);
+	$rsem_check = false;
+	$bigwig_check = false;
+	$process_benchmark = $count + 5;
+	foreach($directories as $d){
+		if($count >= $process_benchmark){
+				$objPHPExcel->getActiveSheet()->insertNewRowBefore($count, 1);
+		}
+		if($d == 'rsem'){
+				$objPHPExcel->getActiveSheet()->setCellValue('B'.$count, 'reads were aligned to the reference genome using RSEM, quantification metrics obtained');
+				$rsem_check = true;
+				$count++;
+		}
+		if($d == 'ucsc_Tophat'){
+				$objPHPExcel->getActiveSheet()->setCellValue('B'.$count, 'reads were aligned to the reference genome using Tophat, bigwig files generated');
+				$bigwig_check = true;
+				$count++;
+		}
+	}
+	if($count < $process_benchmark){
+		$count = $count + ($process_benchmark - $count);
 	}
 	
-	$count = $count + 17;
+	//	Detail appropriate pipeline
+	if($sample_data[0]->organism_symbol != null){
+		$objPHPExcel->getActiveSheet()->setCellValue('B'.($count), $sample_data[0]->organism_symbol);
+	}
+	
+	$count = $count + 5;
+	$data_bench = $count + 3;
 	//	PROCESSED DATA FILES
+	foreach($output_dir as $od){
+		if($rsem_check){
+				$files = checkDirectory($od->outdir . '/rsem');
+				foreach($files as $f){
+						if($f != '' && strpos($f, 'pipe.') === false){
+								var_dump($f);
+								if($count >= $data_bench){
+										$objPHPExcel->getActiveSheet()->insertNewRowBefore($count, 1);
+								}
+								$objPHPExcel->getActiveSheet()->setCellValue('A'.$count, $f);
+								$objPHPExcel->getActiveSheet()->setCellValue('B'.$count, 'tsv');
+								$objPHPExcel->getActiveSheet()->setCellValue('C'.$count, reportCheckSum($od->outdir . '/rsem/' . $f));
+								$count++;
+						}
+				}
+		}
+		if($bigwig_check){
+				$files = checkDirectory($od->outdir . '/ucsc_Tophat');
+				foreach($files as $f){
+						if($f != ''){
+								if(in_array($sample_names, substr($f, 0, strlen($f) - 3))){
+										if($count >= $data_bench){
+												$objPHPExcel->getActiveSheet()->insertNewRowBefore($count, 1);
+										}
+										$objPHPExcel->getActiveSheet()->setCellValue('A'.$count, $f);
+										$objPHPExcel->getActiveSheet()->setCellValue('B'.$count, 'bigwig');
+										$objPHPExcel->getActiveSheet()->setCellValue('C'.$count, reportCheckSum($od->outdir . '/ucsc_Tophat/' . $f));
+										$count++;
+								}
+								
+						}
+				}
+		}
+	}
+	if($count < $data_bench){
+		$count = $count + ($data_bench - $count) + 4;
+	}else{
+		$count = $count + 4;
+	}
 	
 	//	RAW FILES
 	$fastq_bench = $count + 2;
