@@ -489,11 +489,12 @@ function exportGeo() {
 								success : function(q)
 								{
 									console.log(q);
-									window.open(BASE_PATH + "/public" + q, '_blank');
-									file_path = q;
+									json_out = JSON.parse(q);
+									file_path = json_out[0];
+									window.open(BASE_PATH + "/public" + file_path, '_blank');
+									
 								}
 						});
-						/*
 						$.ajax({ type: "GET",
 								url: BASE_PATH+"/public/ajax/export_excel.php",
 								data: { p: "deleteExcel", file: file_path },
@@ -502,7 +503,17 @@ function exportGeo() {
 								{
 								}
 						});
-						*/
+						$('#deleteModal').modal({
+							show: true
+						});
+						document.getElementById('myModalLabel').innerHTML = 'Files to submit to GEO';
+						document.getElementById('deleteLabel').innerHTML = 'You must submit the following files to geo manually:';
+						for(var x = 0; x < json_out[1].length; x++){
+							document.getElementById('deleteAreas').innerHTML += json_out[1][x] + '<br>';
+						}
+							
+						document.getElementById('cancelDeleteButton').innerHTML = "OK";
+						document.getElementById('confirmDeleteButton').setAttribute('style', 'display:none');
 					}else{
 						$('#deleteModal').modal({
 							show: true

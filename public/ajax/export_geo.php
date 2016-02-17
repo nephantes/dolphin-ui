@@ -26,7 +26,8 @@ function reportCheckSum($path){
 		$command = 'md5sum ' . $path;
 		$result = '';
         if ($proc = popen($command, "r")) {
-				$result = implode('\t', fgets($proc, 1000))[0];
+				while (!feof($proc))
+						$result .= explode(" ", trim(fgets($proc, 1000)))[0];
 				pclose($proc);
 				return $result;
         } else {
@@ -211,7 +212,10 @@ if($p == 'exportGeo')
 		$objPHPExcel->getActiveSheet()->setCellValue('B'.($count), $sample_data[0]->organism_symbol);
 	}
 	
-	$count = $count + 5;
+	//	File Output
+	$output_files = array();
+	
+	$count = $count + 6;
 	$data_bench = $count + 3;
 	//	PROCESSED DATA FILES
 	foreach($output_dir as $od){
@@ -219,13 +223,13 @@ if($p == 'exportGeo')
 				$files = checkDirectory($od->outdir . '/rsem');
 				foreach($files as $f){
 						if($f != '' && strpos($f, 'pipe.') === false){
-								var_dump($f);
 								if($count >= $data_bench){
 										$objPHPExcel->getActiveSheet()->insertNewRowBefore($count, 1);
 								}
 								$objPHPExcel->getActiveSheet()->setCellValue('A'.$count, $f);
 								$objPHPExcel->getActiveSheet()->setCellValue('B'.$count, 'tsv');
 								$objPHPExcel->getActiveSheet()->setCellValue('C'.$count, reportCheckSum($od->outdir . '/rsem/' . $f));
+								array_push($output_files, $od->outdir . '/rsem/' . $f); 
 								$count++;
 						}
 				}
@@ -234,13 +238,14 @@ if($p == 'exportGeo')
 				$files = checkDirectory($od->outdir . '/ucsc_Tophat');
 				foreach($files as $f){
 						if($f != ''){
-								if(in_array($sample_names, substr($f, 0, strlen($f) - 3))){
+								if(in_array(substr($f, 0, strlen($f) - 3), $sample_names)){
 										if($count >= $data_bench){
 												$objPHPExcel->getActiveSheet()->insertNewRowBefore($count, 1);
 										}
 										$objPHPExcel->getActiveSheet()->setCellValue('A'.$count, $f);
 										$objPHPExcel->getActiveSheet()->setCellValue('B'.$count, 'bigwig');
 										$objPHPExcel->getActiveSheet()->setCellValue('C'.$count, reportCheckSum($od->outdir . '/ucsc_Tophat/' . $f));
+										array_push($output_files, $od->outdir . '/ucsc_Tophat/' . $f);
 										$count++;
 								}
 								
@@ -249,9 +254,9 @@ if($p == 'exportGeo')
 		}
 	}
 	if($count < $data_bench){
-		$count = $count + ($data_bench - $count) + 4;
+		$count = $count + ($data_bench - $count) + 3;
 	}else{
-		$count = $count + 4;
+		$count = $count + 3;
 	}
 	
 	//	RAW FILES
@@ -277,6 +282,7 @@ if($p == 'exportGeo')
 				}else{
 						$objPHPExcel->getActiveSheet()->setCellValue('F'.$count,'single');	
 				}
+				array_push($output_files, $sd->fastq_dir . '/' . $pec);
 				$pe_count++;
 				$count++;
 		}
@@ -301,7 +307,7 @@ if($p == 'exportGeo')
 	$objWriter = new PHPExcel_Writer_Excel2007($objPHPExcel);
 	$name = "/tmp/files/".$user."_Geo.xls";
 	$objWriter->save("..".$name);
-	echo $name;
+	echo json_encode([$name, $output_files]);
 }
 
 ?>
