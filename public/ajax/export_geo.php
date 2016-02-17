@@ -11,8 +11,10 @@ $query = new dbfuncs();
 
 function checkDirectory($directory){
 		$command = 'ls ' . $directory;
-        if ($proc = popen("($command)2>&1", "r")) {
-				$result = fgets($proc, 1000);
+		$result = array();
+        if ($proc = popen($command, "r")) {
+				while (!feof($proc))
+						array_push($result, trim(fgets($proc, 1000)));
 				pclose($proc);
 				return $result;
         } else {
@@ -42,7 +44,7 @@ if($p == 'exportGeo')
 		ngs_samples.time, ngs_samples.biological_replica, ngs_samples.technical_replica, ngs_samples.spike_ins,
 		ngs_source.source, ngs_source.source_symbol, organism, genotype, molecule, library_type, donor, biosample_type, instrument_model,
 		treatment_manufacturer, ngs_samples.adapter, ngs_samples.notebook_ref, ngs_samples.notes, ngs_lanes.name as l_name,
-		ngs_protocols.name as p_name, target, file_name, checksum
+		ngs_protocols.name as p_name, target, file_name, checksum, fastq_dir, backup_dir
 		FROM ngs_samples
 		LEFT JOIN ngs_lanes
 		ON ngs_samples.lane_id = ngs_lanes.id
@@ -70,6 +72,8 @@ if($p == 'exportGeo')
 		ON ngs_samples.target_id = ngs_antibody_target.id
 		LEFT JOIN ngs_fastq_files
 		ON ngs_samples.id = ngs_fastq_files.sample_id
+		LEFT JOIN ngs_dirs
+		ON ngs_fastq_files.dir_id = ngs_dirs.id
 		WHERE ngs_samples.id IN (".$samples.")
 		"));
 	$experiment_series = $sample_data[0]->series_id;
@@ -136,11 +140,11 @@ if($p == 'exportGeo')
 	//	PROTOCOLS
 	if($sample_data[0]->protocol_id != null){
 		$protocols = json_decode($query->queryTable("
-				SELECT *
+				SELECT ngs_protocols.*, library_strategy
 				FROM ngs_protocols
 				LEFT JOIN ngs_library_strategy
 				ON ngs_protocols.library_strategy_id = ngs_library_strategy.id
-				WHERE id = ".$sample_data[0]->protocol_id."
+				WHERE ngs_protocols.id = ".$sample_data[0]->protocol_id."
 				"));
 		$objPHPExcel->getActiveSheet()->setCellValue('B'.$count, $protocols[0]->growth);
 		$objPHPExcel->getActiveSheet()->setCellValue('B'.($count+1), $protocols[0]->treatment);
@@ -152,17 +156,26 @@ if($p == 'exportGeo')
 	
 	//	DATA PROCESSING PIPELINE
 	//	Obtain directories for samples
-	
+	$output_dir = json_decode($query->queryTable("
+				SELECT outdir
+				FROM ngs_runparams
+				WHERE id in (
+					SELECT DISTINCT run_id
+					FROM ngs_runlist
+					WHERE sample_id in (".$samples.")
+				)
+				AND json_parameters LIKE '%submission\":\"2%'
+				"));
 	//	Check to see if certain directories exist
-	
+	$directories = checkDirectory($output_dir[0]->outdir);
 	//	Detail appropriate pipeline
 	if($sample_data[0]->organism_symbol != null){
 		$objPHPExcel->getActiveSheet()->setCellValue('B'.($count+5), $sample_data[0]->organism_symbol);
 	}
-	//	Create out directory
 	
 	$count = $count + 17;
 	//	PROCESSED DATA FILES
+	
 	//	RAW FILES
 	$fastq_bench = $count + 2;
 	foreach($sample_data as $sd){
