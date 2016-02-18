@@ -948,14 +948,6 @@ class Ngsimport extends VanillaModel {
 					$samp_check = false;
 				}
 			}
-			if(isset($samp->condition)){
-				if(!$this->checkAlphaNumWithAddChars('\s\_\-\,', $samp->condition)){
-					echo $samp->condition;
-				}else{
-					echo $samp->condition;
-				}
-			}
-			
 			
 			//	Concentration
 			if(!isset($samp->concentration)){
@@ -1027,7 +1019,7 @@ class Ngsimport extends VanillaModel {
 			//	Antibody Target
 			if(!isset($samp->target)){
 				$samp->target = NULL;
-			}elseif($this->checkAlphaNumWithAddChars('\s\_\-\,', $samp->target)){
+			}elseif(!$this->checkAlphaNumWithAddChars('\s\_\-\,', $samp->target) && $samp->target != NULL){
 				$text.= $this->errorText("Target does not contain proper characters, please use alpha-numeric characters and underscores (row " . $i . ")");
 				$this->final_check = false;
 				$samp_check = false;
