@@ -19,7 +19,7 @@ if (!empty($_SERVER["HTTP_HOST"])){
    {
       $param_section="Localhost";
    }
-   else if  ( preg_match("/galaxyweb.umassmed.edu/dolphindev", $http_host) )
+   else if  ( preg_match("/galaxyweb.umassmed.edu/", $http_host) )
    {
       $param_section="DolphinDev";
    }
