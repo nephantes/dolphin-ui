@@ -460,6 +460,76 @@ function exportExcel(){
 	}
 }
 
+function exportGeo() {
+	if (checklist_lanes.length == 0 && checklist_samples.length == 0) {
+		$('#deleteModal').modal({
+			show: true
+		});
+		document.getElementById('myModalLabel').innerHTML = 'No Import/Sample Selection';
+		document.getElementById('deleteLabel').innerHTML ='You must select at least one Import/Sample to export.';
+		document.getElementById('deleteAreas').innerHTML = '';
+			
+		document.getElementById('cancelDeleteButton').innerHTML = "OK";
+		document.getElementById('confirmDeleteButton').setAttribute('style', 'display:none');
+	}else{
+		$.ajax({ type: "GET",
+				url: BASE_PATH+"/public/ajax/export_excel.php",
+				data: { p: "checkExperimentSeries", samples: checklist_samples },
+				async: false,
+				success : function(s)
+				{
+					var ES = JSON.parse(s);
+					console.log(ES);
+					if (ES.length == 1) {
+						var file_path;
+						$.ajax({ type: "GET",
+								url: BASE_PATH+"/public/ajax/export_geo.php",
+								data: { p: "exportGeo", samples: checklist_samples.toString() },
+								async: false,
+								success : function(q)
+								{
+									console.log(q);
+									json_out = JSON.parse(q);
+									file_path = json_out[0];
+									window.open(BASE_PATH + "/public" + file_path, '_blank');
+									
+								}
+						});
+						$.ajax({ type: "GET",
+								url: BASE_PATH+"/public/ajax/export_excel.php",
+								data: { p: "deleteExcel", file: file_path },
+								async: false,
+								success : function(r)
+								{
+								}
+						});
+						$('#deleteModal').modal({
+							show: true
+						});
+						document.getElementById('myModalLabel').innerHTML = 'Files to submit to GEO';
+						document.getElementById('deleteLabel').innerHTML = 'You must submit the following files to geo manually:';
+						for(var x = 0; x < json_out[1].length; x++){
+							document.getElementById('deleteAreas').innerHTML += json_out[1][x] + '<br>';
+						}
+							
+						document.getElementById('cancelDeleteButton').innerHTML = "OK";
+						document.getElementById('confirmDeleteButton').setAttribute('style', 'display:none');
+					}else{
+						$('#deleteModal').modal({
+							show: true
+						});
+						document.getElementById('myModalLabel').innerHTML = 'More than one Experiment Series';
+						document.getElementById('deleteLabel').innerHTML ='You must select Imports/Samples within the same experiment series.';
+						document.getElementById('deleteAreas').innerHTML = '';
+							
+						document.getElementById('cancelDeleteButton').innerHTML = "OK";
+						document.getElementById('confirmDeleteButton').setAttribute('style', 'display:none');
+					}
+				}
+		});
+	}
+}
+
 $(function() {
 	"use strict";
 	
