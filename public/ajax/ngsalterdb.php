@@ -12,7 +12,7 @@ if(!function_exists('waitRun')){
 	function waitRun($ids, $idKey, $query){
 		if($ids != ''){
 			$initial_check=$query->queryTable("
-				SELECT id
+				SELECT sample_id
 				FROM ngs_fastq_files
 				WHERE sample_id in (".$ids.")
 				AND total_reads > 0
@@ -22,7 +22,7 @@ if(!function_exists('waitRun')){
 				$wait_check_error = true;
 			}else{
 				foreach(json_decode($initial_check) as $ic){
-					if (!in_array($ic->id, explode(",",$ids))){
+					if (!in_array($ic->sample_id, explode(",",$ids))){
 						$wait_check_error = true;
 					}
 				}
