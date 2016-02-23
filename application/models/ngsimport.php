@@ -372,7 +372,7 @@ class Ngsimport extends VanillaModel {
 	/*
 	* checkUserPermissions
 	*
-	* Runs the service api to find if use has permissions
+	* Runs the service api to find if use has read permissions
 	*
 	* @param string $clustername cluster username
 	* @return string
