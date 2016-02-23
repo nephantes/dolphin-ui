@@ -147,7 +147,7 @@ function checkFastlaneInput(info_array){
 				}
 				//	Input directory does not require write permissions, skip this step if id_array[x] is the input directory
 				if (id_array[x] == 'input_dir') {
-					dir_check_2 = 'Ok';
+					dir_check_2 = JSON.parse('{"Result":"Ok"}');
 				}else{
 					$.ajax({
 						type: 	'GET',
