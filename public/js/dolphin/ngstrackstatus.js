@@ -90,6 +90,7 @@ $(function() {
 						s[i].outdir,
 						s[i].run_description,
 						runstat,
+						s[i].username,
 						'<div class="btn-group pull-right">' +
 						'<button type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown" aria-expanded="true">Options <span class="fa fa-caret-down"></span></button>' +
 						'</button>' +
@@ -225,6 +226,7 @@ $(function() {
 							s[i].outdir,
 							s[i].run_description,
 							runstat,
+							s[i].username,
 							'<div class="btn-group pull-right">' +
 							'<button type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown" aria-expanded="true">Options <span class="fa fa-caret-down"></span></button>' +
 							'</button>' +
@@ -291,6 +293,7 @@ $(function() {
 								runjob.fnAddData([
 									parsed[i].title,
 									parsed[i].duration,
+									parsed[i].result,
 									parsed[i].job_num,
 									parsed[i].submit,
 									parsed[i].start,

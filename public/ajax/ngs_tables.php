@@ -81,8 +81,10 @@ if ($p == 'getStatus')	//	Status tables
 	$time="";
 	if (isset($start)){$time="and `date_created`>='$start' and `date_created`<='$end'";}
 	$data=$query->queryTable("
-	SELECT id, run_group_id, run_name, wkey, outdir, run_description, run_status, owner_id, group_id
+	SELECT ngs_runparams.*, username
 	FROM ngs_runparams
+	JOIN users
+	ON ngs_runparams.owner_id = users.id
 	$run_type $time
 	");
 }

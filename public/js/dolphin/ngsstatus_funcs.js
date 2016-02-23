@@ -57,6 +57,7 @@ function selectService(id){
 					runparams.fnAddData([
 						parsed[i].title,
 						parsed[i].duration,
+						parsed[i].result,
 						parsed[i].job_num,
 						parsed[i].submit,
 						parsed[i].start,
