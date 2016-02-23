@@ -1241,6 +1241,7 @@ class Ngsimport extends VanillaModel {
 		$single_file_check = $this->checkFilePermissions($this->clustername);
 		if($single_file_check != 'pass'){
 			$text.= $this->errorText($single_file_check);
+			$this->final_check = false;
 			$file_check = false;
 		}
 		
