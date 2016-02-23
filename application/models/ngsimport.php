@@ -390,7 +390,7 @@ class Ngsimport extends VanillaModel {
 	/*
 	* checkDirPermissions
 	*
-	* Runs the service api to find if use has permissions over a directory
+	* Runs the service api to find if use has write permissions over a directory
 	*
 	* @param string $dir the directory to check
 	* @param string $clustername cluster username
