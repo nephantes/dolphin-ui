@@ -145,16 +145,21 @@ function checkFastlaneInput(info_array){
 				if (info_array[x].substring(0,1) != '/'  && info_array[x].indexOf('/') > -1) {
 					info_array[x] = '/' + info_array[x];
 				}
-				$.ajax({
-					type: 	'GET',
-					url: 	BASE_PATH+'/public/api/service.php?func=checkPermissions&username='+username.clusteruser+'&outdir=' + info_array[x],
-					async:	false,
-					success: function(s)
-					{
-						console.log(s);
-						dir_check_2 = JSON.parse(s);
-					}
-				});
+				//	Input directory does not require write permissions, skip this step if id_array[x] is the input directory
+				if (id_array[x] == 'input_dir') {
+					dir_check_2 = JSON.parse('{"Result":"Ok"}');
+				}else{
+					$.ajax({
+						type: 	'GET',
+						url: 	BASE_PATH+'/public/api/service.php?func=checkPermissions&username='+username.clusteruser+'&outdir=' + info_array[x],
+						async:	false,
+						success: function(s)
+						{
+							console.log(s);
+							dir_check_2 = JSON.parse(s);
+						}
+					});
+				}
 				
 				if (dir_check_1.Result != 'Ok' || dir_check_2.Result != 'Ok') {
 					//	perms errors

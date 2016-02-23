@@ -372,7 +372,7 @@ class Ngsimport extends VanillaModel {
 	/*
 	* checkUserPermissions
 	*
-	* Runs the service api to find if use has permissions
+	* Runs the service api to find if use has read permissions
 	*
 	* @param string $clustername cluster username
 	* @return string
@@ -390,7 +390,7 @@ class Ngsimport extends VanillaModel {
 	/*
 	* checkDirPermissions
 	*
-	* Runs the service api to find if use has permissions over a directory
+	* Runs the service api to find if use has write permissions over a directory
 	*
 	* @param string $dir the directory to check
 	* @param string $clustername cluster username
@@ -483,13 +483,9 @@ class Ngsimport extends VanillaModel {
 			//	Directory validity tests
 			if(isset($this->fastq_dir) && ( $this->sheetData[$i]["A"]=="fastq directory" || $this->sheetData[$i]["A"]=="input directory")){
 				$permCheck = $this->checkUserPermissions($this->clustername);
-				$dirCheck = $this->checkDirPermissions($this->fastq_dir, $this->clustername);
 				if($permCheck != 'pass'){
 					$text.= $this->errorText("Fastq Directory error (".$this->fastq_dir."). ".$permCheck);
-					$meta_check = false;
-				}
-				if($dirCheck != 'pass'){
-					$text.= $this->errorText("Fastq Directory error (".$this->fastq_dir."). ".$dirCheck);
+					$this->final_check = false;
 					$meta_check = false;
 				}
 			}
@@ -499,10 +495,12 @@ class Ngsimport extends VanillaModel {
 				$dirCheck = $this->checkDirPermissions($this->backup_dir, $this->clustername);
 				if($permCheck != 'pass'){
 					$text.= $this->errorText("Fastq Directory error (".$this->backup_dir."). ".$permCheck);
+					$this->final_check = false;
 					$meta_check = false;
 				}
 				if($dirCheck != 'pass'){
 					$text.= $this->errorText("Fastq Directory error (".$this->backup_dir."). ".$dirCheck);
+					$this->final_check = false;
 					$meta_check = false;
 				}
 			}
@@ -1091,13 +1089,9 @@ class Ngsimport extends VanillaModel {
 			//	Directory validity tests
 			if(isset($this->fastq_dir) && ( $this->sheetData[$i]["A"]=="fastq directory" || $this->sheetData[$i]["A"]=="input directory")){
 				$permCheck = $this->checkUserPermissions($this->clustername);
-				$dirCheck = $this->checkDirPermissions($dir->fastq_dir, $this->clustername);
 				if($permCheck != 'pass'){
 					$text.= $this->errorText("Fastq Directory error (".$dir->fastq_dir."). ".$permCheck);
-					$dir_check = false;
-				}
-				if($dirCheck != 'pass'){
-					$text.= $this->errorText("Fastq Directory error (".$dir->fastq_dir."). ".$dirCheck);
+					$this->final_check = false;
 					$dir_check = false;
 				}
 			}
@@ -1247,6 +1241,7 @@ class Ngsimport extends VanillaModel {
 		$single_file_check = $this->checkFilePermissions($this->clustername);
 		if($single_file_check != 'pass'){
 			$text.= $this->errorText($single_file_check);
+			$this->final_check = false;
 			$file_check = false;
 		}
 		
