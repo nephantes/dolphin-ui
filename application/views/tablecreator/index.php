@@ -9,7 +9,7 @@
 						<form name="editForm" role="form" method="post">
 							<div class="modal-body">
 								<fieldset>
-									<div class="form-group" style="overflow-y: auto;">
+									<div class="form-group" style="overflow:scroll">
 										<label id="errorLabel"></label>
 										<br>
 										<p id="errorAreas"></p>

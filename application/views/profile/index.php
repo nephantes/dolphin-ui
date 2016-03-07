@@ -7,7 +7,7 @@
 						  <h4 class="modal-title" id="myModalLabel">Groups</h4>
 						</div>
 						<form name="editForm" role="form" method="post">
-							<div class="modal-body" style="overflow-y: auto;">
+							<div class="modal-body" style="overflow:scroll">
 								<fieldset>
 									<label id="groupLabel"></label>
 									<div id="groupModalDiv" class="form-group"></div>
@@ -29,7 +29,7 @@
 						  <h4 class="modal-title" id="myAWSModalLabel">Add New Amazon Keys</h4>
 						</div>
 						<form name="editAWSForm" role="form" method="post">
-							<div class="modal-body" style="overflow-y: auto;">
+							<div class="modal-body" style="overflow:scroll">
 								<fieldset>
 									<label id="awsLabel"></label>
 									<div id="awsModalDiv" class="form-group"></div>
@@ -51,7 +51,7 @@
 						  <h4 class="modal-title" id="mySubmitModalLabel">Submission:</h4>
 						</div>
 						<form name="editAWSForm" role="form" method="post">
-							<div class="modal-body">
+							<div class="modal-body" style="overflow:scroll">
 								<fieldset>
 									<label id="submitLabel"></label>
 								</fieldset>   

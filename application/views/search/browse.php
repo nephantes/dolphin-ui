@@ -9,7 +9,7 @@
 						<form name="editForm" role="form" method="post">
 							<div class="modal-body">
 								<fieldset>
-									<div class="form-group" style="overflow-y: auto;">
+									<div class="form-group" style="overflow:scroll">
 										<label id="deleteLabel"></label>
 										<br>
 										<p id="deleteAreas"></p>
