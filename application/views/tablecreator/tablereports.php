@@ -9,7 +9,7 @@
 						<form name="editForm" role="form" method="post">
 							<div class="modal-body">
 								<fieldset>
-									<div class="form-group">
+									<div class="form-group" style="overflow-y: auto;">
 										<label id="permsOwnerLabel"></label>
 										<select id="permsOwnerSelect" class="form-control"></select>
 										<br>
@@ -58,7 +58,7 @@
 						<form name="editForm" role="form" method="post">
 							<div class="modal-body">
 								<fieldset>
-									<div class="form-group">
+									<div class="form-group" style="overflow-y: auto;">
 										<label id="permsConfirmLabel">Table's permissions have been changed!</label>
 										<br>
 									</div>

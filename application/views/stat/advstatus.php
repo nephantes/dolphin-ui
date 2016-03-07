@@ -8,7 +8,7 @@
 					<form name="editForm" role="form" method="post">
 						<div class="modal-body">
 							<fieldset>
-								<div class="form-group">
+								<div class="form-group" style="overflow-y: auto;">
 									<label>Job Name: </label>
 									<label id="job_modal_jobname"></label>
 									<br>

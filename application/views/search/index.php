@@ -9,7 +9,7 @@
 						<form name="editForm" role="form" method="post">
 							<div class="modal-body">
 								<fieldset>
-									<div class="form-group">
+									<div class="form-group" style="overflow-y: auto;">
 										<label id="deleteLabel"></label>
 										<br>
 										<p id="deleteAreas"></p>
@@ -34,7 +34,7 @@
 						<form name="editForm" role="form" method="post">
 							<div class="modal-body">
 								<fieldset>
-									<div class="form-group">
+									<div class="form-group" style="overflow-y: auto;">
 										<label id="permsLabel"></label>
 										<br>
 										<div id="permsDiv">
