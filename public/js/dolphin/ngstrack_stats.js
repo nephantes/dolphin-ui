@@ -508,6 +508,7 @@ function exportGeo() {
 						});
 						document.getElementById('myModalLabel').innerHTML = 'Files to submit to GEO';
 						document.getElementById('deleteLabel').innerHTML = 'You must submit the following files to geo manually:';
+						document.getElementById('deleteAreas').innerHTML = '';
 						for(var x = 0; x < json_out[1].length; x++){
 							document.getElementById('deleteAreas').innerHTML += json_out[1][x] + '<br>';
 						}

@@ -115,8 +115,9 @@ if($p == 'exportGeo')
 	$objPHPExcel->getActiveSheet()->setCellValue('B10', $experiment_data[0]->summary);
 	$objPHPExcel->getActiveSheet()->setCellValue('B11', $experiment_data[0]->design);
 	$count = 12;
+	$contrib_bench = 14;
 	foreach($contributors as $c){
-		if($count < 14){
+		if($count < $contrib_bench){
 		    $objPHPExcel->getActiveSheet()->setCellValue('B'.$count, $c->contributor);
 			$count++;
 		}else{
@@ -126,7 +127,12 @@ if($p == 'exportGeo')
 			$count++;
 		}
 	}
-	$count = $count+7;
+	if($count < $contrib_bench){
+		$count = $count + ($contrib_bench - $count) + 7;
+	}else{
+		$count = $count + 7;
+	}
+	
 	$sample_bench = $count + 4;
 	//	SAMPLES
 	foreach($sample_data as $sd){
@@ -137,15 +143,9 @@ if($p == 'exportGeo')
 		$objPHPExcel->getActiveSheet()->setCellValue('B'.$count, $sd->title);
 		$objPHPExcel->getActiveSheet()->setCellValue('C'.$count, $sd->source);
 		$objPHPExcel->getActiveSheet()->setCellValue('D'.$count, $sd->organism);
-		if($sd->condition != null){
-				$objPHPExcel->getActiveSheet()->setCellValue('E'.$count, $sd->condition);
-		}
-		if($sd->target != null){
-				$objPHPExcel->getActiveSheet()->setCellValue('F'.$count, $sd->target);
-		}
-		if($sd->molecule != null){
-				$objPHPExcel->getActiveSheet()->setCellValue('G'.$count, $sd->molecule);
-		}
+		$objPHPExcel->getActiveSheet()->setCellValue('E'.$count, $sd->condition);
+		$objPHPExcel->getActiveSheet()->setCellValue('F'.$count, $sd->target);
+		$objPHPExcel->getActiveSheet()->setCellValue('G'.$count, $sd->molecule);
 		$count++;
 	}
 	if($count < $sample_bench){
@@ -265,26 +265,21 @@ if($p == 'exportGeo')
 		$paired_end_check = explode(",", $sd->file_name);
 		$pe_count = 0;
 		foreach($paired_end_check as $pec){
-				if($count >= $fastq_bench){
-						$objPHPExcel->getActiveSheet()->insertNewRowBefore($count, 1);	
-				}
-				$objPHPExcel->getActiveSheet()->setCellValue('A'.$count, $pec);
-				$objPHPExcel->getActiveSheet()->setCellValue('B'.$count, 'fastq');
-				$objPHPExcel->getActiveSheet()->setCellValue('C'.$count, explode(",", $sd->checksum)[$pe_count]);
-				if($sd->instrument_model != null){
-					$objPHPExcel->getActiveSheet()->setCellValue('D'.$count, $sd->instrument_model);	
-				}
-				if($sd->read_length != null){
-					$objPHPExcel->getActiveSheet()->setCellValue('E'.$count, $sd->read_length);	
-				}
-				if(count($paired_end_check) == 2){
+				if($pec != NULL){
+						if($count >= $fastq_bench){
+								$objPHPExcel->getActiveSheet()->insertNewRowBefore($count, 1);	
+						}
+						$objPHPExcel->getActiveSheet()->setCellValue('A'.$count, $pec);
+						$objPHPExcel->getActiveSheet()->setCellValue('B'.$count, 'fastq');
+						$objPHPExcel->getActiveSheet()->setCellValue('C'.$count, explode(",", $sd->checksum)[$pe_count]);
+						$objPHPExcel->getActiveSheet()->setCellValue('D'.$count, $sd->instrument_model);	
+						$objPHPExcel->getActiveSheet()->setCellValue('E'.$count, $sd->read_length);	
 						$objPHPExcel->getActiveSheet()->setCellValue('F'.$count, 'paired');		
-				}else{
 						$objPHPExcel->getActiveSheet()->setCellValue('F'.$count,'single');	
+						array_push($output_files, $sd->fastq_dir . '/' . $pec);
+						$pe_count++;
+						$count++;
 				}
-				array_push($output_files, $sd->fastq_dir . '/' . $pec);
-				$pe_count++;
-				$count++;
 		}
 	}
 	if($count < $fastq_bench){
