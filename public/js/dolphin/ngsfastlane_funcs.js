@@ -30,6 +30,8 @@ function expandBarcodeSep(){
 
 function submitFastlaneButton() {
 	var value_array = [];
+	//	genomebuild placeholder
+	value_array.push("human,hg19");
 	for(var x = 0; x < id_array.length; x++){
 		if (document.getElementById(id_array[x]) != null) {
 			value_array.push((document.getElementById(id_array[x]).value).trim());

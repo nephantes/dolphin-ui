@@ -9,7 +9,7 @@
 						<form name="editForm" role="form" method="post">
 							<div class="modal-body">
 								<fieldset>
-									<div class="form-group">
+									<div class="form-group" style="overflow:scroll">
 										<label id="deleteLabel"></label>
 										<br>
 										<p id="deleteAreas"></p>
@@ -34,7 +34,7 @@
 						<form name="editFileForm" role="form" method="post">
 							<div class="modal-body">
 								<fieldset>
-									<div class="form-group">
+									<div class="form-group" style="overflow:scroll">
 										<label id="fileLabel">Saving these changes will overwrite current directory/file information</label>
 										<br>
 										<p id="fileAreas">Please make sure that the changes being made to either the directory location or the file names are accurate before submission.</p>
