@@ -470,8 +470,20 @@ e range"><i class="fa fa-calendar"></i></button>
 		';
 		foreach ($fields as $field):
 		if ($field['fieldname']!=$name && $obj[$field['fieldname']]!=""){
-					 $html.='	<dt>'.$field['title'].'</dt>';
-			 $html.='<dd>'.$obj[$field['fieldname']].'</dd>';
+			$html.='	<dt>'.$field['title'].'</dt>';
+			if($field['title'] == 'Permission'){
+				if($obj[$field['fieldname']] == '3'){
+					$html.='<dd>Only you</dd>';
+				}else if($obj[$field['fieldname']] == '15'){
+					$html.='<dd>Only your group</dd>';
+				}else{
+					$html.='<dd>Everyone</dd>';
+				}
+			}else if($field['title'] == 'Groups' && $obj['name'] != NULL){
+				$html.='<dd>'.$obj['name'].'</dd>';
+			}else{
+				$html.='<dd>'.$obj[$field['fieldname']].'</dd>';
+			}
 		}
 		endforeach;
 	$html.=	'</dl>
