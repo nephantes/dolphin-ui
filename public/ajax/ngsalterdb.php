@@ -202,20 +202,18 @@ else if ($p == 'deleteRunparams')
     if (isset($_POST['run_id'])){$run_id = $_POST['run_id'];}
     
     killPid($run_id, $query);
-    
-	$run_info=json_decode($query->queryTable("SELECT * FROM ngs_runparams WHERE id = $run_id"));
 	
 	$insert_query = "
 	INSERT INTO ngs_deleted_runs
 	(run_id, outdir, run_status, json_parameters,
-	run_name, run_description, owner_id, group_id, perms, date_deleted,
-	reason, last_modified_user)
-	VALUES
-	($run_id, '".$run_info[0]->outdir."', ".$run_info[0]->run_status.", '".$run_info[0]->json_parameters."', '".$run_info[0]->run_name."',
-	'".$run_info[0]->run_description."', ".$run_info[0]->owner_id.", ".$run_info[0]->group_id.",
-	".$run_info[0]->perms.", NOW(), 'Run deletion', ".$_SESSION['uid'].")
-	";
+	run_name, run_description, owner_id, group_id, perms,
+	last_modified_user)
+	SELECT id, outdir, run_status, json_parameters,
+	run_name, run_description, owner_id, group_id, perms,
+	last_modified_user
+	FROM ngs_runparams WHERE id = $run_id";
 	$query->runSQL($insert_query);
+	
 	$query->runSQL("DELETE FROM ngs_runlist WHERE run_id = $run_id");
 	$query->runSQL("DELETE FROM ngs_runparams WHERE id = $run_id");
 	$data = '';
