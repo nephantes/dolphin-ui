@@ -149,15 +149,15 @@ else if($p == 'deleteSelected')
 	$run_info=json_decode($query->queryTable("SELECT * FROM ngs_runparams WHERE id IN (".implode(",", $all_run_ids).")"));
 	$insert_query = "
 	INSERT INTO ngs_deleted_runs
-	(run_id, outdir, run_status, wrapper_pid, runworkflow_pid, json_parameters,
-	run_name, run_description, owner_id, group_id, perms, date_deleted, last_modified_user)
+	(run_id, outdir, run_status, json_parameters,
+	run_name, run_description, owner_id, group_id, perms, date_deleted,
+	reason, last_modified_user)
 	VALUES ";
 	foreach($run_info as $ri){
 		$insert_query .= "
-		(".$ri->id.", '".$ri->outdir."', ".$ri->run_status.", ".$ri->wrapper_pid.",
-		".$ri->runworkflow_pid.", '".$ri->json_parameters."', '".$ri->run_name."',
+		(".$ri->id.", '".$ri->outdir."', ".$ri->run_status.", '".$ri->json_parameters."', '".$ri->run_name."',
 		'".$ri->run_description."', ".$ri->owner_id.", ".$ri->group_id.",
-		".$ri->perms.", NOW(), ".$ri->last_modified_user.")
+		".$ri->perms.", NOW(), 'Sample deletion', ".$_SESSION['uid'].")
 		";
 		if($ri != end($run_info)){
 			$insert_query .= ",";
