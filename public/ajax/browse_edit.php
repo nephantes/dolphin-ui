@@ -146,8 +146,16 @@ else if($p == 'deleteSelected')
 	}
 	
 	//	RUNS
-	//	$query->runSQL("UPDATE ngs_runparams SET run_status = 5 WHERE id IN (".implode(",", $all_run_ids).")");
-	//	For now, status is set to 5 to hide runs that no longer have proper imports/samples
+	$insert_query = "
+	INSERT INTO ngs_deleted_runs
+	(run_id, outdir, run_status, json_parameters,
+	run_name, run_description, owner_id, group_id, perms,
+	last_modified_user)
+	SELECT id, outdir, run_status, json_parameters,
+	run_name, run_description, owner_id, group_id, perms,
+	last_modified_user
+	FROM ngs_runparams WHERE id IN (".implode(",", $all_run_ids).")";
+	$query->runSQL($insert_query);
 	
 	//	If sample is deleted, delete all run information
 	$query->runSQL("DELETE FROM ngs_runlist WHERE run_id IN (".implode(",", $all_run_ids).")");

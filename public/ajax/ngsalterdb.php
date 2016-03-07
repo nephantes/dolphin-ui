@@ -202,7 +202,18 @@ else if ($p == 'deleteRunparams')
     if (isset($_POST['run_id'])){$run_id = $_POST['run_id'];}
     
     killPid($run_id, $query);
-    
+	
+	$insert_query = "
+	INSERT INTO ngs_deleted_runs
+	(run_id, outdir, run_status, json_parameters,
+	run_name, run_description, owner_id, group_id, perms,
+	last_modified_user)
+	SELECT id, outdir, run_status, json_parameters,
+	run_name, run_description, owner_id, group_id, perms,
+	last_modified_user
+	FROM ngs_runparams WHERE id = $run_id";
+	$query->runSQL($insert_query);
+	
 	$query->runSQL("DELETE FROM ngs_runlist WHERE run_id = $run_id");
 	$query->runSQL("DELETE FROM ngs_runparams WHERE id = $run_id");
 	$data = '';
