@@ -566,10 +566,10 @@ e range"><i class="fa fa-calendar"></i></button>
 		endforeach;
 		$html.= '			</dl>
 						</div>'; // END DATA PANEL
-		$html.=			'<div class="box-body tab-pane" id="directory_'.$header.'">';
+		$html.=			'<div class="box-body tab-pane" id="directory_'.$header.'">
+							<div class="box-body">';
 		if($files != null){
-				$html .= '	<div class="box-body">
-								<table class="table table-hover table-striped table-condensed">';
+				$html .= '		<table class="table table-hover table-striped table-condensed">';
 				$html.='			<thead><tr><th>Input File(s) Directory:</th></tr></thead>
 									<tbody>';
 				$html.='				<tr><td onclick="editBox( '.$_SESSION['uid'].', '. $files[0]['dir_id'].', \'fastq_dir\', \'ngs_dirs\', this)">'.$files[0]['fastq_dir'].'</td></tr>
@@ -583,13 +583,11 @@ e range"><i class="fa fa-calendar"></i></button>
 								$html.='<tr><td onclick="editBox( '.$_SESSION['uid'].', '. $f['id'].', \'file_name\', \'ngs_temp_sample_files\', this)">'.$f['file_name'].'</td></tr>';	
 						}
 				}
-				$html .= '			</tbody></table>
-							</div>
-						</div>'; // END DIRECTORY PANEL
+				$html .= '			</tbody>
+								</table>';
 		}
 		if($fastq_files != null && $fastq_files != 'lanes'){
-				$html .= '	<div class="box-body tab-pane">
-								<table class="table table-hover table-striped table-condensed">';
+				$html .= '		<table class="table table-hover table-striped table-condensed">';
 				$html.='			<thead><tr><th>Processed File(s) Directory:</th></tr></thead>
 									<tbody>';
 				$html.='				<tr><td onclick="editBox( '.$_SESSION['uid'].', '. $fastq_files[0]['dir_id'].', \'backup_dir\', \'ngs_dirs\', this)">'.$fastq_files[0]['backup_dir'].'</td></tr>
@@ -603,9 +601,9 @@ e range"><i class="fa fa-calendar"></i></button>
 									<tbody>';
 				$html.='				<tr><td onclick="editBox( '.$_SESSION['uid'].', '. $fastq_files[0]['dir_id'].', \'amazon_bucket\', \'ngs_dirs\', this)">'.$fastq_files[0]['amazon_bucket'].'</td></tr>
 									</tbody>';
-				$html .= '		</table>
-							</div>'; // END DIRECTORY PANEL;
+				$html .= '		</table>';
 		}
+		$html.= 			'</div></div>'; // END DIRECTORY PANEL
 		if($header == 'Sample'){
 			$html.= 	'<div class="box-body tab-pane" id="runs">
 							<div class="box-body margin" style="overflow-y:scroll">';
@@ -622,8 +620,7 @@ e range"><i class="fa fa-calendar"></i></button>
 			$html.=			'</div>
 						</div>'; // END TABLES PANEL
 		}
-		$html.=	'</div>'; // END tab-content
-		$html.= '</div>'; // END box
+		$html.= '</div>'; // END tab-content
 		$html.= '</div>'; // END panel-body
 		$html.= '</div>'; // END panel
 	endforeach;
