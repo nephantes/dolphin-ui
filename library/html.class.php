@@ -510,10 +510,12 @@ e range"><i class="fa fa-calendar"></i></button>
 						<ul id="tabList" class="nav nav-tabs">
 							<li class="active">
 								<a href="#data_'.$header.'" data-toggle="tab" aria-expanded="true">'.$obj[$name].'</a>
-							</li>
-							<li class>
+							</li>';
+	if($files != array()){
+		$html.=				'<li class>
 								<a href="#directory_'.$header.'" data-toggle="tab" aria-expanded="true">Directory Info</a>
 							</li>';
+	}
 	if($header == 'Sample'){
 		
 		$html .=			'<li class>
