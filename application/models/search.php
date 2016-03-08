@@ -18,7 +18,11 @@ class Search extends VanillaModel {
                 LEFT JOIN ngs_conds
                 ON ngs_sample_conds.cond_id = ngs_conds.id
                 LEFT JOIN ngs_instrument_model
-                ON ngs_samples.instrument_model_id = ngs_instrument_model.id";
+                ON ngs_samples.instrument_model_id = ngs_instrument_model.id
+				LEFT JOIN ngs_antibody_target
+				ON ngs_samples.target_id = ngs_antibody_target.id
+				LEFT JOIN ngs_donor
+				ON ngs_samples.donor_id = ngs_donor.id";
                 
 /** Get menuitems for this user **/
 	function getAccItems($fieldname, $tablename, $uid, $gids) {
@@ -87,11 +91,31 @@ class Search extends VanillaModel {
 	}
 	function getValues($value, $table) {
         if($table == 'ngs_samples'){
-            $result = $this->query("select * from $table ".$this->innerJoin." where $table.`id`='$value'");
+            $result = $this->query("SELECT $table.*, groups.name as group_name, ngs_source.source, ngs_organism.organism, ngs_molecule.molecule,
+								   ngs_genotype.genotype, ngs_conds.condition, ngs_library_type.library_type, ngs_instrument_model.instrument_model,
+								   ngs_donor.donor, ngs_antibody_target.target,
+								   ngs_experiment_series.experiment_name as series_name, ngs_lanes.name as lane_name, ngs_protocols.name as proto_name
+								   FROM $table
+								   LEFT JOIN groups
+								   ON $table.group_id = groups.id
+								   LEFT JOIN ngs_experiment_series
+								   ON ngs_experiment_series.id = $table.series_id
+								   LEFT JOIN ngs_lanes
+								   ON ngs_lanes.id = $table.lane_id
+								   LEFT JOIN ngs_protocols
+								   ON ngs_protocols.id = $table.protocol_id
+								   ".$this->innerJoin."
+								   WHERE $table.`id`='$value'");
         }elseif($table == 'ngs_lanes'){
-            $result = $this->query("select $table.id, $table.series_id, $table.name, $table.sequencing_id, $table.lane_id, $table.cost, $table.date_submitted, $table.date_received, $table.total_reads,
-                                   $table.phix_requested, $table.phix_in_lane, $table.total_samples, $table.resequenced, $table.notes, $table.owner_id, $table.group_id, $table.perms, ngs_facility.facility
-                                   from $table left join ngs_facility on ngs_lanes.facility_id = ngs_facility.id where $table.`id`='$value'");
+            $result = $this->query("select $table.*, ngs_facility.facility, groups.name as group_name, ngs_experiment_series.experiment_name as series_name
+									FROM $table
+									LEFT JOIN ngs_facility
+									ON ngs_lanes.facility_id = ngs_facility.id
+									LEFT JOIN groups
+									ON $table.group_id = groups.id
+									LEFT JOIN ngs_experiment_series
+									ON $table.series_id = ngs_experiment_series.id
+									WHERE $table.`id`='$value'");
         }else{
             $result = $this->query("select $table.experiment_name, $table.summary, $table.design, $table.group_id, $table.perms, groups.name
 								   from $table LEFT JOIN groups ON $table.group_id = groups.id where $table.`id`='$value'");

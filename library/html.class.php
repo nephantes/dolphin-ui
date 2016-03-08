@@ -497,40 +497,85 @@ e range"><i class="fa fa-calendar"></i></button>
 	{
 	foreach ($objects as $obj):
 	$html='<div class="panel panel-default">
-		<div class="panel-heading">
-			<h3 class="panel-title">'.$header.'</h3>
-			<div class="panel-tools pull-right">
-				<button class="btn btn-panel-tool" onclick="backFromDetails(\''.$header.'\')">
-					<i class="fa fa-arrow-left"></i>
-				</button>
-			</div>
-		</div>
-		<div class="panel-body">
-		<h4>
-			'.$obj[$name].'
-		</h4>
+				<div class="panel-heading">
+					<h3 class="panel-title">'.$header.'</h3>
+					<div class="panel-tools pull-right">
+						<button class="btn btn-panel-tool" onclick="backFromDetails(\''.$header.'\')">
+							<i class="fa fa-arrow-left"></i>
+						</button>
+					</div>
+				</div>
+				<div class="panel-body">
+					<div class="nav-tabs-custom">
+						<ul id="tabList" class="nav nav-tabs">
+							<li class="active">
+								<a href="#data_'.$header.'" data-toggle="tab" aria-expanded="true">'.$obj[$name].'</a>
+							</li>
+							<li class>
+								<a href="#directory_'.$header.'" data-toggle="tab" aria-expanded="true">Directory Info</a>
+							</li>';
+	if($header == 'Sample'){
 		
-		<div class="box-body col-md-4" style="overflow:scroll">
-		<dl class="dl-horizontal">
-		';
+		$html .=			'<li class>
+								<a href="#runs" data-toggle="tab" aria-expanded="true">Runs</a>
+							</li>
+							<li class>
+								<a href="#tables" data-toggle="tab" aria-expanded="true">Tables</a>
+							</li>';
+	}
+	$html .=			'</ul>
+					</div>
+					<div class="tab-content">
+						<div class="box-body tab-pane active" id="data_'.$header.'">
+							<dl class="dl-horizontal">';
 		foreach ($fields as $field):
 		if ($field['fieldname']!=$name && $obj[$field['fieldname']]!=""){
-					 $html.='	<dt>'.$field['title'].'</dt>';
-			 $html.='<dd>'.$obj[$field['fieldname']].'</dd>';
+			if($field['fieldname'] == 'donor' || $field['fieldname'] == 'condition' || $field['fieldname'] == 'source' ||
+			   $field['fieldname'] == 'time' || $field['fieldname'] == 'target' ||
+			   $field['fieldname'] == 'biological_replica' || $field['fieldname'] == 'technical_replica'){
+				$html.='	<dt style="color:blue">'.$field['title'].'</dt>';
+			}else{
+				$html.='	<dt>'.$field['title'].'</dt>';
+			}
+			if($field['title'] == 'Permission'){
+				if($obj[$field['fieldname']] == '3'){
+					$html.='	<dd>Only you</dd>';
+				}else if($obj[$field['fieldname']] == '15'){
+					$html.='	<dd>Only your group</dd>';
+				}else{
+					$html.='	<dd>Everyone</dd>';
+				}
+			}else if($field['title'] == 'Groups' && $obj['name'] != NULL){
+				$html.='		<dd>'.$obj['group_name'].'</dd>';
+			}else if($field['title'] == 'Series Name'){
+				$html.='		<dd>'.$obj['series_name'].'</dd>';
+			}else if($field['title'] == 'Lane Name'){
+				$html.='		<dd>'.$obj['lane_name'].'</dd>';
+			}else if($field['title'] == 'Protocol Name'){
+				$html.='		<dd>'.$obj['proto_name'].'</dd>';
+			}else if($field['title'] == 'Resequenced?'){
+				if($obj[$field['fieldname']] == '1'){
+					$html.='	<dd>Yes</dd>';
+				}else{
+					$html.='	<dd>No</dd>';
+				}
+			}else{
+				$html.='		<dd>'.$obj[$field['fieldname']].'</dd>';
+			}
 		}
 		endforeach;
-		$html.= '</dl>
-				</div>
-				<div class="box-body col-md-8">';
+		$html.= '			</dl>
+						</div>'; // END DATA PANEL
+		$html.=			'<div class="box-body tab-pane" id="directory_'.$header.'">';
 		if($files != null){
-				$html .= '<div class="box-body col-md-12" style="overflow:scroll">
-				<table class="table table-hover table-striped table-condensed">';
-				$html.='<thead><tr><th>Input File(s) Directory:</th></tr></thead>
-						<tbody>';
-				$html.='<tr><td onclick="editBox( '.$_SESSION['uid'].', '. $files[0]['dir_id'].', \'fastq_dir\', \'ngs_dirs\', this)">'.$files[0]['fastq_dir'].'</td></tr>
-						</tbody>';
-				$html.='<thead><tr><th>Input File(s):</th></tr></thead>
-						<tbody>';
+				$html .= '	<div class="box-body">
+								<table class="table table-hover table-striped table-condensed">';
+				$html.='			<thead><tr><th>Input File(s) Directory:</th></tr></thead>
+									<tbody>';
+				$html.='				<tr><td onclick="editBox( '.$_SESSION['uid'].', '. $files[0]['dir_id'].', \'fastq_dir\', \'ngs_dirs\', this)">'.$files[0]['fastq_dir'].'</td></tr>
+									</tbody>';
+				$html.='			<thead><tr><th>Input File(s):</th></tr></thead>
+									<tbody>';
 				foreach ($files as $f){
 						if($fastq_files == 'lanes'){
 								$html.='<tr><td onclick="editBox( '.$_SESSION['uid'].', '. $f['id'].', \'file_name\', \'ngs_temp_lane_files\', this)">'.$f['file_name'].'</td></tr>';
@@ -538,31 +583,43 @@ e range"><i class="fa fa-calendar"></i></button>
 								$html.='<tr><td onclick="editBox( '.$_SESSION['uid'].', '. $f['id'].', \'file_name\', \'ngs_temp_sample_files\', this)">'.$f['file_name'].'</td></tr>';	
 						}
 				}
-				$html .= '</tbody></table>
-						</div>';
+				$html .= '			</tbody></table>
+							</div>';
 		}
 		if($fastq_files != null && $fastq_files != 'lanes'){
-				$html .= '<div class="box-body col-md-12" style="overflow:scroll">
-				<table class="table table-hover table-striped table-condensed">';
-				$html.='<thead><tr><th>Processed File(s) Directory:</th></tr></thead>
-						<tbody>';
-				$html.='<tr><td onclick="editBox( '.$_SESSION['uid'].', '. $fastq_files[0]['dir_id'].', \'backup_dir\', \'ngs_dirs\', this)">'.$fastq_files[0]['backup_dir'].'</td></tr>
-						</tbody>';
-				$html.='<thead><tr><th>Processed File(s):</th></tr></thead>
-						<tbody>';
+				$html .= '	<div class="box-body">
+								<table class="table table-hover table-striped table-condensed">';
+				$html.='			<thead><tr><th>Processed File(s) Directory:</th></tr></thead>
+									<tbody>';
+				$html.='				<tr><td onclick="editBox( '.$_SESSION['uid'].', '. $fastq_files[0]['dir_id'].', \'backup_dir\', \'ngs_dirs\', this)">'.$fastq_files[0]['backup_dir'].'</td></tr>
+									</tbody>';
+				$html.='			<thead><tr><th>Processed File(s):</th></tr></thead>
+									<tbody>';
 				foreach ($fastq_files as $ff){
-						$html.='<tr><td onclick="editBox( '.$_SESSION['uid'].', '. $ff['id'].', \'file_name\', \'ngs_fastq_files\', this)">'.$ff['file_name'].'</td></tr>';
+						$html.='		<tr><td onclick="editBox( '.$_SESSION['uid'].', '. $ff['id'].', \'file_name\', \'ngs_fastq_files\', this)">'.$ff['file_name'].'</td></tr>';
 				}
-				$html.='<thead><tr><th>Amazon Backup:</th></tr></thead>
-						<tbody>';
-				$html.='<tr><td onclick="editBox( '.$_SESSION['uid'].', '. $fastq_files[0]['dir_id'].', \'amazon_bucket\', \'ngs_dirs\', this)">'.$fastq_files[0]['amazon_bucket'].'</td></tr>
-						</tbody>';
-				$html .= '</tbody></table>
-						</div>';
+				$html.='			<thead><tr><th>Amazon Backup:</th></tr></thead>
+									<tbody>';
+				$html.='				<tr><td onclick="editBox( '.$_SESSION['uid'].', '. $fastq_files[0]['dir_id'].', \'amazon_bucket\', \'ngs_dirs\', this)">'.$fastq_files[0]['amazon_bucket'].'</td></tr>
+									</tbody>';
+				$html .= '		</table>
+							</div>
+						</div>'; // END DIRECTORY PANEL
 		}
-		$html.=	'</div>
-			</div>
-			</div>';
+		if($header == 'Sample'){
+			$html.= 	'<div class="box-body tab-pane" id="runs">
+							<div class="box-body">
+							</div>
+							</div>'; // END RUNS PANEL
+			$html.= 	'<div class="box-body tab-pane" id="tables">
+							<div class="box-body">
+							</div>
+						</div>'; // END TABLES PANEL
+		}
+		$html.=	'</div>'; // END tab-content
+		$html.= '</div>'; // END box
+		$html.= '</div>'; // END panel-body
+		$html.= '</div>'; // END panel
 	endforeach;
 	return $html;
 	}
