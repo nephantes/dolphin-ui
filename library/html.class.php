@@ -493,7 +493,7 @@ e range"><i class="fa fa-calendar"></i></button>
 	return $html;
 	}
 	
-	function getBrowserPanelMore($objects, $fields, $header ,$name, $files, $fastq_files)
+	function getBrowserPanelMore($objects, $fields, $header ,$name, $files, $fastq_files, $sample_runs, $sample_tables)
 	{
 	foreach ($objects as $obj):
 	$html='<div class="panel panel-default">
@@ -584,10 +584,11 @@ e range"><i class="fa fa-calendar"></i></button>
 						}
 				}
 				$html .= '			</tbody></table>
-							</div>';
+							</div>
+						</div>'; // END DIRECTORY PANEL
 		}
 		if($fastq_files != null && $fastq_files != 'lanes'){
-				$html .= '	<div class="box-body">
+				$html .= '	<div class="box-body tab-pane">
 								<table class="table table-hover table-striped table-condensed">';
 				$html.='			<thead><tr><th>Processed File(s) Directory:</th></tr></thead>
 									<tbody>';
@@ -603,17 +604,22 @@ e range"><i class="fa fa-calendar"></i></button>
 				$html.='				<tr><td onclick="editBox( '.$_SESSION['uid'].', '. $fastq_files[0]['dir_id'].', \'amazon_bucket\', \'ngs_dirs\', this)">'.$fastq_files[0]['amazon_bucket'].'</td></tr>
 									</tbody>';
 				$html .= '		</table>
-							</div>
-						</div>'; // END DIRECTORY PANEL
+							</div>'; // END DIRECTORY PANEL;
 		}
 		if($header == 'Sample'){
 			$html.= 	'<div class="box-body tab-pane" id="runs">
-							<div class="box-body">
-							</div>
-							</div>'; // END RUNS PANEL
+							<div class="box-body margin">';
+			foreach($sample_runs as $sr){
+				$html.=				'<a>'.$sr->id.' -- '.$sr->run_name.'</a><br>';
+			}
+			$html.=			'</div>
+						</div>'; // END RUNS PANEL
 			$html.= 	'<div class="box-body tab-pane" id="tables">
-							<div class="box-body">
-							</div>
+							<div class="box-body margin">';
+			foreach($sample_tables as $st){
+				$html.=				'<a>'.$st->id.' -- '.$st->name.'</a><br>';
+			}
+			$html.=			'</div>
 						</div>'; // END TABLES PANEL
 		}
 		$html.=	'</div>'; // END tab-content

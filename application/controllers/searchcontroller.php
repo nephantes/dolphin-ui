@@ -81,6 +81,9 @@ class SearchController extends VanillaController {
 			$this->set('samples', $this->Search->getValues($value, 'ngs_samples'));
             $this->set('sample_file', $this->Search->getSampleFileLocation($value));
             $this->set('sample_fastq_file', $this->Search->getSampleFastqFileLocation($value));
+			$temp_runlist = $this->Search->getRuns($value);
+			$this->set('sample_runs', $temp_runlist);
+			$this->set('sample_tables', $this->Search->getTables($temp_runlist));
 		}
 	}
 

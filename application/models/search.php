@@ -126,6 +126,30 @@ class Search extends VanillaModel {
 		$result = $this->query("select df.fieldname, df.title from datatables dt, datafields df where df.table_id=dt.id and dt.tablename='$table'");
 		return json_decode($result, true);
 	}
+	function getRuns($sample){
+		$query = 	'SELECT id, run_name
+					FROM ngs_runparams
+					WHERE id in(
+						SELECT run_id
+						FROM ngs_runlist
+						WHERE sample_id = '.$sample.'
+						)';
+		$result = $this->query($query);
+		return json_decode($result);
+	}
+	function getTables($runlist){
+		$query = 	'SELECT id, name
+					FROM ngs_createdtables
+					WHERE parameters LIKE ';
+		foreach($runlist as $rl){
+			$query.= "'%;".$rl->id."%' ";
+			if(end($runlist) != $rl){
+				$query.= 'OR parameters LIKE ';
+			}
+		}
+		$result = $this->query($query);
+		return json_decode($result);
+	}
     function getGroup($username) {
         $groups = json_decode($this->query("select g.id from user_group ug, users u, groups g where ug.u_id=u.id and ug.g_id=g.id and username='$username'"), true);
         $group_str='';
