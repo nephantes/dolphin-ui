@@ -608,16 +608,16 @@ e range"><i class="fa fa-calendar"></i></button>
 		}
 		if($header == 'Sample'){
 			$html.= 	'<div class="box-body tab-pane" id="runs">
-							<div class="box-body margin">';
+							<div class="box-body margin" style="overflow-y:scroll">';
 			foreach($sample_runs as $sr){
-				$html.=				'<a>'.$sr->id.' -- '.$sr->run_name.'</a><br>';
+				$html.=				'<a href="#" id="'.$sr->id.'" onclick="reportSelected(this.id,1)">'.$sr->id.' -- '.$sr->run_name.'</a><br>';
 			}
 			$html.=			'</div>
 						</div>'; // END RUNS PANEL
 			$html.= 	'<div class="box-body tab-pane" id="tables">
-							<div class="box-body margin">';
+							<div class="box-body margin" style="overflow-y:scroll">';
 			foreach($sample_tables as $st){
-				$html.=				'<a>'.$st->id.' -- '.$st->name.'</a><br>';
+				$html.=				'<a href="#" id="'.$st->id.'" onclick="sendToSavedTable(this.id)">'.$st->id.' -- '.$st->name.'</a><br>';
 			}
 			$html.=			'</div>
 						</div>'; // END TABLES PANEL

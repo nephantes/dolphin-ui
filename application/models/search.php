@@ -126,7 +126,7 @@ class Search extends VanillaModel {
 		$result = $this->query("select df.fieldname, df.title from datatables dt, datafields df where df.table_id=dt.id and dt.tablename='$table'");
 		return json_decode($result, true);
 	}
-	function getRuns($sample){
+	function getRuns($sample, $gids){
 		$query = 	'SELECT id, run_name
 					FROM ngs_runparams
 					WHERE id in(
@@ -134,20 +134,30 @@ class Search extends VanillaModel {
 						FROM ngs_runlist
 						WHERE sample_id = '.$sample.'
 						)';
-		$result = $this->query($query);
+		if($_SESSION['uid'] != '1'){
+			$perms = ' AND (((group_id in ('.$gids.')) AND (perms >= 15)) OR (owner_id = '.$_SESSION['uid'].'))';
+		}else{
+			$perms = '';
+		}
+		$result = $this->query($query . $perms);
 		return json_decode($result);
 	}
-	function getTables($runlist){
+	function getTables($runlist, $gids){
 		$query = 	'SELECT id, name
 					FROM ngs_createdtables
 					WHERE parameters LIKE ';
+		if($_SESSION['uid'] != '1'){
+			$perms = ' AND (((group_id in ('.$gids.')) AND (perms >= 15)) OR (owner_id = '.$_SESSION['uid'].'))';
+		}else{
+			$perms = '';
+		}
 		foreach($runlist as $rl){
 			$query.= "'%;".$rl->id."%' ";
 			if(end($runlist) != $rl){
 				$query.= 'OR parameters LIKE ';
 			}
 		}
-		$result = $this->query($query);
+		$result = $this->query($query . $perms);
 		return json_decode($result);
 	}
     function getGroup($username) {
