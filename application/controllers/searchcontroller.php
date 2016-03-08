@@ -48,7 +48,6 @@ class SearchController extends VanillaController {
         $this->set('uid', $_SESSION['uid']);
         $gids = $this->Search->getGroup($_SESSION['user']);
         $this->set('gids', $gids);
-        
 		$this->set('assay', $this->Search->getAccItemsCont("library_type", "ngs_library_type", $search, $_SESSION['uid'], $gids), $search);
 		$this->set('organism', $this->Search->getAccItemsCont("organism", "ngs_organism", $search, $_SESSION['uid'], $gids), $search);
 		$this->set('molecule', $this->Search->getAccItemsCont("molecule", "ngs_molecule", $search, $_SESSION['uid'], $gids), $search);
@@ -81,6 +80,9 @@ class SearchController extends VanillaController {
 			$this->set('samples', $this->Search->getValues($value, 'ngs_samples'));
             $this->set('sample_file', $this->Search->getSampleFileLocation($value));
             $this->set('sample_fastq_file', $this->Search->getSampleFastqFileLocation($value));
+			$temp_runlist = $this->Search->getRuns($value, $gids);
+			$this->set('sample_runs', $temp_runlist);
+			$this->set('sample_tables', $this->Search->getTables($temp_runlist, $gids));
 		}
 	}
 
