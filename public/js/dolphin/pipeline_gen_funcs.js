@@ -1621,6 +1621,14 @@ function removePipes(num){
 				recursiveRemovePipes(q);
 			}
 		}
+	}else if (currentPipelineVal[index] == 'Tophat') {
+		if (currentPipelineVal.indexOf('Tophat') >= index) {
+			rsem_index = currentPipelineVal.indexOf('RNASeqRSEM');
+			rsem_index_num = currentPipelineID[rsem_index];
+			if (rsem_index > -1) {
+				document.getElementById('checkbox_1_' + rsem_index_num).checked = false;
+			}
+		}
 	}else if (currentPipelineVal[index] == 'BisulphiteMapping') {
 		for(var q = currentPipelineVal.length - 1; q > -1; q--){
 			if (currentPipelineVal[q] == 'DiffMeth') {
