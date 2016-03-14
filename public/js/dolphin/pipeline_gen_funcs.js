@@ -2037,7 +2037,7 @@ function tophatCustomOptions(num){
 	}
 }
 
-function useDeduplicateReadCheck(id){
+function useDeduplicatedReadCheck(id){
 	if(document.getElementById(id).checked == true){
 		tophatIndex = currentPipelineVal.indexOf('Tophat');
 		rsemIndex = currentPipelineVal.indexOf('RNASeqRSEM');
