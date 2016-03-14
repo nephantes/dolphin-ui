@@ -272,6 +272,7 @@ else if ($p == 'resetWKey'){
 	$wkey=$table[0]->wkey;
 	
 	killPid($idKey, $query);
+	
 	$data=$query->runSQL("
 	INSERT INTO ngs_wkeylist
 	(run_id, wkey, wrapper_pid, workflow_pid, time_added)
@@ -280,7 +281,8 @@ else if ($p == 'resetWKey'){
 	");
 	$data = $query->runSQL("
 	UPDATE ngs_runparams
-	SET wkey = ''
+	SET run_status = 6,
+	wkey = ''
 	WHERE id = $id
 	");
 }
