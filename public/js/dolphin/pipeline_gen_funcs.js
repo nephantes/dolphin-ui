@@ -162,11 +162,14 @@ function rerunLoad() {
 									IGVTDFSelection('select_1_'+i);
 									document.getElementById('textarea_2_'+i).value = splt1[i].ExtFactor;
 								}
-								if (splt1[i].MarkDuplicates == 'yes' || splt1[i].MarkDuplicates == '1') {
+								if (splt1[i].UseDeduplicatedReads == 'yes' || splt1[i].UseDeduplicatedReads == '1') {
 									document.getElementById('checkbox_1_'+i).checked = true;
 								}
 								if (splt1[i].RSeQC == 'yes' || splt1[i].RSeQC == '1') {
 									document.getElementById('checkbox_2_'+i).checked = true;
+								}
+								if (splt1[i].NoGenomeBAM == 'yes' || splt1[i].NoGenomeBAM == '1') {
+									document.getElementById('checkbox_3_'+i).checked = true;
 								}
 								if (splt1[i].CustomGenomeIndex != 'None' || splt1[i].CustomGenomeAnnotation != 'None') {
 									tophatCustomOptions(i);
@@ -425,11 +428,14 @@ function pipelineSelect(num){
 		testText.value = '--bowtie-e 70 --bowtie-chunkmbs 100';
 		divAdj.appendChild( testText );
 		divAdj = mergeTidy(divAdj, 12,
-				[ [createElement('label', ['class','TEXTNODE'], ['margin', 'Mark Duplicates']),
-				createElement('input', ['id', 'type', 'class'], ['checkbox_1_'+num, 'checkbox', 'margin'])] ]);
+				[ [createElement('label', ['class','TEXTNODE'], ['margin', 'Use Deduplicated Reads:']),
+				createElement('input', ['id', 'type', 'class', 'onclick'], ['checkbox_1_'+num, 'checkbox', 'margin', 'useDeduplicatedReadCheck(this.id)'])] ]);
 		divAdj = mergeTidy(divAdj, 12,
 				[ [createElement('label', ['class','TEXTNODE'], ['box-title margin', 'RNA-Seq QC:']),
 				   createElement('input', ['id', 'type', 'class'], ['checkbox_2_'+num, 'checkbox', 'margin'])] ]);
+		divAdj = mergeTidy(divAdj, 12,
+				[ [createElement('label', ['class','TEXTNODE'], ['box-title margin', 'No Genome BAM:']),
+				   createElement('input', ['id', 'type', 'class'], ['checkbox_3_'+num, 'checkbox', 'margin'])] ]);
 		divAdj = mergeTidy(divAdj, 6,
 				[ [createElement('label', ['class','TEXTNODE'], ['box-title', 'IGV/TDF Conversion:']),
 				createElement('select', ['id','class','onChange','OPTION', 'OPTION'], ['select_1_'+num, 'form-control', 'IGVTDFSelection(this.id)','no', 'yes'])],
@@ -1723,7 +1729,7 @@ function findAdditionalInfoValues(goWord, additionalArray){
 }
 /*##### GENERATE ADDITIONAL PIPELINE STR FOR JSON #####*/
 function findPipelineValues(){
-	var RSEM_JSON_DICT  = ['Params', 'MarkDuplicates', 'RSeQC', 'IGVTDF', 'BAM2BW', 'ExtFactor', 'Custom', 'CustomGenomeIndex', 'CustomGenomeAnnotation'];
+	var RSEM_JSON_DICT  = ['Params', 'UseDeduplicatedReads', 'RSeQC', 'NoGenomeBAM', 'IGVTDF', 'BAM2BW', 'ExtFactor', 'Custom', 'CustomGenomeIndex', 'CustomGenomeAnnotation'];
 	var DESEQ_JSON_DICT = ['Name', 'Columns', 'Conditions', 'FitType', 'HeatMap', 'padj', 'foldChange', 'DataType'];
 	var CHIPSEQ_JSON_DICT = ['ChipInput', 'MultiMapper', 'TagSize', 'BandWith', 'EffectiveGenome', 'MarkDuplicates', 'CollectMultipleMetrics', 'IGVTDF', 'BAM2BW', 'ExtFactor'];
 	var TOPHAT_JSON_DICT = ['Params', 'MarkDuplicates', 'RSeQC', 'CollectRnaSeqMetrics', 'CollectMultipleMetrics', 'IGVTDF', 'BAM2BW', 'ExtFactor', 'Custom', 'CustomGenomeIndex', 'CustomGenomeAnnotation'];
@@ -2028,5 +2034,29 @@ function tophatCustomOptions(num){
 		document.getElementById('label_4_'+num).style.display = 'none';
 		document.getElementById('textarea_4_'+num).style.display = 'none';
 		document.getElementById('textarea_4_'+num).value = 'None';
+	}
+}
+
+function useDeduplicatedReadCheck(id){
+	if(document.getElementById(id).checked == true){
+		tophatIndex = currentPipelineVal.indexOf('Tophat');
+		rsemIndex = currentPipelineVal.indexOf('RNASeqRSEM');
+		if (tophatIndex > rsemIndex || tophatIndex == -1) {
+			//	Error code
+			$('#errorModal').modal({
+				show: true
+			});
+			document.getElementById('errorLabel').innerHTML ='You must run Tophat before RSEM in order to use deduplicated reads.';
+			document.getElementById('errorAreas').innerHTML = '';
+			document.getElementById(id).checked = false;
+		}else if (document.getElementById('checkbox_4_' + tophatIndex).checked == false) {
+			//	Error code
+			$('#errorModal').modal({
+				show: true
+			});
+			document.getElementById('errorLabel').innerHTML ='You must select to mark duplicates within your Tophat pipeline in order to use deduplicated reads.';
+			document.getElementById('errorAreas').innerHTML = '';
+			document.getElementById(id).checked = false;
+		}
 	}
 }
