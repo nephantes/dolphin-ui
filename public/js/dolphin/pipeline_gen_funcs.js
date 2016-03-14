@@ -345,10 +345,10 @@ function rerunLoad() {
 								pipelineSelect(i);
 								
 								document.getElementById('text_1_'+i).value = splt1[i].standard_min_confidence_threshold_for_calling;
-								document.getElementById('text_1_'+i).value = splt1[i].standard_min_confidence_threshold_for_emitting;
-								document.getElementById('text_1_'+i).value = splt1[i].min_base_quality_score;
-								document.getElementById('text_1_'+i).value = splt1[i].minReadsPerAlignmentStart;
-								document.getElementById('text_1_'+i).value = splt1[i].maxReadsInRegionPerSample;
+								document.getElementById('text_2_'+i).value = splt1[i].standard_min_confidence_threshold_for_emitting;
+								document.getElementById('text_3_'+i).value = splt1[i].min_base_quality_score;
+								document.getElementById('text_4_'+i).value = splt1[i].minReadsPerAlignmentStart;
+								document.getElementById('text_5_'+i).value = splt1[i].maxReadsInRegionPerSample;
 							}
 						}
 						document.getElementById(jsonTypeList[x]+'_exp_body').setAttribute('style', 'display: block');
