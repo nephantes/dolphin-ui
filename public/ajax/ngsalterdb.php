@@ -265,13 +265,15 @@ else if ($p == 'alterSecretKey')
 }
 else if ($p == 'resetWKey'){
 	if (isset($_POST['id'])){$id = $_POST['id'];}
-	$table=json_decode($query->queryTable("SELECT id,wrapper_pid,runworkflow_pid,wkey FROM ngs_runparams WHERE id = $id limit 1"));
+	$table=json_decode($query->queryTable("SELECT id,run_status,wrapper_pid,runworkflow_pid,wkey FROM ngs_runparams WHERE id = $id limit 1"));
 	$idKey=$table[0]->id;
 	$wrapper_pid=$table[0]->wrapper_pid;
 	$workflow_pid=$table[0]->runworkflow_pid;
 	$wkey=$table[0]->wkey;
+	$runstatus=$table[0]->run_status;
 	
 	killPid($idKey, $query);
+	
 	$data=$query->runSQL("
 	INSERT INTO ngs_wkeylist
 	(run_id, wkey, wrapper_pid, workflow_pid, time_added)
@@ -280,7 +282,8 @@ else if ($p == 'resetWKey'){
 	");
 	$data = $query->runSQL("
 	UPDATE ngs_runparams
-	SET wkey = ''
+	SET run_status = 6,
+	wkey = ''
 	WHERE id = $id
 	");
 }
