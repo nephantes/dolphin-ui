@@ -519,7 +519,10 @@ class Dolphin:
              
               if (pipe['Type'] == "DiffMeth"):
                  methylkit_name =( pipe['Name'] if ('Name' in pipe) else '' )
-                 self.prf( fp, '%s'%(stepMethylKit % locals()) )             
+                 self.prf( fp, '%s'%(stepMethylKit % locals()) )
+                 
+              if (pipe['Type'] == "HaplotypeCaller"):
+                 self.prf( fp, '%s'%(stepHaplotype % locals()) )
 
         level = str(1 if ('clean' in runparams and runparams['clean'].lower() != 'none') else 0)
         print >>fp, '%s'%(stepClean % locals())
