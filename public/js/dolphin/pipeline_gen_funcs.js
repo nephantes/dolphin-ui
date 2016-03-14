@@ -162,7 +162,7 @@ function rerunLoad() {
 									IGVTDFSelection('select_1_'+i);
 									document.getElementById('textarea_2_'+i).value = splt1[i].ExtFactor;
 								}
-								if (splt1[i].MarkDuplicates == 'yes' || splt1[i].MarkDuplicates == '1') {
+								if (splt1[i].UseDuplicateReads == 'yes' || splt1[i].UseDuplicateReads == '1') {
 									document.getElementById('checkbox_1_'+i).checked = true;
 								}
 								if (splt1[i].RSeQC == 'yes' || splt1[i].RSeQC == '1') {
@@ -1729,7 +1729,7 @@ function findAdditionalInfoValues(goWord, additionalArray){
 }
 /*##### GENERATE ADDITIONAL PIPELINE STR FOR JSON #####*/
 function findPipelineValues(){
-	var RSEM_JSON_DICT  = ['Params', 'MarkDuplicates', 'RSeQC', 'NoGenomeBAM', 'IGVTDF', 'BAM2BW', 'ExtFactor', 'Custom', 'CustomGenomeIndex', 'CustomGenomeAnnotation'];
+	var RSEM_JSON_DICT  = ['Params', 'UseDuplicateReads', 'RSeQC', 'NoGenomeBAM', 'IGVTDF', 'BAM2BW', 'ExtFactor', 'Custom', 'CustomGenomeIndex', 'CustomGenomeAnnotation'];
 	var DESEQ_JSON_DICT = ['Name', 'Columns', 'Conditions', 'FitType', 'HeatMap', 'padj', 'foldChange', 'DataType'];
 	var CHIPSEQ_JSON_DICT = ['ChipInput', 'MultiMapper', 'TagSize', 'BandWith', 'EffectiveGenome', 'MarkDuplicates', 'CollectMultipleMetrics', 'IGVTDF', 'BAM2BW', 'ExtFactor'];
 	var TOPHAT_JSON_DICT = ['Params', 'MarkDuplicates', 'RSeQC', 'CollectRnaSeqMetrics', 'CollectMultipleMetrics', 'IGVTDF', 'BAM2BW', 'ExtFactor', 'Custom', 'CustomGenomeIndex', 'CustomGenomeAnnotation'];
