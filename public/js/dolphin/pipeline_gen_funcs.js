@@ -389,6 +389,7 @@ function pipelineSelect(num){
 	console.log(pipeType);
 	var divAdj = createElement('div', ['id', 'class', 'style'], ['select_child_'+num, 'input-group margin col-md-11', 'float:left']);
 	console.log(divAdj);
+	
 	//Check for only one RSEM/DESeq dependencies
 	if (pipeType == pipelineDict[0] && currentPipelineVal.indexOf('RNASeqRSEM') > -1)
 	{
