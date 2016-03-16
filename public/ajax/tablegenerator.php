@@ -150,10 +150,10 @@ else if ($p == 'createTableFile')
 	$user = $_SESSION['user'].'_'.date('Y-m-d-H-i-s').'.json2';
 	
 	$file = fopen('../tmp/files/'.$user, "w");
-	fwrite($file,$json);
+	fwrite($file,json_encode($json));
 	fclose($file);
 	
-	$data = json_encode($user);
+	$data = json_encode($json);
 }
 else if ($p == 'convertToTSV')
 {

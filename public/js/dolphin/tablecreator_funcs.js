@@ -297,13 +297,13 @@ function saveTable() {
 		
 	$.ajax({ type: "GET",
 			url: BASE_PATH+"/public/ajax/tablegenerator.php",
-			data: { p: "createTableFile", url: BASE_PATH+"/public/api/getsamplevals.php?" + beforeFormat + 'format=json2' },
+			data: { p: "createTableFile", url: BASE_PATH+"/public/api/getsamplevals.php?" + beforeFormat + 'format=json' },
 			async: false,
 			success : function(s)
 			{
 				file_name = s;
 				console.log(s);
-				console.log(BASE_PATH+"/public/api/getsamplevals.php?" + beforeFormat + 'format=json2');
+				console.log(BASE_PATH+"/public/api/getsamplevals.php?" + beforeFormat + 'format=json');
 				alert();
 			}
 	});
