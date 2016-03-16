@@ -13,6 +13,8 @@ function generateStreamTable(type, queryData, queryType, qvar, rvar, seg, theSea
 	var obj_conversion = [];
 	if (type == 'generated') {
 		if (queryData.length > 0) {
+			console.log(queryData.length);
+			console.log(queryData[0]);
 			keys = Object.keys(queryData[0]);
 		}
 		var new_header = '<tr>';
