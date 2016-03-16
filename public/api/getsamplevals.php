@@ -103,7 +103,9 @@ foreach ($new_data as $nd_key => $nd_value){
     }
     array_push($final_array, $new_object);
 }
-
+if($format == 'json2' || $format == 'JSON2'){
+    $format = 'json2_5';
+}
 $function = 'object_to_' . $format;
 $api = new CSV_To_API();
 echo $api->$function($final_array);
