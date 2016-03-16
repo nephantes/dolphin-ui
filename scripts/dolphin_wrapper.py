@@ -358,6 +358,13 @@ class Dolphin:
                print >>fp, '@CONDS%s=%s'%(name, self.remove_space(pipe['Conditions']))
                
 
+             if (pipe['Type']=="HaplotypeCaller"):
+               print >>fp, '@SMCTFC=%s'%(pipe['standard_min_confidence_threshold_for_calling'])
+               print >>fp, '@SMCTFE=%s'%(pipe['standard_min_confidence_threshold_for_emitting'])
+               print >>fp, '@MBQS=%s'%(pipe['min_base_quality_score'])
+               print >>fp, '@MRPAS=%s'%(pipe['minReadsPerAlignmentStart'])
+               print >>fp, '@MRIRPS=%s'%(pipe['maxReadsInRegionPerSample'])
+
        print >>fp, '@MAPNAMES=%s'%(mapnames)
        print >>fp, '@PREVIOUSPIPE=%s'%(previous)
        
@@ -537,6 +544,9 @@ class Dolphin:
               if (pipe['Type'] == "DiffMeth"):
                  diffmeth_name =( pipe['Name'] if ('Name' in pipe) else '' )
                  self.prf( fp, '%s'%(stepDiffMeth % locals()) )             
+
+              if (pipe['Type'] == "HaplotypeCaller"):
+                 self.prf( fp, '%s'%(stepHaplotype % locals()) )
 
         level = str(1 if ('clean' in runparams and runparams['clean'].lower() != 'none') else 0)
         print >>fp, '%s'%(stepClean % locals())
