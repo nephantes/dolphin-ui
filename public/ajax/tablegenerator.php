@@ -302,7 +302,7 @@ else if  ($p == 'getJsonFromFile')
 else if ($p == 'updateTableFile')
 {
 	if (isset($_GET['url'])){$url = $_GET['url'];}
-	if (isset($_GET['id'])){$url = $_GET['id'];}
+	if (isset($_GET['id'])){$id = $_GET['id'];}
 	$json = file_get_contents($url);
 	$user = $_SESSION['user'].'_'.date('Y-m-d-H-i-s').'.json';
 	
