@@ -417,7 +417,7 @@ function createDownloadReportButtons(currentSelection, type){
 			ul.appendChild(li);
 		}
 		ul.appendChild(createElement('li', ['class'], ['divider']));
-		if(currentResultSelection.split("/")[0] == 'rsem'){
+		if(currentResultSelection.split("/")[0] == 'rsem' || currentResultSelection == 'mRNA' || currentResultSelection == 'tRNA'){
 			var li = createElement('li', [], []);
 			var a = createElement('a', ['onclick', 'style'], ['downloadReports("debrowser", "'+type+'")', 'cursor:pointer']);
 			a.innerHTML = 'Send to DEBrowser';
