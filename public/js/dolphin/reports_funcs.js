@@ -451,9 +451,10 @@ function downloadReports(buttonType, type){
 	}else{
 		temp_currentResultSelection = currentResultSelection;
 	}
-	var URL = BASE_PATH + "/public/api/?source=" + API_PATH + '/public/pub/' + wkey + '/' + temp_currentResultSelection + '&format=' + buttonType;
+	var URL = BASE_PATH + '/public/api/?source=' + API_PATH + '/public/pub/' + wkey + '/' + temp_currentResultSelection + '&format=' + buttonType;
 	if (type == 'debrowser') {
-        URL = BASE_PATH + "/public/api/?source=" + API_PATH + '/public/pub/' + wkey + '/' + temp_currentResultSelection + '&format=JSON';
+        URL = BASE_PATH + '/public/api/?source=' + API_PATH + '/public/pub/' + wkey + '/' + temp_currentResultSelection + '&format=JSON';
+		console.log(URL);
 		$.ajax({ type: "GET",
                         url: BASE_PATH+"/public/ajax/sessionrequests.php",
                         data: { p: "sendToDebrowser", table: URL },
