@@ -419,7 +419,7 @@ function createDownloadReportButtons(currentSelection, type){
 		ul.appendChild(createElement('li', ['class'], ['divider']));
 		if(currentResultSelection.split("/")[0] == 'rsem'){
 			var li = createElement('li', [], []);
-			var a = createElement('a', ['onclick', 'style'], ['downloadReports("debrowser", "debrowser")', 'cursor:pointer']);
+			var a = createElement('a', ['onclick', 'style'], ['downloadReports("debrowser", "'+type+'")', 'cursor:pointer']);
 			a.innerHTML = 'Send to DEBrowser';
 			li.appendChild(a);
 			ul.appendChild(li);
@@ -447,12 +447,12 @@ function createDownloadReportButtons(currentSelection, type){
 function downloadReports(buttonType, type){
 	var temp_currentResultSelection;
 	if (type == 'initial_mapping') {
-		temp_currentResultSelection = 'counts/' + currentResultSelection + '.counts.tsv';
+		temp_currentResultSelection = 'counts/' + document.getElementById('select_'+type+'_report').value + '.counts.tsv';
 	}else{
-		temp_currentResultSelection = currentResultSelection;
+		temp_currentResultSelection = document.getElementById('select_'+type+'_report').value;
 	}
 	var URL = BASE_PATH + '/public/api/?source=' + API_PATH + '/public/pub/' + wkey + '/' + temp_currentResultSelection + '&format=' + buttonType;
-	if (type == 'debrowser') {
+	if (buttonType == 'debrowser') {
         URL = BASE_PATH + '/public/api/?source=' + API_PATH + '/public/pub/' + wkey + '/' + temp_currentResultSelection + '&format=JSON';
 		console.log(URL);
 		$.ajax({ type: "GET",
