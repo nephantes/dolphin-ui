@@ -60,40 +60,38 @@ $new_data=array();
 $title=array();
 
 foreach ($a as $i => $row){
-        if ($type!="summary"){
-            $fields="&fields=$commonfields,$keepcols,$row";
+    if ($type!="summary"){
+        $fields="&fields=$commonfields,$keepcols,$row";
+    }
+    $url=API_PATH."/public/api/?source=".API_PATH."/public/pub/".$i."/$file&$fields&format=json";
+    $json = file_get_contents($url);
+    $dat1 = json_decode($json, $array=TRUE);
+    foreach ($dat1[0] as $key => $value){
+        if (!in_array($key, $title) || in_array($key, $keepcols_array)){
+            array_push($title, $key); 
         }
-        $url=API_PATH."/public/api/?source=".API_PATH."/public/pub/".$i."/$file&$fields&format=json";
-        $json = file_get_contents($url);
-        $dat1 = json_decode($json, $array=TRUE);
-        foreach ($dat1[0] as $key => $value){
-            if (!in_array($key, $title) || in_array($key, $keepcols_array)){
-                array_push($title, $key); 
+    }
+    for ($j=0; $j<sizeof($dat1); $j++){
+        $row = $dat1[$j];
+        if ($type=="summary"){
+            if(in_array($row["File"], $sample_array)){
+                $new_data[$row["File"]]=$row;
+            }
+        }else{
+            if ((isset($filter) && in_array($row[$keyfield], $filter_array)) || !isset($filter)){
+                if(!isset($new_data[$row[$keyfield]])){
+                   $oc[$row[$keyfield]]=array();
+                   $new_data[$row[$keyfield]]=array();
+                }
+                foreach ($row as $key => $value){
+                    if (!in_array($key, $oc[$row[$keyfield]]) || in_array($key, $keepcols_array) ){ 
+                      array_push($new_data[$row[$keyfield]], $value);
+                      array_push($oc[$row[$keyfield]] , $key);
+                    }
+                }
             }
         }
-        for ($j=0; $j<sizeof($dat1); $j++){
-            $row = $dat1[$j];
-            if ($type=="summary"){
-                if(in_array($row["File"], $sample_array)){
-                    $new_data[$row["File"]]=$row;
-                }
-            }else{
-                if ((isset($filter) && in_array($row[$keyfield], $filter_array)) || !isset($filter)){
-                    if(!isset($new_data[$row[$keyfield]])){
-                       $oc[$row[$keyfield]]=array();
-                       $new_data[$row[$keyfield]]=array();
-                    }
-                    foreach ($row as $key => $value){
-                        if (!in_array($key, $oc[$row[$keyfield]]) || in_array($key, $keepcols_array) ){ 
-                          array_push($new_data[$row[$keyfield]], $value);
-                          array_push($oc[$row[$keyfield]] , $key);
-                        }
-                    }
-                }
-            }
-        }
-        #$obj = json_decode($json);
-        #echo $obj."<br>";
+    }
 }
 $final_array=array();
 foreach ($new_data as $nd_key => $nd_value){
@@ -103,6 +101,7 @@ foreach ($new_data as $nd_key => $nd_value){
     }
     array_push($final_array, $new_object);
 }
+var_dump($final_array);
 if($format == 'json2' || $format == 'JSON2'){
     $format = 'json2_5';
 }
