@@ -417,6 +417,14 @@ function createDownloadReportButtons(currentSelection, type){
 			ul.appendChild(li);
 		}
 		ul.appendChild(createElement('li', ['class'], ['divider']));
+		if(currentResultSelection.split("/")[0] == 'rsem'){
+			var li = createElement('li', [], []);
+			var a = createElement('a', ['onclick', 'style'], ['downloadReports("'+buttonType[x]+'", "debrowser")', 'cursor:pointer']);
+			a.innerHTML = buttonType[x] + ' link';
+			li.appendChild(a);
+			ul.appendChild(li);
+			ul.appendChild(createElement('li', ['class'], ['divider']));
+		}
 	}
 	var TSV = createElement('li', [], []);
 	var TSV_a = createElement('a', ['value', 'onclick', 'style'], ['Download File', 'downloadTSV("'+type+'")', 'cursor:pointer']);
@@ -444,7 +452,20 @@ function downloadReports(buttonType, type){
 		temp_currentResultSelection = currentResultSelection;
 	}
 	var URL = BASE_PATH + "/public/api/?source=" + API_PATH + '/public/pub/' + wkey + '/' + temp_currentResultSelection + '&format=' + buttonType;
-	window.open(URL);
+	if (type == 'debrowser') {
+        URL = BASE_PATH + "/public/api/?source=" + API_PATH + '/public/pub/' + wkey + '/' + temp_currentResultSelection + '&format=JSON';
+		$.ajax({ type: "GET",
+                        url: BASE_PATH+"/public/ajax/sessionrequests.php",
+                        data: { p: "sendToDebrowser", table: URL },
+                        async: false,
+                        success : function(s)
+                        {
+                        }
+        });
+        window.location.href = BASE_PATH + '/debrowser';
+    }else{
+		window.open(URL);
+	}
 }
 
 function downloadTSV(type){
