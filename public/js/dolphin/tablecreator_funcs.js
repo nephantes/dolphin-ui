@@ -632,7 +632,7 @@ $(function() {
 		li += '<li><a onclick="changeTableType(\'XML\', \''+beforeFormat+'\')" style="cursor:pointer">XML link</a></li>';
 		li += debrowser_string;
 		li += '<li class="divider"></li>';
-		li += '<li><a value="Download TSV" onclick="downloadGeneratedTSV(\''+beforeFormat+'\')" style="cursor:pointer">Download TSV</a></li>';
+		li += '<li><a value="Download TSV" onclick="downloadGeneratedTSV(\''+BASE_PATH+'/public/api/getsamplevals.php?'+beforeFormat+'format=json\')" style="cursor:pointer">Download TSV</a></li>';
 		
 		ul.innerHTML = li;
 		export_table.appendChild(ul);
@@ -668,7 +668,7 @@ $(function() {
 						var debrowser_string = '';
 						var datafile = splitParameters[1].split('file=')[1].split(',').join(', ');
 						if (datafile.indexOf('rsem') > -1) {
-                            debrowser_string = '<li><a id="' + s[x].id+'" onclick="sendTableToDebrowser(\''+s[x].file+'\')">Send to DEBrowser</a></li>' +
+                            debrowser_string = '<li><a id="' + s[x].id+'" onclick="sendTableToDebrowser(\''+BASE_PATH+'/public/api/getsamplevals.php?'+s[x].parameters+'\')">Send to DEBrowser</a></li>' +
 									'<li class="divider"></li>';
                         }
 						runparams.fnAddData([
