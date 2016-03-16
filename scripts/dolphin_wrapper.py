@@ -339,22 +339,24 @@ class Dolphin:
                print >>fp, '@GSIZE=%s'%(self.remove_space(str(pipe['EffectiveGenome'])))
 
              if (pipe['Type']=="BisulphiteMapping"):
-               if (pipe['BSMapStep'] == "yes"):
+               if ('BSMapStep' in pipe and pipe['BSMapStep'] == "yes"):
                  print >>fp, '@DIGESTION=%s'%(  str(pipe['Digestion']) if ('Digestion' in pipe) else 'NONE' )
                  self.writeInputParamLine(fp, pipe, "@BSMAPPARAM", 'BSMapParams', "BSMapStep")
-               if (pipe['MCallStep']== "yes"):
+               if ('MCallStep' in pipe and pipe['MCallStep']== "yes"):
                  self.writeInputParamLine(fp, pipe, "@MCALLPARAM", 'MCallParams', "MCallStep")
+               if ('MethylKitStep' in pipe and pipe['MethylKitStep']== "yes"):
+                 print >>fp, '@TILE_SIZE=%s'%(pipe['TileSize'])
+                 print >>fp, '@STEP_SIZE=%s'%(pipe['StepSize'])
+                 print >>fp, '@STRAND=%s'%(pipe['StrandSpecific'])
+                 print >>fp, '@TOPN=%s'%(pipe['TopN'])
+                 print >>fp, '@MINCOVERAGE=%s'%(pipe['MinCoverage'])
+                 print >>fp, '@GBUILD=%s'%(gb[1])
                  
-             if (pipe['Type']=="DiffMeth"):
+             if ('DiffMeth' in pipe and pipe['Type']=="DiffMeth"):
                name = ( pipe['Name'] if ('Name' in pipe) else  "")
                print >>fp, '@COLS%s=%s'%(name, self.remove_space(pipe['Columns']))
                print >>fp, '@CONDS%s=%s'%(name, self.remove_space(pipe['Conditions']))
-               print >>fp, '@TILE_SIZE%s=%s'%(name, pipe['TileSize'])
-               print >>fp, '@STEP_SIZE%s=%s'%(name, pipe['StepSize'])
-               print >>fp, '@STRAND%s=%s'%(name, pipe['StrandSpecific'])
-               print >>fp, '@TOPN%s=%s'%(name, pipe['TopN'])
-               print >>fp, '@MINCOVERAGE%s=%s'%(name, pipe['MinCoverage'])
-               print >>fp, '@GBUILD%s=%s'%(name, gb[1])
+               
 
              if (pipe['Type']=="HaplotypeCaller"):
                print >>fp, '@SMCTFC=%s'%(pipe['standard_min_confidence_threshold_for_calling'])
@@ -403,7 +405,7 @@ class Dolphin:
           if( (metric=="CollectRnaSeqMetrics" and (type.lower().find("tophat")>1 or type.lower().find("rsem")>1  )) or metric != "CollectRnaSeqMetrics" ):
             self.prf( fp, stepPicard % locals() if ((metric in pipe and pipe[metric].lower()=="yes")) else None )
             if ("MarkDuplicates" in pipe):
-                type = "dup"+initialtype
+                type = "dedup"+initialtype
         
         self.prf( fp, stepMergePicard % locals() if (('CollectRnaSeqMetrics' in pipe and pipe['CollectRnaSeqMetrics'].lower()=="yes") or ('CollectMultipleMetrics' in pipe and pipe['CollectMultipleMetrics'].lower()=="yes")) else None )
      
@@ -452,9 +454,21 @@ class Dolphin:
            thenumberofreads=str(runparams['split'])
            self.prf( fp, stepSplit % locals() )
            
+        dedupforrsem=""
         if ('pipeline' in runparams):
            for pipe in runparams['pipeline']:
               if (pipe['Type']=="RNASeqRSEM"):
+                 dedup=False
+                 genome_bam="yes"
+                 if(pipe['UseDeduplicatedReads'].lower()=='yes'):
+                     dedup=True
+                     genome_bam="no"
+                     self.prf( fp, stepBamToFastq % locals() )
+
+                 previousrsem = (dedupforrsem if (dedup) else "@PREVIOUSRSEM " )
+
+                 rsemref = (pipe['CustomGenomeIndex'] if ('CustomGenomeIndex' in pipe and pipe['CustomGenomeIndex'].lower()!="none") else "@RSEMREF" )
+
                  self.prf( fp, stepRSEM % locals() )
                  gis = ("genes","isoforms")
                  tes = ("expected_count", "tpm") 
@@ -477,7 +491,8 @@ class Dolphin:
 
                  self.writePicard (fp, type, pipe, sep )
                  if ("MarkDuplicates" in pipe and pipe['MarkDuplicates'].lower()=="yes"):
-                    type="dup"+type
+                    type="dedup"+type
+                    dedupforrsem = type
 
                  self.writeVisualizationStr( fp, type, pipe, sep )
                  self.writeRSeQC ( fp, type, pipe, sep )
@@ -499,7 +514,7 @@ class Dolphin:
 
                  self.writePicard (fp, type, pipe, sep )
                  if ("MarkDuplicates" in pipe and pipe['MarkDuplicates'].lower()=="yes"):
-                    type="dup"+type
+                    type="dedup"+type
 
                  self.writeVisualizationStr( fp, type, pipe, sep )
                                   
@@ -518,16 +533,18 @@ class Dolphin:
                     
                  self.writePicard (fp, type, pipe, sep )
                  if ("MarkDuplicates" in pipe and pipe['MarkDuplicates'].lower()=="yes"):
-                    type="dup"+type 
+                    type="dedup"+type 
                  
                  self.writeVisualizationStr( fp, type, pipe, sep )
-                 
-                 self.prf( fp, '%s'% ( stepMCall % locals() if ('MCallStep' in pipe and pipe['MCallStep'].lower()=="yes") else None ) )
+                 if ('MCallStep' in pipe and pipe['MCallStep'].lower() == "yes"):    
+                     self.prf( fp, '%s'% ( stepMCall % locals() if ('MCallStep' in pipe and pipe['MCallStep'].lower()=="yes") else None ) )
+                 if ('MethylKitStep' in pipe and pipe['MethylKitStep'].lower() == "yes"): 
+                     self.prf( fp, '%s'%(stepMethylKit % locals()) )   
              
               if (pipe['Type'] == "DiffMeth"):
-                 methylkit_name =( pipe['Name'] if ('Name' in pipe) else '' )
-                 self.prf( fp, '%s'%(stepMethylKit % locals()) )
-                 
+                 diffmeth_name =( pipe['Name'] if ('Name' in pipe) else '' )
+                 self.prf( fp, '%s'%(stepDiffMeth % locals()) )             
+
               if (pipe['Type'] == "HaplotypeCaller"):
                  self.prf( fp, '%s'%(stepHaplotype % locals()) )
 
