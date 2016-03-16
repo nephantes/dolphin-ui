@@ -18,7 +18,7 @@ var checklist_experiment_series = [];
 var pipelineNum = 0;
 var customSeqNum = 0;
 var customSeqNumCheck = [];
-var pipelineDict = ['RNASeqRSEM', 'Tophat', 'ChipSeq', 'DESeq', 'BisulphiteMapping', 'DiffMeth'];
+var pipelineDict = ['RNASeqRSEM', 'Tophat', 'ChipSeq', 'DESeq', 'BisulphiteMapping', 'DiffMeth', 'HaplotypeCaller'];
 var rnaList = ["ercc","rRNA","miRNA","tRNA","piRNA","snRNA","rmsk","genome","change_params"];
 var qualityDict = ["window size","required quality","leading","trailing","minlen"];
 var trimmingDict = ["single or paired-end", "5 length 1", "3 length 1", "5 length 2", "3 length 2"];
@@ -338,6 +338,17 @@ function rerunLoad() {
 								if (splt1[i].StrandSpecific == 'yes' || splt1[i].StrandSpecific == '1') {
 									document.getElementById('checkbox_1_'+i).checked = true;
 								}
+							}else if (splt1[i].Type == pipelineDict[6]) {
+								//HaplotypeCaller
+								additionalPipes();
+								document.getElementById('select_'+i).value = pipelineDict[6];
+								pipelineSelect(i);
+								
+								document.getElementById('text_1_'+i).value = splt1[i].standard_min_confidence_threshold_for_calling;
+								document.getElementById('text_2_'+i).value = splt1[i].standard_min_confidence_threshold_for_emitting;
+								document.getElementById('text_3_'+i).value = splt1[i].min_base_quality_score;
+								document.getElementById('text_4_'+i).value = splt1[i].minReadsPerAlignmentStart;
+								document.getElementById('text_5_'+i).value = splt1[i].maxReadsInRegionPerSample;
 							}
 						}
 						document.getElementById(jsonTypeList[x]+'_exp_body').setAttribute('style', 'display: block');
@@ -573,6 +584,21 @@ function pipelineSelect(num){
 		labelDiv.appendChild( createElement('label', ['class','TEXTNODE'], ['box-title margin', 'Strand Specific Information:']));
 		labelDiv.appendChild( createElement('input', ['id', 'type', 'class'], ['checkbox_1_'+num, 'checkbox', 'margin']));
 		divAdj.appendChild(labelDiv);
+	}else if (pipeType == pipelineDict[6]) {
+		//HaplotypeCaller
+		divAdj = mergeTidy(divAdj, 6,
+				[ [createElement('label', ['class','TEXTNODE'], ['box-title', 'Min Calling Threshold Confidence:']),
+				createElement('input', ['id', 'class', 'type', 'value'], ['text_1_'+num, 'form-control', 'text', '30'])],
+				[createElement('label', ['class','TEXTNODE'], ['box-title', 'Min Emitting Threshold Confidence:']),
+				createElement('input', ['id', 'class', 'type', 'value'], ['text_2_'+num, 'form-control', 'text', '30'])] ]);
+		divAdj = mergeTidy(divAdj, 6,
+				[ [createElement('label', ['class','TEXTNODE'], ['box-title', 'Min Base Quality Score:']),
+				createElement('input', ['id', 'class', 'type', 'value'], ['text_3_'+num, 'form-control', 'text', '10'])],
+				[createElement('label', ['class','TEXTNODE'], ['box-title', 'Min Reads Per Alignment Start:']),
+				createElement('input', ['id', 'class', 'type', 'value'], ['text_4_'+num, 'form-control', 'text', '10'])] ]);
+		divAdj = mergeTidy(divAdj, 6,
+				[ [createElement('label', ['class','TEXTNODE'], ['box-title', 'Max Reads In Region Per Sample:']),
+				createElement('input', ['id', 'class', 'type', 'value'], ['text_5_'+num, 'form-control', 'text', '10000'])] ]);
 	}
 	//replace div
 	$('#select_child_'+num).replaceWith(divAdj);
@@ -1629,9 +1655,9 @@ function additionalPipes(){
 	var innerDiv = document.createElement( 'div' );
 	//attach children to parent
 	innerDiv.appendChild( createElement('select',
-					['id', 'class', 'onchange', 'OPTION_DIS_SEL', 'OPTION', 'OPTION', 'OPTION', 'OPTION', 'OPTION', 'OPTION'],
+					['id', 'class', 'onchange', 'OPTION_DIS_SEL', 'OPTION', 'OPTION', 'OPTION', 'OPTION', 'OPTION', 'OPTION', 'OPTION'],
 					['select_'+pipelineNum, 'form-control', 'pipelineSelect('+pipelineNum+')', '--- Select a Pipeline ---',
-					pipelineDict[0], pipelineDict[1], pipelineDict[2], pipelineDict[3], pipelineDict[4], pipelineDict[5]]));
+					pipelineDict[0], pipelineDict[1], pipelineDict[2], pipelineDict[3], pipelineDict[4], pipelineDict[5], pipelineDict[6]]));
 	innerDiv.appendChild( createElement('div', ['id'], ['select_child_'+pipelineNum]));
 	outerDiv.appendChild( innerDiv );
 	outerDiv.appendChild( createElement('input', ['id', 'type', 'class', 'style', 'value', 'onclick'],
@@ -1708,6 +1734,7 @@ function findPipelineValues(){
 	var TOPHAT_JSON_DICT = ['Params', 'MarkDuplicates', 'RSeQC', 'CollectRnaSeqMetrics', 'CollectMultipleMetrics', 'IGVTDF', 'BAM2BW', 'ExtFactor', 'Custom', 'CustomGenomeIndex', 'CustomGenomeAnnotation'];
 	var BISULPHITE_JSON_DICT = ['BSMapStep', 'BisulphiteType', 'Digestion', 'BSMapParams', 'CollectMultipleMetrics', 'IGVTDF', 'MarkDuplicates', 'BAM2BW', 'ExtFactor', 'MCallStep', 'MCallParams'];
 	var DIFFMETH_JSON_DICT = [ 'Name', 'Columns', 'Conditions', 'TileSize', 'StepSize', 'MinCoverage', 'TopN', 'StrandSpecific' ];
+	var HAPLOTYPE_CALLER_DICT = ['standard_min_confidence_threshold_for_calling', 'standard_min_confidence_threshold_for_emitting', 'min_base_quality_score', 'minReadsPerAlignmentStart', 'maxReadsInRegionPerSample'];
 	
 	var JSON_ARRAY =  [];
 	for (var y = 0; y < currentPipelineID.length; y++) {
@@ -1725,6 +1752,8 @@ function findPipelineValues(){
 			USED_DICT = BISULPHITE_JSON_DICT;
 		}else if (currentPipelineVal[y] == 'DiffMeth') {
 			USED_DICT = DIFFMETH_JSON_DICT;
+		}else if (currentPipelineVal[y] == 'HaplotypeCaller') {
+			USED_DICT = HAPLOTYPE_CALLER_DICT;
 		}
 		
 		var dict_counter = 0;
