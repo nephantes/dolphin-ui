@@ -315,6 +315,8 @@ else if ($p == 'updateTableFile')
 	SET file = '$user'
 	WHERE id = $id
 	");
+	
+	$_SESSION['table_file'] = $user;
 }
 
 if (!headers_sent()) {
