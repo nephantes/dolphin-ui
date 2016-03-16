@@ -89,7 +89,7 @@ class tablegenerator_unittest extends PHPUnit_Framework_TestCase
 	}
 	
 	public function testGetCreatedTables(){
-		ob_start();
+		//ob_start();
 		$_GET['p'] = 'getCreatedTables';
 		$_GET['gids'] = '1';
 		include('tablegenerator.php');
@@ -100,7 +100,7 @@ class tablegenerator_unittest extends PHPUnit_Framework_TestCase
 		$this->assertEquals($data->group_id,'1');
 		$this->assertEquals($data->perms,'15');
 		$this->assertEquals($data->last_modified_user,'1');
-		ob_end_clean();
+		//ob_end_clean();
 	}
 	
 	public function testDeleteTable(){
