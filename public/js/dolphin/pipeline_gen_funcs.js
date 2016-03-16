@@ -423,6 +423,14 @@ function pipelineSelect(num){
 		document.getElementById('errorAreas').innerHTML = '';
 		document.getElementById('select_'+num).value = currentPipelineVal[currentPipelineID.indexOf(num)];
 	}
+	else if (pipeType == pipelineDict[5] && document.getElementById('checkbox_5_'+currentPipelineID['BisulphiteMapping']).checked == false) {
+		$('#errorModal').modal({
+			show: true
+		});
+		document.getElementById('errorLabel').innerHTML ='You must first add a MethylKit within BisulphiteMapping pipeline before running DiffMeth';
+		document.getElementById('errorAreas').innerHTML = '';
+		document.getElementById('select_'+num).value = currentPipelineVal[currentPipelineID.indexOf(num)];
+	}
 	else
 	{
 	//pipelineDict: global variable containing selections
@@ -1969,6 +1977,7 @@ function MCallSelection(id){
 	}else{
 		document.getElementById('label_4_'+id).setAttribute("style", "display:none");
 		document.getElementById('textarea_3_'+id).setAttribute("style", "display:none");
+		document.getElementById('checkbox_5_'+id).checked = false;
 	}
 }
 
