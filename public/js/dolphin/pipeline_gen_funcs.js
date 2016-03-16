@@ -423,7 +423,7 @@ function pipelineSelect(num){
 		document.getElementById('errorAreas').innerHTML = '';
 		document.getElementById('select_'+num).value = currentPipelineVal[currentPipelineID.indexOf(num)];
 	}
-	else if (pipeType == pipelineDict[5] && document.getElementById('checkbox_5_'+currentPipelineID['BisulphiteMapping']).checked == false) {
+	else if (pipeType == pipelineDict[5] && document.getElementById('checkbox_5_'+currentPipelineID[currentPipelineVal.indexOf('BisulphiteMapping')]).checked == false) {
 		$('#errorModal').modal({
 			show: true
 		});
