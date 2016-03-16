@@ -10,6 +10,6 @@
                 </section>
                 <!-- Main content -->
                 <section class="content">
-						<iframe id="debrowser" src="<?php echo DEBROWSER_HOST?>" frameborder="0" style="height:100vh;width:100%">
+						<iframe id="debrowser" src="<?php echo DEBROWSER_HOST.$jsonobject?>" frameborder="0" style="height:100vh;width:100%">
 						</iframe>
                 </section><!-- /.content -->

@@ -56,70 +56,56 @@ for ($i=0; $i<sizeof($dat); $i++)
     $a[$dat[$i]->wkey].=$dat[$i]->samplename.",";
     array_push($sample_array, $dat[$i]->samplename);
 }
-
 $new_data=array();
 $title=array();
 
-foreach ($a as $i => $row)
-{
-   if ($type!="summary"){
-       $fields="&fields=$commonfields,$keepcols,$row";
-   }
-
-   $url=API_PATH."/public/api/?source=".API_PATH."/public/pub/".$i."/$file&$fields&format=json";
-   #print $url."<br><br>";
-   $json = file_get_contents($url);
-   #print $json."<br><br>";
-   $dat1 = json_decode($json, $array=TRUE);
-   #var_dump($dat1);
-   foreach ($dat1[0] as $key => $value)
-   {
-      if (!in_array($key, $title) || in_array($key, $keepcols_array)){
-        array_push($title, $key); 
-      }
-   }
-   $new_data["title"]=$title;
-   for ($j=0; $j<sizeof($dat1); $j++)
-   {
-       $row = $dat1[$j];
-       if ($type=="summary")
-       {
-         if(in_array($row["File"], $sample_array))
-         {
-           $new_data[$row["File"]]=$row;
-         }
-       }
-       else 
-       {
-          if ((isset($filter) && in_array($row[$keyfield], $filter_array)) || !isset($filter))
-          {
-          if(!isset($new_data[$row[$keyfield]])){
-             $oc[$row[$keyfield]]=array();
-             $new_data[$row[$keyfield]]=array();
-          }
-            foreach ($row as $key => $value)
-            {
-               if (!in_array($key, $oc[$row[$keyfield]]) || in_array($key, $keepcols_array) ){ 
-                 array_push($new_data[$row[$keyfield]], $value);
-                 array_push($oc[$row[$keyfield]] , $key);
-               }
+foreach ($a as $i => $row){
+        if ($type!="summary"){
+            $fields="&fields=$commonfields,$keepcols,$row";
+        }
+        $url=API_PATH."/public/api/?source=".API_PATH."/public/pub/".$i."/$file&$fields&format=json";
+        $json = file_get_contents($url);
+        $dat1 = json_decode($json, $array=TRUE);
+        foreach ($dat1[0] as $key => $value){
+            if (!in_array($key, $title) || in_array($key, $keepcols_array)){
+                array_push($title, $key); 
             }
-          }
-       }
-   }
-   #$obj = json_decode($json);
-   #echo $obj."<br>";
+        }
+        for ($j=0; $j<sizeof($dat1); $j++){
+            $row = $dat1[$j];
+            if ($type=="summary"){
+                if(in_array($row["File"], $sample_array)){
+                    $new_data[$row["File"]]=$row;
+                }
+            }else{
+                if ((isset($filter) && in_array($row[$keyfield], $filter_array)) || !isset($filter)){
+                    if(!isset($new_data[$row[$keyfield]])){
+                       $oc[$row[$keyfield]]=array();
+                       $new_data[$row[$keyfield]]=array();
+                    }
+                    foreach ($row as $key => $value){
+                        if (!in_array($key, $oc[$row[$keyfield]]) || in_array($key, $keepcols_array) ){ 
+                          array_push($new_data[$row[$keyfield]], $value);
+                          array_push($oc[$row[$keyfield]] , $key);
+                        }
+                    }
+                }
+            }
+        }
+        #$obj = json_decode($json);
+        #echo $obj."<br>";
 }
-#var_dump($new_data);
-if($format == 'json2'){
-    $format = 'json2_5';
+$final_array=array();
+foreach ($new_data as $nd_key => $nd_value){
+    $new_object=array();
+    foreach($nd_value as $v_key => $v_value){
+        $new_object[$oc[$nd_key][$v_key]] = $v_value;
+    }
+    array_push($final_array, $new_object);
 }
+
 $function = 'object_to_' . $format;
 $api = new CSV_To_API();
-echo $api->$function($new_data);
-
-
-#print json_encode($new_data); 
-
-#echo json_encode($data);
+echo $api->$function($final_array);
 exit;
+

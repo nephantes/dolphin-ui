@@ -335,7 +335,6 @@ class CSV_To_API {
     foreach ( reset( $data ) as $header ) {
       $output .= "      {\n        \"label\":\"$header\"\n      },\n";
     }
-	unset($data["title"]);
     $output = $this->commatrim($output); 
     $output .= "\n    ],\n";
     $output .= "    \"rows\": [\n";
