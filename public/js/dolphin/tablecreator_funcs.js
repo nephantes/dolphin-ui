@@ -303,6 +303,7 @@ function saveTable() {
 			{
 				file_name = s;
 				console.log(s);
+				console.log(BASE_PATH+"/public/api/getsamplevals.php?" + beforeFormat + 'format=json2');
 				alert();
 			}
 	});
