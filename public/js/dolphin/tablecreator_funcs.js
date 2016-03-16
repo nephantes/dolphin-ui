@@ -622,7 +622,7 @@ $(function() {
 		var debrowser_string = '';
 		if (beforeFormat.indexOf('rsem/') > -1) {
 			debrowser_string = '<li class="divider"></li>' +
-				'<li><a onclick="sendTableToDebrowser(\''+beforeFormat+'\')" style="cursor:pointer">Send to DEBrowser</a></li>';
+				'<li><a onclick="sendTableToDebrowser(\''+BASE_PATH+'/public/api/getsamplevals.php?'+beforeFormat+'format=json\')" style="cursor:pointer">Send to DEBrowser</a></li>';
 		}
 		
 		var ul = createElement('ul', ['class','role'],['dropdown-menu','menu']);
@@ -632,7 +632,7 @@ $(function() {
 		li += '<li><a onclick="changeTableType(\'XML\', \''+beforeFormat+'\')" style="cursor:pointer">XML link</a></li>';
 		li += debrowser_string;
 		li += '<li class="divider"></li>';
-		li += '<li><a value="Download TSV" onclick="downloadGeneratedTSV(\''+BASE_PATH+'/public/api/getsamplevals.php?'+beforeFormat+'format=json\')" style="cursor:pointer">Download TSV</a></li>';
+		li += '<li><a value="Download TSV" onclick="downloadGeneratedTSV(\''+beforeFormat+'\')" style="cursor:pointer">Download TSV</a></li>';
 		
 		ul.innerHTML = li;
 		export_table.appendChild(ul);
