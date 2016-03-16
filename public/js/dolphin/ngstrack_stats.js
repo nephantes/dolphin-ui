@@ -635,8 +635,8 @@ $(function() {
 			async: false,
 			success : function(s)
 				{
+					console.log(s);
 					json_obj = JSON.parse(s);
-					console.log(json_obj);
 					generateStreamTable('generated', json_obj, phpGrab.theSegment, qvar, rvar, segment, theSearch, uid, gids);
 				}
 			});
