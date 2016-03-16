@@ -295,8 +295,7 @@ else if ($p == 'createCustomTable')
 else if  ($p == 'getJsonFromFile')
 {
 	if (isset($_GET['file'])){$file = $_GET['file'];}
-	$data = $file;
-	#$data = file_get_contents("../tmp/files/$file");
+	$data = file_get_contents("../tmp/files/$file");
 }
 
 if (!headers_sent()) {
