@@ -369,7 +369,7 @@ function sendTableToPlot(file){
 function sendTableToDebrowser(file){
 	$.ajax({ type: "GET",
                         url: BASE_PATH+"/public/ajax/sessionrequests.php",
-                        data: { p: "sendToDebrowser", type: 'table', file: file },
+                        data: { p: "sendToDebrowser", table: file },
                         async: false,
                         success : function(s)
                         {
