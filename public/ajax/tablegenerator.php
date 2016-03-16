@@ -147,10 +147,10 @@ else if ($p == 'createTableFile')
 {
 	if (isset($_GET['url'])){$url = $_GET['url'];}
 	$json = file_get_contents($url);
-	$user = $_SESSION['user'].'_'.date('Y-m-d-H-i-s').'.json2';
+	$user = $_SESSION['user'].'_'.date('Y-m-d-H-i-s').'.json';
 	
 	$file = fopen('../tmp/files/'.$user, "w");
-	fwrite($file,json_encode($json));
+	fwrite($file,$json);
 	fclose($file);
 	
 	$data = json_encode($json);
