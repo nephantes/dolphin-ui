@@ -644,7 +644,7 @@ $(function() {
 					generateStreamTable('generated', json_obj, phpGrab.theSegment, qvar, rvar, segment, theSearch, uid, gids);
 				}
 			});
-			if (json_obj == undefined) {
+			if (json_obj == undefined || json_obj == []) {
 				$.ajax({ type: "GET",
 				url: BASE_PATH +"/public/api/getsamplevals.php?" + table_params.parameters,
 				async: false,
