@@ -641,7 +641,6 @@ $(function() {
 				{
 					console.log(s);
 					json_obj = s;
-					generateStreamTable('generated', json_obj, phpGrab.theSegment, qvar, rvar, segment, theSearch, uid, gids);
 				}
 			});
 			if (json_obj == undefined || json_obj == []) {
@@ -655,6 +654,17 @@ $(function() {
 						generateStreamTable('generated', json_obj, phpGrab.theSegment, qvar, rvar, segment, theSearch, uid, gids);
 					}
 				});
+				$.ajax({ type: "GET",
+				url: BASE_PATH +"/public/ajax/tablegenerator.php",
+				data: { p: "updateTableFile", url: BASE_PATH +"/public/api/getsamplevals.php?" + table_params.parameters, id: table_params.id},
+				async: false,
+				success : function(s)
+					{
+						console.log(s);
+					}
+				});
+			}else{
+				generateStreamTable('generated', json_obj, phpGrab.theSegment, qvar, rvar, segment, theSearch, uid, gids);
 			}
 		}else{
 			$.ajax({ type: "GET",
@@ -665,6 +675,15 @@ $(function() {
 					console.log(s);
 					json_obj = JSON.parse(s);
 					generateStreamTable('generated', json_obj, phpGrab.theSegment, qvar, rvar, segment, theSearch, uid, gids);
+				}
+			});
+			$.ajax({ type: "GET",
+			url: BASE_PATH +"/public/ajax/tablegenerator.php",
+			data: { p: "updateTableFile", url: BASE_PATH +"/public/api/getsamplevals.php?" + table_params.parameters, id: table_params.id},
+			async: false,
+			success : function(s)
+				{
+					console.log(s);
 				}
 			});
 		}
