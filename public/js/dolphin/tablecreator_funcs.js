@@ -617,14 +617,18 @@ $(function() {
 		var beforeFormat = table_params.parameters.split('format=')[0];
 		var json_obj = '';
 		var export_table = document.getElementById('downloadOptions');
-
+		var debrowser_string = '';
+		if (beforeFormat.indexOf('rsem/') > -1) {
+			debrowser_string = '<li class="divider"></li>' +
+				'<li><a onclick="sendTableToDebrowser(\''+beforeFormat+'\')" style="cursor:pointer">Send to DEBrowser</a></li>';
+		}
+		
 		var ul = createElement('ul', ['class','role'],['dropdown-menu','menu']);
 		var li = '<li><a onclick="changeTableType(\'json\', \''+beforeFormat+'\')" style="cursor:pointer">JSON link</a></li>';
 		li += '<li><a onclick="changeTableType(\'json2\', \''+beforeFormat+'\')" style="cursor:pointer">JSON2 link</a></li>';
 		li += '<li><a onclick="changeTableType(\'html\', \''+beforeFormat+'\')" style="cursor:pointer">HTML link</a></li>';
 		li += '<li><a onclick="changeTableType(\'XML\', \''+beforeFormat+'\')" style="cursor:pointer">XML link</a></li>';
-		li += '<li class="divider"></li>';
-		li += '<li><a onclick="sendTableToDebrowser(\''+beforeFormat+'\')" style="cursor:pointer">Send to DEBrowser</a></li>';
+		
 		li += '<li class="divider"></li>';
 		li += '<li><a value="Download TSV" onclick="downloadGeneratedTSV(\''+beforeFormat+'\')" style="cursor:pointer">Download TSV</a></li>';
 		
@@ -659,6 +663,12 @@ $(function() {
 								stringSampleRuns += 'Run: ' + splitSampleRuns[run].split(';')[1] + ' Samples: ' + splitSampleRuns[run].split(';')[0] + ' | ';
 							}
 						}
+						var debrowser_string = '';
+						var datafile = splitParameters[1].split('file=')[1].split(',').join(', ');
+						if (datafile.indexOf('rsem') > -1) {
+                            debrowser_string = '<li><a id="' + s[x].id+'" onclick="sendTableToDebrowser(\''+s[x].file+'\')">Send to DEBrowser</a></li>' +
+									'<li class="divider"></li>';
+                        }
 						runparams.fnAddData([
 							s[x].id,
 							s[x].name,
@@ -670,8 +680,7 @@ $(function() {
 									'<li><a id="' + s[x].id+'" onclick="sendToSavedTable(this.id)">View</a></li>' +
 									'<li><a id="' + s[x].id+'" onclick="sendTableToPlot(\''+s[x].file+'\')">Plot Table</a></li>' +
 									'<li class="divider"></li>' +
-									'<li><a id="' + s[x].id+'" onclick="sendTableToDebrowser(\''+s[x].file+'\')">Send to DEBrowser</a></li>' +
-									'<li class="divider"></li>' +
+									debrowser_string +
 									'<li><a id="' + s[x].id+'" onclick="changeTableData(this.id)">Change Table Permissions</a></li>' +
 									'<li class="divider"></li>' +
 									'<li><a href="" id="' + s[x].id+'" onclick="deleteTable(this.id)">Delete</a></li>' +
