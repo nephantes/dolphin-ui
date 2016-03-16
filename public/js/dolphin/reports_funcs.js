@@ -420,7 +420,7 @@ function createDownloadReportButtons(currentSelection, type){
 		if(currentResultSelection.split("/")[0] == 'rsem'){
 			var li = createElement('li', [], []);
 			var a = createElement('a', ['onclick', 'style'], ['downloadReports("debrowser", "debrowser")', 'cursor:pointer']);
-			a.innerHTML = buttonType[x] + ' link';
+			a.innerHTML = 'Send to DEBrowser';
 			li.appendChild(a);
 			ul.appendChild(li);
 			ul.appendChild(createElement('li', ['class'], ['divider']));
