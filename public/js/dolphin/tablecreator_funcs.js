@@ -302,6 +302,8 @@ function saveTable() {
 			success : function(s)
 			{
 				file_name = s;
+				console.log(s);
+				alert();
 			}
 	});
 	console.log(file_name);
