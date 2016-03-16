@@ -37,7 +37,7 @@ function generateStreamTable(type, queryData, queryType, qvar, rvar, seg, theSea
 					keys[y] = keys[y].replace(/ /g,"_").replace(/>/g,"_");
 				}
 			}else{
-				if (!queryData[Object.keys(queryData)[0]][y].match(/[^$,.\d]/)) {
+				if (!queryData[Object.keys(queryData)[0]][keys[y]].match(/[^$,.\d]/)) {
 					new_header += '<th data-sort="'+keys[y]+'::number" onclick="shiftColumns(this)">'+
 								keys[y]+'<i id="'+y+'" class="pull-right fa fa-unsorted"></i></th>';
 					keys[y] = keys[y].replace(/ /g,"_").replace(/>/g,"_");
