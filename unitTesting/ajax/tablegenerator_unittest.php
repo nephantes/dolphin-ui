@@ -49,7 +49,7 @@ class tablegenerator_unittest extends PHPUnit_Framework_TestCase
 	}
 	
 	public function testCreateTableFile(){
-		//ob_start();
+		ob_start();
 		$_GET['p'] = 'createTableFile';
 		$_GET['url'] = substr(getcwd(), 0, strlen(getcwd()) - 11) . 'public/api/getsamplevals.php';
 		$_GET['samples'] = 'samples=1,2,3,4,5,6:3';
@@ -60,7 +60,7 @@ class tablegenerator_unittest extends PHPUnit_Framework_TestCase
 		include('tablegenerator.php');
 		$file = json_decode($data);
 		$this->assertEquals(json_decode($data),$file);
-		//ob_end_clean();
+		ob_end_clean();
 		return $file;
 	}
 	
@@ -89,18 +89,18 @@ class tablegenerator_unittest extends PHPUnit_Framework_TestCase
 	}
 	
 	public function testGetCreatedTables(){
-		//ob_start();
+		ob_start();
 		$_GET['p'] = 'getCreatedTables';
 		$_GET['gids'] = '1';
 		include('tablegenerator.php');
-		$this->assertEquals($data->id,'1');
-		$this->assertEquals($data->name,'test_table2');
-		$this->assertEquals($data->parameters,'samples=1,2,3,4,5,6:3&file=rsem/genes_expression_tpm.tsv&common=gene,transcript&key=gene&format=json');
-		$this->assertEquals($data->owner_id,'1');
-		$this->assertEquals($data->group_id,'1');
-		$this->assertEquals($data->perms,'15');
-		$this->assertEquals($data->last_modified_user,'1');
-		//ob_end_clean();
+		$this->assertEquals(json_decode($data)[0]->id,'1');
+		$this->assertEquals(json_decode($data)[0]->name,'test_table2');
+		$this->assertEquals(json_decode($data)[0]->parameters,'samples=1,2,3,4,5,6:3&file=rsem/genes_expression_tpm.tsv&common=gene,transcript&key=gene&format=json');
+		$this->assertEquals(json_decode($data)[0]->owner_id,'1');
+		$this->assertEquals(json_decode($data)[0]->group_id,'1');
+		$this->assertEquals(json_decode($data)[0]->perms,'15');
+		$this->assertEquals(json_decode($data)[0]->last_modified_user,'1');
+		ob_end_clean();
 	}
 	
 	public function testDeleteTable(){
@@ -108,7 +108,7 @@ class tablegenerator_unittest extends PHPUnit_Framework_TestCase
 		$_GET['p'] = 'deleteTable';
 		$_GET['id'] = '1';
 		include('tablegenerator.php');
-		$this->assertEquals($data,'1');
+		$this->assertEquals(json_decode($data),'1');
 		ob_end_clean();
 	}
 	/*
