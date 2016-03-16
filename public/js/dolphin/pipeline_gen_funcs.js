@@ -305,6 +305,9 @@ function rerunLoad() {
 								document.getElementById('text_3_'+i).value = splt1[i].StepSize;
 								document.getElementById('text_4_'+i).value = splt1[i].MinCoverage;
 								document.getElementById('text_5_'+i).value = splt1[i].TopN;
+								if (splt1[i].StrandSpecific == 'yes' || splt1[i].StrandSpecific == '1') {
+									document.getElementById('checkbox_6_'+i).checked = true;
+								}
 							}else if (splt1[i].Type == pipelineDict[5]) {
 								//DiffMeth
 								additionalPipes();
@@ -340,9 +343,6 @@ function rerunLoad() {
 									if (select2_values.indexOf(select2.options[h].value) != -1) {
 										select2.options[h].selected = true;
 									}
-								}
-								if (splt1[i].StrandSpecific == 'yes' || splt1[i].StrandSpecific == '1') {
-									document.getElementById('checkbox_1_'+i).checked = true;
 								}
 							}else if (splt1[i].Type == pipelineDict[6]) {
 								//HaplotypeCaller
@@ -1973,29 +1973,39 @@ function MCallSelection(id){
 }
 
 function MethylKitSelection(id){
-	var check = document.getElementById('checkbox_5_'+id).checked;
-	if (check) {
-		document.getElementById('label_2_'+id).setAttribute("style", "display:show");
-		document.getElementById('text_2_'+id).setAttribute("style", "display:show");
-		document.getElementById('label_3_'+id).setAttribute("style", "display:show");
-		document.getElementById('text_3_'+id).setAttribute("style", "display:show");
-		document.getElementById('label_5_'+id).setAttribute("style", "display:show");
-		document.getElementById('text_4_'+id).setAttribute("style", "display:show");
-		document.getElementById('label_6_'+id).setAttribute("style", "display:show");
-		document.getElementById('text_5_'+id).setAttribute("style", "display:show");
-		document.getElementById('label_7_'+id).setAttribute("style", "display:show");
-		document.getElementById('text_6_'+id).setAttribute("style", "display:show");
+	var MCall_check = document.getElementById('checkbox_4_'+id).checked;
+	if (MCall_check) {
+		var check = document.getElementById('checkbox_5_'+id).checked;
+		if (check) {
+			document.getElementById('label_2_'+id).setAttribute("style", "display:show");
+			document.getElementById('text_2_'+id).setAttribute("style", "display:show");
+			document.getElementById('label_3_'+id).setAttribute("style", "display:show");
+			document.getElementById('text_3_'+id).setAttribute("style", "display:show");
+			document.getElementById('label_5_'+id).setAttribute("style", "display:show");
+			document.getElementById('text_4_'+id).setAttribute("style", "display:show");
+			document.getElementById('label_6_'+id).setAttribute("style", "display:show");
+			document.getElementById('text_5_'+id).setAttribute("style", "display:show");
+			document.getElementById('label_7_'+id).setAttribute("style", "display:show");
+			document.getElementById('checkbox_6_'+id).setAttribute("style", "display:show");
+		}else{
+			document.getElementById('label_2_'+id).setAttribute("style", "display:none");
+			document.getElementById('text_2_'+id).setAttribute("style", "display:none");
+			document.getElementById('label_3_'+id).setAttribute("style", "display:none");
+			document.getElementById('text_3_'+id).setAttribute("style", "display:none");
+			document.getElementById('label_5_'+id).setAttribute("style", "display:none");
+			document.getElementById('text_4_'+id).setAttribute("style", "display:none");
+			document.getElementById('label_6_'+id).setAttribute("style", "display:none");
+			document.getElementById('text_5_'+id).setAttribute("style", "display:none");
+			document.getElementById('label_7_'+id).setAttribute("style", "display:none");
+			document.getElementById('checkbox_6_'+id).setAttribute("style", "display:none");
+		}
 	}else{
-		document.getElementById('label_2_'+id).setAttribute("style", "display:none");
-		document.getElementById('text_2_'+id).setAttribute("style", "display:none");
-		document.getElementById('label_3_'+id).setAttribute("style", "display:none");
-		document.getElementById('text_3_'+id).setAttribute("style", "display:none");
-		document.getElementById('label_5_'+id).setAttribute("style", "display:none");
-		document.getElementById('text_4_'+id).setAttribute("style", "display:none");
-		document.getElementById('label_6_'+id).setAttribute("style", "display:none");
-		document.getElementById('text_5_'+id).setAttribute("style", "display:none");
-		document.getElementById('label_7_'+id).setAttribute("style", "display:none");
-		document.getElementById('text_6_'+id).setAttribute("style", "display:none");
+		$('#errorModal').modal({
+			show: true
+		});
+		document.getElementById('errorLabel').innerHTML ='You must first add a MCall before adding MethylKit';
+		document.getElementById('errorAreas').innerHTML = '';
+		document.getElementById('checkbox_5_'+id).checked = false;
 	}
 }
 
