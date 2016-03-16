@@ -161,5 +161,11 @@ else if ($p == 'changeRunType')
 	}else{
 		echo ',';
 	}
+}else if ($p == 'sendToDebrowser'){
+        if (isset($_GET['table'])){$table = $_GET['table'];}
+        $_SESSION['debrowser'] = $table;
+        echo $_SESSION['debrowser'];
+}else if ($p == 'loadDebrowser'){
+        echo $_SESSION['debrowser'];
 }
 ?>

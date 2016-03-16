@@ -366,6 +366,18 @@ function sendTableToPlot(file){
 	window.location.href = BASE_PATH + '/plot';
 }
 
+function sendTableToDebrowser(file){
+	$.ajax({ type: "GET",
+                        url: BASE_PATH+"/public/ajax/sessionrequests.php",
+                        data: { p: "sendToDebrowser", type: 'table', file: file },
+                        async: false,
+                        success : function(s)
+                        {
+                        }
+        });
+        window.location.href = BASE_PATH + '/debrowser';
+}
+
 function deleteTable(id){
 	$.ajax({ type: "GET",
 				url: BASE_PATH+"/public/ajax/tablegenerator.php",
@@ -655,6 +667,8 @@ $(function() {
 								'<ul class="dropdown-menu" role="menu">' + 
 									'<li><a id="' + s[x].id+'" onclick="sendToSavedTable(this.id)">View</a></li>' +
 									'<li><a id="' + s[x].id+'" onclick="sendTableToPlot(\''+s[x].file+'\')">Plot Table</a></li>' +
+									'<li class="divider"></li>' +
+									'<li><a id="' + s[x].id+'" onclick="sendTableToDebrowser(\''+s[x].file+'\')">Send to DEBrowser</a></li>' +
 									'<li class="divider"></li>' +
 									'<li><a id="' + s[x].id+'" onclick="changeTableData(this.id)">Change Table Permissions</a></li>' +
 									'<li class="divider"></li>' +
