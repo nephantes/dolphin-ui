@@ -50,6 +50,7 @@ $data=$query->getSampleQuery($samples);
 #header('Content-type: application/json');
 
 $dat=json_decode($data);
+var_dump($dat);
 $sample_array=array();
 for ($i=0; $i<sizeof($dat); $i++)
 {
@@ -101,7 +102,6 @@ foreach ($new_data as $nd_key => $nd_value){
     }
     array_push($final_array, $new_object);
 }
-var_dump($final_array);
 if($format == 'json2' || $format == 'JSON2'){
     $format = 'json2_5';
 }
