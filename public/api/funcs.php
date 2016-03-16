@@ -408,7 +408,13 @@ class funcs
         }
         return "ERROR 003: in getServiceCommand";
     }
-    
+   
+    function deleteLastServiceJobs($wkey)
+    {
+        $sql="DELETE FROM jobs where wkey='$wkey' and service_id = (SELECT service_id FROM service_run where service_run_id = (select max(service_run_id) FROM service_run where wkey='$wkey'))";
+        $result = $this->runSQL($sql);
+    } 
+ 
     function startWorkflow( $params )
     {
         $inputparam=$params['inputparam'];
@@ -441,8 +447,7 @@ class funcs
         } else {
             $inputparam = $this->updateInputParam($wkey, $username, $inputparam);
             $ret =  $inputparam;
-            $sql="delete from jobs where wkey like '$wkey-%'";
-            $this->runSQL($sql);
+            $this->deleteLastServiceJobs($wkey);
         }
         if(preg_match('/^ERROR/', $ret))
         {
