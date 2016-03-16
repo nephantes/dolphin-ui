@@ -6,9 +6,11 @@ class DebrowserController extends VanillaController {
 	
 	}
 	
-	function index() {
+	function index($from = 'tablegen') {
 		$this->set('title','DEBrowser');
-		if(isset($_SESSION['debrowser'])){
+		if($from == 'index'){
+			$this->set('jsonobject','/?title=no');
+		}else if(isset($_SESSION['debrowser'])){
 			$this->set('jsonobject', '/?jsonobject='.urlencode($_SESSION['debrowser']).'&title=no');
 		}else if ($_SESSION['debrowser'] == ''){
 			$this->set('jsonobject','/?title=no');
