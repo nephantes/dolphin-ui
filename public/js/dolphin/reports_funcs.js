@@ -419,7 +419,7 @@ function createDownloadReportButtons(currentSelection, type){
 		ul.appendChild(createElement('li', ['class'], ['divider']));
 		if(currentResultSelection.split("/")[0] == 'rsem'){
 			var li = createElement('li', [], []);
-			var a = createElement('a', ['onclick', 'style'], ['downloadReports("'+buttonType[x]+'", "debrowser")', 'cursor:pointer']);
+			var a = createElement('a', ['onclick', 'style'], ['downloadReports("debrowser", "debrowser")', 'cursor:pointer']);
 			a.innerHTML = buttonType[x] + ' link';
 			li.appendChild(a);
 			ul.appendChild(li);
