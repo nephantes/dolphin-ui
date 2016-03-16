@@ -12,8 +12,9 @@ function generateStreamTable(type, queryData, queryType, qvar, rvar, seg, theSea
 	var keys = [];
 	var obj_conversion = [];
 	if (type == 'generated') {
-		keys = queryData.title;
-		delete queryData.title;
+		if (queryData.length > 0) {
+			keys = Object.keys(queryData[0]);
+		}
 		var new_header = '<tr>';
 		var picard_summary_check = table_params.parameters.indexOf('picard.alignment_summary');
 		console.log(picard_summary_check);
