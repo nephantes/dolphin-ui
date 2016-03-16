@@ -50,7 +50,6 @@ $data=$query->getSampleQuery($samples);
 #header('Content-type: application/json');
 
 $dat=json_decode($data);
-var_dump($dat);
 $sample_array=array();
 for ($i=0; $i<sizeof($dat); $i++)
 {
