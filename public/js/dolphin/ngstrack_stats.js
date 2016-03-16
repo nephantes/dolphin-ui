@@ -632,6 +632,7 @@ $(function() {
 		if (table_params.file != '') {
 			//	Load JSON file
 			console.log(table_params.file);
+			json_obj = undefined;
 			$.ajax({ type: "GET",
 			url: BASE_PATH +"/public/ajax/tablegenerator.php",
 			data: { p: "getJsonFromFile", file: table_params.file},
@@ -643,6 +644,18 @@ $(function() {
 					generateStreamTable('generated', json_obj, phpGrab.theSegment, qvar, rvar, segment, theSearch, uid, gids);
 				}
 			});
+			if (json_obj == undefined) {
+				$.ajax({ type: "GET",
+				url: BASE_PATH +"/public/api/getsamplevals.php?" + table_params.parameters,
+				async: false,
+				success : function(s)
+					{
+						console.log(s);
+						json_obj = JSON.parse(s);
+						generateStreamTable('generated', json_obj, phpGrab.theSegment, qvar, rvar, segment, theSearch, uid, gids);
+					}
+				});
+			}
 		}else{
 			$.ajax({ type: "GET",
 			url: BASE_PATH +"/public/api/getsamplevals.php?" + table_params.parameters,
