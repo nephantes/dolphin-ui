@@ -153,7 +153,7 @@ else if ($p == 'createTableFile')
 	fwrite($file,$json);
 	fclose($file);
 	
-	$data = json_encode($json);
+	$data = json_encode($user);
 }
 else if ($p == 'convertToTSV')
 {
