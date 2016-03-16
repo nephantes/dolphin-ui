@@ -628,8 +628,9 @@ $(function() {
 		var json_obj;
 		if (table_params.file != '') {
 			//	Load JSON file
+			console.log(table_params.file);
 			$.ajax({ type: "GET",
-			url: BASE_PATH +"/public/ajax/tablegenerator.php?",
+			url: BASE_PATH +"/public/ajax/tablegenerator.php",
 			data: { p: "getJsonFromFile", file: table_params.file},
 			async: false,
 			success : function(s)
