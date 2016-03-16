@@ -344,7 +344,7 @@ class Dolphin:
                  self.writeInputParamLine(fp, pipe, "@BSMAPPARAM", 'BSMapParams', "BSMapStep")
                if ('MCallStep' in pipe and pipe['MCallStep']== "yes"):
                  self.writeInputParamLine(fp, pipe, "@MCALLPARAM", 'MCallParams', "MCallStep")
-               if ('MethylKitStep' in pipe and pipe['MethylKitStep']== "yes"):
+               if ('MethylKit' in pipe and pipe['MethylKit']== "yes"):
                  print >>fp, '@TILE_SIZE=%s'%(pipe['TileSize'])
                  print >>fp, '@STEP_SIZE=%s'%(pipe['StepSize'])
                  print >>fp, '@STRAND=%s'%(pipe['StrandSpecific'])
@@ -352,7 +352,7 @@ class Dolphin:
                  print >>fp, '@MINCOVERAGE=%s'%(pipe['MinCoverage'])
                  print >>fp, '@GBUILD=%s'%(gb[1])
                  
-             if ('DiffMeth' in pipe and pipe['Type']=="DiffMeth"):
+             if (pipe['Type']=="DiffMeth"):
                name = ( pipe['Name'] if ('Name' in pipe) else  "")
                print >>fp, '@COLS%s=%s'%(name, self.remove_space(pipe['Columns']))
                print >>fp, '@CONDS%s=%s'%(name, self.remove_space(pipe['Conditions']))
@@ -538,7 +538,7 @@ class Dolphin:
                  self.writeVisualizationStr( fp, type, pipe, sep )
                  if ('MCallStep' in pipe and pipe['MCallStep'].lower() == "yes"):    
                      self.prf( fp, '%s'% ( stepMCall % locals() if ('MCallStep' in pipe and pipe['MCallStep'].lower()=="yes") else None ) )
-                 if ('MethylKitStep' in pipe and pipe['MethylKitStep'].lower() == "yes"): 
+                 if ('MethylKit' in pipe and pipe['MethylKit'].lower() == "yes"): 
                      self.prf( fp, '%s'%(stepMethylKit % locals()) )   
              
               if (pipe['Type'] == "DiffMeth"):
