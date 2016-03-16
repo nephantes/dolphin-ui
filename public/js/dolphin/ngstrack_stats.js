@@ -626,16 +626,32 @@ $(function() {
 			}
 		});
 		var json_obj;
-		console.log(BASE_PATH +"/public/api/getsamplevals.php?" + table_params.parameters);
-		$.ajax({ type: "GET",
+		if (table_params.file != '') {
+			//	Load JSON file
+			$.ajax({ type: "GET",
+			url: BASE_PATH +"/public/ajax/tablegenerator.php?",
+			data: { p: "getJsonFromFile", file: table_params.file},
+			async: false,
+			success : function(s)
+				{
+					json_obj = JSON.parse(s);
+					console.log(json_obj);
+					generateStreamTable('generated', json_obj, phpGrab.theSegment, qvar, rvar, segment, theSearch, uid, gids);
+				}
+			});
+		}else{
+			$.ajax({ type: "GET",
 			url: BASE_PATH +"/public/api/getsamplevals.php?" + table_params.parameters,
 			async: false,
 			success : function(s)
-			{
-				json_obj = JSON.parse(s);
-				generateStreamTable('generated', json_obj, phpGrab.theSegment, qvar, rvar, segment, theSearch, uid, gids);
-			}
-		});
+				{
+					json_obj = JSON.parse(s);
+					generateStreamTable('generated', json_obj, phpGrab.theSegment, qvar, rvar, segment, theSearch, uid, gids);
+				}
+			});
+		}
+		console.log(BASE_PATH +"/public/api/getsamplevals.php?" + table_params.parameters);
+		
 	}else if (phpGrab.theSegment != 'report' && phpGrab.theSegment != 'table_viewer') {
 		var experiment_series_data = [];
 		var lane_data = [];
