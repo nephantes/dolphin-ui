@@ -63,8 +63,9 @@ foreach ($a as $i => $row){
     if ($type!="summary"){
         $fields="&fields=$commonfields,$keepcols,$row";
     }
-    $url=BASE_PATH."/public/api/?source=".API_PATH."/public/pub/".$i."/$file&$fields&format=json";
+    $url=API_PATH."/public/api/?source=".API_PATH."/public/pub/".$i."/$file&$fields&format=json";
     $json = file_get_contents($url);
+    var_dump($json);
     $dat1 = json_decode($json, $array=TRUE);
     foreach ($dat1[0] as $key => $value){
         if (!in_array($key, $title) || in_array($key, $keepcols_array)){
