@@ -49,18 +49,18 @@ class tablegenerator_unittest extends PHPUnit_Framework_TestCase
 	}
 	
 	public function testCreateTableFile(){
-		ob_start();
+		//ob_start();
 		$_GET['p'] = 'createTableFile';
 		$_GET['url'] = substr(getcwd(), 0, strlen(getcwd()) - 11) . 'public/api/getsamplevals.php';
 		$_GET['samples'] = 'samples=1,2,3,4,5,6:3';
 		$_GET['file'] = 'file=rsem/genes_expression_tpm.tsv';
 		$_GET['common'] = 'common=gene,transcript';
 		$_GET['key'] = 'key=gene';
-		$_GET['format'] = 'format=json2';
+		$_GET['format'] = 'format=json';
 		include('tablegenerator.php');
 		$file = json_decode($data);
 		$this->assertEquals(json_decode($data),$file);
-		ob_end_clean();
+		//ob_end_clean();
 		return $file;
 	}
 	
