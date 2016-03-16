@@ -667,9 +667,14 @@ $(function() {
 						}
 						var debrowser_string = '';
 						var datafile = splitParameters[1].split('file=')[1].split(',').join(', ');
-						if (datafile.indexOf('rsem') > -1) {
-                            debrowser_string = '<li><a id="' + s[x].id+'" onclick="sendTableToDebrowser(\''+BASE_PATH+'/public/api/getsamplevals.php?'+s[x].parameters+'\')">Send to DEBrowser</a></li>' +
+						if (datafile.indexOf('rsem') > -1 || datafile.indexOf('mRNA') > -1 || datafile.indexOf('tRNA')) {
+							if (s[x].file != null && s[x].file != '') {
+								debrowser_string = '<li><a id="' + s[x].id+'" onclick="sendTableToDebrowser(\''+BASE_PATH+'/public/tmp/files/'+s[x].file+'\')">Send to DEBrowser</a></li>' +
 									'<li class="divider"></li>';
+							}else{
+								debrowser_string = '<li><a id="' + s[x].id+'" onclick="sendTableToDebrowser(\''+BASE_PATH+'/public/api/getsamplevals.php?'+s[x].parameters+'\')">Send to DEBrowser</a></li>' +
+									'<li class="divider"></li>';
+							}
                         }
 						runparams.fnAddData([
 							s[x].id,
