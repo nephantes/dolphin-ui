@@ -269,7 +269,7 @@ else if ($p == 'sendToGeneratedTable')
 	WHERE id = $table_id
 	"));
 	$_SESSION['from_table_list'] = 'true';
-	$_SESSION['table_id'] = $table_id
+	$_SESSION['table_id'] = $table_id;
 	$_SESSION['table_file'] = $data[0]->file;
 	$_SESSION['table_params'] = $data[0]->parameters;
 	$data=json_encode($data);
