@@ -12,8 +12,11 @@ function generateStreamTable(type, queryData, queryType, qvar, rvar, seg, theSea
 	var keys = [];
 	var obj_conversion = [];
 	if (type == 'generated') {
-		keys = queryData.title;
-		delete queryData.title;
+		if (queryData.length > 0) {
+			console.log(queryData.length);
+			console.log(queryData[0]);
+			keys = Object.keys(queryData[0]);
+		}
 		var new_header = '<tr>';
 		var picard_summary_check = table_params.parameters.indexOf('picard.alignment_summary');
 		console.log(picard_summary_check);
@@ -34,7 +37,7 @@ function generateStreamTable(type, queryData, queryType, qvar, rvar, seg, theSea
 					keys[y] = keys[y].replace(/ /g,"_").replace(/>/g,"_");
 				}
 			}else{
-				if (!queryData[Object.keys(queryData)[0]][y].match(/[^$,.\d]/)) {
+				if (!queryData[Object.keys(queryData)[0]][keys[y]].match(/[^$,.\d]/)) {
 					new_header += '<th data-sort="'+keys[y]+'::number" onclick="shiftColumns(this)">'+
 								keys[y]+'<i id="'+y+'" class="pull-right fa fa-unsorted"></i></th>';
 					keys[y] = keys[y].replace(/ /g,"_").replace(/>/g,"_");
@@ -626,16 +629,66 @@ $(function() {
 			}
 		});
 		var json_obj;
-		console.log(BASE_PATH +"/public/api/getsamplevals.php?" + table_params.parameters);
-		$.ajax({ type: "GET",
+		if (table_params.file != '') {
+			//	Load JSON file
+			console.log(table_params.file);
+			json_obj = undefined;
+			$.ajax({ type: "GET",
+			url: BASE_PATH +"/public/ajax/tablegenerator.php",
+			data: { p: "getJsonFromFile", file: table_params.file},
+			async: false,
+			success : function(s)
+				{
+					console.log(s);
+					json_obj = s;
+				}
+			});
+			if (json_obj == undefined || json_obj == []) {
+				$.ajax({ type: "GET",
+				url: BASE_PATH +"/public/api/getsamplevals.php?" + table_params.parameters,
+				async: false,
+				success : function(s)
+					{
+						console.log(s);
+						json_obj = JSON.parse(s);
+						generateStreamTable('generated', json_obj, phpGrab.theSegment, qvar, rvar, segment, theSearch, uid, gids);
+					}
+				});
+				$.ajax({ type: "GET",
+				url: BASE_PATH +"/public/ajax/tablegenerator.php",
+				data: { p: "updateTableFile", url: BASE_PATH +"/public/api/getsamplevals.php?" + table_params.parameters, id: table_params.id},
+				async: false,
+				success : function(s)
+					{
+						console.log(s);
+					}
+				});
+			}else{
+				generateStreamTable('generated', json_obj, phpGrab.theSegment, qvar, rvar, segment, theSearch, uid, gids);
+			}
+		}else{
+			$.ajax({ type: "GET",
 			url: BASE_PATH +"/public/api/getsamplevals.php?" + table_params.parameters,
 			async: false,
 			success : function(s)
-			{
-				json_obj = JSON.parse(s);
-				generateStreamTable('generated', json_obj, phpGrab.theSegment, qvar, rvar, segment, theSearch, uid, gids);
-			}
-		});
+				{
+					console.log(s);
+					json_obj = JSON.parse(s);
+					generateStreamTable('generated', json_obj, phpGrab.theSegment, qvar, rvar, segment, theSearch, uid, gids);
+				}
+			});
+			$.ajax({ type: "GET",
+			url: BASE_PATH +"/public/ajax/tablegenerator.php",
+			data: { p: "updateTableFile", url: BASE_PATH +"/public/api/getsamplevals.php?" + table_params.parameters, id: table_params.id},
+			async: false,
+			success : function(s)
+				{
+					console.log(s);
+				}
+			});
+		}
+		console.log(BASE_PATH +"/public/api/getsamplevals.php?" + table_params.parameters);
+		
 	}else if (phpGrab.theSegment != 'report' && phpGrab.theSegment != 'table_viewer') {
 		var experiment_series_data = [];
 		var lane_data = [];

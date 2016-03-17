@@ -297,11 +297,13 @@ function saveTable() {
 		
 	$.ajax({ type: "GET",
 			url: BASE_PATH+"/public/ajax/tablegenerator.php",
-			data: { p: "createTableFile", url: BASE_PATH+"/public/api/getsamplevals.php?" + beforeFormat + 'format=json2' },
+			data: { p: "createTableFile", url: BASE_PATH+"/public/api/getsamplevals.php?" + beforeFormat + 'format=json' },
 			async: false,
 			success : function(s)
 			{
 				file_name = s;
+				console.log(s);
+				console.log(BASE_PATH+"/public/api/getsamplevals.php?" + beforeFormat + 'format=json');
 			}
 	});
 	console.log(file_name);
@@ -364,6 +366,18 @@ function sendTableToPlot(file){
 			}
 	});
 	window.location.href = BASE_PATH + '/plot';
+}
+
+function sendTableToDebrowser(file){
+	$.ajax({ type: "GET",
+                        url: BASE_PATH+"/public/ajax/sessionrequests.php",
+                        data: { p: "sendToDebrowser", table: file },
+                        async: false,
+                        success : function(s)
+                        {
+                        }
+        });
+        window.location.href = BASE_PATH + '/debrowser';
 }
 
 function deleteTable(id){
@@ -605,12 +619,23 @@ $(function() {
 		var beforeFormat = table_params.parameters.split('format=')[0];
 		var json_obj = '';
 		var export_table = document.getElementById('downloadOptions');
-
+		var debrowser_string = '';
+		if (beforeFormat.indexOf('rsem/') > -1 || beforeFormat.indexOf('mRNA') > -1 || beforeFormat.indexOf('tRNA') > -1) {
+			if (table_params.file != null && table_params.file != '') {
+				debrowser_string = '<li class="divider"></li>' +
+					'<li><a onclick="sendTableToDebrowser(\''+BASE_PATH+'/public/tmp/files/'+table_params.file+'\')" style="cursor:pointer">Send to DEBrowser</a></li>';
+			}else{
+				debrowser_string = '<li class="divider"></li>' +
+					'<li><a onclick="sendTableToDebrowser(\''+BASE_PATH+'/public/api/getsamplevals.php?'+beforeFormat+'format=json\')" style="cursor:pointer">Send to DEBrowser</a></li>';
+			}
+		}
+		
 		var ul = createElement('ul', ['class','role'],['dropdown-menu','menu']);
 		var li = '<li><a onclick="changeTableType(\'json\', \''+beforeFormat+'\')" style="cursor:pointer">JSON link</a></li>';
 		li += '<li><a onclick="changeTableType(\'json2\', \''+beforeFormat+'\')" style="cursor:pointer">JSON2 link</a></li>';
 		li += '<li><a onclick="changeTableType(\'html\', \''+beforeFormat+'\')" style="cursor:pointer">HTML link</a></li>';
 		li += '<li><a onclick="changeTableType(\'XML\', \''+beforeFormat+'\')" style="cursor:pointer">XML link</a></li>';
+		li += debrowser_string;
 		li += '<li class="divider"></li>';
 		li += '<li><a value="Download TSV" onclick="downloadGeneratedTSV(\''+beforeFormat+'\')" style="cursor:pointer">Download TSV</a></li>';
 		
@@ -645,6 +670,17 @@ $(function() {
 								stringSampleRuns += 'Run: ' + splitSampleRuns[run].split(';')[1] + ' Samples: ' + splitSampleRuns[run].split(';')[0] + ' | ';
 							}
 						}
+						var debrowser_string = '';
+						var datafile = splitParameters[1].split('file=')[1].split(',').join(', ');
+						if (datafile.indexOf('rsem') > -1 || datafile.indexOf('mRNA') > -1 || datafile.indexOf('tRNA') > -1) {
+							if (s[x].file != null && s[x].file != '') {
+								debrowser_string = '<li><a id="' + s[x].id+'" onclick="sendTableToDebrowser(\''+BASE_PATH+'/public/tmp/files/'+s[x].file+'\')">Send to DEBrowser</a></li>' +
+									'<li class="divider"></li>';
+							}else{
+								debrowser_string = '<li><a id="' + s[x].id+'" onclick="sendTableToDebrowser(\''+BASE_PATH+'/public/api/getsamplevals.php?'+s[x].parameters+'\')">Send to DEBrowser</a></li>' +
+									'<li class="divider"></li>';
+							}
+                        }
 						runparams.fnAddData([
 							s[x].id,
 							s[x].name,
@@ -656,6 +692,7 @@ $(function() {
 									'<li><a id="' + s[x].id+'" onclick="sendToSavedTable(this.id)">View</a></li>' +
 									'<li><a id="' + s[x].id+'" onclick="sendTableToPlot(\''+s[x].file+'\')">Plot Table</a></li>' +
 									'<li class="divider"></li>' +
+									debrowser_string +
 									'<li><a id="' + s[x].id+'" onclick="changeTableData(this.id)">Change Table Permissions</a></li>' +
 									'<li class="divider"></li>' +
 									'<li><a href="" id="' + s[x].id+'" onclick="deleteTable(this.id)">Delete</a></li>' +

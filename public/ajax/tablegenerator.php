@@ -147,7 +147,7 @@ else if ($p == 'createTableFile')
 {
 	if (isset($_GET['url'])){$url = $_GET['url'];}
 	$json = file_get_contents($url);
-	$user = $_SESSION['user'].'_'.date('Y-m-d-H-i-s').'.json2';
+	$user = $_SESSION['user'].'_'.date('Y-m-d-H-i-s').'.json';
 	
 	$file = fopen('../tmp/files/'.$user, "w");
 	fwrite($file,$json);
@@ -263,19 +263,23 @@ else if ($p == 'getTableOwner')
 else if ($p == 'sendToGeneratedTable')
 {
 	if (isset($_GET['table_id'])){$table_id = $_GET['table_id'];}
-	$data=$query->queryAVal("
-	SELECT parameters
+	$data=json_decode($query->queryTable("
+	SELECT parameters, file
 	FROM ngs_createdtables
 	WHERE id = $table_id
-	");
+	"));
 	$_SESSION['from_table_list'] = 'true';
-	$_SESSION['table_params'] = $data;
+	$_SESSION['table_id'] = $table_id;
+	$_SESSION['table_file'] = $data[0]->file;
+	$_SESSION['table_params'] = $data[0]->parameters;
 	$data=json_encode($data);
 }
 else if ($p == 'getGeneratedTable')
 {
 	if(isset($_SESSION['table_params'])){
 		$array['parameters'] = $_SESSION['table_params'];
+		$array['file'] = $_SESSION['table_file'];
+		$array['id'] = $_SESSION['table_id'];
 		$array['from_table_list'] = $_SESSION['from_table_list'];
 		$data = json_encode($array);
 	}else{
@@ -286,8 +290,33 @@ else if ($p == 'createCustomTable')
 {
 	if (isset($_GET['params'])){$params = $_GET['params'];}
 	$_SESSION['from_table_list'] = 'false';
+	$_SESSION['table_file'] = '';
 	$_SESSION['table_params'] = $params;
 	$data=json_encode($params);
+}
+else if  ($p == 'getJsonFromFile')
+{
+	if (isset($_GET['file'])){$file = $_GET['file'];}
+	$data = file_get_contents("../tmp/files/$file");
+}
+else if ($p == 'updateTableFile')
+{
+	if (isset($_GET['url'])){$url = $_GET['url'];}
+	if (isset($_GET['id'])){$id = $_GET['id'];}
+	$json = file_get_contents($url);
+	$user = $_SESSION['user'].'_'.date('Y-m-d-H-i-s').'.json';
+	
+	$file = fopen('../tmp/files/'.$user, "w");
+	fwrite($file,$json);
+	fclose($file);
+	
+	$data=$query->runSQL("
+	UPDATE ngs_createdtables
+	SET file = '$user'
+	WHERE id = $id
+	");
+	
+	$_SESSION['table_file'] = $user;
 }
 
 if (!headers_sent()) {

@@ -417,6 +417,14 @@ function createDownloadReportButtons(currentSelection, type){
 			ul.appendChild(li);
 		}
 		ul.appendChild(createElement('li', ['class'], ['divider']));
+		if(currentResultSelection.split("/")[0] == 'rsem' || currentResultSelection == 'mRNA' || currentResultSelection == 'tRNA'){
+			var li = createElement('li', [], []);
+			var a = createElement('a', ['onclick', 'style'], ['downloadReports("debrowser", "'+type+'")', 'cursor:pointer']);
+			a.innerHTML = 'Send to DEBrowser';
+			li.appendChild(a);
+			ul.appendChild(li);
+			ul.appendChild(createElement('li', ['class'], ['divider']));
+		}
 	}
 	var TSV = createElement('li', [], []);
 	var TSV_a = createElement('a', ['value', 'onclick', 'style'], ['Download File', 'downloadTSV("'+type+'")', 'cursor:pointer']);
@@ -439,12 +447,26 @@ function createDownloadReportButtons(currentSelection, type){
 function downloadReports(buttonType, type){
 	var temp_currentResultSelection;
 	if (type == 'initial_mapping') {
-		temp_currentResultSelection = 'counts/' + currentResultSelection + '.counts.tsv';
+		temp_currentResultSelection = 'counts/' + document.getElementById('select_'+type+'_report').value + '.counts.tsv';
 	}else{
-		temp_currentResultSelection = currentResultSelection;
+		temp_currentResultSelection = document.getElementById('select_'+type+'_report').value;
 	}
-	var URL = BASE_PATH + "/public/api/?source=" + API_PATH + '/public/pub/' + wkey + '/' + temp_currentResultSelection + '&format=' + buttonType;
-	window.open(URL);
+	var URL = BASE_PATH + '/public/api/?source=' + API_PATH + '/public/pub/' + wkey + '/' + temp_currentResultSelection + '&format=' + buttonType;
+	if (buttonType == 'debrowser') {
+        URL = BASE_PATH + '/public/api/?source=' + API_PATH + '/public/pub/' + wkey + '/' + temp_currentResultSelection + '&format=JSON';
+		console.log(URL);
+		$.ajax({ type: "GET",
+                        url: BASE_PATH+"/public/ajax/sessionrequests.php",
+                        data: { p: "sendToDebrowser", table: URL },
+                        async: false,
+                        success : function(s)
+                        {
+                        }
+        });
+        window.location.href = BASE_PATH + '/debrowser';
+    }else{
+		window.open(URL);
+	}
 }
 
 function downloadTSV(type){
