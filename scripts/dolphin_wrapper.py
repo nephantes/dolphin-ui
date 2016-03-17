@@ -269,7 +269,7 @@ class Dolphin:
                runparams['trim']="%s:%s"%(str(pipe["5len1"]),str(pipe["3len1"]))
        previous=self.writeInputParamLine(fp, runparams, "@TRIM", 'trim', "TRIM", previous)
        
-       if ('commonind' in runparams and  runparams['commonind'].lower() != "none"):
+       if ('commonind' in runparams and  str(runparams['commonind']).lower() != "none"):
          arr=re.split(r'[,:]+', self.parse_content(commonind))
          for i in arr:
            print i
@@ -284,16 +284,17 @@ class Dolphin:
     
        mapnames = (runparams['commonind'] if ('commonind' in runparams and runparams['commonind'].lower()!="none") else "")
    
-       if ('customind' in runparams and runparams['customind'].lower()!="none"):
-          for vals in runparams['customind']:
+       if ('custominds' in runparams and str(runparams['custominds']).lower() != "none"):
+          print str(runparams['custominds'])
+          for vals in runparams['custominds']:
             index=self.parse_content(vals['FullPath'] + "/" + vals['IndexPrefix'])
             name=self.parse_content(self.replace_space(vals['IndexPrefix']))
             
             mapnames = (mapnames + "," + name + ":" + index if mapnames!="" else name + ":" + index)
             
-            bowtie_params=self.parse_content(self.replace_space(arr[2]))
-            description=self.parse_content(self.replace_space(arr[3]))
-            filter_out=arr[4]
+            bowtie_params=self.parse_content(self.replace_space(vals['BowtieParams']))
+            description=self.parse_content(self.replace_space(vals['Description']))
+            filter_out=vals['Filter Out']
     
             print >>fp, '@PARAM%s=%s,%s,%s,%s,%s,%s'%(name,index,name,bowtie_params,description,filter_out,previous)
             if (str(filter_out)=="1"):
@@ -433,7 +434,7 @@ class Dolphin:
         self.prf(fp, stepTrim % locals() if ('trim' in runparams and runparams['trim'].lower()!="none") else None  )
        
         countstep = False
-        if ('commonind' in runparams and  runparams['commonind'].lower() != 'none'):
+        if ('commonind' in runparams and str(runparams['commonind']).lower() != 'none'):
            arr=re.split(r'[,:]+', self.parse_content(commonind))
            for i in arr:
               countstep = True
@@ -441,11 +442,10 @@ class Dolphin:
                 indexname=i
               self.prf(fp, stepSeqMapping % locals() )
         
-        if ('customind' in runparams and runparams['customind'].lower() != 'none'):
-           for i in customind:
+        if ('custominds' in runparams and str(runparams['custominds']).lower() != 'none'):
+           for vals in runparams['custominds']:
               countstep = True
-              arr=i.split(':')
-              indexname = runparams['customind']['FullPath'] + "/" + runparams['customind']['IndexPrefix'] 
+              indexname = self.parse_content(self.replace_space(vals['IndexPrefix']))
               self.prf( fp, stepSeqMapping % locals() )
        
         if (countstep):
