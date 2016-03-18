@@ -292,3 +292,19 @@ function changeRunType(int_type){
 		}	
 	});
 }
+
+function softResetService(wkey, s_id, name){
+	
+}
+
+function hardResetService(wkey, s_id, name){
+	
+}
+
+function softResetJob(wkey, s_id, name){
+	
+}
+
+function hardResetJob(wkey, s_id, name){
+	
+}

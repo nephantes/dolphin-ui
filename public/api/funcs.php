@@ -96,7 +96,16 @@ class funcs
         }
         return "{\"Result\":\"Ok\"}";
     }
-     
+    function removeJob($wkey, $dir, $file)
+    {
+        $this->readINI();
+        if($file != ""){
+            $com = "rm -rf $dir/$file*";
+            $retval = $this->syscall($this->getCMDs($com));
+        }else{
+            return "File given is an empty string";
+        }
+    }
     function getKey()
     {
         $characters = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";

@@ -136,6 +136,7 @@ $(function() {
 			 async: false,
 			 success : function(s)
 			 {
+				console.log(s);
 				runparams.fnClearTable();
 				var parsed = s;
 				for(var i = 0; i < parsed.length; i++) {
