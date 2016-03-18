@@ -623,10 +623,10 @@ $(function() {
 		if (beforeFormat.indexOf('rsem/') > -1 || beforeFormat.indexOf('mRNA') > -1 || beforeFormat.indexOf('tRNA') > -1) {
 			if (table_params.file != null && table_params.file != '') {
 				debrowser_string = '<li class="divider"></li>' +
-					'<li><a onclick="sendTableToDebrowser(\''+BASE_PATH+'/public/tmp/files/'+table_params.file+'\')" style="cursor:pointer">Send to DEBrowser</a></li>';
+					'<li><a onclick="sendTableToDebrowser(\''+API_PATH+'/public/tmp/files/'+table_params.file+'\')" style="cursor:pointer">Send to DEBrowser</a></li>';
 			}else{
 				debrowser_string = '<li class="divider"></li>' +
-					'<li><a onclick="sendTableToDebrowser(\''+BASE_PATH+'/public/api/getsamplevals.php?'+beforeFormat+'format=json\')" style="cursor:pointer">Send to DEBrowser</a></li>';
+					'<li><a onclick="sendTableToDebrowser(\''+API_PATH+'/public/api/getsamplevals.php?'+beforeFormat+'format=json\')" style="cursor:pointer">Send to DEBrowser</a></li>';
 			}
 		}
 		
@@ -674,10 +674,10 @@ $(function() {
 						var datafile = splitParameters[1].split('file=')[1].split(',').join(', ');
 						if (datafile.indexOf('rsem') > -1 || datafile.indexOf('mRNA') > -1 || datafile.indexOf('tRNA') > -1) {
 							if (s[x].file != null && s[x].file != '') {
-								debrowser_string = '<li><a id="' + s[x].id+'" onclick="sendTableToDebrowser(\''+BASE_PATH+'/public/tmp/files/'+s[x].file+'\')">Send to DEBrowser</a></li>' +
+								debrowser_string = '<li><a id="' + s[x].id+'" onclick="sendTableToDebrowser(\''+API_PATH+'/public/tmp/files/'+s[x].file+'\')">Send to DEBrowser</a></li>' +
 									'<li class="divider"></li>';
 							}else{
-								debrowser_string = '<li><a id="' + s[x].id+'" onclick="sendTableToDebrowser(\''+BASE_PATH+'/public/api/getsamplevals.php?'+s[x].parameters+'\')">Send to DEBrowser</a></li>' +
+								debrowser_string = '<li><a id="' + s[x].id+'" onclick="sendTableToDebrowser(\''+API_PATH+'/public/api/getsamplevals.php?'+s[x].parameters+'\')">Send to DEBrowser</a></li>' +
 									'<li class="divider"></li>';
 							}
                         }
