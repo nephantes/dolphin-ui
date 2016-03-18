@@ -96,11 +96,11 @@ class funcs
         }
         return "{\"Result\":\"Ok\"}";
     }
-    function removeJob($wkey, $dir, $file)
+    function removeSuccessFile($wkey, $dir, $file)
     {
         $this->readINI();
         if($file != ""){
-            $com = "rm -rf $dir/$file*";
+            $com = "rm -rf $dir/tmp/track/$file*";
             $retval = $this->syscall($this->getCMDs($com));
         }else{
             return "File given is an empty string";
