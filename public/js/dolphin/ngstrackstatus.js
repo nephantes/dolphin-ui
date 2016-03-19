@@ -160,12 +160,9 @@ $(function() {
 								'<li><a href="#" onclick="resetService('+run_id+', '+parsed[i].num+', \''+wkey+'\', \''+parsed[i].title+'\', \'soft\')">Soft Reset</a></li>' +
 								'<li><a href="#" onclick="resetService('+run_id+', '+parsed[i].num+', \''+wkey+'\', \''+parsed[i].title+'\', \'hard\')">Hard Reset</a></li>' +
 								'<li class="divider"></li>' + 
-								'<li><a id="'+parsed[i].num+'" href="#" onclick="selectService(this.id)">Select Service</a></li>' +
+								'<li><a id="'+parsed[i].num+'" href="#" onclick="selectService(this.id, \''+wkey+'\')">Select Service</a></li>' +
 							'</ul>' +
 						'</div>'
-						//'<button id="'+parsed[i].num+'" class="btn btn-warning btn-xs" onclick="resetService("'+run_id+'", '+parsed[i].num+', "'+wkey+'", "'+parsed[i].title+'", "soft")">Soft Reset</button>' +
-						//'<button id="'+parsed[i].num+'" class="btn btn-danger btn-xs" onclick="resetService("'+run_id+'", '+parsed[i].num+', "'+wkey+'", "'+parsed[i].title+'", "hard")">Hard Reset</button>',
-						//'<button id="'+parsed[i].num+'" class="btn btn-primary btn-xs pull-right" onclick="selectService(this.id)">Select Service</button>'
 					]);
 				} // End For
 			}
@@ -293,12 +290,9 @@ $(function() {
 										'<li><a href="#" onclick="resetService('+run_id+', '+parsed[i].num+', \''+wkey+'\', \''+parsed[i].title+'\', \'soft\')">Soft Reset</a></li>' +
 										'<li><a href="#" onclick="resetService('+run_id+', '+parsed[i].num+', \''+wkey+'\', \''+parsed[i].title+'\', \'hard\')">Hard Reset</a></li>' +
 										'<li class="divider"></li>' + 
-										'<li><a id="'+parsed[i].num+'" href="#" onclick="selectService(this.id)">Select Service</a></li>' +
+										'<li><a id="'+parsed[i].num+'" href="#" onclick="selectService(this.id, \''+wkey+'\')">Select Service</a></li>' +
 									'</ul>' +
 								'</div>'
-								// '<button id="'+parsed[i].num+'" class="btn btn-warning btn-xs" onclick="resetService("'+run_id+'", '+parsed[i].num+', "'+wkey+'", "'+parsed[i].title+'", "soft")">Soft Reset</button>' +
-								//'<button id="'+parsed[i].num+'" class="btn btn-danger btn-xs" onclick="resetService("'+run_id+'", '+parsed[i].num+', "'+wkey+'", "'+parsed[i].title+'", "hard")">Hard Reset</button>',
-								//'<button id="'+parsed[i].num+'" class="btn btn-primary btn-xs pull-right" onclick="selectService(this.id)">Select Service</button>'
 							]);
 						} // End For
 					}
@@ -327,15 +321,12 @@ $(function() {
 									'<div class="btn-group pull-right">' + 
 										'<button type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown" aria-expanded="true">Options <span class="fa fa-caret-down"></span></button>' +
 										'<ul class="dropdown-menu" role="menu">' +
-											'<li><a href="#" onclick="resetService()">Soft Reset</a></li>' +
-											'<li><a href="#" onclick="resetService()">Hard Reset</a></li>' +
+											'<li><a href="#" onclick="resetJob('+parsed[i].num+', '+parsed[i].num+', \''+wkey+'\', \''+parsed[i].title+'\', \'soft\')">Soft Reset</a></li>' +
+											'<li><a href="#" onclick="resetJob('+parsed[i].num+', '+parsed[i].num+', \''+wkey+'\', \''+parsed[i].title+'\', \'hard\')">Hard Reset</a></li>' +
 											'<li class="divider"></li>' + 
 											'<li><a id="'+parsed[i].num+'" href="#" onclick="selectJob(this.id)">Select Service</a></li>' +
 										'</ul>' +
 									'</div>'
-									//'<button id="'+parsed[i].num+'" class="btn btn-warning btn-xs" onclick="resetJob('+parsed[i].num+', '+parsed[i].num+', "'+wkey+'", "'+parsed[i].title+'", "soft")">Soft Reset</button>' +
-									//'<button id="'+parsed[i].num+'" class="btn btn-danger btn-xs" onclick="resetJob('+parsed[i].num+', '+parsed[i].num+', "'+wkey+'", "'+parsed[i].title+'", "hard")">Hard Reset</button>',
-									//'<button id="'+parsed[i].num+'" class="btn btn-primary btn-xs pull-right" onclick="selectJob(this.id)">Select Job</button>'
 								]);
 							} // End For
 							document.getElementById('service_jobs').style.display = 'inline';

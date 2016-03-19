@@ -43,7 +43,7 @@ function getWKey(run_id){
 	return wkey;
 }
 
-function selectService(id){
+function selectService(id, wkey){
 	service_id = id;
 	var runparams = $('#jsontable_jobs').dataTable();
 	$.ajax({ type: "GET",
@@ -65,15 +65,12 @@ function selectService(id){
 						'<div class="btn-group pull-right">' + 
 							'<button type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown" aria-expanded="true">Options <span class="fa fa-caret-down"></span></button>' +
 							'<ul class="dropdown-menu" role="menu">' +
-								'<li><a href="#" onclick="resetJob()">Soft Reset</a></li>' +
-								'<li><a href="#" onclick="resetJob()">Hard Reset</a></li>' +
+								'<li><a href="#" onclick="resetJob('+run_id+', '+parsed[i].num+', \''+wkey+'\', \''+parsed[i].title+'\', \'soft\')">Soft Reset</a></li>' +
+								'<li><a href="#" onclick="resetJob('+run_id+', '+parsed[i].num+', \''+wkey+'\', \''+parsed[i].title+'\', \'hard\')">Hard Reset</a></li>' +
 								'<li class="divider"></li>' + 
 								'<li><a id="'+parsed[i].num+'" href="#" onclick="selectJob(this.id)">Select Service</a></li>' +
 							'</ul>' +
 						'</div>'
-						//'<button id="'+parsed[i].num+'" class="btn btn-warning btn-xs" onclick="resetJob("'+run_id+'", '+parsed[i].num+', "'+wkey+'", "'+parsed[i].title+'", "soft")">Soft Reset</button>' +
-						//'<button id="'+parsed[i].num+'" class="btn btn-danger btn-xs" onclick="resetJob("'+run_id+'", '+parsed[i].num+', "'+wkey+'", "'+parsed[i].title+'", "hard")">Hard Reset</button>',
-						//'<button id="'+parsed[i].num+'" class="btn btn-primary btn-xs pull-right" onclick="selectJob(this.id)">Select Job</button>'
 					]);
 				} // End For
 				document.getElementById('service_jobs').style.display = 'inline';
@@ -305,11 +302,6 @@ function changeRunType(int_type){
 }
 
 function resetService(run_id, s_id, wkey, name, type){
-	console.log(run_id)
-	console.log(wkey)
-	console.log(s_id)
-	console.log(name)
-	console.log(type)
 	$.ajax({ type: "GET",
 		url: BASE_PATH+"/public/ajax/ngs_stat_funcs.php",
 		data: { p: 'resetService', run_id: run_id, wkey: wkey, s_id: s_id, name: name, type: type },
@@ -317,18 +309,24 @@ function resetService(run_id, s_id, wkey, name, type){
 		success : function(s)
 		{
 			console.log(s);
+			if (s == 0) {
+				location.reload();
+			}
 		}	
 	});
 }
 
-function resetJob(s_id, wkey, name, type){
+function resetJob(run_id, s_id, wkey, name, type){
 	$.ajax({ type: "GET",
 		url: BASE_PATH+"/public/ajax/ngs_stat_funcs.php",
-		data: { p: 'resetJob', wkey: wkey, s_id: s_id, name: name, type: type },
+		data: { p: 'resetJob', run_id: run_id, wkey: wkey, s_id: s_id, name: name, type: type },
 		async: false,
 		success : function(s)
 		{
 			console.log(s);
+			if (s == 0) {
+				location.reload();
+			}
 		}	
 	});
 }

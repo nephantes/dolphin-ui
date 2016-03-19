@@ -28,7 +28,6 @@ if ($p == "resetService")
 		");
 		$remove_out = $funcs->removeSuccessFile($wkey, $outdir, $name);
 	}
-	
 	$data=$query->runSQL("
 	DELETE FROM jobs
 	WHERE wkey = '$wkey'
@@ -44,7 +43,6 @@ if ($p == "resetService")
 	WHERE wkey = '$wkey'
 	AND service_run_id = $s_id
 	");
-	$data = json_encode($wkey);
 }
 else if ($p == 'resetJob')
 {
@@ -62,7 +60,6 @@ else if ($p == 'resetJob')
 		");
 		$remove_out = $funcs->removeSuccessFile($wkey, $outdir, $name);
 	}
-	
 	$data=$query->runSQL("
 	DELETE FROM jobs
 	WHERE wkey = '$wkey'
