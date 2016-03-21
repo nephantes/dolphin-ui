@@ -57,7 +57,7 @@ class tablegenerator_unittest extends PHPUnit_Framework_TestCase
 		$_GET['key'] = 'key=gene';
 		$_GET['format'] = 'format=json';
 		$_GET['url'] = substr(getcwd(), 0, strlen(getcwd()) - 11) . 'public/api/getsamplevals.php?' .
-			"&" . $_GET['samples'] .
+			$_GET['samples'] .
 			"&" . $_GET['file'] .
 			"&" . $_GET['common'] .
 			"&" . $_GET['key'] .
