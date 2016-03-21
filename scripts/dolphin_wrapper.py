@@ -292,7 +292,7 @@ class Dolphin:
             
             mapnames = (mapnames + "," + name + ":" + index if mapnames!="" else name + ":" + index)
             
-            bowtie_params=self.parse_content(self.replace_space(vals['BowtieParams']))
+            bowtie_params= self.replace_space(self.convert_comma(vals['BowtieParams']))
             description=self.parse_content(self.replace_space(vals['Description']))
             filter_out=vals['Filter Out']
     
@@ -309,7 +309,13 @@ class Dolphin:
                print >>fp, '@PARAMSRSEM=%s'%(self.parse_content(paramsrsem))
                print >>fp, '@TSIZE=50';
                print >>fp, '@PREVIOUSRSEM=%s'%(previoussplit)
-    
+               if ("MarkDuplicates" in pipe and pipe['MarkDuplicates'].lower()=="yes"):
+                   bowtie_params=self.replace_space(self.convert_comma("-N 1 --sensitive --dpad 0 --gbar 99999999 --mp 1,1 --np 1 --score-min L,0,-0.1"))
+                   filter_out="0"
+                   name="RSEMBAM"
+                   indexname="rsem_ref.transcripts"
+                   print >>fp, '@PARAM%s=@GDB/%s,%s,%s,%s,%s,%s'%(name,indexname,indexname,bowtie_params,indexname,filter_out,previous)
+                   
              if (pipe['Type']=="Tophat"):
                paramstophat=pipe['Params'] if ('Params' in pipe and pipe['Params']!="") else "NONE"
                print >>fp, '@TSIZE=50';
@@ -403,7 +409,7 @@ class Dolphin:
       try:
         metrics = ("MarkDuplicates", "CollectRnaSeqMetrics", "CollectMultipleMetrics") 
         for metric in metrics:
-          if( (metric=="CollectRnaSeqMetrics" and (type.lower().find("tophat")>1 or type.lower().find("rsem")>1  )) or metric != "CollectRnaSeqMetrics" ):
+          if( (metric=="CollectRnaSeqMetrics" and (str(type).lower().find("tophat")>1 or str(type).lower().find("rsem")>1  )) or metric != "CollectRnaSeqMetrics" ):
             self.prf( fp, stepPicard % locals() if ((metric in pipe and pipe[metric].lower()=="yes")) else None )
             if ("MarkDuplicates" in pipe):
                 type = "dedup"+initialtype
@@ -411,9 +417,18 @@ class Dolphin:
         self.prf( fp, stepMergePicard % locals() if (('CollectRnaSeqMetrics' in pipe and pipe['CollectRnaSeqMetrics'].lower()=="yes") or ('CollectMultipleMetrics' in pipe and pipe['CollectMultipleMetrics'].lower()=="yes")) else None )
      
       except Exception, ex:
-        self.stop_err('Error (line:%s)running wrwritePicarditeWorkflow\n%s'%(format(sys.exc_info()[-1].tb_lineno), str(ex)))
+        self.stop_err('Error (line:%s)running writePicardWorkflow\n%s'%(format(sys.exc_info()[-1].tb_lineno), str(ex)))
 
+    def writeDedupForRSEM(self, pipe, type, fp, sep):
+      try:
+        indexname = "RSEMBAM"
+        self.prf( fp, stepSeqMapping % locals() )
+        self.writePicard (fp, type, pipe, sep )
     
+        
+      except Exception, ex:
+        self.stop_err('Error (line:%s)running dedupForRSEM\n%s'%(format(sys.exc_info()[-1].tb_lineno), str(ex)))
+
     def writeWorkflow(self,  file, gettotalreads, amazonupload, backupS3, runparamsid, runparams ):
       try:
         commonind=''
@@ -453,20 +468,27 @@ class Dolphin:
         if ('split' in runparams and runparams['split'].lower() != 'none'):
            thenumberofreads=str(runparams['split'])
            self.prf( fp, stepSplit % locals() )
-           
-        dedupforrsem=""
+
         if ('pipeline' in runparams):
            for pipe in runparams['pipeline']:
               if (pipe['Type']=="RNASeqRSEM"):
                  dedup=False
                  genome_bam="yes"
-                 if(pipe['UseDeduplicatedReads'].lower()=='yes'):
-                     dedup=True
+                 bamsupport="no"
+                 type="rsem"
+                 previousrsem = "@PREVIOUSRSEM"
+                 if('MarkDuplicates' in pipe and pipe['MarkDuplicates'].lower()=='yes'):
                      genome_bam="no"
-                     self.prf( fp, stepBamToFastq % locals() )
+                     bamsupport="yes"
+                     type = "rsem_ref.transcripts"
+                     self.writeDedupForRSEM(pipe, type, fp, sep)
+                     previousrsem = "dedup" + type
+                     type=previousrsem
 
-                 previousrsem = (dedupforrsem if (dedup) else "@PREVIOUSRSEM " )
-
+                 if ('split' in runparams and runparams['split'].lower() != 'none'):
+                    self.prf( fp, '%s'%(stepMergeBAM % locals()) )
+                    previousrsem="merge"+previousrsem
+                     
                  rsemref = (pipe['CustomGenomeIndex'] if ('CustomGenomeIndex' in pipe and pipe['CustomGenomeIndex'].lower()!="none") else "@RSEMREF" )
 
                  self.prf( fp, stepRSEM % locals() )
@@ -492,12 +514,10 @@ class Dolphin:
                  self.writePicard (fp, type, pipe, sep )
                  if ("MarkDuplicates" in pipe and pipe['MarkDuplicates'].lower()=="yes"):
                     type="dedup"+type
-                    dedupforrsem = type
 
                  self.writeVisualizationStr( fp, type, pipe, sep )
                  self.writeRSeQC ( fp, type, pipe, sep )
 
-                    
               if (pipe['Type'] == "DESeq"):
                  deseq_name =( pipe['Name'] if ('Name' in pipe) else '' )
                  self.prf( fp, '%s'%(stepDESeq2 % locals()) )
@@ -506,7 +526,6 @@ class Dolphin:
                  #Arrange ChipSeq mapping step
                  indexname='Chip'
                  self.prf( fp, '%s'%(stepSeqMapping % locals()) )
-
                  type="chip"
                  if ('split' in runparams and runparams['split'].lower() != 'none'):
                      self.prf( fp, '%s'%(stepMergeBAM % locals()) )
@@ -563,6 +582,9 @@ class Dolphin:
     def remove_space(self, content) :
         content = content.replace( '__cr____cn__', '' )
         content = re.sub('[\s\t\n]+', '', content)
+        return content
+    def convert_comma(self, content) :
+        content = content.replace(',', '__tc__')
         return content
         
     def parse_content(self, content, ncols=8, base64=False, verbose=0 ) :
