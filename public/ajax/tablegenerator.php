@@ -153,6 +153,15 @@ else if ($p == 'createTableFile')
 	fwrite($file,$json);
 	fclose($file);
 	
+	if(strpos($url, ".json") > -1){
+		$json2 = file_get_contents($url."2");
+	}else{
+		$json2 = '';
+	}
+	$file = fopen('../tmp/files/'.$user."2", "w");
+	fwrite($file,$json2);
+	fclose($file);
+	
 	$data = json_encode($user);
 }
 else if ($p == 'convertToTSV')
@@ -276,11 +285,13 @@ else if ($p == 'sendToGeneratedTable')
 }
 else if ($p == 'getGeneratedTable')
 {
+	//	Please note that this does not check for the JSON2 file.
+	//	Removal of the file name within the database will generate the JSON2 file
 	if(isset($_SESSION['table_params'])){
 		$array['parameters'] = $_SESSION['table_params'];
-		$array['file'] = $_SESSION['table_file'];
 		$array['id'] = $_SESSION['table_id'];
 		$array['from_table_list'] = $_SESSION['from_table_list'];
+		$array['file'] = $_SESSION['table_file'];
 		$data = json_encode($array);
 	}else{
 		$data = '';
@@ -308,6 +319,11 @@ else if ($p == 'updateTableFile')
 	
 	$file = fopen('../tmp/files/'.$user, "w");
 	fwrite($file,$json);
+	fclose($file);
+	
+	$json2 = file_get_contents($url."2");
+	$file = fopen('../tmp/files/'.$user."2", "w");
+	fwrite($file,$json2);
 	fclose($file);
 	
 	$data=$query->runSQL("

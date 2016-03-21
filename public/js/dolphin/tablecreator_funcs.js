@@ -252,7 +252,7 @@ function tableCreatorPage(){
 
 function changeTableType(format, query){
 	var json_obj;
-	var URL = BASE_PATH+"/public/api/getsamplevals.php?" + query + 'format=' + format;
+	var URL = API_PATH+"/public/api/getsamplevals.php?" + query + 'format=' + format;
 	window.open(URL);
 }
 
@@ -297,13 +297,13 @@ function saveTable() {
 		
 	$.ajax({ type: "GET",
 			url: BASE_PATH+"/public/ajax/tablegenerator.php",
-			data: { p: "createTableFile", url: BASE_PATH+"/public/api/getsamplevals.php?" + beforeFormat + 'format=json' },
+			data: { p: "createTableFile", url: API_PATH+"/public/api/getsamplevals.php?" + beforeFormat + 'format=json' },
 			async: false,
 			success : function(s)
 			{
 				file_name = s;
 				console.log(s);
-				console.log(BASE_PATH+"/public/api/getsamplevals.php?" + beforeFormat + 'format=json');
+				console.log(API_PATH+"/public/api/getsamplevals.php?" + beforeFormat + 'format=json');
 			}
 	});
 	console.log(file_name);
@@ -324,7 +324,7 @@ function saveTable() {
 }
 
 function downloadGeneratedTSV(beforeFormat){
-	var url = BASE_PATH +"/public/api/getsamplevals.php?" + beforeFormat + 'format=json'
+	var url = API_PATH +"/public/api/getsamplevals.php?" + beforeFormat + 'format=json'
 	var file_name = '';
 	console.log(url);
 	$.ajax({ type: "GET",
@@ -359,7 +359,7 @@ function optionSelection(args) {
 function sendTableToPlot(file){
 	$.ajax({ type: "GET",
 			url: BASE_PATH+"/public/ajax/sessionrequests.php",
-			data: { p: "setPlotToggle", type: 'generated', file: file },
+			data: { p: "setPlotToggle", type: 'generated', file: file + "2" },
 			async: false,
 			success : function(s)
 			{
