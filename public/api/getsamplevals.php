@@ -109,6 +109,10 @@ if($format == 'json2' || $format == 'JSON2'){
 }
 $function = 'object_to_' . $format;
 $api = new CSV_To_API();
-echo $api->$function($final_array);
+if($format == 'json2_5'){
+    echo $api->$function($new_data);
+}else{
+    echo $api->$function($final_array);    
+}
 exit;
 
