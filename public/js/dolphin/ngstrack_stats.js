@@ -616,8 +616,9 @@ $(function() {
 	if (phpGrab.theField == "samples") {
 		reloadBasket();
 	}
-	
+	//	If table generated page
 	if (phpGrab.theSegment == 'generated') {
+		//	Obtain table information (JSON format)
 		$.ajax({ type: "GET",
 			url: BASE_PATH +"/public/ajax/tablegenerator.php?",
 			data: { p: "getGeneratedTable"},
@@ -629,65 +630,77 @@ $(function() {
 			}
 		});
 		var json_obj;
+		//	If file does exist
 		if (table_params.file != '') {
 			//	Load JSON file
 			console.log(table_params.file);
 			json_obj = undefined;
+			//	Obtain JSON data
 			$.ajax({ type: "GET",
-			url: BASE_PATH +"/public/ajax/tablegenerator.php",
-			data: { p: "getJsonFromFile", file: table_params.file},
-			async: false,
-			success : function(s)
+				url: BASE_PATH +"/public/ajax/tablegenerator.php",
+				data: { p: "getJsonFromFile", file: table_params.file},
+				async: false,
+				success : function(s)
 				{
 					console.log(s);
 					json_obj = s;
 				}
 			});
+			//	If no information can be obtained
 			if (json_obj == undefined || json_obj == []) {
+				//	Generate JSON data manually
 				$.ajax({ type: "GET",
-				url: BASE_PATH +"/public/api/getsamplevals.php?" + table_params.parameters,
-				async: false,
-				success : function(s)
+					url: API_PATH +"/public/api/getsamplevals.php?" + table_params.parameters,
+					async: false,
+					success : function(s)
 					{
 						console.log(s);
 						json_obj = JSON.parse(s);
 						generateStreamTable('generated', json_obj, phpGrab.theSegment, qvar, rvar, segment, theSearch, uid, gids);
 					}
 				});
+				//	Update table with new file information
+				//	Create both JSON and JSON2 files
 				$.ajax({ type: "GET",
-				url: BASE_PATH +"/public/ajax/tablegenerator.php",
-				data: { p: "updateTableFile", url: BASE_PATH +"/public/api/getsamplevals.php?" + table_params.parameters, id: table_params.id},
-				async: false,
-				success : function(s)
+					url: BASE_PATH +"/public/ajax/tablegenerator.php",
+					data: { p: "updateTableFile", url: API_PATH +"/public/api/getsamplevals.php?" + table_params.parameters, id: table_params.id},
+					async: false,
+					success : function(s)
 					{
 						console.log(s);
 					}
 				});
 			}else{
+				//	Generate table with obtained JSON information from file
 				generateStreamTable('generated', json_obj, phpGrab.theSegment, qvar, rvar, segment, theSearch, uid, gids);
 			}
+		//	If file doesn't exist
 		}else{
+			//	Generate JSON data manually
 			$.ajax({ type: "GET",
-			url: BASE_PATH +"/public/api/getsamplevals.php?" + table_params.parameters,
-			async: false,
-			success : function(s)
+				url: API_PATH +"/public/api/getsamplevals.php?" + table_params.parameters,
+				async: false,
+				success : function(s)
 				{
 					console.log(s);
 					json_obj = JSON.parse(s);
 					generateStreamTable('generated', json_obj, phpGrab.theSegment, qvar, rvar, segment, theSearch, uid, gids);
 				}
 			});
+			//	Update table with new file information
+				//	Create both JSON and JSON2 files
 			$.ajax({ type: "GET",
-			url: BASE_PATH +"/public/ajax/tablegenerator.php",
-			data: { p: "updateTableFile", url: BASE_PATH +"/public/api/getsamplevals.php?" + table_params.parameters, id: table_params.id},
-			async: false,
-			success : function(s)
+				url: BASE_PATH +"/public/ajax/tablegenerator.php",
+				data: { p: "updateTableFile", url: API_PATH +"/public/api/getsamplevals.php?" + table_params.parameters, id: table_params.id},
+				async: false,
+				success : function(s)
 				{
 					console.log(s);
 				}
 			});
 		}
-		console.log(BASE_PATH +"/public/api/getsamplevals.php?" + table_params.parameters);
+		//	Log data path
+		console.log(API_PATH +"/public/api/getsamplevals.php?" + table_params.parameters);
 		
 	}else if (phpGrab.theSegment != 'report' && phpGrab.theSegment != 'table_viewer') {
 		var experiment_series_data = [];

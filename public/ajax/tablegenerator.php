@@ -283,9 +283,21 @@ else if ($p == 'getGeneratedTable')
 {
 	if(isset($_SESSION['table_params'])){
 		$array['parameters'] = $_SESSION['table_params'];
-		$array['file'] = $_SESSION['table_file'];
 		$array['id'] = $_SESSION['table_id'];
 		$array['from_table_list'] = $_SESSION['from_table_list'];
+		//	Check if files exist
+		$clustername = $query->queryAVal("
+		SELECT clustername
+		FROM users
+		WHERE id = ".$_SESSION['uid']
+		);
+		$request = API_PATH.'/api/service.php?func=checkFile&username='.$clustername.'&file='.$_SESSION['table_file'].",".$_SESSION['table_file']."2";
+		$valid_files = json_decode('['.json_decode(file_get_contents($request)).']');
+		if(isset($valid_files[0]->ERROR)){
+			$array['file'] = '';
+		}else{
+			$array['file'] = $_SESSION['table_file'];
+		}
 		$data = json_encode($array);
 	}else{
 		$data = '';
@@ -313,6 +325,11 @@ else if ($p == 'updateTableFile')
 	
 	$file = fopen('../tmp/files/'.$user, "w");
 	fwrite($file,$json);
+	fclose($file);
+	
+	$json2 = file_get_contents($url."2");
+	$file = fopen('../tmp/files/'.$user."2", "w");
+	fwrite($file,$json2);
 	fclose($file);
 	
 	$data=$query->runSQL("
