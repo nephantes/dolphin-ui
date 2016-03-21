@@ -155,6 +155,8 @@ else if ($p == 'createTableFile')
 	
 	if(strpos($url, ".json") > -1){
 		$json2 = file_get_contents($url."2");
+	}else{
+		$json2 = '';
 	}
 	$file = fopen('../tmp/files/'.$user."2", "w");
 	fwrite($file,$json2);
