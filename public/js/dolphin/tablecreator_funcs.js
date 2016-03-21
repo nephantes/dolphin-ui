@@ -359,7 +359,7 @@ function optionSelection(args) {
 function sendTableToPlot(file){
 	$.ajax({ type: "GET",
 			url: BASE_PATH+"/public/ajax/sessionrequests.php",
-			data: { p: "setPlotToggle", type: 'generated', file: file },
+			data: { p: "setPlotToggle", type: 'generated', file: file + "2" },
 			async: false,
 			success : function(s)
 			{
