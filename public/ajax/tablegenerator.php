@@ -281,6 +281,8 @@ else if ($p == 'sendToGeneratedTable')
 }
 else if ($p == 'getGeneratedTable')
 {
+	//	Please note that this does not check for the JSON2 file.
+	//	Removal of the file name within the database will generate the JSON2 file
 	if(isset($_SESSION['table_params'])){
 		$array['parameters'] = $_SESSION['table_params'];
 		$array['id'] = $_SESSION['table_id'];
