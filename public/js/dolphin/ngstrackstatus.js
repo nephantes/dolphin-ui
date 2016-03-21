@@ -154,15 +154,9 @@ $(function() {
 						'<div class="progress progress-xs"><div class="progress-bar progress-bar-'+bartype+'" style="width: '+parsed[i].percentComplete+'%"></div></div>',
 						parsed[i].start,
 						parsed[i].finish,
-						'<div class="btn-group pull-right">' + 
-							'<button type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown" aria-expanded="true">Options <span class="fa fa-caret-down"></span></button>' +
-							'<ul class="dropdown-menu" role="menu">' +
-								'<li><a href="#" onclick="resetService('+run_id+', '+parsed[i].num+', \''+wkey+'\', \''+parsed[i].title+'\', \'soft\')">Soft Reset</a></li>' +
-								'<li><a href="#" onclick="resetService('+run_id+', '+parsed[i].num+', \''+wkey+'\', \''+parsed[i].title+'\', \'hard\')">Hard Reset</a></li>' +
-								'<li class="divider"></li>' + 
-								'<li><a id="'+parsed[i].num+'" href="#" onclick="selectService(this.id, \''+wkey+'\')">Select Service</a></li>' +
-							'</ul>' +
-						'</div>'
+						'<button id="'+parsed[i].num+'" class="btn btn-danger btn-xs pull-right" onclick="resetService('+run_id+', '+parsed[i].num+', \''+wkey+'\', \''+parsed[i].title+'\', \'hard\', \'services\', this)"><span class="fa fa-times"></span></button>' +
+						'<button id="'+parsed[i].num+'" class="btn btn-warning btn-xs pull-right" onclick="resetService('+run_id+', '+parsed[i].num+', \''+wkey+'\', \''+parsed[i].title+'\', \'soft\', \'services\', this)"><span class="fa fa-times"></span></button>' +
+						'<button id="'+parsed[i].num+'" class="btn btn-primary btn-xs pull-right" onclick="selectService(this.id, \''+wkey+'\')">&nbsp;<span class="fa fa-caret-down"></span>&nbsp;</button>'
 					]);
 				} // End For
 			}
@@ -247,8 +241,8 @@ $(function() {
 								'<li><a href="#" id="'+s[i].id+'" name="'+s[i].run_group_id+'" onClick="reportSelected(this.id, this.name)">Report Details</a></li>' +
 								'<li class="divider"></li>' +
 								disabled +
-								'<li><a href="#" onclick="resetService('+run_id+', '+parsed[i].num+', "'+wkey+'", "'+parsed[i].title+'", "soft")">Soft Reset</a></li>' +
-								'<li><a href="#" onclick="resetService('+run_id+', '+parsed[i].num+', "'+wkey+'", "'+parsed[i].title+'", "hard")">Hard Reset</a></li>' +
+								'<li><a href="#" id="'+s[i].id+'" name="'+s[i].run_group_id+'" onclick="resumeSelected(this.id, this.name)">Resume</a></li>' +
+								'<li><a href="#" id="'+s[i].id+'" name="'+s[i].run_group_id+'" onclick="resetSelected(this.id, this.name)">Reset</a></li>' +
 								'<li class="divider"></li>' +
 								'<li><a href="#" id="'+s[i].id+'" name="'+s[i].run_group_id+'" onClick="deleteRunparams(\''+s[i].id+'\')">Delete</a></li>' +
 							'</ul>' +
@@ -284,15 +278,9 @@ $(function() {
 								'<div class="progress progress-xs"><div class="progress-bar progress-bar-'+bartype+'" style="width: '+parsed[i].percentComplete+'%"></div></div>',
 								parsed[i].start,
 								parsed[i].finish,
-								'<div class="btn-group pull-right">' + 
-									'<button type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown" aria-expanded="true">Options <span class="fa fa-caret-down"></span></button>' +
-									'<ul class="dropdown-menu" role="menu">' +
-										'<li><a href="#" onclick="resetService('+run_id+', '+parsed[i].num+', \''+wkey+'\', \''+parsed[i].title+'\', \'soft\')">Soft Reset</a></li>' +
-										'<li><a href="#" onclick="resetService('+run_id+', '+parsed[i].num+', \''+wkey+'\', \''+parsed[i].title+'\', \'hard\')">Hard Reset</a></li>' +
-										'<li class="divider"></li>' + 
-										'<li><a id="'+parsed[i].num+'" href="#" onclick="selectService(this.id, \''+wkey+'\')">Select Service</a></li>' +
-									'</ul>' +
-								'</div>'
+								'<button id="'+parsed[i].num+'" class="btn btn-danger btn-xs pull-right" onclick="resetService('+run_id+', '+parsed[i].num+', \''+wkey+'\', \''+parsed[i].title+'\', \'hard\', \'services\', this)"><span class="fa fa-times"></span></button>' +
+								'<button id="'+parsed[i].num+'" class="btn btn-warning btn-xs pull-right" onclick="resetService('+run_id+', '+parsed[i].num+', \''+wkey+'\', \''+parsed[i].title+'\', \'soft\', \'services\', this)"><span class="fa fa-times"></span></button>' +
+								'<button id="'+parsed[i].num+'" class="btn btn-primary btn-xs pull-right" onclick="selectService(this.id, \''+wkey+'\')">&nbsp;<span class="fa fa-caret-down"></span>&nbsp;</button>'
 							]);
 						} // End For
 					}
@@ -318,15 +306,9 @@ $(function() {
 									parsed[i].submit,
 									parsed[i].start,
 									parsed[i].finish,
-									'<div class="btn-group pull-right">' + 
-										'<button type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown" aria-expanded="true">Options <span class="fa fa-caret-down"></span></button>' +
-										'<ul class="dropdown-menu" role="menu">' +
-											'<li><a href="#" onclick="resetJob('+parsed[i].num+', '+parsed[i].num+', \''+wkey+'\', \''+parsed[i].title+'\', \'soft\')">Soft Reset</a></li>' +
-											'<li><a href="#" onclick="resetJob('+parsed[i].num+', '+parsed[i].num+', \''+wkey+'\', \''+parsed[i].title+'\', \'hard\')">Hard Reset</a></li>' +
-											'<li class="divider"></li>' + 
-											'<li><a id="'+parsed[i].num+'" href="#" onclick="selectJob(this.id)">Select Service</a></li>' +
-										'</ul>' +
-									'</div>'
+									'<button id="'+parsed[i].num+'" class="btn btn-danger btn-xs pull-right" onclick="resetJob('+parsed[i].num+', '+parsed[i].num+', \''+wkey+'\', \''+parsed[i].title+'\', \'hard\', \'jobs\', this)"><span class="fa fa-times"></span></button>' +
+									'<button id="'+parsed[i].num+'" class="btn btn-warning btn-xs pull-right" onclick="resetJob('+parsed[i].num+', '+parsed[i].num+', \''+wkey+'\', \''+parsed[i].title+'\', \'soft\', \'jobs\', this)"><span class="fa fa-times"></span></button>' +
+									'<button id="'+parsed[i].num+'" class="btn btn-primary btn-xs pull-right" onclick="selectJob(this.id)">&nbsp;<span class="fa fa-caret-down"></span>&nbsp;</button>'
 								]);
 							} // End For
 							document.getElementById('service_jobs').style.display = 'inline';

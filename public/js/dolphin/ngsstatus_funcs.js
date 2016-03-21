@@ -62,15 +62,9 @@ function selectService(id, wkey){
 						parsed[i].submit,
 						parsed[i].start,
 						parsed[i].finish,
-						'<div class="btn-group pull-right">' + 
-							'<button type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown" aria-expanded="true">Options <span class="fa fa-caret-down"></span></button>' +
-							'<ul class="dropdown-menu" role="menu">' +
-								'<li><a href="#" onclick="resetJob('+run_id+', '+parsed[i].num+', \''+wkey+'\', \''+parsed[i].title+'\', \'soft\')">Soft Reset</a></li>' +
-								'<li><a href="#" onclick="resetJob('+run_id+', '+parsed[i].num+', \''+wkey+'\', \''+parsed[i].title+'\', \'hard\')">Hard Reset</a></li>' +
-								'<li class="divider"></li>' + 
-								'<li><a id="'+parsed[i].num+'" href="#" onclick="selectJob(this.id)">Select Service</a></li>' +
-							'</ul>' +
-						'</div>'
+						'<button id="'+parsed[i].num+'" class="btn btn-danger btn-xs pull-right" onclick="resetJob('+run_id+', '+parsed[i].num+', \''+wkey+'\', \''+parsed[i].title+'\', \'hard\', \'jobs\', this)"><span class="fa fa-times"></span></button>' +
+						'<button id="'+parsed[i].num+'" class="btn btn-warning btn-xs pull-right" onclick="resetJob('+run_id+', '+parsed[i].num+', \''+wkey+'\', \''+parsed[i].title+'\', \'soft\', \'jobs\', this)"><span class="fa fa-times"></span></button>' +
+						'<button id="'+parsed[i].num+'" class="btn btn-primary btn-xs pull-right" onclick="selectJob(this.id)">&nbsp;<span class="fa fa-caret-down"></span>&nbsp;</button>'
 					]);
 				} // End For
 				document.getElementById('service_jobs').style.display = 'inline';
@@ -90,6 +84,13 @@ function selectJob(id){
 				joboutDataModal(parsed[0].jobname, parsed[0].jobout);
 			}
 		});
+}
+
+function removeServiceTable(table_str, button){
+	var table = $('#jsontable_'+table_str).dataTable();
+	var row = $(button).closest('tr');
+	table.fnDeleteRow(row);
+	table.fnDraw();
 }
 
 function errorOutModal(run_id, wkey){
@@ -301,7 +302,7 @@ function changeRunType(int_type){
 	});
 }
 
-function resetService(run_id, s_id, wkey, name, type){
+function resetService(run_id, s_id, wkey, name, type, table_str, button){
 	$.ajax({ type: "GET",
 		url: BASE_PATH+"/public/ajax/ngs_stat_funcs.php",
 		data: { p: 'resetService', run_id: run_id, wkey: wkey, s_id: s_id, name: name, type: type },
@@ -309,14 +310,13 @@ function resetService(run_id, s_id, wkey, name, type){
 		success : function(s)
 		{
 			console.log(s);
-			if (s == 0) {
-				location.reload();
-			}
+			removeServiceTable(table_str, button);
+			document.getElementById('service_jobs').style.display = 'none';
 		}	
 	});
 }
 
-function resetJob(run_id, s_id, wkey, name, type){
+function resetJob(run_id, s_id, wkey, name, type, table_str, button){
 	$.ajax({ type: "GET",
 		url: BASE_PATH+"/public/ajax/ngs_stat_funcs.php",
 		data: { p: 'resetJob', run_id: run_id, wkey: wkey, s_id: s_id, name: name, type: type },
@@ -324,9 +324,7 @@ function resetJob(run_id, s_id, wkey, name, type){
 		success : function(s)
 		{
 			console.log(s);
-			if (s == 0) {
-				location.reload();
-			}
+			removeServiceTable(table_str, button);
 		}	
 	});
 }
