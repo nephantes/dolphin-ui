@@ -1,4 +1,5 @@
-
+var run_id = '0';
+var wkey = '';
 var page_mark_runparams = 0;
 var page_mark_services = 0;
 var page_mark_jobs = 0;
@@ -116,7 +117,6 @@ $(function() {
 	//runparams.fnAdjustColumnSizing(true);
 	
 	}else if (segment == 'advstatus') {
-	var run_id = '0';
 		$.ajax({ type: "GET",
 			url: BASE_PATH +"/ajax/sessionrequests.php",
 			data: { p: 'getAdvStatusRunID' },
@@ -127,7 +127,7 @@ $(function() {
 				run_id = s;
 			}
 		});
-	var wkey = getWKey(run_id);
+	wkey = getWKey(run_id);
 	var runparams = $('#jsontable_services').dataTable();
 	console.log(wkey);
 	
@@ -136,6 +136,7 @@ $(function() {
 			 async: false,
 			 success : function(s)
 			 {
+				console.log(s);
 				runparams.fnClearTable();
 				var parsed = s;
 				for(var i = 0; i < parsed.length; i++) {
@@ -153,7 +154,9 @@ $(function() {
 						'<div class="progress progress-xs"><div class="progress-bar progress-bar-'+bartype+'" style="width: '+parsed[i].percentComplete+'%"></div></div>',
 						parsed[i].start,
 						parsed[i].finish,
-						'<button id="'+parsed[i].num+'" class="btn btn-primary btn-xs pull-right" onclick="selectService(this.id)">Select Service</button>'
+						'<button id="'+parsed[i].num+'" class="btn btn-danger btn-xs pull-right" onclick="resetService('+run_id+', '+parsed[i].num+', \''+wkey+'\', \''+parsed[i].title+'\', \'hard\', \'services\', this)"><span class="fa fa-times"></span></button>' +
+						'<button id="'+parsed[i].num+'" class="btn btn-warning btn-xs pull-right" onclick="resetService('+run_id+', '+parsed[i].num+', \''+wkey+'\', \''+parsed[i].title+'\', \'soft\', \'services\', this)"><span class="fa fa-times"></span></button>' +
+						'<button id="'+parsed[i].num+'" class="btn btn-primary btn-xs pull-right" onclick="selectService(this.id, \''+wkey+'\')">&nbsp;<span class="fa fa-caret-down"></span>&nbsp;</button>'
 					]);
 				} // End For
 			}
@@ -253,7 +256,6 @@ $(function() {
 			$('#jsontable_runparams').DataTable().page(page_mark_runparams).draw(false);
 		}else if (segment == 'advstatus') {
 			var runparams = $('#jsontable_services').dataTable();
-			
 			$.ajax({ type: "GET",
 					 url: BASE_PATH + "/public/ajax/dataservice.php?wkey=" + wkey,
 					 async: false,
@@ -276,7 +278,9 @@ $(function() {
 								'<div class="progress progress-xs"><div class="progress-bar progress-bar-'+bartype+'" style="width: '+parsed[i].percentComplete+'%"></div></div>',
 								parsed[i].start,
 								parsed[i].finish,
-								'<button id="'+parsed[i].num+'" class="btn btn-primary btn-xs pull-right" onclick="selectService(this.id)">Select Service</button>'
+								'<button id="'+parsed[i].num+'" class="btn btn-danger btn-xs pull-right" onclick="resetService('+run_id+', '+parsed[i].num+', \''+wkey+'\', \''+parsed[i].title+'\', \'hard\', \'services\', this)"><span class="fa fa-times"></span></button>' +
+								'<button id="'+parsed[i].num+'" class="btn btn-warning btn-xs pull-right" onclick="resetService('+run_id+', '+parsed[i].num+', \''+wkey+'\', \''+parsed[i].title+'\', \'soft\', \'services\', this)"><span class="fa fa-times"></span></button>' +
+								'<button id="'+parsed[i].num+'" class="btn btn-primary btn-xs pull-right" onclick="selectService(this.id, \''+wkey+'\')">&nbsp;<span class="fa fa-caret-down"></span>&nbsp;</button>'
 							]);
 						} // End For
 					}
@@ -302,7 +306,9 @@ $(function() {
 									parsed[i].submit,
 									parsed[i].start,
 									parsed[i].finish,
-									'<button id="'+parsed[i].num+'" class="btn btn-primary btn-xs pull-right" onclick="selectJob(this.id)">Select Job</button>'
+									'<button id="'+parsed[i].num+'" class="btn btn-danger btn-xs pull-right" onclick="resetJob('+parsed[i].num+', '+parsed[i].num+', \''+wkey+'\', \''+parsed[i].title+'\', \'hard\', \'jobs\', this)"><span class="fa fa-times"></span></button>' +
+									'<button id="'+parsed[i].num+'" class="btn btn-warning btn-xs pull-right" onclick="resetJob('+parsed[i].num+', '+parsed[i].num+', \''+wkey+'\', \''+parsed[i].title+'\', \'soft\', \'jobs\', this)"><span class="fa fa-times"></span></button>' +
+									'<button id="'+parsed[i].num+'" class="btn btn-primary btn-xs pull-right" onclick="selectJob(this.id)">&nbsp;<span class="fa fa-caret-down"></span>&nbsp;</button>'
 								]);
 							} // End For
 							document.getElementById('service_jobs').style.display = 'inline';
