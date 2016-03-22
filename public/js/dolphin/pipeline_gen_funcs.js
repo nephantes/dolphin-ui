@@ -403,289 +403,241 @@ function pipelineSelect(num){
 	console.log(divAdj);
 	console.log(currentPipelineVal);
 	//Check for only one RSEM/DESeq dependencies
-	if (pipeType == pipelineDict[0] && currentPipelineVal.indexOf('RNASeqRSEM') > -1)
-	{
-		$('#errorModal').modal({
-			show: true
-		});
-		document.getElementById('errorLabel').innerHTML ='You cannot select more than one RSEM pipeline';
-		document.getElementById('errorAreas').innerHTML = '';
+	if (pipelineSelectCheck(num, pipeType)){
 		document.getElementById('select_'+num).value = currentPipelineVal[currentPipelineID.indexOf(num)];
-	}
-	else if (pipeType == pipelineDict[3] && (currentPipelineVal.indexOf('RNASeqRSEM') == -1 || (currentPipelineVal[currentPipelineID.indexOf(num)] == 'RNASeqRSEM'))) {
-		$('#errorModal').modal({
-			show: true
-		});
-		document.getElementById('errorLabel').innerHTML ='You must first add a RSEM pipeline before running DESeq';
-		document.getElementById('errorAreas').innerHTML = '';
-		document.getElementById('select_'+num).value = currentPipelineVal[currentPipelineID.indexOf(num)];
-	}
-	else if (pipeType == pipelineDict[4] && currentPipelineVal.indexOf('BisulphiteMapping') > -1){
-		$('#errorModal').modal({
-			show: true
-		});
-		document.getElementById('errorLabel').innerHTML ='You cannot select more than one BisulphiteMapping pipeline';
-		document.getElementById('errorAreas').innerHTML = '';
-		document.getElementById('select_'+num).value = currentPipelineVal[currentPipelineID.indexOf(num)];
-	}
-	else if (pipeType == pipelineDict[5] && (currentPipelineVal.indexOf('BisulphiteMapping') == -1 || (currentPipelineVal[currentPipelineID.indexOf(num)] == 'BisulphiteMapping'))) {
-		$('#errorModal').modal({
-			show: true
-		});
-		document.getElementById('errorLabel').innerHTML ='You must first add a BisulphiteMapping pipeline before running DiffMeth';
-		document.getElementById('errorAreas').innerHTML = '';
-		document.getElementById('select_'+num).value = currentPipelineVal[currentPipelineID.indexOf(num)];
-	}
-	else if (pipeType == pipelineDict[5] && document.getElementById('checkbox_5_'+currentPipelineID[currentPipelineVal.indexOf('BisulphiteMapping')]).checked == false) {
-		$('#errorModal').modal({
-			show: true
-		});
-		document.getElementById('errorLabel').innerHTML ='You must first add a MethylKit within BisulphiteMapping pipeline before running DiffMeth';
-		document.getElementById('errorAreas').innerHTML = '';
-		document.getElementById('select_'+num).value = currentPipelineVal[currentPipelineID.indexOf(num)];
-	}
-	else if (pipeType == pipelineDict[6] && haploCheck(num, 'Tophat') && haploCheck(num, 'ChipSeq')) {
-		$('#errorModal').modal({
-			show: true
-		});
-		document.getElementById('errorLabel').innerHTML ='You must first add a Tophat or ChipSeq before selecting HaplotypeCaller';
-		document.getElementById('errorAreas').innerHTML = '';
-		document.getElementById('select_'+num).value = currentPipelineVal[currentPipelineID.indexOf(num)];
-	}	
-	else
-	{
-	//pipelineDict: global variable containing selections
-	if (pipeType == pipelineDict[0]) {
-		//RNASeq RSEM
-		divAdj.appendChild( createElement('label', ['class','TEXTNODE'], ['box-title', 'RSEM parameters:']));
-		var testText = createElement('textarea', ['id', 'class'], ['textarea_'+num,'form-control'])
-		testText.value = '--bowtie-e 70 --bowtie-chunkmbs 100';
-		divAdj.appendChild( testText );
-		divAdj = mergeTidy(divAdj, 12,
-				[ [createElement('label', ['class','TEXTNODE'], ['margin', 'Mark Duplicates:']),
-				createElement('input', ['id', 'type', 'class', 'onclick'], ['checkbox_1_'+num, 'checkbox', 'margin'])] ]);
-		divAdj = mergeTidy(divAdj, 12,
-				[ [createElement('label', ['class','TEXTNODE'], ['box-title margin', 'RNA-Seq QC:']),
-				   createElement('input', ['id', 'type', 'class'], ['checkbox_2_'+num, 'checkbox', 'margin'])] ]);
-		divAdj = mergeTidy(divAdj, 12,
-				[ [createElement('label', ['class','TEXTNODE'], ['box-title margin', 'No Genome BAM:']),
-				   createElement('input', ['id', 'type', 'class'], ['checkbox_3_'+num, 'checkbox', 'margin'])] ]);
-		divAdj = mergeTidy(divAdj, 6,
-				[ [createElement('label', ['class','TEXTNODE'], ['box-title', 'IGV/TDF Conversion:']),
-				createElement('select', ['id','class','onChange','OPTION', 'OPTION'], ['select_1_'+num, 'form-control', 'IGVTDFSelection(this.id)','no', 'yes'])],
-
-				[createElement('label', ['class','TEXTNODE'], ['box-title', 'BigWig Conversion:']),
-				createElement('select', ['id', 'class', 'OPTION', 'OPTION'], ['select_2_'+num, 'form-control', 'no', 'yes'])] ]);
-		divAdj = mergeTidy(divAdj, 6,
-				[ [createElement('label', ['id', 'class', 'style', 'TEXTNODE'], ['label_1_'+num, 'box-title', 'display:none', 'extFactor']),
-				   createElement('input', ['id', 'class', 'type', 'style', 'value'], ['textarea_2_'+num, 'form-control', 'text', 'display:none', '0'])] ]);
-		divAdj = mergeTidy(divAdj, 12,
-				[ [createElement('label', ['class','TEXTNODE'], ['box-title margin', 'Custom Options']),
-				createElement('input', ['id', 'type', 'class', 'onClick'], ['checkbox_5_'+num, 'checkbox', 'margin', 'tophatCustomOptions('+num+')'])] ]);
-		divAdj = mergeTidy(divAdj, 12,
-				[ [createElement('label', ['id', 'class', 'style', 'TEXTNODE'], ['label_3_'+num, 'box-title', 'display:none', 'Custom Genome File Path and Index']),
-				   createElement('input', ['id', 'class', 'type', 'style', 'value'], ['textarea_3_'+num, 'form-control', 'text', 'display:none', 'None'])] ]);
-		divAdj = mergeTidy(divAdj, 12,
-				[ [createElement('label', ['id', 'class', 'style', 'TEXTNODE'], ['label_4_'+num, 'box-title', 'display:none', 'Custom Genome Annotation File (Full Path)']),
-				   createElement('input', ['id', 'class', 'type', 'style', 'value'], ['textarea_4_'+num, 'form-control', 'text', 'display:none', 'None'])] ]);
-	}else if (pipeType == pipelineDict[1]) {
-		//Tophat Pipeline
-		divAdj.appendChild( createElement('label', ['class','TEXTNODE'], ['box-title', 'Tophat parameters:']));
-		divAdj.appendChild( createElement('textarea', ['id', 'class'], ['textarea_'+num, 'form-control']));
-		divAdj = mergeTidy(divAdj, 12,
-				[ [createElement('label', ['class','TEXTNODE'], ['margin', 'Mark Duplicates']),
-				createElement('input', ['id', 'type', 'class'], ['checkbox_4_'+num, 'checkbox', 'margin'])] ]);
-		divAdj = mergeTidy(divAdj, 12,
-				[ [createElement('label', ['class','TEXTNODE'], ['box-title margin', 'RNA-Seq QC:']),
-				createElement('input', ['id', 'type', 'class'], ['checkbox_1_'+num, 'checkbox', 'margin'])],
-				[createElement('label', ['class','TEXTNODE'], ['margin', 'Collect RNA Metrics']),
-				createElement('input', ['id', 'type', 'class'], ['checkbox_2_'+num, 'checkbox', 'margin'])],
-				[createElement('label', ['class','TEXTNODE'], ['margin', 'Collect Multiple Picard Metrics']),
-				createElement('input', ['id', 'type', 'class'], ['checkbox_3_'+num, 'checkbox', 'margin'])] ]);
-		divAdj = mergeTidy(divAdj, 6,
-				[ [createElement('label', ['class','TEXTNODE'], ['box-title', 'IGV/TDF Conversion:']),
-				createElement('select', ['id','class','onChange','OPTION', 'OPTION'], ['select_1_'+num, 'form-control', 'IGVTDFSelection(this.id)','no', 'yes'])],
-				[createElement('label', ['class','TEXTNODE'], ['box-title', 'BigWig Conversion:']),
-				createElement('select', ['id', 'class', 'OPTION', 'OPTION'], ['select_2_'+num, 'form-control', 'no', 'yes'])] ]);
-		divAdj = mergeTidy(divAdj, 6,
-				[ [createElement('label', ['id', 'class', 'style', 'TEXTNODE'], ['label_1_'+num, 'box-title', 'display:none', 'extFactor']),
-				   createElement('input', ['id', 'class', 'type', 'style', 'value'], ['textarea_2_'+num, 'form-control', 'text', 'display:none', '0'])] ]);
-		divAdj = mergeTidy(divAdj, 12,
-				[ [createElement('label', ['class','TEXTNODE'], ['box-title margin', 'Custom Options']),
-				createElement('input', ['id', 'type', 'class', 'onClick'], ['checkbox_5_'+num, 'checkbox', 'margin', 'tophatCustomOptions('+num+')'])] ]);
-		divAdj = mergeTidy(divAdj, 12,
-				[ [createElement('label', ['id', 'class', 'style', 'TEXTNODE'], ['label_3_'+num, 'box-title', 'display:none', 'Custom Genome File Path and Index']),
-				   createElement('input', ['id', 'class', 'type', 'style', 'value'], ['textarea_3_'+num, 'form-control', 'text', 'display:none', 'None'])] ]);
-		divAdj = mergeTidy(divAdj, 12,
-				[ [createElement('label', ['id', 'class', 'style', 'TEXTNODE'], ['label_4_'+num, 'box-title', 'display:none', 'Custom Genome Annotation File (Full Path)']),
-				   createElement('input', ['id', 'class', 'type', 'style', 'value'], ['textarea_4_'+num, 'form-control', 'text', 'display:none', 'None'])] ]);
+	}else{
+		//pipelineDict: global variable containing selections
+		if (pipeType == pipelineDict[0]) {
+			//RNASeq RSEM
+			divAdj.appendChild( createElement('label', ['class','TEXTNODE'], ['box-title', 'RSEM parameters:']));
+			var testText = createElement('textarea', ['id', 'class'], ['textarea_'+num,'form-control'])
+			testText.value = '--bowtie-e 70 --bowtie-chunkmbs 100';
+			divAdj.appendChild( testText );
+			divAdj = mergeTidy(divAdj, 12,
+					[ [createElement('label', ['class','TEXTNODE'], ['margin', 'Mark Duplicates:']),
+					createElement('input', ['id', 'type', 'class', 'onclick'], ['checkbox_1_'+num, 'checkbox', 'margin'])] ]);
+			divAdj = mergeTidy(divAdj, 12,
+					[ [createElement('label', ['class','TEXTNODE'], ['box-title margin', 'RNA-Seq QC:']),
+					   createElement('input', ['id', 'type', 'class'], ['checkbox_2_'+num, 'checkbox', 'margin'])] ]);
+			divAdj = mergeTidy(divAdj, 12,
+					[ [createElement('label', ['class','TEXTNODE'], ['box-title margin', 'No Genome BAM:']),
+					   createElement('input', ['id', 'type', 'class'], ['checkbox_3_'+num, 'checkbox', 'margin'])] ]);
+			divAdj = mergeTidy(divAdj, 6,
+					[ [createElement('label', ['class','TEXTNODE'], ['box-title', 'IGV/TDF Conversion:']),
+					createElement('select', ['id','class','onChange','OPTION', 'OPTION'], ['select_1_'+num, 'form-control', 'IGVTDFSelection(this.id)','no', 'yes'])],
+	
+					[createElement('label', ['class','TEXTNODE'], ['box-title', 'BigWig Conversion:']),
+					createElement('select', ['id', 'class', 'OPTION', 'OPTION'], ['select_2_'+num, 'form-control', 'no', 'yes'])] ]);
+			divAdj = mergeTidy(divAdj, 6,
+					[ [createElement('label', ['id', 'class', 'style', 'TEXTNODE'], ['label_1_'+num, 'box-title', 'display:none', 'extFactor']),
+					   createElement('input', ['id', 'class', 'type', 'style', 'value'], ['textarea_2_'+num, 'form-control', 'text', 'display:none', '0'])] ]);
+			divAdj = mergeTidy(divAdj, 12,
+					[ [createElement('label', ['class','TEXTNODE'], ['box-title margin', 'Custom Options']),
+					createElement('input', ['id', 'type', 'class', 'onClick'], ['checkbox_5_'+num, 'checkbox', 'margin', 'tophatCustomOptions('+num+')'])] ]);
+			divAdj = mergeTidy(divAdj, 12,
+					[ [createElement('label', ['id', 'class', 'style', 'TEXTNODE'], ['label_3_'+num, 'box-title', 'display:none', 'Custom Genome File Path and Index']),
+					   createElement('input', ['id', 'class', 'type', 'style', 'value'], ['textarea_3_'+num, 'form-control', 'text', 'display:none', 'None'])] ]);
+			divAdj = mergeTidy(divAdj, 12,
+					[ [createElement('label', ['id', 'class', 'style', 'TEXTNODE'], ['label_4_'+num, 'box-title', 'display:none', 'Custom Genome Annotation File (Full Path)']),
+					   createElement('input', ['id', 'class', 'type', 'style', 'value'], ['textarea_4_'+num, 'form-control', 'text', 'display:none', 'None'])] ]);
+		}else if (pipeType == pipelineDict[1]) {
+			//Tophat Pipeline
+			divAdj.appendChild( createElement('label', ['class','TEXTNODE'], ['box-title', 'Tophat parameters:']));
+			divAdj.appendChild( createElement('textarea', ['id', 'class'], ['textarea_'+num, 'form-control']));
+			divAdj = mergeTidy(divAdj, 12,
+					[ [createElement('label', ['class','TEXTNODE'], ['margin', 'Mark Duplicates']),
+					createElement('input', ['id', 'type', 'class'], ['checkbox_4_'+num, 'checkbox', 'margin'])] ]);
+			divAdj = mergeTidy(divAdj, 12,
+					[ [createElement('label', ['class','TEXTNODE'], ['box-title margin', 'RNA-Seq QC:']),
+					createElement('input', ['id', 'type', 'class'], ['checkbox_1_'+num, 'checkbox', 'margin'])],
+					[createElement('label', ['class','TEXTNODE'], ['margin', 'Collect RNA Metrics']),
+					createElement('input', ['id', 'type', 'class'], ['checkbox_2_'+num, 'checkbox', 'margin'])],
+					[createElement('label', ['class','TEXTNODE'], ['margin', 'Collect Multiple Picard Metrics']),
+					createElement('input', ['id', 'type', 'class'], ['checkbox_3_'+num, 'checkbox', 'margin'])] ]);
+			divAdj = mergeTidy(divAdj, 6,
+					[ [createElement('label', ['class','TEXTNODE'], ['box-title', 'IGV/TDF Conversion:']),
+					createElement('select', ['id','class','onChange','OPTION', 'OPTION'], ['select_1_'+num, 'form-control', 'IGVTDFSelection(this.id)','no', 'yes'])],
+					[createElement('label', ['class','TEXTNODE'], ['box-title', 'BigWig Conversion:']),
+					createElement('select', ['id', 'class', 'OPTION', 'OPTION'], ['select_2_'+num, 'form-control', 'no', 'yes'])] ]);
+			divAdj = mergeTidy(divAdj, 6,
+					[ [createElement('label', ['id', 'class', 'style', 'TEXTNODE'], ['label_1_'+num, 'box-title', 'display:none', 'extFactor']),
+					   createElement('input', ['id', 'class', 'type', 'style', 'value'], ['textarea_2_'+num, 'form-control', 'text', 'display:none', '0'])] ]);
+			divAdj = mergeTidy(divAdj, 12,
+					[ [createElement('label', ['class','TEXTNODE'], ['box-title margin', 'Custom Options']),
+					createElement('input', ['id', 'type', 'class', 'onClick'], ['checkbox_5_'+num, 'checkbox', 'margin', 'tophatCustomOptions('+num+')'])] ]);
+			divAdj = mergeTidy(divAdj, 12,
+					[ [createElement('label', ['id', 'class', 'style', 'TEXTNODE'], ['label_3_'+num, 'box-title', 'display:none', 'Custom Genome File Path and Index']),
+					   createElement('input', ['id', 'class', 'type', 'style', 'value'], ['textarea_3_'+num, 'form-control', 'text', 'display:none', 'None'])] ]);
+			divAdj = mergeTidy(divAdj, 12,
+					[ [createElement('label', ['id', 'class', 'style', 'TEXTNODE'], ['label_4_'+num, 'box-title', 'display:none', 'Custom Genome Annotation File (Full Path)']),
+					   createElement('input', ['id', 'class', 'type', 'style', 'value'], ['textarea_4_'+num, 'form-control', 'text', 'display:none', 'None'])] ]);
+			
+		}else if (pipeType == pipelineDict[2]) {
+			//ChipSeq Pipeline
+			divAdj.appendChild( createElement('label', ['class','TEXTNODE'], ['box-title', 'Chip Input Definitions:']));
+			divAdj.appendChild( createElement('textarea', ['id', 'class'], ['textarea_'+num, 'form-control']));
+			divAdj = mergeTidy(divAdj, 6,
+					[ [createElement('label', ['class','TEXTNODE'], ['box-title', 'Multimapper:']),
+					createElement('input', ['id', 'class', 'type', 'value'], ['text_1_'+num, 'form-control', 'text', '1'])],
+					[createElement('label', ['class','TEXTNODE'], ['box-title', 'Tag size(bp) for MACS:']),
+					createElement('input', ['id', 'class', 'type', 'value'], ['text_2_'+num, 'form-control', 'text', '75'])] ]);
+			divAdj = mergeTidy(divAdj, 6,
+					[ [createElement('label', ['class','TEXTNODE'], ['box-title', 'Band width(bp) for MACS:']),
+					createElement('input', ['id', 'class', 'type', 'value'], ['select_1_'+num, 'form-control', 'text', '230'])],
+					[createElement('label', ['class','TEXTNODE'], ['box-title', 'Effective genome size(bp):']),
+					createElement('input', ['id', 'class', 'type', 'value'], ['select_2_'+num, 'form-control', 'text', '2700000000'])] ]);
+			divAdj = mergeTidy(divAdj, 12,
+					[ [createElement('label', ['class','TEXTNODE'], ['margin', 'Mark Duplicates:']),
+					createElement('input', ['id', 'type', 'class'], ['checkbox_2_'+num, 'checkbox', 'margin'])],
+					[createElement('label', ['class','TEXTNODE'], ['margin', 'Collect Multiple Picard Metrics:']),
+					createElement('input', ['id', 'type', 'class'], ['checkbox_1_'+num, 'checkbox', 'margin'])] ]);
+			divAdj = mergeTidy(divAdj, 6,
+					[ [createElement('label', ['class','TEXTNODE'], ['box-title', 'IGV/TDF Conversion:']),
+					createElement('select', ['id','class','onChange','OPTION', 'OPTION'], ['select_3_'+num, 'form-control', 'IGVTDFSelection(this.id)','no', 'yes'])],
+					[createElement('label', ['class','TEXTNODE'], ['box-title', 'BigWig Conversion:']),
+					createElement('select', ['id', 'class', 'OPTION', 'OPTION'], ['select_4_'+num, 'form-control', 'no', 'yes'])] ]);
+			divAdj = mergeTidy(divAdj, 6,
+					[ [createElement('label', ['id', 'class', 'style', 'TEXTNODE'], ['label_1_'+num, 'box-title', 'display:none', 'extFactor']),
+					   createElement('input', ['id', 'class', 'type', 'style', 'value'], ['textarea_2_'+num, 'form-control', 'text', 'display:none', '0'])] ]);
+		}else if (pipeType == pipelineDict[3]) {
+			//DESEQ
+			divAdj = mergeTidy(divAdj, 12,
+					[ [createElement('label', ['class','TEXTNODE'], ['box-title', 'Name:']),
+					createElement('input', ['id', 'class', 'type', 'value'], ['text_1_'+num, 'form-control', 'text', ''])] ]);
+			divAdj = mergeTidy(divAdj, 6,
+					[ [createElement('label', ['class','TEXTNODE'], ['box-title', 'Condition 1']),
+					createElement('select',['id', 'class', 'type', 'multiple', 'size', 'onchange'],['multi_select_1_'+num, 'form-control', 'select-multiple', 'multiple', '8', 'deselectCondition(1, '+num+')'])],
+					[createElement('label', ['class','TEXTNODE'], ['box-title', 'Condition 2']),
+					createElement('select',['id', 'class', 'type', 'multiple', 'size', 'onchange'],['multi_select_2_'+num, 'form-control', 'select-multiple', 'multiple', '8', 'deselectCondition(2, '+num+')'])] ]);
+			divAdj = mergeTidy(divAdj, 6,
+					[ [createElement('label', ['class','TEXTNODE'], ['box-title', 'Fit Type:']),
+					createElement('select', ['id', 'class', 'OPTION', 'OPTION', 'OPTION'], ['select_3_'+num, 'form-control', 'parametric', 'local', 'mean'])],
+					[createElement('label', ['class','TEXTNODE'], ['box-title', 'Heatmap:']),
+					createElement('select', ['id', 'class', 'OPTION', 'OPTION'], ['select_4_'+num, 'form-control', 'Yes', 'No'])] ]);
+			divAdj = mergeTidy(divAdj, 6,
+					[ [createElement('label', ['class','TEXTNODE'], ['box-title', 'pAdj cutoff']),
+					createElement('input', ['id', 'class', 'type', 'value'], ['text_2_'+num, 'form-control', 'text', '0.01'])],
+					[createElement('label', ['class','TEXTNODE'], ['box-title', 'Fold Change cutoff']),
+					createElement('input', ['id', 'class', 'type', 'value'], ['text_3_'+num, 'form-control', 'text', '2'])] ]);
+			divAdj = mergeTidy(divAdj, 12,
+					[ [createElement('label', ['class','TEXTNODE'], ['box-title', 'Select Sequence']),
+					createElement('select', ['id', 'class'], ['select_5_'+num, 'form-control'])] ]);
+		}else if (pipeType == pipelineDict[4]) {
+			//MMap
+			var labelDiv = createElement('div', ['class'], ['col-md-12 text-center']);
+			labelDiv.appendChild( createElement('label', ['class','TEXTNODE'], ['box-title margin', 'Run BSMap:']));
+			labelDiv.appendChild( createElement('input', ['id', 'type', 'class', 'checked', 'disabled'], ['checkbox_1_'+num, 'checkbox', 'margin']));
+			divAdj.appendChild(labelDiv);
+			var innerDiv = createTidyDiv(12);
+			divAdj = mergeTidy(divAdj, 12,
+					[[createLabeledDiv(12, 'RRBS&nbsp;&nbsp;', '&nbsp;&nbsp;WGBS', createElement('input', ['id', 'name', 'type', 'value', 'onClick', 'checked'], [num+'_RRBS', num, 'radio', 'RRBS', 'bisulphiteSelect(this.id, '+num+')']),
+						   createElement('input', ['id', 'name', 'type', 'value', 'onClick',], [num+'_WGBS', num, 'radio', 'WGBS', 'bisulphiteSelect(this.id, '+num+')']))
+						],
+					[createElement('label', ['class','TEXTNODE'], ['box-title', 'Digestion Site:']),
+					createElement('input', ['id', 'class', 'type', 'value'], ['text_1_'+num, 'form-control', 'text', 'C-CGG'])]
+					]);
+			labelDiv = createElement('div', ['class'], ['col-md-12']);
+			labelDiv.appendChild( createElement('label', ['class','TEXTNODE'], ['box-title', 'Additional BSMap Parameters:']));
+			labelDiv.appendChild( createElement('textarea', ['id', 'class'], ['textarea_1_'+num, 'form-control']));
+			divAdj.appendChild(labelDiv);
+			divAdj = mergeTidy(divAdj, 12,
+					[ [createElement('label', ['class','TEXTNODE'], ['margin', 'Mark Duplicates:']),
+					createElement('input', ['id', 'type', 'class'], ['checkbox_3_'+num, 'checkbox', 'margin'])],
+					[createElement('label', ['class','TEXTNODE'], ['margin', 'Collect Multiple Picard Metrics:']),
+					createElement('input', ['id', 'type', 'class'], ['checkbox_2_'+num, 'checkbox', 'margin'])] ]);
+			divAdj = mergeTidy(divAdj, 6,
+					[ [createElement('label', ['class','TEXTNODE'], ['box-title', 'IGV/TDF Conversion:']),
+					createElement('select', ['id','class','onChange','OPTION', 'OPTION'], ['select_1_'+num, 'form-control', 'IGVTDFSelection(this.id)','no', 'yes'])],
+					[createElement('label', ['class','TEXTNODE'], ['box-title', 'BigWig Conversion:']),
+					createElement('select', ['id', 'class', 'OPTION', 'OPTION'], ['select_2_'+num, 'form-control', 'no', 'yes'])] ]);
+			divAdj = mergeTidy(divAdj, 6,
+					[ [createElement('label', ['id', 'class', 'style', 'TEXTNODE'], ['label_1_'+num, 'box-title', 'display:none', 'extFactor']),
+					   createElement('input', ['id', 'class', 'type', 'style', 'value'], ['textarea_2_'+num, 'form-control', 'text', 'display:none', '0'])] ]);
+			//MCALL
+			labelDiv = createElement('div', ['class'], ['col-md-12 text-center']);
+			labelDiv.appendChild( createElement('label', ['class','TEXTNODE'], ['box-title margin', 'Run MCall:']));
+			labelDiv.appendChild( createElement('input', ['id', 'type', 'class', 'onClick'], ['checkbox_4_'+num, 'checkbox', 'margin', 'MCallSelection("'+num+'")']));
+			divAdj.appendChild(labelDiv);
+			labelDiv2 = createElement('div', ['class'], ['col-md-12']);
+			labelDiv2.appendChild( createElement('label', ['id', 'class', 'style', 'TEXTNODE'], ['label_4_'+num, 'box-title', 'display:none', 'Additional MCall Parameters:']));
+			labelDiv2.appendChild( createElement('textarea', ['id', 'class', 'style'], ['textarea_3_'+num, 'form-control', 'display:none']));
+			divAdj.appendChild(labelDiv2);
+			//RUN METHYLKIT
+			labelDiv = createElement('div', ['class'], ['col-md-12 text-center']);
+			labelDiv.appendChild( createElement('label', ['class','TEXTNODE'], ['box-title margin', 'Run MethylKit:']));
+			labelDiv.appendChild( createElement('input', ['id', 'type', 'class', 'onClick'], ['checkbox_5_'+num, 'checkbox', 'margin', 'MethylKitSelection("'+num+'")']));
+			divAdj.appendChild(labelDiv);
+			divAdj = mergeTidy(divAdj, 6,
+					[ [createElement('label', ['id', 'class','TEXTNODE', 'style'], ['label_2_'+num, 'box-title', 'Tile Size:', 'display:none']),
+					createElement('input', ['id', 'class', 'type', 'value', 'style'], ['text_2_'+num, 'form-control', 'text', '300', 'display:none'])],
+					[createElement('label', ['id', 'class','TEXTNODE', 'style'], ['label_3_'+num, 'box-title', 'Step Size:', 'display:none']),
+					createElement('input', ['id', 'class', 'type', 'value', 'style'], ['text_3_'+num, 'form-control', 'text', '300', 'display:none'])] ]);
+			divAdj = mergeTidy(divAdj, 6,
+					[ [createElement('label', ['id', 'class','TEXTNODE', 'style'], ['label_5_'+num, 'box-title', 'Min Coverage:', 'display:none']),
+					createElement('input', ['id', 'class', 'type', 'value', 'style'], ['text_4_'+num, 'form-control', 'text', '5', 'display:none'])],
+					[createElement('label', ['id', 'class','TEXTNODE', 'style'], ['label_6_'+num, 'box-title', 'Top N Regions:', 'display:none']),
+					createElement('input', ['id', 'class', 'type', 'value', 'style'], ['text_5_'+num, 'form-control', 'text', '2000', 'display:none'])] ]);
+			labelDiv = createElement('div', ['class'], ['col-md-12 text-center']);
+			labelDiv.appendChild( createElement('label', ['id', 'class','TEXTNODE', 'style'], ['label_7_'+num,'box-title margin', 'Strand Specific Information:', 'display:none']));
+			labelDiv.appendChild( createElement('input', ['id', 'type', 'class', 'style'], ['checkbox_6_'+num, 'checkbox', 'margin', 'display:none']));
+			divAdj.appendChild(labelDiv);
+		}else if (pipeType == pipelineDict[5]) {
+			//DiffMeth
+			divAdj = mergeTidy(divAdj, 12,
+					[ [createElement('label', ['class','TEXTNODE'], ['box-title', 'Name:']),
+					createElement('input', ['id', 'class', 'type', 'value'], ['text_1_'+num, 'form-control', 'text', ''])] ]);
+			divAdj = mergeTidy(divAdj, 6,
+					[ [createElement('label', ['class','TEXTNODE'], ['box-title', 'Condition 1']),
+					createElement('select',['id', 'class', 'type', 'multiple', 'size', 'onchange'],['multi_select_1_'+num, 'form-control', 'select-multiple', 'multiple', '8', 'deselectCondition(1, '+num+')'])],
+					[createElement('label', ['class','TEXTNODE'], ['box-title', 'Condition 2']),
+					createElement('select',['id', 'class', 'type', 'multiple', 'size', 'onchange'],['multi_select_2_'+num, 'form-control', 'select-multiple', 'multiple', '8', 'deselectCondition(2, '+num+')'])] ]);
+		}else if (pipeType == pipelineDict[6]) {
+			//HaplotypeCaller
+			divAdj = mergeTidy(divAdj, 6,
+					[ [createElement('label', ['class','TEXTNODE'], ['box-title', 'Min Calling Threshold Confidence:']),
+					createElement('input', ['id', 'class', 'type', 'value'], ['text_1_'+num, 'form-control', 'text', '30'])],
+					[createElement('label', ['class','TEXTNODE'], ['box-title', 'Min Emitting Threshold Confidence:']),
+					createElement('input', ['id', 'class', 'type', 'value'], ['text_2_'+num, 'form-control', 'text', '30'])] ]);
+			divAdj = mergeTidy(divAdj, 6,
+					[ [createElement('label', ['class','TEXTNODE'], ['box-title', 'Min Base Quality Score:']),
+					createElement('input', ['id', 'class', 'type', 'value'], ['text_3_'+num, 'form-control', 'text', '10'])],
+					[createElement('label', ['class','TEXTNODE'], ['box-title', 'Min Reads Per Alignment Start:']),
+					createElement('input', ['id', 'class', 'type', 'value'], ['text_4_'+num, 'form-control', 'text', '10'])] ]);
+			divAdj = mergeTidy(divAdj, 6,
+					[ [createElement('label', ['class','TEXTNODE'], ['box-title', 'Max Reads In Region Per Sample:']),
+					createElement('input', ['id', 'class', 'type', 'value'], ['text_5_'+num, 'form-control', 'text', '10000'])] ]);
+		}
+		//replace div
+		$('#select_child_'+num).replaceWith(divAdj);
+		if (pipeType == pipelineDict[3]) {
+			for (var x = 0; x < deseqList.length; x++) {
+				var opt = createElement('option', ['id', 'value'], [deseqList[x], deseqList[x]]);
+				opt.innerHTML = deseqList[x];
+				document.getElementById('select_5_'+num).appendChild(opt);
+			}
+		}
 		
-	}else if (pipeType == pipelineDict[2]) {
-		//ChipSeq Pipeline
-		divAdj.appendChild( createElement('label', ['class','TEXTNODE'], ['box-title', 'Chip Input Definitions:']));
-		divAdj.appendChild( createElement('textarea', ['id', 'class'], ['textarea_'+num, 'form-control']));
-		divAdj = mergeTidy(divAdj, 6,
-				[ [createElement('label', ['class','TEXTNODE'], ['box-title', 'Multimapper:']),
-				createElement('input', ['id', 'class', 'type', 'value'], ['text_1_'+num, 'form-control', 'text', '1'])],
-				[createElement('label', ['class','TEXTNODE'], ['box-title', 'Tag size(bp) for MACS:']),
-				createElement('input', ['id', 'class', 'type', 'value'], ['text_2_'+num, 'form-control', 'text', '75'])] ]);
-		divAdj = mergeTidy(divAdj, 6,
-				[ [createElement('label', ['class','TEXTNODE'], ['box-title', 'Band width(bp) for MACS:']),
-				createElement('input', ['id', 'class', 'type', 'value'], ['select_1_'+num, 'form-control', 'text', '230'])],
-				[createElement('label', ['class','TEXTNODE'], ['box-title', 'Effective genome size(bp):']),
-				createElement('input', ['id', 'class', 'type', 'value'], ['select_2_'+num, 'form-control', 'text', '2700000000'])] ]);
-		divAdj = mergeTidy(divAdj, 12,
-				[ [createElement('label', ['class','TEXTNODE'], ['margin', 'Mark Duplicates:']),
-				createElement('input', ['id', 'type', 'class'], ['checkbox_2_'+num, 'checkbox', 'margin'])],
-				[createElement('label', ['class','TEXTNODE'], ['margin', 'Collect Multiple Picard Metrics:']),
-				createElement('input', ['id', 'type', 'class'], ['checkbox_1_'+num, 'checkbox', 'margin'])] ]);
-		divAdj = mergeTidy(divAdj, 6,
-				[ [createElement('label', ['class','TEXTNODE'], ['box-title', 'IGV/TDF Conversion:']),
-				createElement('select', ['id','class','onChange','OPTION', 'OPTION'], ['select_3_'+num, 'form-control', 'IGVTDFSelection(this.id)','no', 'yes'])],
-				[createElement('label', ['class','TEXTNODE'], ['box-title', 'BigWig Conversion:']),
-				createElement('select', ['id', 'class', 'OPTION', 'OPTION'], ['select_4_'+num, 'form-control', 'no', 'yes'])] ]);
-		divAdj = mergeTidy(divAdj, 6,
-				[ [createElement('label', ['id', 'class', 'style', 'TEXTNODE'], ['label_1_'+num, 'box-title', 'display:none', 'extFactor']),
-				   createElement('input', ['id', 'class', 'type', 'style', 'value'], ['textarea_2_'+num, 'form-control', 'text', 'display:none', '0'])] ]);
-	}else if (pipeType == pipelineDict[3]) {
-		//DESEQ
-		divAdj = mergeTidy(divAdj, 12,
-				[ [createElement('label', ['class','TEXTNODE'], ['box-title', 'Name:']),
-				createElement('input', ['id', 'class', 'type', 'value'], ['text_1_'+num, 'form-control', 'text', ''])] ]);
-		divAdj = mergeTidy(divAdj, 6,
-				[ [createElement('label', ['class','TEXTNODE'], ['box-title', 'Condition 1']),
-				createElement('select',['id', 'class', 'type', 'multiple', 'size', 'onchange'],['multi_select_1_'+num, 'form-control', 'select-multiple', 'multiple', '8', 'deselectCondition(1, '+num+')'])],
-				[createElement('label', ['class','TEXTNODE'], ['box-title', 'Condition 2']),
-				createElement('select',['id', 'class', 'type', 'multiple', 'size', 'onchange'],['multi_select_2_'+num, 'form-control', 'select-multiple', 'multiple', '8', 'deselectCondition(2, '+num+')'])] ]);
-		divAdj = mergeTidy(divAdj, 6,
-				[ [createElement('label', ['class','TEXTNODE'], ['box-title', 'Fit Type:']),
-				createElement('select', ['id', 'class', 'OPTION', 'OPTION', 'OPTION'], ['select_3_'+num, 'form-control', 'parametric', 'local', 'mean'])],
-				[createElement('label', ['class','TEXTNODE'], ['box-title', 'Heatmap:']),
-				createElement('select', ['id', 'class', 'OPTION', 'OPTION'], ['select_4_'+num, 'form-control', 'Yes', 'No'])] ]);
-		divAdj = mergeTidy(divAdj, 6,
-				[ [createElement('label', ['class','TEXTNODE'], ['box-title', 'pAdj cutoff']),
-				createElement('input', ['id', 'class', 'type', 'value'], ['text_2_'+num, 'form-control', 'text', '0.01'])],
-				[createElement('label', ['class','TEXTNODE'], ['box-title', 'Fold Change cutoff']),
-				createElement('input', ['id', 'class', 'type', 'value'], ['text_3_'+num, 'form-control', 'text', '2'])] ]);
-		divAdj = mergeTidy(divAdj, 12,
-				[ [createElement('label', ['class','TEXTNODE'], ['box-title', 'Select Sequence']),
-				createElement('select', ['id', 'class'], ['select_5_'+num, 'form-control'])] ]);
-	}else if (pipeType == pipelineDict[4]) {
-		//MMap
-		var labelDiv = createElement('div', ['class'], ['col-md-12 text-center']);
-		labelDiv.appendChild( createElement('label', ['class','TEXTNODE'], ['box-title margin', 'Run BSMap:']));
-		labelDiv.appendChild( createElement('input', ['id', 'type', 'class', 'checked', 'disabled'], ['checkbox_1_'+num, 'checkbox', 'margin']));
-		divAdj.appendChild(labelDiv);
-		var innerDiv = createTidyDiv(12);
-		divAdj = mergeTidy(divAdj, 12,
-				[[createLabeledDiv(12, 'RRBS&nbsp;&nbsp;', '&nbsp;&nbsp;WGBS', createElement('input', ['id', 'name', 'type', 'value', 'onClick', 'checked'], [num+'_RRBS', num, 'radio', 'RRBS', 'bisulphiteSelect(this.id, '+num+')']),
-					   createElement('input', ['id', 'name', 'type', 'value', 'onClick',], [num+'_WGBS', num, 'radio', 'WGBS', 'bisulphiteSelect(this.id, '+num+')']))
-					],
-				[createElement('label', ['class','TEXTNODE'], ['box-title', 'Digestion Site:']),
-				createElement('input', ['id', 'class', 'type', 'value'], ['text_1_'+num, 'form-control', 'text', 'C-CGG'])]
-				]);
-		labelDiv = createElement('div', ['class'], ['col-md-12']);
-		labelDiv.appendChild( createElement('label', ['class','TEXTNODE'], ['box-title', 'Additional BSMap Parameters:']));
-		labelDiv.appendChild( createElement('textarea', ['id', 'class'], ['textarea_1_'+num, 'form-control']));
-		divAdj.appendChild(labelDiv);
-		divAdj = mergeTidy(divAdj, 12,
-				[ [createElement('label', ['class','TEXTNODE'], ['margin', 'Mark Duplicates:']),
-				createElement('input', ['id', 'type', 'class'], ['checkbox_3_'+num, 'checkbox', 'margin'])],
-				[createElement('label', ['class','TEXTNODE'], ['margin', 'Collect Multiple Picard Metrics:']),
-				createElement('input', ['id', 'type', 'class'], ['checkbox_2_'+num, 'checkbox', 'margin'])] ]);
-		divAdj = mergeTidy(divAdj, 6,
-				[ [createElement('label', ['class','TEXTNODE'], ['box-title', 'IGV/TDF Conversion:']),
-				createElement('select', ['id','class','onChange','OPTION', 'OPTION'], ['select_1_'+num, 'form-control', 'IGVTDFSelection(this.id)','no', 'yes'])],
-				[createElement('label', ['class','TEXTNODE'], ['box-title', 'BigWig Conversion:']),
-				createElement('select', ['id', 'class', 'OPTION', 'OPTION'], ['select_2_'+num, 'form-control', 'no', 'yes'])] ]);
-		divAdj = mergeTidy(divAdj, 6,
-				[ [createElement('label', ['id', 'class', 'style', 'TEXTNODE'], ['label_1_'+num, 'box-title', 'display:none', 'extFactor']),
-				   createElement('input', ['id', 'class', 'type', 'style', 'value'], ['textarea_2_'+num, 'form-control', 'text', 'display:none', '0'])] ]);
-		//MCALL
-		labelDiv = createElement('div', ['class'], ['col-md-12 text-center']);
-		labelDiv.appendChild( createElement('label', ['class','TEXTNODE'], ['box-title margin', 'Run MCall:']));
-		labelDiv.appendChild( createElement('input', ['id', 'type', 'class', 'onClick'], ['checkbox_4_'+num, 'checkbox', 'margin', 'MCallSelection("'+num+'")']));
-		divAdj.appendChild(labelDiv);
-		labelDiv2 = createElement('div', ['class'], ['col-md-12']);
-		labelDiv2.appendChild( createElement('label', ['id', 'class', 'style', 'TEXTNODE'], ['label_4_'+num, 'box-title', 'display:none', 'Additional MCall Parameters:']));
-		labelDiv2.appendChild( createElement('textarea', ['id', 'class', 'style'], ['textarea_3_'+num, 'form-control', 'display:none']));
-		divAdj.appendChild(labelDiv2);
-		//RUN METHYLKIT
-		labelDiv = createElement('div', ['class'], ['col-md-12 text-center']);
-		labelDiv.appendChild( createElement('label', ['class','TEXTNODE'], ['box-title margin', 'Run MethylKit:']));
-		labelDiv.appendChild( createElement('input', ['id', 'type', 'class', 'onClick'], ['checkbox_5_'+num, 'checkbox', 'margin', 'MethylKitSelection("'+num+'")']));
-		divAdj.appendChild(labelDiv);
-		divAdj = mergeTidy(divAdj, 6,
-				[ [createElement('label', ['id', 'class','TEXTNODE', 'style'], ['label_2_'+num, 'box-title', 'Tile Size:', 'display:none']),
-				createElement('input', ['id', 'class', 'type', 'value', 'style'], ['text_2_'+num, 'form-control', 'text', '300', 'display:none'])],
-				[createElement('label', ['id', 'class','TEXTNODE', 'style'], ['label_3_'+num, 'box-title', 'Step Size:', 'display:none']),
-				createElement('input', ['id', 'class', 'type', 'value', 'style'], ['text_3_'+num, 'form-control', 'text', '300', 'display:none'])] ]);
-		divAdj = mergeTidy(divAdj, 6,
-				[ [createElement('label', ['id', 'class','TEXTNODE', 'style'], ['label_5_'+num, 'box-title', 'Min Coverage:', 'display:none']),
-				createElement('input', ['id', 'class', 'type', 'value', 'style'], ['text_4_'+num, 'form-control', 'text', '5', 'display:none'])],
-				[createElement('label', ['id', 'class','TEXTNODE', 'style'], ['label_6_'+num, 'box-title', 'Top N Regions:', 'display:none']),
-				createElement('input', ['id', 'class', 'type', 'value', 'style'], ['text_5_'+num, 'form-control', 'text', '2000', 'display:none'])] ]);
-		labelDiv = createElement('div', ['class'], ['col-md-12 text-center']);
-		labelDiv.appendChild( createElement('label', ['id', 'class','TEXTNODE', 'style'], ['label_7_'+num,'box-title margin', 'Strand Specific Information:', 'display:none']));
-		labelDiv.appendChild( createElement('input', ['id', 'type', 'class', 'style'], ['checkbox_6_'+num, 'checkbox', 'margin', 'display:none']));
-		divAdj.appendChild(labelDiv);
-	}else if (pipeType == pipelineDict[5]) {
-		//DiffMeth
-		divAdj = mergeTidy(divAdj, 12,
-				[ [createElement('label', ['class','TEXTNODE'], ['box-title', 'Name:']),
-				createElement('input', ['id', 'class', 'type', 'value'], ['text_1_'+num, 'form-control', 'text', ''])] ]);
-		divAdj = mergeTidy(divAdj, 6,
-				[ [createElement('label', ['class','TEXTNODE'], ['box-title', 'Condition 1']),
-				createElement('select',['id', 'class', 'type', 'multiple', 'size', 'onchange'],['multi_select_1_'+num, 'form-control', 'select-multiple', 'multiple', '8', 'deselectCondition(1, '+num+')'])],
-				[createElement('label', ['class','TEXTNODE'], ['box-title', 'Condition 2']),
-				createElement('select',['id', 'class', 'type', 'multiple', 'size', 'onchange'],['multi_select_2_'+num, 'form-control', 'select-multiple', 'multiple', '8', 'deselectCondition(2, '+num+')'])] ]);
-	}else if (pipeType == pipelineDict[6]) {
-		//HaplotypeCaller
-		divAdj = mergeTidy(divAdj, 6,
-				[ [createElement('label', ['class','TEXTNODE'], ['box-title', 'Min Calling Threshold Confidence:']),
-				createElement('input', ['id', 'class', 'type', 'value'], ['text_1_'+num, 'form-control', 'text', '30'])],
-				[createElement('label', ['class','TEXTNODE'], ['box-title', 'Min Emitting Threshold Confidence:']),
-				createElement('input', ['id', 'class', 'type', 'value'], ['text_2_'+num, 'form-control', 'text', '30'])] ]);
-		divAdj = mergeTidy(divAdj, 6,
-				[ [createElement('label', ['class','TEXTNODE'], ['box-title', 'Min Base Quality Score:']),
-				createElement('input', ['id', 'class', 'type', 'value'], ['text_3_'+num, 'form-control', 'text', '10'])],
-				[createElement('label', ['class','TEXTNODE'], ['box-title', 'Min Reads Per Alignment Start:']),
-				createElement('input', ['id', 'class', 'type', 'value'], ['text_4_'+num, 'form-control', 'text', '10'])] ]);
-		divAdj = mergeTidy(divAdj, 6,
-				[ [createElement('label', ['class','TEXTNODE'], ['box-title', 'Max Reads In Region Per Sample:']),
-				createElement('input', ['id', 'class', 'type', 'value'], ['text_5_'+num, 'form-control', 'text', '10000'])] ]);
-	}
-	//replace div
-	$('#select_child_'+num).replaceWith(divAdj);
-	if (pipeType == pipelineDict[3]) {
-		for (var x = 0; x < deseqList.length; x++) {
-			var opt = createElement('option', ['id', 'value'], [deseqList[x], deseqList[x]]);
-			opt.innerHTML = deseqList[x];
-			document.getElementById('select_5_'+num).appendChild(opt);
+		//MULTI-SELECT
+		if (document.getElementById('multi_select_1_'+num) != null) {
+			var sample_names = getSampleNames(window.location.href.split('/')[window.location.href.split('/').length - 1].replace('$', ''));
+			console.log(sample_names);
+			for(var x = 0; x < sample_names.length; x++){
+					document.getElementById('multi_select_1_'+num).appendChild(createElement('option', ['id', 'value'], [num+'_1_'+sample_names[x], sample_names[x]]));
+					document.getElementById(num+'_1_'+sample_names[x]).innerHTML = sample_names[x]
+					document.getElementById('multi_select_2_'+num).appendChild(createElement('option', ['id', 'value'], [num+'_2_'+sample_names[x], sample_names[x]]));
+					document.getElementById(num+'_2_'+sample_names[x]).innerHTML = sample_names[x]
+			}
 		}
-	}
-	
-	//MULTI-SELECT
-	if (document.getElementById('multi_select_1_'+num) != null) {
-		var sample_names = getSampleNames(window.location.href.split('/')[window.location.href.split('/').length - 1].replace('$', ''));
-		console.log(sample_names);
-		for(var x = 0; x < sample_names.length; x++){
-				document.getElementById('multi_select_1_'+num).appendChild(createElement('option', ['id', 'value'], [num+'_1_'+sample_names[x], sample_names[x]]));
-				document.getElementById(num+'_1_'+sample_names[x]).innerHTML = sample_names[x]
-				document.getElementById('multi_select_2_'+num).appendChild(createElement('option', ['id', 'value'], [num+'_2_'+sample_names[x], sample_names[x]]));
-				document.getElementById(num+'_2_'+sample_names[x]).innerHTML = sample_names[x]
+		
+		//adjust global pipeline counter
+		if (currentPipelineID.indexOf(num) == -1) {
+			currentPipelineID.push(num);
+			currentPipelineVal.push(pipeType);
 		}
-	}
-	
-	//adjust global pipeline counter
-	if (currentPipelineID.indexOf(num) == -1) {
-		currentPipelineID.push(num);
-		currentPipelineVal.push(pipeType);
-	}
-	else if (currentPipelineID.indexOf(num) != -1 && currentPipelineVal.indexOf(currentPipelineID.indexOf(num)) != pipeType)
-	{
-		currentPipelineVal[currentPipelineID.indexOf(num)] = pipeType;
-	}
+		else if (currentPipelineID.indexOf(num) != -1 && currentPipelineVal.indexOf(currentPipelineID.indexOf(num)) != pipeType)
+		{
+			currentPipelineVal[currentPipelineID.indexOf(num)] = pipeType;
+		}
 	}
 }
 
@@ -2111,21 +2063,6 @@ function bisulphiteSelect(id, num){
 		dig_site.disabled = true;
 		dig_site.value = '';
 	}
-}
-
-function haploCheck(num, type){
-	hc_check = false;
-	//	Doesn't Exist
-	if (currentPipelineVal.indexOf(type) == -1){
-		hc_check = true;
-	//	Downstream
-	}else if (currentPipelineID[currentPipelineVal.indexOf(type)] > num){
-		hc_check = true;
-	//	Replacing
-	}else if (currentPipelineID[currentPipelineVal.indexOf(type)] == num) {
-		hc_check = true;
-	}
-	return hc_check;
 }
 
 function tophatCustomOptions(num){
