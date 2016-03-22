@@ -401,7 +401,7 @@ function pipelineSelect(num){
 	console.log(pipeType);
 	var divAdj = createElement('div', ['id', 'class', 'style'], ['select_child_'+num, 'input-group margin col-md-11', 'float:left']);
 	console.log(divAdj);
-	
+	console.log(currentPipelineVal);
 	//Check for only one RSEM/DESeq dependencies
 	if (pipeType == pipelineDict[0] && currentPipelineVal.indexOf('RNASeqRSEM') > -1)
 	{
@@ -444,6 +444,14 @@ function pipelineSelect(num){
 		document.getElementById('errorAreas').innerHTML = '';
 		document.getElementById('select_'+num).value = currentPipelineVal[currentPipelineID.indexOf(num)];
 	}
+	else if (pipeType == pipelineDict[6] && haploCheck(num, 'Tophat') && haploCheck(num, 'ChipSeq')) {
+		$('#errorModal').modal({
+			show: true
+		});
+		document.getElementById('errorLabel').innerHTML ='You must first add a Tophat or ChipSeq before selecting HaplotypeCaller';
+		document.getElementById('errorAreas').innerHTML = '';
+		document.getElementById('select_'+num).value = currentPipelineVal[currentPipelineID.indexOf(num)];
+	}	
 	else
 	{
 	//pipelineDict: global variable containing selections
@@ -2103,6 +2111,21 @@ function bisulphiteSelect(id, num){
 		dig_site.disabled = true;
 		dig_site.value = '';
 	}
+}
+
+function haploCheck(num, type){
+	hc_check = false;
+	//	Doesn't Exist
+	if (currentPipelineVal.indexOf(type) == -1){
+		hc_check = true;
+	//	Downstream
+	}else if (currentPipelineID[currentPipelineVal.indexOf(type)] > num){
+		hc_check = true;
+	//	Replacing
+	}else if (currentPipelineID[currentPipelineVal.indexOf(type)] == num) {
+		hc_check = true;
+	}
+	return hc_check;
 }
 
 function tophatCustomOptions(num){
