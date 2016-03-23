@@ -84,7 +84,6 @@ function checkFieldNucleotidesOnly(input){
 	if (document.getElementById(input).value.match(/[bd-fh-sv-zBD-FH-SV-Z0-9\!\@\#\$\%\^\&\*\(\)\_\+\-\=\\\|\[\]\{\}\;\'\:\"\,\.\/\<\>\?\`\~]+/g)) {
 		check = true;
 	}
-	console.log(check);
 	return check;
 }
 
@@ -93,7 +92,6 @@ function checkFieldCheckboxChecked(input){
 	if (!document.getElementById(input).checked) {
 		check = true;
 	}
-	console.log(check);
 	return check;
 }
 
@@ -102,7 +100,6 @@ function checkFieldSelection(input, value){
 	if (!document.getElementById(input).value == value) {
 		check = true;
 	}
-	console.log(check);
 	return check;
 }
 
@@ -111,7 +108,6 @@ function checkFieldsEmpty(input){
 	if (document.getElementById(input).value == null || document.getElementById(input).value == undefined || document.getElementById(input).value.trim() == "") {
 		check = true;
 	}
-	console.log(check);
 	return check;
 }
 
@@ -120,7 +116,6 @@ function checkFieldIsNotInt(input){
 	if (isNaN(document.getElementById(input).value) || document.getElementById(input).value.toString().indexOf('.') > -1) {
 		check = true;
 	}
-	console.log(check);
 	return check;
 }
 
@@ -129,7 +124,6 @@ function checkFieldIsNotFloat(input){
 	if (isNaN(document.getElementById(input).value) || document.getElementById(input).value.toString().indexOf('.') == -1) {
 		check = true;
 	}
-	console.log(check);
 	return check;
 }
 
@@ -139,7 +133,6 @@ function checkFieldAlphaNumeric(input){
 	if (!document.getElementById(input).value.match(alpha_numeric)) {
 		check = true;
 	}
-	console.log(check);
 	return check;
 }
 function checkFieldAlphaNumericAdditionalChars(input, additional){
@@ -148,7 +141,6 @@ function checkFieldAlphaNumericAdditionalChars(input, additional){
 	if (!document.getElementById(input).value.match(alpha_numeric)) {
 		check = true;
 	}
-	console.log(check);
 	return check;
 }
 
@@ -159,7 +151,6 @@ function checkFieldMultiSelectEmpty(input1, input2){
 	}else if(document.getElementById(input2).value == "" ){
 		check = true;
 	}
-	console.log(check);
 	return check;
 }
 
@@ -455,7 +446,6 @@ function pipelineSubmitCheck(non_pipeline, non_pipeline_values, pipeline, pipeli
 			}
 		}
 	}
-	alert();
 	return false;
 }
 

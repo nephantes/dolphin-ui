@@ -158,7 +158,7 @@ function rerunLoad() {
 								document.getElementById('textarea_'+i).value = splt1[i].Params;
 								document.getElementById('select_1_'+i).value = splt1[i].IGVTDF;
 								document.getElementById('select_2_'+i).value = splt1[i].BAM2BW;
-								if (splt1[i].ExtFactor != '0' && splt1[i].ExtFactor != 0) {
+								if (splt1[i].IGVTDF == 'yes') {
 									IGVTDFSelection('select_1_'+i);
 									document.getElementById('textarea_2_'+i).value = splt1[i].ExtFactor;
 								}
@@ -178,6 +178,7 @@ function rerunLoad() {
 									document.getElementById('textarea_4_'+i).value = splt1[i].CustomGenomeAnnotation;
 								}
 							}else if (splt1[i].Type == pipelineDict[1]) {
+								console.log(splt1[i]);
 								//Tophat
 								additionalPipes();
 								document.getElementById('select_'+i).value = pipelineDict[1];
@@ -185,7 +186,7 @@ function rerunLoad() {
 								document.getElementById('textarea_'+i).value = splt1[i].Params;
 								document.getElementById('select_1_'+i).value = splt1[i].IGVTDF;
 								document.getElementById('select_2_'+i).value = splt1[i].BAM2BW;
-								if (splt1[i].ExtFactor != '0' && splt1[i].ExtFactor != 0) {
+								if (splt1[i].IGVTDF == 'yes') {
 									IGVTDFSelection('select_1_'+i);
 									document.getElementById('textarea_2_'+i).value = splt1[i].ExtFactor;
 								}
@@ -219,7 +220,7 @@ function rerunLoad() {
 								document.getElementById('select_2_'+i).value = splt1[i].EffectiveGenome;
 								document.getElementById('select_3_'+i).value = splt1[i].IGVTDF;
 								document.getElementById('select_4_'+i).value = splt1[i].BAM2BW;
-								if (splt1[i].ExtFactor != '0' && splt1[i].ExtFactor != 0) {
+								if (splt1[i].IGVTDF == 'yes') {
 									IGVTDFSelection('select_3_'+i);
 									document.getElementById('textarea_2_'+i).value = splt1[i].ExtFactor;
 								}
@@ -276,6 +277,7 @@ function rerunLoad() {
 								document.getElementById('text_3_'+i).value = splt1[i].foldChange;
 								document.getElementById('select_5_'+i).value = splt1[i].DataType;
 							}else if (splt1[i].Type == pipelineDict[4]) {
+								//BisulphiteMapping
 								//MMap
 								additionalPipes();
 								document.getElementById('select_'+i).value = pipelineDict[4];
@@ -289,7 +291,7 @@ function rerunLoad() {
 								document.getElementById('textarea_1_'+i).value = splt1[i].BSMapParams;
 								document.getElementById('select_1_'+i).value = splt1[i].IGVTDF;
 								document.getElementById('select_2_'+i).value = splt1[i].BAM2BW;
-								if (splt1[i].ExtFactor != '0' && splt1[i].ExtFactor != 0) {
+								if (splt1[i].IGVTDF == 'yes') {
 									IGVTDFSelection('select_1_'+i);
 									document.getElementById('textarea_2_'+i).value = splt1[i].ExtFactor;
 								}
