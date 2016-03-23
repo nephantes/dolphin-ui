@@ -657,23 +657,28 @@ function submitPipeline(type) {
 	
 	var JSON_OBJECT = {};
 	var empty_values = []
-	if (run_name == "") {
-		empty_values.push('Run Name');
-	}
-	if (description == "") {
-		empty_values.push("Run Description");
-	}
-	if (outputdir == "") {
-		empty_values.push('Output Directory');
-	}
 	
-	if (empty_values.length > 0) {
-		$('#errorModal').modal({
-			show: true
-		});
-		document.getElementById('errorLabel').innerHTML ='The following fields may not be empty for submission:';
-		document.getElementById('errorAreas').innerHTML = empty_values.join(", ");
-	}else{
+	var doAdapter = findRadioChecked("adapters");
+	var doQuality = findRadioChecked("quality");
+	var doTrimming = findRadioChecked("trim");
+	var doRNA = findRNAChecked(rnaList);
+	var doSplit = findRadioChecked("split");
+	
+	var adapterValType = ["adapters"];
+	var qualityValType = ["window size", "required quality", "leading", "trailing", "minlen"];
+	var trimValType = ["single or paired-end", "5 length 1", "3 length 1", "5 length 2", "3 length 2"];
+	var splitValType = ["number of reads per file"];
+	
+	var adapter = findAdditionalInfoValues(doAdapter, adapterValType);	
+	var quality = findAdditionalInfoValues(doQuality, qualityValType);
+	var trimming = findAdditionalInfoValues(doTrimming, trimValType);
+	var rna = findAdditionalInfoValues(doRNA, rnaList);
+	var split = findAdditionalInfoValues(doSplit, splitValType);
+	
+	var non_pipeline = [doAdapter, doQuality, doTrimming, doRNA, doSplit];
+	var non_pipeline_values = [adapterValType, qualityValType, trimValType, rnaList, splitValType];
+	
+	if (!pipelineSubmitCheck(non_pipeline, non_pipeline_values, currentPipelineVal, currentPipelineID)) {
 		//	get Username
 		$.ajax({
 			type: 	'GET',
@@ -686,32 +691,11 @@ function submitPipeline(type) {
 			}
 		});
 		
-		//Expanding
-		var doAdapter = findRadioChecked("adapters");
-		var doQuality = findRadioChecked("quality");
-		var doTrimming = findRadioChecked("trim");
-		var doRNA = findRNAChecked(rnaList);
-		var doSplit = findRadioChecked("split");
-	
-		var adapter = findAdditionalInfoValues(doAdapter, ["adapters"]);
-
-		var adapterCheck = false;
-		if (adapter[0].match(/[bd-fh-sv-zBD-FH-SV-Z0-9\!\@\#\$\%\^\&\*\(\)\_\+\-\=\\\|\[\]\{\}\;\'\:\"\,\.\/\<\>\?\`\~]+/g)) {
-			adapterCheck = true;
-		}
-			
-		var quality = findAdditionalInfoValues(doQuality, ["window size", "required quality", "leading", "trailing", "minlen"]);
-		var trimming = findAdditionalInfoValues(doTrimming, ["single or paired-end", "5 length 1", "3 length 1", "5 length 2", "3 length 2"]);
-		var rna = findAdditionalInfoValues(doRNA, rnaList);
-		var split = findAdditionalInfoValues(doSplit, ["number of reads per file"]);
-	
-		//Pipeline
-		var pipelines = findPipelineValues();
-	
 		//Grab sample ids
 		var ids = getSampleIDs(phpGrab.theSearch);
 		var previous = 'none';
 		//start json construction
+		
 		//static
 		var json = '{"genomebuild":"' + genome + '"'
 		JSON_OBJECT['genomebuild'] = genome;
@@ -802,6 +786,10 @@ function submitPipeline(type) {
 		if (customSeqSet.length > 0) {
 			JSON_OBJECT['custominds'] = customSeqSet;
 		}
+		
+		//Pipeline
+		var pipelines = findPipelineValues();
+		
 		if (pipelines.length > 0) {
 			JSON_OBJECT['pipeline'] = pipelines;
 		}
@@ -843,35 +831,14 @@ function submitPipeline(type) {
 			//	No errors
 			dir_tests = true;
 		}
-	
+		
 		//Check empty multi_selections
-		var de_multi_error = false;
-		var meth_multi_error = false;
-		var name_error = false;
 		var tophatCheckIndex = false;
 		var tophatCheckAnnotation = false;
-		for(var z = 0; z < currentPipelineVal.length; z++){
-			if (currentPipelineVal[z] == 'DESeq') {
-				if (document.getElementById('multi_select_1_'+currentPipelineID[z]).value == "") {
-					de_multi_error = true;
-				}else if(document.getElementById('multi_select_2_'+currentPipelineID[z]).value == "" ){
-					de_multi_error = true;
-				}
-			}else if (currentPipelineVal[z] == 'DiffMeth') {
-				if (document.getElementById('multi_select_1_'+currentPipelineID[z]).value == "") {
-					meth_multi_error = true;
-				}else if(document.getElementById('multi_select_2_'+currentPipelineID[z]).value == "" ){
-					meth_multi_error = true;
-				}
-			}
-		}
+		
 		if (JSON_OBJECT['pipeline'] != null) {
 			for( var i = 0; i < JSON_OBJECT['pipeline'].length; i++){
-				if (JSON_OBJECT['pipeline'][i].Type == 'DESeq' || JSON_OBJECT['pipeline'][i].Type == 'DiffMeth') {
-					if (JSON_OBJECT['pipeline'][i].Name == "") {
-						name_error = true;
-					}
-				}else if (JSON_OBJECT['pipeline'][i].Type == 'Tophat') {
+				if (JSON_OBJECT['pipeline'][i].Type == 'Tophat') {
 					if(JSON_OBJECT['pipeline'][i].CustomGenomeIndex != 'None' || JSON_OBJECT['pipeline'][i].CustomGenomeAnnotation != 'None'){
 						$.ajax({
 							type: 	'GET',
@@ -907,13 +874,7 @@ function submitPipeline(type) {
 			}
 		}
 		
-		if (adapterCheck && doAdapter == 'yes') {
-			$('#errorModal').modal({
-				show: true
-			});
-			document.getElementById('errorLabel').innerHTML ='Please use A,T,C,G only in the adapter';
-			document.getElementById('errorAreas').innerHTML = '';
-		}else if (!dir_tests){
+		if (!dir_tests){
 			$('#errorModal').modal({
 				show: true
 			});
@@ -931,24 +892,6 @@ function submitPipeline(type) {
 				show: true
 			});
 			document.getElementById('errorLabel').innerHTML ='You do not have permissions or the file does not exist for the File:<br><br>'+custom_error
-			document.getElementById('errorAreas').innerHTML = '';
-		}else if(de_multi_error){
-			$('#errorModal').modal({
-				show: true
-			});
-			document.getElementById('errorLabel').innerHTML ='DESeq is missing selected conditions.<br><br>';
-			document.getElementById('errorAreas').innerHTML = '';
-		}else if (meth_multi_error){
-			$('#errorModal').modal({
-				show: true
-			});
-			document.getElementById('errorLabel').innerHTML ='DiffMeth is missing selected conditions.<br><br>';
-			document.getElementById('errorAreas').innerHTML = '';
-		}else if(name_error){
-			$('#errorModal').modal({
-				show: true
-			});
-			document.getElementById('errorLabel').innerHTML ='DESeq/DiffMeth require a name in order to run the pipeline.<br><br>';
 			document.getElementById('errorAreas').innerHTML = '';
 		}else if(tophatCheckIndex || tophatCheckAnnotation){
 			$('#errorModal').modal({
@@ -968,10 +911,6 @@ function submitPipeline(type) {
 			}
 		}
 	}
-}
-
-function commonRNACheck(id){
-	console.log(id);
 }
 
 function sendToFastlane(){
@@ -1723,21 +1662,21 @@ function getMultipleSelectionBox(selection) {
 function findAdditionalInfoValues(goWord, additionalArray){
 	var values = [];
 	if (goWord == "yes") {
-	for (var i = 0, len = additionalArray.length; i < len; i++) {
-		if (document.getElementById(additionalArray[i]+'_val') != null) {
-		values.push(document.getElementById(additionalArray[i]+'_val').value);
-		}else{
-		if(document.getElementById(additionalArray[i]+'_yes') != null){
-			if(document.getElementById(additionalArray[i]+'_yes').checked){
-			values.push(additionalArray[i]);
+		for (var i = 0, len = additionalArray.length; i < len; i++) {
+			if (document.getElementById(additionalArray[i]+'_val') != null) {
+				values.push(document.getElementById(additionalArray[i]+'_val').value);
+			}else{
+				if(document.getElementById(additionalArray[i]+'_yes') != null){
+					if(document.getElementById(additionalArray[i]+'_yes').checked){
+						values.push(additionalArray[i]);
+					}
+				}
 			}
 		}
-		}
-	}
 	}else{
-	for (var i = 0, len = additionalArray.length; i < len; i++) {
-		values.push('none');
-	}
+		for (var i = 0, len = additionalArray.length; i < len; i++) {
+			values.push('none');
+		}
 	}
 	return values;
 }

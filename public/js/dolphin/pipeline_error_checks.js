@@ -79,6 +79,90 @@ function checkPipelineVariableDependency(num, type, id){
 	return check;
 }
 
+function checkFieldNucleotidesOnly(input){
+	var check = false;
+	if (document.getElementById(input).value.match(/[bd-fh-sv-zBD-FH-SV-Z0-9\!\@\#\$\%\^\&\*\(\)\_\+\-\=\\\|\[\]\{\}\;\'\:\"\,\.\/\<\>\?\`\~]+/g)) {
+		check = true;
+	}
+	console.log(check);
+	return check;
+}
+
+function checkFieldCheckboxChecked(input){
+	var check = false;
+	if (!document.getElementById(input).checked) {
+		check = true;
+	}
+	console.log(check);
+	return check;
+}
+
+function checkFieldSelection(input, value){
+	var check = false;
+	if (!document.getElementById(input).value == value) {
+		check = true;
+	}
+	console.log(check);
+	return check;
+}
+
+function checkFieldsEmpty(input){
+	var check = false;
+	if (document.getElementById(input).value == null || document.getElementById(input).value == undefined || document.getElementById(input).value.trim() == "") {
+		check = true;
+	}
+	console.log(check);
+	return check;
+}
+
+function checkFieldIsNotInt(input){
+	var check = false;
+	if (isNaN(document.getElementById(input).value) || document.getElementById(input).value.toString().indexOf('.') > -1) {
+		check = true;
+	}
+	console.log(check);
+	return check;
+}
+
+function checkFieldIsNotFloat(input){
+	var check = false;
+	if (isNaN(document.getElementById(input).value) || document.getElementById(input).value.toString().indexOf('.') == -1) {
+		check = true;
+	}
+	console.log(check);
+	return check;
+}
+
+function checkFieldAlphaNumeric(input){
+	var check = false;
+	var alpha_numeric = /^([0-9]|[a-z]|[A-Z])+([0-9a-zA-Z]+)$/i;
+	if (!document.getElementById(input).value.match(alpha_numeric)) {
+		check = true;
+	}
+	console.log(check);
+	return check;
+}
+function checkFieldAlphaNumericAdditionalChars(input, additional){
+	var check = false;
+	var alpha_numeric = new RegExp('^([0-9]|[a-z]|[A-Z]|[' + additional + '])+([0-9a-zA-Z' + additional + ']+)$', 'i');
+	if (!document.getElementById(input).value.match(alpha_numeric)) {
+		check = true;
+	}
+	console.log(check);
+	return check;
+}
+
+function checkFieldMultiSelectEmpty(input1, input2){
+	var check = false;
+	if (document.getElementById(input1).value == "") {
+		check = true;
+	}else if(document.getElementById(input2).value == "" ){
+		check = true;
+	}
+	console.log(check);
+	return check;
+}
+
 //	END GENERIC FUNCTIONS
 //	************************************************************************
 //	START GROUPED FUNCTIONS
@@ -159,8 +243,220 @@ function pipelineSelectCheck(num, type){
 	return false;
 }
 
-function pipelineSubmitCheck(){
+function pipelineSubmitCheck(non_pipeline, non_pipeline_values, pipeline, pipeline_index){
+	//	Non-pipeline checks empty
+	var non_pipeline_dictionary = ['adapters', 'quality', 'trim', 'rna', 'split'];
+	//	Run name
+	if (checkFieldsEmpty('run_name')) {
+		displayErrorModal('#errorModal', 'Run Name field cannot be empty');
+		return true;
+	}
+	//	Run Description empty
+	if (checkFieldsEmpty('run_description')) {
+		displayErrorModal('#errorModal', 'Run Description field cannot be empty');
+		return true;
+	}
+	//	Run outdir empty
+	if (checkFieldsEmpty('outdir')) {
+		displayErrorModal('#errorModal', 'Output Directory field cannot be empty');
+		return true;
+	}
+	//	Run outdir nonnumeric
+	if (checkFieldAlphaNumericAdditionalChars('outdir', '\\_\\-\\/')) {
+		displayErrorModal('#errorModal', 'Output Directory must use proper directory syntax');
+		return true;
+	}
 	
+	//	Adapters
+	if (non_pipeline[0] == 'yes' && (checkFieldNucleotidesOnly(non_pipeline_values[0][0]+"_val") || checkFieldsEmpty(non_pipeline_values[0][0]+"_val")) ) {
+		displayErrorModal('#errorModal', 'Adapted must use the appropriate nucleotide syntax in Adapters');
+		return true;
+	}
+	
+	//	Quality
+	//	window sizw
+	if (non_pipeline[1] == "yes" && (checkFieldsEmpty(non_pipeline_values[1][0]+"_val") || checkFieldIsNotInt(non_pipeline_values[1][0]+"_val")) ) {
+		displayErrorModal('#errorModal', 'Window Size must be of type int in Quality Filtering');
+		return true;
+	//	required quality
+	}else if (non_pipeline[1] == "yes" && (checkFieldsEmpty(non_pipeline_values[1][1]+"_val") || checkFieldIsNotInt(non_pipeline_values[1][1]+"_val")) ) {
+		displayErrorModal('#errorModal', 'Required Quality must be of type int in Quality Filtering');
+		return true;
+	//	leading
+	}else if (non_pipeline[1] == "yes" && (checkFieldsEmpty(non_pipeline_values[1][2]+"_val") || checkFieldIsNotInt(non_pipeline_values[1][2]+"_val")) ) {
+		displayErrorModal('#errorModal', 'Leading must be of type int in Quality Filtering');
+		return true;
+	//	trailing
+	}else if (non_pipeline[1] == "yes" && (checkFieldsEmpty(non_pipeline_values[1][3]+"_val") || checkFieldIsNotInt(non_pipeline_values[1][3]+"_val")) ) {
+		displayErrorModal('#errorModal', 'Trailing must be of type int in Quality Filtering');
+		return true;
+	//	minlen
+	}else if (non_pipeline[1] == "yes" && (checkFieldsEmpty(non_pipeline_values[1][4]+"_val") || checkFieldIsNotInt(non_pipeline_values[1][4]+"_val")) ) {
+		displayErrorModal('#errorModal', 'Minlen must be of type int in Quality Filtering');
+		return true;
+	}
+	
+	//	Trim
+	//	5 length 1
+	if (non_pipeline[2] == "yes" && (checkFieldsEmpty(non_pipeline_values[2][1]+"_val") || checkFieldIsNotInt(non_pipeline_values[2][1]+"_val")) ) {
+		displayErrorModal('#errorModal', '5 Length 1 must be of type int in Trimming');
+		return true;
+	//	3 length 1
+	}else if (non_pipeline[1] == "yes" && (checkFieldsEmpty(non_pipeline_values[2][2]+"_val") || checkFieldIsNotInt(non_pipeline_values[2][2]+"_val")) ) {
+		displayErrorModal('#errorModal', '3 Length 1 must be of type int in Trimming');
+		return true;
+	}
+	if (document.getElementById(non_pipeline_values[2][0]+'_val').value == 'paired-end') {
+		//	5 length 2
+		if (non_pipeline[2] == "yes" && (checkFieldsEmpty(non_pipeline_values[2][3]+"_val") || checkFieldIsNotInt(non_pipeline_values[2][3]+"_val")) ) {
+			displayErrorModal('#errorModal', '5 Length 2 must be of type int in Trimming');
+			return true;
+		//	3 length 2
+		}else if (non_pipeline[1] == "yes" && (checkFieldsEmpty(non_pipeline_values[2][4]+"_val") || checkFieldIsNotInt(non_pipeline_values[2][4]+"_val")) ) {
+			displayErrorModal('#errorModal', '3 Length 2 must be of type int in Trimming');
+			return true;
+		}
+	}
+	
+	//	RNA
+	//	change parameters
+	if (non_pipeline[3] == "yes" && document.getElementById(non_pipeline_values[3][8]+'_val') != null) {
+		if (checkFieldsEmpty(non_pipeline_values[3][8]+'_val')) {
+			displayErrorModal('#errorModal', 'Change Parameters must not be empty in Common RNAs');
+			return true;
+		}
+	}
+	
+	//	Split
+	if (non_pipeline[4] == "yes" && (checkFieldsEmpty(non_pipeline_values[4][0]+'_val') || checkFieldIsNotInt(non_pipeline_values[4][0]+'_val'))) {
+		displayErrorModal('#errorModal', 'Number of Reads per File must be of type int in Splitting');
+		return true;
+	}
+	
+	//	Pipeline checks
+	for(var x = 0; x < pipeline.length; x++){
+		var name = pipeline[x]
+		//	RSEM
+		if (name == 'RNASeqRSEM') {
+			//	extFactor is empty and selected
+			if (!checkFieldSelection('select_1_'+pipeline_index[x], 'yes') && (checkFieldsEmpty('textarea_2_'+pipeline_index[x]) || checkFieldIsNotInt('textarea_2_'+pipeline_index[x]))) {
+				displayErrorModal('#errorModal', 'extFactor field must be of type int within RNASeqRSEM');
+				return true;
+			}
+		//	Tophat
+		}else if (name == 'Tophat') {
+			//	extFactor is empty and selected
+			if (!checkFieldSelection('select_1_'+pipeline_index[x], 'yes') && (checkFieldsEmpty('textarea_2_'+pipeline_index[x]) || checkFieldIsNotInt('textarea_2_'+pipeline_index[x]))) {
+				displayErrorModal('#errorModal', 'extFactor field must be of type int within Tophat');
+				return true;
+			}
+		//	ChipSeq
+		}else if (name == 'ChipSeq') {
+			//	extFactor is empty and selected
+			if (!checkFieldSelection('select_3_'+pipeline_index[x], 'yes') && (checkFieldsEmpty('textarea_2_'+pipeline_index[x]) || checkFieldIsNotInt('textarea_2_'+pipeline_index[x]))) {
+				displayErrorModal('#errorModal', 'extFactor field must be of type int within ChipSeq');
+				return true;
+			//	Multimapper is empty
+			}else if (checkFieldIsNotInt('text_1_'+pipeline_index[x]) || checkFieldsEmpty('text_1_'+pipeline_index[x])) {
+				displayErrorModal('#errorModal', 'Multimapper field must contain an integer value within ChipSeq');
+				return true;
+			//	Tag size(bp) for MACS is non-int
+			}else if (checkFieldIsNotInt('text_2_'+pipeline_index[x]) || checkFieldsEmpty('text_2_'+pipeline_index[x])) {
+				displayErrorModal('#errorModal', 'Tag size(bp) for MACS field must contain an integer value within ChipSeq');
+				return true;
+			//	Band width(bp) for MACS is non-int
+			}else if (checkFieldIsNotInt('select_1_'+pipeline_index[x]) || checkFieldsEmpty('select_1_'+pipeline_index[x])) {
+				displayErrorModal('#errorModal', 'Band width(bp) for MACS field must contain an integer value within ChipSeq');
+				return true;
+			//	Effective genome size(bp) is non-int
+			}else if (checkFieldIsNotInt('select_2_'+pipeline_index[x]) || checkFieldsEmpty('select_2_'+pipeline_index[x])) {
+				displayErrorModal('#errorModal', 'Effective genome size(bp) field must contain an integer value within ChipSeq');
+				return true;
+			}
+		//	DESeq
+		}else if (name == 'DESeq') {
+			//	Name is empty
+			if (checkFieldsEmpty('text_1_'+pipeline_index[x])) {
+				displayErrorModal('#errorModal', 'Name field cannot be empty within DESeq');
+				return true;
+			//	Check Multiple Selection
+			}else if (checkFieldMultiSelectEmpty('multi_select_1_'+pipeline_index[x], 'multi_select_2_'+pipeline_index[x])) {
+				displayErrorModal('#errorModal', 'Conditions 1 and 2 cannot be empty within DESeq');
+				return true;
+			//	padj cutoff is empty or non-float
+			}else if (checkFieldIsNotFloat('text_2_'+pipeline_index[x]) || checkFieldsEmpty('text_2_'+pipeline_index[x])) {
+				displayErrorModal('#errorModal', 'pAdj cutoff is not of type float within DESeq');
+				return true;
+			//	Fold Change cutoff is empty or non-int
+			}else if (checkFieldIsNotInt('text_3_'+pipeline_index[x]) || checkFieldsEmpty('text_3_'+pipeline_index[x])) {
+				displayErrorModal('#errorModal', 'Fold Change cutoff is not of type int within DESeq');
+				return true;
+			}
+		//	BisulphiteMapping
+		}else if (name == 'BisulphiteMapping') {
+			//	Digestion Site is empty
+			if (checkFieldsEmpty('text_1_'+pipeline_index[x])) {
+				displayErrorModal('#errorModal', 'Digestion Site field cannot be empty within BisulphiteMapping');
+				return true;
+			//	extFactor is empty and selected
+			}else if (!checkFieldSelection('select_1_'+pipeline_index[x], 'yes') && (checkFieldsEmpty('textarea_2_'+pipeline_index[x]) || checkFieldIsNotInt('textarea_2_'+pipeline_index[x]))) {
+				displayErrorModal('#errorModal', 'extFactor field must be of type int within BisulphiteMapping');
+				return true;
+			//	MethylKit Tile Size
+			}else if (!checkFieldCheckboxChecked('checkbox_5_'+pipeline_index[x]) && (checkFieldIsNotInt('text_2_'+pipeline_index[x]) || checkFieldsEmpty('text_2_'+pipeline_index[x])) ) {
+				displayErrorModal('#errorModal', 'Tile Size field must be of type int for BisulphiteMapping');
+				return true;
+			//	MethylKit Step Size
+			}else if (!checkFieldCheckboxChecked('checkbox_5_'+pipeline_index[x]) && (checkFieldIsNotInt('text_3_'+pipeline_index[x]) || checkFieldsEmpty('text_3_'+pipeline_index[x]))) {
+				displayErrorModal('#errorModal', 'Step Size field must be of type int for BisulphiteMapping');
+				return true;
+			//	MethylKit Min Coverage
+			}else if (!checkFieldCheckboxChecked('checkbox_5_'+pipeline_index[x]) && (checkFieldIsNotInt('text_4_'+pipeline_index[x]) || checkFieldsEmpty('text_4_'+pipeline_index[x])) ) {
+				displayErrorModal('#errorModal', 'Min Coverage field must be of type int for BisulphiteMapping');
+				return true;
+			//	MethylKit Top N Regions
+			}else if (!checkFieldCheckboxChecked('checkbox_5_'+pipeline_index[x]) && (checkFieldIsNotInt('text_5_'+pipeline_index[x]) || checkFieldsEmpty('text_5_'+pipeline_index[x])) ) {
+				displayErrorModal('#errorModal', 'Top N Regions field must be of type int for BisulphiteMapping');
+				return true;
+			}
+		//	DiffMeth
+		}else if (name == 'DiffMeth') {
+			//	Name is empty
+			if (checkFieldsEmpty('text_1_'+pipeline_index[x])) {
+				displayErrorModal('#errorModal', 'Name field cannot be empty within DiffMeth');
+				return true;
+			//	Check Multiple Selection
+			}else if (checkFieldMultiSelectEmpty('multi_select_1_'+pipeline_index[x], 'multi_select_2_'+pipeline_index[x])) {
+				displayErrorModal('#errorModal', 'Conditions 1 and 2 cannot be empty within DiffMeth');
+				return true;
+			}
+		//	HaplotypeCaller
+		}else if (name == 'HaplotypeCaller') {
+			//	Min Calling Threshold Confidence
+			if (checkFieldIsNotInt('text_1_'+pipeline_index[x]) || checkFieldsEmpty('text_1_'+pipeline_index[x])) {
+				displayErrorModal('#errorModal', 'Min Calling Threshold Confidence field must be of type int for HaplotypeCaller');
+				return true;
+			//	Min Emitting Threshold Confidence
+			}else if (checkFieldIsNotInt('text_2_'+pipeline_index[x]) || checkFieldsEmpty('text_2_'+pipeline_index[x])) {
+				displayErrorModal('#errorModal', 'Min Emitting Threshold Confidence field must be of type int for HaplotypeCaller');
+				return true;
+			//	Min Base Quality Score
+			}else if (checkFieldIsNotInt('text_3_'+pipeline_index[x]) || checkFieldsEmpty('text_3_'+pipeline_index[x])) {
+				displayErrorModal('#errorModal', 'Min Base Quality Score field must be of type int for HaplotypeCaller');
+				return true;
+			//	Min Reads Per Alignment Start
+			}else if (checkFieldIsNotInt('text_4_'+pipeline_index[x]) || checkFieldsEmpty('text_4_'+pipeline_index[x])) {
+				displayErrorModal('#errorModal', 'Min Reads Per Alignment Start field must be of type int for HaplotypeCaller');
+				return true;
+			//	Max Reads In Region Per Sample
+			}else if (checkFieldIsNotInt('text_5_'+pipeline_index[x]) || checkFieldsEmpty('text_5_'+pipeline_index[x])) {
+				displayErrorModal('#errorModal', 'Max Reads In Region Per Sample field must be of type int for HaplotypeCaller');
+				return true;
+			}
+		}
+	}
+	alert();
+	return false;
 }
 
 //	END GROUPED FUNCTIONS
