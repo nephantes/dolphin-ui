@@ -19,8 +19,11 @@ function createElement(type, fields, options){
 				opt.disabled = true;
 				opt.selected = true;
 				element.appendChild(opt);
-		}else if(fields[x] == 'TEXTNODE'){
+		}else if (fields[x] == 'TEXTNODE'){
 			element.appendChild(document.createTextNode(options[x]));
+		}else if (fields[x] == 'type' && options[x] == 'button'){
+			element.setAttribute(fields[x], options[x]);
+			element.innerHTML = element.value;
 		}else{
 			element.setAttribute(fields[x], options[x]);
 		}
