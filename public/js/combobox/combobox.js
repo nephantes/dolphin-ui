@@ -137,14 +137,11 @@ ComboBox = function (object_name) {
 		
 	};
 	this.edit.onkeyup = function (e) {
-		console.log(e.keyCode);
 		e = e || window.event;	
 		if (e.keyCode == 13 && parobject.dropdownlist.style.display == 'none') {
-				console.log(parobject.dropdownlist.style.display);
 				submitChanges(this, e);
 		}else if (e.keyCode == 13) {
 			// enter
-			console.log(parobject.dropdownlist.style.display);
 			if (parobject.visiblecount != 0) {
 				var upv = parobject.currentitem.innerHTML;   
 				upv = upv .replace(/\<b\>/ig, '');

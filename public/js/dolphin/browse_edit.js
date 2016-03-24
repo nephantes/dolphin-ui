@@ -21,7 +21,7 @@ var fileDatabaseDict = ['ngs_dirs', 'ngs_temp_sample_files', 'ngs_temp_lane_file
 
 function editBox(uid, id, type, table, element){
 	var havePermission = 0;
-	
+	console.log([uid, id, type, table, element]);
 	$.ajax({ type: "GET",
 					url: BASE_PATH+"/public/ajax/browse_edit.php",
 					data: { p: 'checkPerms', id: id, uid: uid, table: table},
@@ -40,6 +40,8 @@ function editBox(uid, id, type, table, element){
 				document.getElementById('submit_file_changes').remove();
 				document.getElementById('cancel_file_changes').remove();
 			}
+		}else{
+			
 		}
 		element_highlighted = element;
 		element_highlighted_value = element.innerHTML;
@@ -49,11 +51,7 @@ function editBox(uid, id, type, table, element){
 		element_highlighted_table = table;
 		element_highlighted_onclick = element.onclick;
 		element.innerHTML = '';
-		
-		if (element_highlighted_value == element_highlighted.innerHTML) {
-			//code
-		}
-		
+
 		if (normalized.indexOf(type) > -1) {
 			
 			element.onclick = '';
@@ -113,16 +111,17 @@ function editBox(uid, id, type, table, element){
 				submitButton = createElement('input', ['id','class','onclick','value','type'],['submit_file_changes','btn btn-primary pull-right margin', 'submitChangesFiles()', 'Submit','button']);
 				cancelButton = createElement('input', ['id','class','onclick','value','type'],['cancel_file_changes','btn btn-default pull-right margin', 'cancelChangesFiles()', 'Cancel','button']);
 			}else{
-				textarea.setAttribute('onkeydown', 'submitChanges(this)');
+				textarea.setAttribute('onkeydown', 'submitChanges(this, event)');
 			}
 			element.appendChild(textarea);
 			if (submitButton != undefined) {
 				element.parentNode.parentNode.parentNode.appendChild(cancelButton);
 				element.parentNode.parentNode.parentNode.appendChild(submitButton);
 			}
+			console.log(element_highlighted_value);
 			textarea.innerHTML = element_highlighted_value;
-			element.removeAttribute('onclick');
-			element_highlighted.removeAttribute('onclick');
+			element.onclick = '';
+			element_highlighted.onclick = '';
 		}
 	}
 }
@@ -169,8 +168,12 @@ function submitChanges(ele, event = event) {
 		if (successBool) {
 			element_highlighted.innerHTML = ele.value;
 			element_highlighted.onclick = element_highlighted_onclick;
-			document.getElementById('submit_file_changes').remove();
-			document.getElementById('cancel_file_changes').remove();
+			if (document.getElementById('submit_file_changes') != undefined) {
+				document.getElementById('submit_file_changes').remove();
+			}
+			if (document.getElementById('cancel_file_changes') != undefined) {
+				document.getElementById('cancel_file_changes').remove();
+			}
 			clearElementHighlighted();
 		}
     }else if(event.keyCode == 27) {
