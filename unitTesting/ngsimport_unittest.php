@@ -103,7 +103,8 @@ class ngsimport_unittest extends PHPUnit_Framework_TestCase
 		$gid = 1;
 		$uid = 1;
 		$inputFileType = 'Excel5';
-		$inputFileName = 'public/downloads/example_template_multi_dirs.xls';
+		chdir('public');
+		$inputFileName = 'downloads/example_template_multi_dirs.xls';
 		$worksheetData = $this->worksheetTestGenerator();
 		$objReader = PHPExcel_IOFactory::createReader($inputFileType);
 		$objPHPExcel = $objReader->load($inputFileName);
@@ -124,6 +125,7 @@ class ngsimport_unittest extends PHPUnit_Framework_TestCase
 			$out_string = $ngsimport->finalizeExcel($worksheet, $sheetData);
 			$this->assertEquals(strpos($out_string, "color='red'"), false);
 		}
+		chdir('../');
 		ob_end_clean();
 	}
 	
