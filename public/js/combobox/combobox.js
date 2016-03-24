@@ -132,14 +132,14 @@ ComboBox = function (object_name) {
 			}
 			return false;
 		}else if (e.keyCode == 27) {
-			submitChanges(this);
+			submitChanges(this, e);
 		}
 		
 	};
 	this.edit.onkeyup = function (e) {
 		e = e || window.event;	
 		if (e.keyCode == 13 && parobject.dropdownlist.style.display == 'none') {
-				submitChanges(this);
+				submitChanges(this, e);
 		}else if (e.keyCode == 13) {
 			// enter
 			if (parobject.visiblecount != 0) {
