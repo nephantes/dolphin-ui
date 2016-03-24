@@ -165,7 +165,7 @@ class Ngsimport extends VanillaModel {
 				}
 				$conds = explode(",", $sample->condition_symbol);
 				foreach($conds as $c){
-					$samplename.= strtoupper(substr($c, 0, 1)) . strtolower(substr($c, 1, strlen($c)));
+					$samplename.= strtoupper(substr(trim($c), 0, 1)) . strtolower(substr(trim($c), 1, strlen($c)));
 				}
 				if($underscore_mark){
 					$underscore_mark = false;
@@ -417,18 +417,29 @@ class Ngsimport extends VanillaModel {
 	* @return string
 	*/
 	function checkFilePermissions($clustername){
-		$request = API_PATH.'/api/service.php?func=checkFile&username='.$clustername.'&file=';
+		chdir(getcwd().'/api');
+		require_once('funcs.php');
+		chdir('../');
+		$funcs = new funcs();
+		$request = "";
 		foreach($this->file_name_arr as $fna){
-			$request .= $fna . ',';
+			if(end($this->file_name_arr) == $fna){
+					$request .= $fna;
+			}else{
+					$request .= $fna . ',';
+			}
 		}
-		$valid_fastq = json_decode('['.json_decode(file_get_contents($request)).']');
+		$params['username'] = $clustername;
+		$params['file'] = $request;
+		$result = $funcs->checkFile($params);
+		$valid_fastq = json_decode('['.$result.']');
 		if(isset($valid_fastq[0]->ERROR)){
 			$this->final_check = false;
 			$error_array = explode("ls: ",$valid_fastq[0]->ERROR);
 			return implode("<br>", array_splice($error_array, 1));
 		}
 		return 'pass';
-	}
+        }
 	
 	function getMeta() {
 		$meta_check = true;
@@ -929,8 +940,8 @@ class Ngsimport extends VanillaModel {
 			if(!isset($samp->condition_symbol)){
 				$samp->condition_symbol = NULL;
 			}else{
-				if(!$this->checkAlphaNumWithAddChars('\s\_\-\,', $samp->condition_symbol) && $samp->condition_symbol != NULL){
-					$text.= $this->errorText("Condition symbol does not contain proper characters, please use alpha-numeric characters and underscores (row " . $i . ")");
+				if(!$this->checkAlphaNumWithAddChars('\_\-\,', $samp->condition_symbol) && $samp->condition_symbol != NULL){
+					$text.= $this->errorText("Condition symbol does not contain proper characters, please use alpha-numeric characters and underscores/dashes and separate multiple conditions with , (row " . $i . ")");
 					$this->final_check = false;
 					$samp_check = false;
 				}
@@ -941,7 +952,7 @@ class Ngsimport extends VanillaModel {
 				$samp->condition = NULL;
 			}else{
 				if(!$this->checkAlphaNumWithAddChars('\s\_\-\,', $samp->condition) && $samp->condition != NULL){
-					$text.= $this->errorText("Condition does not contain proper characters, please use alpha-numeric characters and underscores and separate multiple conditions with , (row " . $i . ")");
+					$text.= $this->errorText("Condition does not contain proper characters, please use alpha-numeric characters and underscores/dashes and separate multiple conditions with , (row " . $i . ")");
 					$this->final_check = false;
 					$samp_check = false;
 				}
