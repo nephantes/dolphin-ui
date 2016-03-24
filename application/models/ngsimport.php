@@ -421,7 +421,6 @@ class Ngsimport extends VanillaModel {
 		require_once('funcs.php');
 		chdir('../');
 		$funcs = new funcs();
-		$url = API_PATH.'/api/service.php?func=checkFile&username='.$clustername.'&file=';
 		$request = "";
 		foreach($this->file_name_arr as $fna){
 			if(end($this->file_name_arr) == $fna){
