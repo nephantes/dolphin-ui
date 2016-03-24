@@ -234,7 +234,7 @@ function pipelineSelectCheck(num, type){
 	return false;
 }
 
-function pipelineSubmitCheck(non_pipeline, non_pipeline_values, pipeline, pipeline_index){
+function pipelineSubmitCheck(non_pipeline, non_pipeline_values, pipeline, pipeline_index, chipseq, chipseq_values){
 	//	Non-pipeline checks empty
 	var non_pipeline_dictionary = ['adapters', 'quality', 'trim', 'rna', 'split'];
 	//	Run name
@@ -343,6 +343,23 @@ function pipelineSubmitCheck(non_pipeline, non_pipeline_values, pipeline, pipeli
 			}
 		//	ChipSeq
 		}else if (name == 'ChipSeq') {
+			//	Chip Inputs
+			for(var y = 0; y < chipseq.length; y++){
+				//	name
+				if (checkFieldsEmpty('text_chip_'+pipeline_index[x]+'_'+chipseq[y])) {
+					displayErrorModal('#errorModal', 'Chip Input is missing a name within ChipSeq');
+					return true;
+				//	correct characters
+				}else if (checkFieldAlphaNumericAdditionalChars('text_chip_'+pipeline_index[x]+'_'+chipseq[y], '\\_')) {
+					displayErrorModal('#errorModal', 'Name must contain alphanumeric or underscore characters only within ChipSeq');
+					return true;
+				//	multiselect
+				}else if (checkFieldMultiSelectEmpty('multi_chip_1_'+pipeline_index[x]+'_'+chipseq[y], 'multi_chip_2_'+pipeline_index[x]+'_'+chipseq[y])) {
+					displayErrorModal('#errorModal', 'Samples and Input cannot be empty within ChipSeq');
+					return true;
+				}
+			}
+			
 			//	extFactor is empty and selected
 			if (!checkFieldSelection('select_3_'+pipeline_index[x], 'yes') && (checkFieldsEmpty('textarea_2_'+pipeline_index[x]) || checkFieldIsNotInt('textarea_2_'+pipeline_index[x]))) {
 				displayErrorModal('#errorModal', 'extFactor field must be of type int within ChipSeq');

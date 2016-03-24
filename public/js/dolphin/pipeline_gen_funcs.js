@@ -27,6 +27,9 @@ var currentPipelineVal =[];
 var deseqList = ['RSEM'];
 var valid_samples;
 var username;
+var currentChipCount = 0;
+var currentChipInputID = [];
+var currentChipInputVal = [];
 
 /*##### FILL A RERUN PIPELINE WITH PREVIOUS SELECTIONS #####*/
 function rerunLoad() {
@@ -213,7 +216,34 @@ function rerunLoad() {
 								additionalPipes();
 								document.getElementById('select_'+i).value = pipelineDict[2];
 								pipelineSelect(i);
-								document.getElementById('textarea_'+i).value = splt1[i].ChipInput.replace(/__cr____cn__/g, "\n");
+								//Chip Input
+								var chip = splt1[i].ChipInput
+								for(var z = 0; z < chip.length; z++){
+									addChipSeqInput(i);
+									document.getElementById('text_chip_'+i+'_'+z).value = chip[z].name;
+									//handle for multiple selections
+									var chip_samples = [];
+									if (chip[z].samples != undefined) {
+										chip_samples = chip[z].samples.split(",");
+									}
+									var chip_input = [];
+									if (chip[z].samples != undefined) {
+										chip_input = chip[z].input.split(",");
+									}
+									var selected_chip_samples = document.getElementById('multi_chip_1_'+i+'_'+z);
+									for(var h = 0; h < selected_chip_samples.options.length; h++){
+										if (chip_samples.indexOf(selected_chip_samples.options[h].value) != -1) {
+											selected_chip_samples.options[h].selected = true;
+										}
+									}
+									var selected_chip_inputs = document.getElementById('multi_chip_2_'+i+'_'+z);
+									for(var h = 0; h < selected_chip_inputs.options.length; h++){
+										if (chip_input.indexOf(selected_chip_inputs.options[h].value) != -1) {
+											selected_chip_inputs.options[h].selected = true;
+										}
+									}
+									selectChipCondition(1, i, z);
+								}
 								document.getElementById('text_1_'+i).value = splt1[i].MultiMapper;
 								document.getElementById('text_2_'+i).value = splt1[i].TagSize;
 								document.getElementById('select_1_'+i).value = splt1[i].BandWith;
@@ -476,8 +506,10 @@ function pipelineSelect(num){
 			
 		}else if (pipeType == pipelineDict[2]) {
 			//ChipSeq Pipeline
-			divAdj.appendChild( createElement('label', ['class','TEXTNODE'], ['box-title', 'Chip Input Definitions:']));
-			divAdj.appendChild( createElement('textarea', ['id', 'class'], ['textarea_'+num, 'form-control']));
+			divAdj = mergeTidy(divAdj, 12,
+					[ [createElement('label', ['class','TEXTNODE'], ['box-title', 'Chip Input Definitions:'])],
+					[createElement('div', ['id', 'class'], ['div_chip_'+num, ''])],
+					[createElement('button', ['id', 'value', 'type', 'class', 'onclick'], ['div_add_'+num, 'Add Chip Input', 'button', 'btn btn-primary', 'addChipSeqInput('+num+')'])] ]);
 			divAdj = mergeTidy(divAdj, 6,
 					[ [createElement('label', ['class','TEXTNODE'], ['box-title', 'Multimapper:']),
 					createElement('input', ['id', 'class', 'type', 'value'], ['text_1_'+num, 'form-control', 'text', '1'])],
@@ -680,7 +712,7 @@ function submitPipeline(type) {
 	var non_pipeline = [doAdapter, doQuality, doTrimming, doRNA, doSplit];
 	var non_pipeline_values = [adapterValType, qualityValType, trimValType, rnaList, splitValType];
 	
-	if (!pipelineSubmitCheck(non_pipeline, non_pipeline_values, currentPipelineVal, currentPipelineID)) {
+	if (!pipelineSubmitCheck(non_pipeline, non_pipeline_values, currentPipelineVal, currentPipelineID, currentChipInputID, currentChipInputVal)) {
 		//	get Username
 		$.ajax({
 			type: 	'GET',
@@ -1718,6 +1750,10 @@ function findPipelineValues(){
 		var masterDiv = document.getElementById('select_child_'+currentPipelineID[y]).getElementsByTagName('*');
 		var conditions_array = [];
 		var conditions_type_array = [];
+		var chip_counter = 0;
+		var chip_name = "";
+		var chip_array_samples = [];
+		var chip_array_inputs = [];
 		var multireset = false;
 		for (var x = 0; x < masterDiv.length; x++) {
 			if (multireset == true) {
@@ -1726,8 +1762,36 @@ function findPipelineValues(){
 				multireset = false;
 			}
 			var e = masterDiv[x];
-			if (e.type != undefined) {
-				if (e.type == "select-multiple") {
+			if (e.type != undefined && e.type != "button") {
+				if (e.id.match('chip')) {
+					if (e.type == "select-multiple") {
+						if (chip_array_samples.length == 0) {
+							var chip_array_samples = getMultipleSelectionBox(e);
+						}else{
+							var chip_array_inputs = getMultipleSelectionBox(e);
+							if (chip_array_samples.length > 0) {
+								var input_array = {};
+								input_array["name"] = chip_name.toString();
+								input_array["samples"] = chip_array_samples.toString();
+								input_array["input"] = chip_array_inputs.toString();
+								if (JSON_OBJECT[USED_DICT[dict_counter]] == undefined) {
+									JSON_OBJECT[USED_DICT[dict_counter]] = [];
+								}
+								JSON_OBJECT[USED_DICT[dict_counter]].push(input_array);
+								chip_name = "";
+								chip_array_samples = [];
+								chip_array_inputs = [];
+								chip_counter++;
+								if (chip_counter == currentChipInputID.length) {
+									dict_counter++;
+								}
+							}
+						}
+					}else{
+						chip_name = e.value.replace(/\r\n|\r|\n/g, "__cr____cn__");
+					}
+					dict_counter--;
+				}else if (e.type == "select-multiple") {
 					if (conditions_array.length == 0) {
 						var current_cond = getMultipleSelectionBox(e);
 						for(z in current_cond){
@@ -2022,3 +2086,135 @@ function tophatCustomOptions(num){
 	}
 }
 
+function addChipSeqInput(id){
+	var master_div = document.getElementById('div_chip_'+id);
+	var div = createElement('div', ['id', 'class'], ['div_chip_child_'+currentChipCount, 'col-md-12 margin']);
+	div = mergeTidy(div, 4,
+			[ [createElement('label', ['class','TEXTNODE'], ['box-title', 'Name']),
+			createElement('input', ['id', 'class', 'type', 'value'], ['text_chip_'+id+'_'+currentChipCount, 'form-control', 'text', ''])],
+			[createElement('label', ['class','TEXTNODE'], ['box-title', 'Samples:']),
+			createElement('select',['id', 'class', 'type', 'multiple', 'size', 'onchange'],['multi_chip_1_'+id+'_'+currentChipCount, 'form-control', 'select-multiple', 'multiple', '4', 'selectChipCondition(1, '+id+', '+currentChipCount+')'])],
+			[createElement('label', ['class','TEXTNODE'], ['box-title', 'Inputs:']),
+			createElement('select',['id', 'class', 'type', 'multiple', 'size', 'onchange'],['multi_chip_2_'+id+'_'+currentChipCount, 'form-control', 'select-multiple', 'multiple', '4', ''])] ]);
+	div.appendChild(createElement('button', ['id', 'value', 'type', 'class', 'onclick'], ['div_rmv_'+currentChipCount, 'Remove Input', 'button', 'btn btn-primary pull-right margin', 'removeChipSeqInput('+id+', '+currentChipCount+')']));
+	master_div.appendChild(div);
+	
+	//CHIP MULTI_SELECT
+	if (document.getElementById('multi_chip_1_'+id+'_'+currentChipCount) != null) {
+		var sample_names = getSampleNames(window.location.href.split('/')[window.location.href.split('/').length - 1].replace('$', ''));
+		var adj_sample_names = sample_names;
+		for(var x = 0; x < currentChipInputID.length; x++){
+			if (currentChipInputVal[currentChipInputID.indexOf(currentChipInputID[x])] != undefined) {
+				var adj_sample_names = adj_sample_names.filter( function (sample) { return currentChipInputVal[currentChipInputID.indexOf(currentChipInputID[x])].indexOf( sample ) < 0; } );
+			}
+		}
+		
+		for(var x = 0; x < sample_names.length; x++){
+			if (adj_sample_names.indexOf(sample_names[x]) > -1) {
+				document.getElementById('multi_chip_1_'+id+'_'+currentChipCount).appendChild(createElement('option', ['id', 'value'], [id+'_'+currentChipCount+'_1_'+sample_names[x], sample_names[x]]));
+				document.getElementById(id+'_'+currentChipCount+'_1_'+sample_names[x]).innerHTML = sample_names[x]
+			}else{
+				document.getElementById('multi_chip_1_'+id+'_'+currentChipCount).appendChild(createElement('option', ['id', 'value', 'style', 'disabled'], [id+'_'+currentChipCount+'_1_'+sample_names[x], sample_names[x], 'opacity: 0.4', 'true']));
+				document.getElementById(id+'_'+currentChipCount+'_1_'+sample_names[x]).innerHTML = sample_names[x]
+			}
+			
+			document.getElementById('multi_chip_2_'+id+'_'+currentChipCount).appendChild(createElement('option', ['id', 'value'], [id+'_'+currentChipCount+'_2_'+sample_names[x], sample_names[x]]));
+			document.getElementById(id+'_'+currentChipCount+'_2_'+sample_names[x]).innerHTML = sample_names[x]
+		}
+		
+	}
+	
+	if (adj_sample_names.length == 0){
+		removeChipSeqInput(id, currentChipCount);
+		$('#errorModal').modal({
+			show: true
+		});
+		document.getElementById('errorLabel').innerHTML ='No availible samples to use for a new chip input';
+		document.getElementById('errorAreas').innerHTML = '';
+	}else if(!chipSampleErrorCheck(currentChipCount)){
+		currentChipInputID.push(currentChipCount);
+		currentChipCount++;
+		currentChipInputVal.push([]);
+	}else{
+		removeChipSeqInput(id, currentChipCount);
+		$('#errorModal').modal({
+			show: true
+		});
+		document.getElementById('errorLabel').innerHTML ='You must first fill out your previous input before adding a new input';
+		document.getElementById('errorAreas').innerHTML = '';
+	}
+}
+
+function chipSampleErrorCheck(chip_id){
+	//Check previous seleciton
+	var check = false;
+	var check_array = [];
+	if (currentChipInputVal[currentChipInputVal.length - 1] != undefined) {
+		if (currentChipInputVal[currentChipInputVal.length - 1].length == 0) {
+			check = true;
+		}
+	}
+	return check;
+}
+
+function removeChipSeqInput(pipeNum, chip_id) {
+	var index = currentChipInputID.indexOf(chip_id);
+	if (currentChipInputID[index] != undefined) {
+		var removed_array = currentChipInputVal[index];
+		console.log(removed_array);
+		for(var y = 0; y < currentChipInputID.length; y++){
+			if (currentChipInputID[y] != chip_id) {
+				var options = document.getElementById('multi_chip_1_'+pipeNum+'_'+currentChipInputID[y]).options;
+				for (var z = 0; z < options.length; z++) {
+					if (removed_array.indexOf(options[z].value) > -1) {
+						options[z].style = 'opacity: 1.0';
+						options[z].disabled = false;
+					}
+				}
+			}
+		}
+		currentChipInputID.splice(index, 1);
+	}
+	if (currentChipInputVal[index] != undefined) {
+		currentChipInputVal.splice(index, 1);
+	}
+	var div = document.getElementById('div_chip_child_' + chip_id);
+	div.parentNode.removeChild(div);
+}
+
+function selectChipCondition(condition, pipeNum, chipNum){
+	var selection = document.getElementById('multi_chip_'+condition+'_'+pipeNum+'_'+chipNum);
+	var option_storage = [];
+	for (var x = 0; x < selection.options.length; x++) {
+		var opt = selection.options[x];
+		if (opt.selected) {
+			option_storage.push(opt.value);
+		}
+	}
+	if (currentChipInputVal[currentChipInputID.indexOf(chipNum)] == undefined) {
+		currentChipInputVal.push(option_storage);
+	}else{
+		currentChipInputVal[currentChipInputID.indexOf(chipNum)] = option_storage;
+	}
+	var selected_array = []
+	for(var y = 0; y < currentChipInputVal.length; y++){
+		for(var z = 0; z < currentChipInputVal[y].length; z++){
+			selected_array.push(currentChipInputVal[y][z]);
+		}
+	}
+	console.log(selected_array)
+	for(var y = 0; y < currentChipInputID.length; y++){
+		if (currentChipInputID[y] != chipNum) {
+			var options = document.getElementById('multi_chip_1_'+pipeNum+'_'+currentChipInputID[y]).options;
+			for (var z = 0; z < options.length; z++) {
+				if (selected_array.indexOf(options[z].value) > -1 && options[z].selected == false) {
+					options[z].style = 'opacity: 0.4';
+					options[z].disabled = true;
+				}else{
+					options[z].style = 'opacity: 1.0';
+					options[z].disabled = false;
+				}
+			}
+		}
+	}
+}
