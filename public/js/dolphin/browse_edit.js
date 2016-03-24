@@ -98,7 +98,7 @@ function editBox(uid, id, type, table, element){
 			masterDiv.appendChild(button);
 			masterDiv.appendChild(div);
 			var no = new ComboBox('cb_identifier');
-			
+			console.log('test');
 		}else{
 			var submitButton;
 			var cancelButton;
@@ -128,17 +128,20 @@ function editBox(uid, id, type, table, element){
 }
 
 function cancelChangesFiles(){
-	submitChanges('details_cancel');
+	submitChanges('details_cancel', 27);
 }
 
 function submitChangesFiles(){
 	$('#fileModal').modal({
 		show: true
 	});
-	document.getElementById('confirmFileButton').setAttribute('onclick', 'submitChanges("dir_element")');
+	document.getElementById('confirmFileButton').setAttribute('onclick', 'submitChanges("dir_element", 13)');
 }
 
-function submitChanges(ele) {
+function submitChanges(ele, event = event) {
+	console.log(ele);
+	console.log(ele.value);
+	console.log(event.keyCode);
 	var successBool = false;
     if (ele == 'details_cancel') {
 		element_highlighted.innerHTML = element_highlighted_value;
@@ -146,7 +149,8 @@ function submitChanges(ele) {
 		document.getElementById('submit_file_changes').remove();
 		document.getElementById('cancel_file_changes').remove();
 		clearElementHighlighted();
-	}else if(event.keyCode == 13 && ele.value != '' && ele.value != null || ele == 'dir_element') {
+	}else if((event.keyCode == 13 && ele.value != '' && ele.value != null) || ele == 'dir_element') {
+		console.log('test');
 		if (ele == "dir_element") {
 			ele = document.getElementById('inputTextBox');
 			console.log(ele.value);
