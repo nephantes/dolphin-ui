@@ -349,6 +349,10 @@ function pipelineSubmitCheck(non_pipeline, non_pipeline_values, pipeline, pipeli
 				if (checkFieldsEmpty('text_chip_'+pipeline_index[x]+'_'+chipseq[y])) {
 					displayErrorModal('#errorModal', 'Chip Input is missing a name within ChipSeq');
 					return true;
+				//	correct characters
+				}else if (checkFieldAlphaNumericAdditionalChars('text_chip_'+pipeline_index[x]+'_'+chipseq[y], '\\_')) {
+					displayErrorModal('#errorModal', 'Name must contain alphanumeric or underscore characters only within ChipSeq');
+					return true;
 				//	multiselect
 				}else if (checkFieldMultiSelectEmpty('multi_chip_1_'+pipeline_index[x]+'_'+chipseq[y], 'multi_chip_2_'+pipeline_index[x]+'_'+chipseq[y])) {
 					displayErrorModal('#errorModal', 'Samples and Input cannot be empty within ChipSeq');
