@@ -5,6 +5,7 @@ var page_mark_services = 0;
 var page_mark_jobs = 0;
 var selected_service;
 var service_id;
+var clusteruser;
 
 $(function() {
 	"use strict";
@@ -32,6 +33,16 @@ $(function() {
 	if (gids == '') {
 		gids = -1;
 	}
+	
+	$.ajax({ type: "GET",
+		url: BASE_PATH+"/public/ajax/ngs_stat_funcs.php",
+		data: { p: "getClusterUser" },
+		async: false,
+		success : function(s)
+		{
+			clusteruser = s;
+		}
+	});
 	
 	/*##### STATUS TABLE #####*/
 	if (segment == 'status') {

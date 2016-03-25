@@ -113,8 +113,9 @@ class funcs
         }
         return "{\"Result\":\"Ok\"}";
     }
-    function removeSuccessFile($run_id, $dir, $file)
+    function removeSuccessFile($run_id, $dir, $file, $clusteruser)
     {
+        $this->username=$clusteruser;
         $this->readINI();
         if($file != ""){
             $com = "rm -rf $dir/tmp/track/$file*";

@@ -19,6 +19,7 @@ if ($p == "resetService")
 	if (isset($_GET['wkey'])){$wkey = $_GET['wkey'];}
 	if (isset($_GET['name'])){$name = $_GET['name'];}
 	if (isset($_GET['type'])){$type = $_GET['type'];}
+	if (isset($_GET['clusteruser'])){$clusteruser = $_GET['clusteruser'];}
 
 	$data = $type;
 	if($type == 'hard'){
@@ -27,7 +28,7 @@ if ($p == "resetService")
 		FROM ngs_runparams
 		WHERE id = $run_id
 		");
-		$data = json_encode($funcs->removeSuccessFile($run_id, $outdir, $name));
+		$data = json_encode($funcs->removeSuccessFile($run_id, $outdir, $name, $clusteruser));
 	}
 	$query->runSQL("
 	DELETE FROM jobs
@@ -52,6 +53,7 @@ else if ($p == 'resetJob')
 	if (isset($_GET['wkey'])){$wkey = $_GET['wkey'];}
 	if (isset($_GET['name'])){$name = $_GET['name'];}
 	if (isset($_GET['type'])){$type = $_GET['type'];}
+	if (isset($_GET['clusteruser'])){$clusteruser = $_GET['clusteruser'];}
 	
 	$data = $type;
 	if($type == 'hard'){
@@ -60,12 +62,20 @@ else if ($p == 'resetJob')
 		FROM ngs_runparams
 		WHERE id = $run_id
 		");
-		$data = json_encode($funcs->removeSuccessFile($wkey, $outdir, $name));
+		$data = json_encode($funcs->removeSuccessFile($wkey, $outdir, $name, $clusteruser));
 	}
 	$query->runSQL("
 	DELETE FROM jobs
 	WHERE wkey = '$wkey'
 	AND jobname = '$name'
+	");
+}
+else if ($p == 'getClusterUser')
+{
+	$data=$query->queryAVal("
+	SELECT clusteruser
+	FROM users
+	WHERE id = '".$_SESSION['uid']."'
 	");
 }
 if (!headers_sent()) {

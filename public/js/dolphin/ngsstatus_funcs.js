@@ -334,7 +334,7 @@ function resetType(run_id, s_id, wkey, name, table_str, button){
 function resetService(run_id, s_id, wkey, name, type, table_str, button){
 	$.ajax({ type: "GET",
 		url: BASE_PATH+"/public/ajax/ngs_stat_funcs.php",
-		data: { p: 'resetService', run_id: run_id, wkey: wkey, s_id: s_id, name: name, type: type },
+		data: { p: 'resetService', run_id: run_id, wkey: wkey, s_id: s_id, name: name, type: type, clusteruser: clusteruser },
 		async: false,
 		success : function(s)
 		{
@@ -350,7 +350,7 @@ function resetService(run_id, s_id, wkey, name, type, table_str, button){
 function resetJob(run_id, s_id, wkey, name, type, table_str, button){
 	$.ajax({ type: "GET",
 		url: BASE_PATH+"/public/ajax/ngs_stat_funcs.php",
-		data: { p: 'resetJob', run_id: run_id, wkey: wkey, s_id: s_id, name: name, type: type },
+		data: { p: 'resetJob', run_id: run_id, wkey: wkey, s_id: s_id, name: name, type: type, clusteruser: clusteruser },
 		async: false,
 		success : function(s)
 		{
