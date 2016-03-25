@@ -61,7 +61,24 @@ class funcs
         } 
         return $com;
     }
-
+    function sendLog($retval, $logname, $logtype){
+        $result = "";
+        $mkdir = $this->syscall($this->getCMDs("mkdir ".ERROR_LOG_DIRECTORY));
+        if (preg_match('/cannot create directory/', $mkdir)) {
+            $file = ERROR_LOG_DIRECTORY . "/" . $_SESSION['user'] . "_" . $logname . "_" . $logtype . ".log";
+        }else if($mkdir == ""){
+            $file = ERROR_LOG_DIRECTORY . "/" . $_SESSION['user'] . "_" . $logname . "_" . $logtype . ".log";
+        }else{
+            return $mkdir;
+        }
+        if ( $logging = fopen($file, "w")) {
+            fwrite($logging, $retval . PHP_EOL);
+            fclose($logging);
+            return 'pass';
+        } else {
+            return "ERROR 104: Cannot Log Error";
+        }
+    }
     function checkFile($params)
     {
         $this->username=$params['username'];
@@ -102,8 +119,8 @@ class funcs
         if($file != ""){
             $com = "rm -rf $dir/tmp/track/$file*";
             $removal = $this->syscall($this->getCMDs($com));
-            $retval = $this->syscall($this->getCMDs("ls $dir/tmp/track/$file*"));
-            return $retval;
+            $logging = $this->sendLog($removal, $file, "removeSuccessFile");
+            return $logging;
         }else{
             return "File given is an empty string";
         }
@@ -182,7 +199,6 @@ class funcs
         } else {
             return "ERROR 104: Cannot run $command!";
         }
-        
     }
     function sysback($command)
     {

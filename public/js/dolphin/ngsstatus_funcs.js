@@ -44,6 +44,7 @@ function getWKey(run_id){
 }
 
 function selectService(id, title, wkey){
+	selected_service = title;
 	service_id = id.split('_')[0];
 	var runparams = $('#jsontable_jobs').dataTable();
 	$.ajax({ type: "GET",
@@ -55,8 +56,11 @@ function selectService(id, title, wkey){
 				var parsed = s;
 				var reset = "";
 				for(var i = 0; i < parsed.length; i++) {
-					if (title != parsed[i].title) {
+					console.log(parsed[i].title);
+					if (selected_service != parsed[i].title) {
 						reset = '<button id="'+parsed[i].num+'" class="btn btn-warning btn-xs pull-right" name="soft" title="Soft Reset"onclick="resetType('+run_id+', '+parsed[i].num+', \''+wkey+'\', \''+parsed[i].title+'\', \'jobs\', this)"><span class="fa fa-times"></span></button>'; 
+					}else{
+						reset = "";
 					}
 					runparams.fnAddData([
 						parsed[i].title,
@@ -310,13 +314,17 @@ function changeRunType(int_type){
 function resetType(run_id, s_id, wkey, name, table_str, button){
 	if (table_str == 'services') {
 		resetService(run_id, s_id, wkey, name, button.name, table_str, button);
-		document.getElementById(s_id+'_select').remove();
+		if (name == "soft") {
+			document.getElementById(s_id+'_select').remove();
+		}
 		button.name = 'hard';
 		button.title = 'Hard Reset';
 		button.setAttribute('class', 'btn btn-danger btn-xs pull-right');
 	}else if (table_str == 'jobs') {
 		resetJob(run_id, s_id, wkey, name, button.name, table_str, button);
-		document.getElementById(s_id+'_select').remove();
+		if (name == "soft") {
+			document.getElementById(s_id+'_select').remove();
+		}
 		button.name = 'hard';
 		button.title = 'Hard Reset';
 		button.setAttribute('class', 'btn btn-danger btn-xs pull-right');

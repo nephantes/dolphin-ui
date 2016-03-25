@@ -3,6 +3,7 @@ var wkey = '';
 var page_mark_runparams = 0;
 var page_mark_services = 0;
 var page_mark_jobs = 0;
+var selected_service;
 var service_id;
 
 $(function() {
@@ -295,7 +296,13 @@ $(function() {
 						 {
 							runjob.fnClearTable();
 							var parsed = s;
+							var reset = "";
 							for(var i = 0; i < parsed.length; i++) {
+								if (selected_service != parsed[i].title) {
+									reset = '<button id="'+parsed[i].num+'" class="btn btn-warning btn-xs pull-right" name="soft" title="Soft Reset"onclick="resetType('+run_id+', '+parsed[i].num+', \''+wkey+'\', \''+parsed[i].title+'\', \'jobs\', this)"><span class="fa fa-times"></span></button>'; 
+								}else{
+									reset = "";
+								}
 								runjob.fnAddData([
 									parsed[i].title,
 									parsed[i].duration,
@@ -304,7 +311,7 @@ $(function() {
 									parsed[i].submit,
 									parsed[i].start,
 									parsed[i].finish,
-									'<button id="'+parsed[i].num+'" class="btn btn-warning btn-xs pull-right" name="soft" title="Soft Reset" onclick="resetType('+parsed[i].num+', '+parsed[i].num+', \''+wkey+'\', \''+parsed[i].title+'\', \'jobs\', this)"><span class="fa fa-times"></span></button>' +
+									reset +
 									'<button id="'+parsed[i].num+'_select" class="btn btn-primary btn-xs pull-right" title="Select" onclick="selectJob(this.id)">&nbsp;<span class="fa fa-caret-down"></span>&nbsp;</button>'
 								]);
 							} // End For
