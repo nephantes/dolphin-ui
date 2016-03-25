@@ -61,17 +61,18 @@ class funcs
         } 
         return $com;
     }
-    function sendLog($clusteruser, $retval, $logname, $logtype){
+    function sendLog($description, $retval){
         $result = "";
-        $mkdir = $this->syscall($this->getCMDs("mkdir -p ".ERROR_LOG_DIRECTORY."/".$clusteruser));
+        $mkdir = $this->syscall($this->getCMDs("mkdir -p ../tmp/logs"));
         if (preg_match('/cannot create directory/', $mkdir)) {
-            $file = ERROR_LOG_DIRECTORY . "/" . $clusteruser."/".$clusteruser . "/" . $logname . "_run" . $logtype . ".log";
+            $file = "../tmp/logs/API.log";
         }else if($mkdir == ""){
-            $file = ERROR_LOG_DIRECTORY . "/" . $clusteruser."/".$clusteruser . "/" . $logname . "_run" . $logtype . ".log";
+            $file = "../tmp/logs/API.log";
         }else{
             return $mkdir;
         }
-        if ( $logging = fopen($file, "w")) {
+        if ( $logging = fopen($file, "a")) {
+            fwrite($logging, $description . PHP_EOL);
             fwrite($logging, $retval . PHP_EOL);
             fclose($logging);
             return 'pass';
@@ -120,7 +121,7 @@ class funcs
         if($file != ""){
             $com = "rm -rf $dir/tmp/track/$file*";
             $removal = $this->syscall($this->getCMDs($com));
-            $logging = $this->sendLog($clusteruser, $removal, $file, $run_id);
+            $logging = $this->sendLog($removal, $file . " removal, run " . $run_id . ": ");
             return $logging;
         }else{
             return "File given is an empty string";
