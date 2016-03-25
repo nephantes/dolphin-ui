@@ -73,6 +73,7 @@ class funcs
         }
         
         $logging = fopen($file, "a");
+        return $logging;
         if($logging != NULL){
             fwrite($logging, $description . PHP_EOL . $retval . PHP_EOL);
             fclose($logging);
