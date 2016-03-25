@@ -72,11 +72,11 @@ else if ($p == 'resetJob')
 }
 else if ($p == 'getClusterUser')
 {
-	$data=$query->queryAVal("
-	SELECT clusteuser
+	$data=json_encode($query->queryAVal("
+	SELECT clusteruser
 	FROM users
 	WHERE id = '".$_SESSION['uid']."'
-	");
+	"));
 }
 if (!headers_sent()) {
    header('Cache-Control: no-cache, must-revalidate');
