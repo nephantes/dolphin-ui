@@ -286,7 +286,7 @@ $(function() {
 			runparams.fnSort( [ [4,'asc'] ] );
 			$('#jsontable_services').DataTable().page(page_mark_services).draw(false);
 			
-			if (document.getElementById('service_jobs').style.display != "none") {
+			if (service_id != undefined) {
 				var runjob = $('#jsontable_jobs').dataTable();
 				$.ajax({ type: "GET",
 						 url: BASE_PATH +"/ajax/datajobs.php?id=" + service_id,
