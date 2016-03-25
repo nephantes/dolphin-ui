@@ -2090,13 +2090,9 @@ function addChipSeqInput(id){
 	var master_div = document.getElementById('div_chip_'+id);
 	var div = createElement('div', ['id', 'class'], ['div_chip_child_'+currentChipCount, 'col-md-12 margin']);
 	var sample_names = getSampleNames(window.location.href.split('/')[window.location.href.split('/').length - 1].replace('$', ''));
-	var intro_samplename = '';
-	if(currentChipInputID.length == 0){
-		intro_samplename = sample_names[0];
-	}
 	div = mergeTidy(div, 4,
 			[ [createElement('label', ['class','TEXTNODE'], ['box-title', 'Name']),
-			createElement('input', ['id', 'class', 'type', 'value'], ['text_chip_'+id+'_'+currentChipCount, 'form-control', 'text', intro_samplename])],
+			createElement('input', ['id', 'class', 'type', 'value'], ['text_chip_'+id+'_'+currentChipCount, 'form-control', 'text', ''])],
 			[createElement('label', ['class','TEXTNODE'], ['box-title', 'Samples:']),
 			createElement('select',['id', 'class', 'type', 'multiple', 'size', 'onchange'],['multi_chip_1_'+id+'_'+currentChipCount, 'form-control', 'select-multiple', 'multiple', '4', 'selectChipCondition(1, '+id+', '+currentChipCount+')'])],
 			[createElement('label', ['class','TEXTNODE'], ['box-title', 'Inputs:']),
@@ -2220,5 +2216,8 @@ function selectChipCondition(condition, pipeNum, chipNum){
 				}
 			}
 		}
+	}
+	if(document.getElementById('text_chip_'+pipeNum+'_'+chipNum).value == '' && option_storage.length != 0){
+		document.getElementById('text_chip_'+pipeNum+'_'+chipNum).value = option_storage[0]
 	}
 }
