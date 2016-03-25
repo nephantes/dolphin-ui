@@ -72,7 +72,8 @@ class funcs
             return $mkdir;
         }
         
-        if ( $logging = fopen($file, "a")) {
+        $logging = fopen($file, "a");
+        if($logging != NULL){
             fwrite($logging, $description . PHP_EOL . $retval . PHP_EOL);
             fclose($logging);
             return 'pass';
