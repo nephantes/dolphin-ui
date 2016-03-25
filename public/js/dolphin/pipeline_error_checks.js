@@ -156,7 +156,7 @@ function checkFieldMultiSelectEmpty(input1, input2){
 
 function checkChipMultiSelectEmpty(input){
 	var check = false;
-	if (document.getElementById(input1).value == "") {
+	if (document.getElementById(input).value == "") {
 		check = true;
 	}
 	return check;
