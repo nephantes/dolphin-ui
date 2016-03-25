@@ -61,13 +61,13 @@ class funcs
         } 
         return $com;
     }
-    function sendLog($description, $retval){
+    function sendLog($run_id, $description, $retval){
         $result = "";
-        $mkdir = $this->syscall($this->getCMDs("mkdir -p ../tmp/logs"));
+        $mkdir = $this->syscall($this->getCMDs("mkdir -p ../tmp/logs/run".$run_id));
         if (preg_match('/cannot create directory/', $mkdir)) {
-            $file = "../tmp/logs/API.log";
+            $file = "../tmp/logs/run".$run_id."API.log";
         }else if($mkdir == ""){
-            $file = "../tmp/logs/API.log";
+            $file = "../tmp/logs/run".$run_id."API.log";
         }else{
             return $mkdir;
         }
@@ -121,7 +121,7 @@ class funcs
         if($file != ""){
             $com = "rm -rf $dir/tmp/track/$file*";
             $removal = $this->syscall($this->getCMDs($com));
-            $logging = $this->sendLog($removal, $file . " removal, run " . $run_id . ": ");
+            $logging = $this->sendLog($run_id, $removal, $file . " removal message: ");
             return $logging;
         }else{
             return "File given is an empty string";
