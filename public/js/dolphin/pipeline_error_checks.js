@@ -154,6 +154,14 @@ function checkFieldMultiSelectEmpty(input1, input2){
 	return check;
 }
 
+function checkChipMultiSelectEmpty(input){
+	var check = false;
+	if (document.getElementById(input).value == "") {
+		check = true;
+	}
+	return check;
+}
+
 //	END GENERIC FUNCTIONS
 //	************************************************************************
 //	START GROUPED FUNCTIONS
@@ -354,8 +362,8 @@ function pipelineSubmitCheck(non_pipeline, non_pipeline_values, pipeline, pipeli
 					displayErrorModal('#errorModal', 'Name must contain alphanumeric or underscore characters only within ChipSeq');
 					return true;
 				//	multiselect
-				}else if (checkFieldMultiSelectEmpty('multi_chip_1_'+pipeline_index[x]+'_'+chipseq[y], 'multi_chip_2_'+pipeline_index[x]+'_'+chipseq[y])) {
-					displayErrorModal('#errorModal', 'Samples and Input cannot be empty within ChipSeq');
+				}else if (checkChipMultiSelectEmpty('multi_chip_1_'+pipeline_index[x]+'_'+chipseq[y])) {
+					displayErrorModal('#errorModal', 'Samples cannot be empty within ChipSeq');
 					return true;
 				}
 			}
