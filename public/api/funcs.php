@@ -63,7 +63,6 @@ class funcs
     }
     function sendLog($run_id, $description, $retval){
         $result = "";
-        return getcwd();
         $mkdir = $this->syscall($this->getCMDs("mkdir -p ../tmp/logs/run".$run_id));
         if (preg_match('/cannot create directory/', $mkdir)) {
             $file = "../tmp/logs/run".$run_id."/API.log";
@@ -73,16 +72,8 @@ class funcs
             return $mkdir;
         }
         
-        $proc = popen("touch $file", "w");
-        $create_file .= fgets($proc, 1000);
-        pclose($proc);
-        if($create_file != ""){
-            return $create_file;
-        }
-        
         if ( $logging = fopen($file, "a")) {
-            fwrite($logging, $description . PHP_EOL);
-            fwrite($logging, $retval . PHP_EOL);
+            fwrite($logging, $description . PHP_EOL . $retval . PHP_EOL);
             fclose($logging);
             return 'pass';
         } else {
