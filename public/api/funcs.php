@@ -101,7 +101,9 @@ class funcs
         $this->readINI();
         if($file != ""){
             $com = "rm -rf $dir/tmp/track/$file*";
-            $retval = $this->syscall($this->getCMDs($com));
+            $removal = $this->syscall($this->getCMDs($com));
+            $retval = $this->syscall($this->getCMDs("ls $dir/tmp/track/$file*"));
+            return $retval;
         }else{
             return "File given is an empty string";
         }

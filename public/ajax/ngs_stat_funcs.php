@@ -20,15 +20,16 @@ if ($p == "resetService")
 	if (isset($_GET['name'])){$name = $_GET['name'];}
 	if (isset($_GET['type'])){$type = $_GET['type'];}
 
+	$data = $type;
 	if($type == 'hard'){
 		$outdir=$query->queryAVal("
 		SELECT outdir
 		FROM ngs_runparams
 		WHERE id = $run_id
 		");
-		$remove_out = $funcs->removeSuccessFile($wkey, $outdir, $name);
+		$data = json_encode($funcs->removeSuccessFile($wkey, $outdir, $name));
 	}
-	$data=$query->runSQL("
+	$query->runSQL("
 	DELETE FROM jobs
 	WHERE wkey = '$wkey'
 	AND service_id = (
@@ -38,7 +39,7 @@ if ($p == "resetService")
 		AND service_run_id = $s_id
 		)
 	");
-	$data=$query->runSQL("
+	$query->runSQL("
 	DELETE FROM service_run
 	WHERE wkey = '$wkey'
 	AND service_run_id = $s_id
@@ -52,15 +53,16 @@ else if ($p == 'resetJob')
 	if (isset($_GET['name'])){$name = $_GET['name'];}
 	if (isset($_GET['type'])){$type = $_GET['type'];}
 	
+	$data = $type;
 	if($type == 'hard'){
 		$outdir=$query->queryAVal("
 		SELECT outdir
 		FROM ngs_runparams
 		WHERE id = $run_id
 		");
-		$remove_out = $funcs->removeSuccessFile($wkey, $outdir, $name);
+		$data = json_encode($funcs->removeSuccessFile($wkey, $outdir, $name));
 	}
-	$data=$query->runSQL("
+	$query->runSQL("
 	DELETE FROM jobs
 	WHERE wkey = '$wkey'
 	AND jobname = '$name'
