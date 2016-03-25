@@ -61,13 +61,13 @@ class funcs
         } 
         return $com;
     }
-    function sendLog($retval, $logname, $logtype){
+    function sendLog($clusteruser, $retval, $logname, $logtype){
         $result = "";
-        $mkdir = $this->syscall($this->getCMDs("mkdir -p ".ERROR_LOG_DIRECTORY."/".$_SESSION['user']));
+        $mkdir = $this->syscall($this->getCMDs("mkdir -p ".ERROR_LOG_DIRECTORY."/".$clusteruser));
         if (preg_match('/cannot create directory/', $mkdir)) {
-            $file = ERROR_LOG_DIRECTORY . "/" . $_SESSION['user']."/".$_SESSION['user'] . "/" . $logname . "_run" . $logtype . ".log";
+            $file = ERROR_LOG_DIRECTORY . "/" . $clusteruser."/".$clusteruser . "/" . $logname . "_run" . $logtype . ".log";
         }else if($mkdir == ""){
-            $file = ERROR_LOG_DIRECTORY . "/" . $_SESSION['user']."/".$_SESSION['user'] . "/" . $logname . "_run" . $logtype . ".log";
+            $file = ERROR_LOG_DIRECTORY . "/" . $clusteruser."/".$clusteruser . "/" . $logname . "_run" . $logtype . ".log";
         }else{
             return $mkdir;
         }
@@ -120,7 +120,7 @@ class funcs
         if($file != ""){
             $com = "rm -rf $dir/tmp/track/$file*";
             $removal = $this->syscall($this->getCMDs($com));
-            $logging = $this->sendLog($removal, $file, $run_id);
+            $logging = $this->sendLog($clusteruser, $removal, $file, $run_id);
             return $logging;
         }else{
             return "File given is an empty string";

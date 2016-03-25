@@ -62,7 +62,7 @@ else if ($p == 'resetJob')
 		FROM ngs_runparams
 		WHERE id = $run_id
 		");
-		$data = json_encode($funcs->removeSuccessFile($wkey, $outdir, $name, $clusteruser));
+		$data = json_encode($funcs->removeSuccessFile($run_id, $outdir, $name, $clusteruser));
 	}
 	$query->runSQL("
 	DELETE FROM jobs
