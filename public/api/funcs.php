@@ -71,6 +71,14 @@ class funcs
         }else{
             return $mkdir;
         }
+        
+        $proc = popen("touch $file", "w");
+        $create_file .= fgets($proc, 1000);
+        pclose($proc);
+        if($create_file != ""){
+            return $create_file;
+        }
+        
         if ( $logging = fopen($file, "a")) {
             fwrite($logging, $description . PHP_EOL);
             fwrite($logging, $retval . PHP_EOL);
