@@ -27,7 +27,7 @@ if ($p == "resetService")
 		FROM ngs_runparams
 		WHERE id = $run_id
 		");
-		$data = json_encode($funcs->removeSuccessFile($wkey, $outdir, $name));
+		$data = json_encode($funcs->removeSuccessFile($run_id, $outdir, $name));
 	}
 	$query->runSQL("
 	DELETE FROM jobs

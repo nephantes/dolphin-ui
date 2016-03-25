@@ -63,11 +63,11 @@ class funcs
     }
     function sendLog($retval, $logname, $logtype){
         $result = "";
-        $mkdir = $this->syscall($this->getCMDs("mkdir ".ERROR_LOG_DIRECTORY));
+        $mkdir = $this->syscall($this->getCMDs("mkdir -p ".ERROR_LOG_DIRECTORY."/".$_SESSION['user']));
         if (preg_match('/cannot create directory/', $mkdir)) {
-            $file = ERROR_LOG_DIRECTORY . "/" . $_SESSION['user'] . "_" . $logname . "_" . $logtype . ".log";
+            $file = ERROR_LOG_DIRECTORY . "/" . $_SESSION['user']."/".$_SESSION['user'] . "/" . $logname . "_run" . $logtype . ".log";
         }else if($mkdir == ""){
-            $file = ERROR_LOG_DIRECTORY . "/" . $_SESSION['user'] . "_" . $logname . "_" . $logtype . ".log";
+            $file = ERROR_LOG_DIRECTORY . "/" . $_SESSION['user']."/".$_SESSION['user'] . "/" . $logname . "_run" . $logtype . ".log";
         }else{
             return $mkdir;
         }
@@ -113,13 +113,13 @@ class funcs
         }
         return "{\"Result\":\"Ok\"}";
     }
-    function removeSuccessFile($wkey, $dir, $file)
+    function removeSuccessFile($run_id, $dir, $file)
     {
         $this->readINI();
         if($file != ""){
             $com = "rm -rf $dir/tmp/track/$file*";
             $removal = $this->syscall($this->getCMDs($com));
-            $logging = $this->sendLog($removal, $file, "removeSuccessFile");
+            $logging = $this->sendLog($removal, $file, $run_id);
             return $logging;
         }else{
             return "File given is an empty string";
