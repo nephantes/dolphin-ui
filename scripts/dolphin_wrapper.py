@@ -334,6 +334,7 @@ class Dolphin:
     
              if (pipe['Type']=="ChipSeq"):
                chipinput=self.chip_parse_input(pipe['ChipInput'])
+               print(chipinput)
                bowtie_params=self.remove_space("-k_%s"%(str(pipe['MultiMapper'])))
                description="Chip_Mapping"
                filter_out="0"
@@ -607,15 +608,18 @@ class Dolphin:
         return content
 
     def chip_parse_input(self, content, ncols=8, base64=False, verbose=0):
-        new_content = ""
-        for input in content:
+      new_content = ""
+      try:
+          for input in content:
             new_content += input['name'] + '__tt__'
-            new_content += self.parse_content(input['samples']) + '__tt__'
-            if (input == content(-1)):
-                new_content += self.parse_content(input['input'])
-            else:
-                new_content += self.parse_content(input['input']) + ':'
-        return new_content
+            new_content += self.parse_content(input['samples']) 
+            if ('input' in input and input['input']!=""):
+                new_content += "__tt__"+self.parse_content(input['input']) 
+            if (input != content[-1]):
+                new_content += ":"
+      except Exception, ex:
+        self.stop_err('Error (line:%s)running orkflow\n%s'%(format(sys.exc_info()[-1].tb_lineno), str(ex)))
+      return new_content
 
     # error
     def stop_err(self, msg ):
