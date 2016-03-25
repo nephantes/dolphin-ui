@@ -63,11 +63,12 @@ class funcs
     }
     function sendLog($run_id, $description, $retval){
         $result = "";
+        return getcwd();
         $mkdir = $this->syscall($this->getCMDs("mkdir -p ../tmp/logs/run".$run_id));
         if (preg_match('/cannot create directory/', $mkdir)) {
-            $file = "../tmp/logs/run".$run_id."API.log";
+            $file = "../tmp/logs/run".$run_id."/API.log";
         }else if($mkdir == ""){
-            $file = "../tmp/logs/run".$run_id."API.log";
+            $file = "../tmp/logs/run".$run_id."/API.log";
         }else{
             return $mkdir;
         }
