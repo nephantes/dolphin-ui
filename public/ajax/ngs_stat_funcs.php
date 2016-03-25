@@ -73,7 +73,7 @@ else if ($p == 'resetJob')
 else if ($p == 'getClusterUser')
 {
 	$data=$query->queryAVal("
-	SELECT clusteruser
+	SELECT clusteuser
 	FROM users
 	WHERE id = '".$_SESSION['uid']."'
 	");
