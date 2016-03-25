@@ -93,6 +93,8 @@ class funcs
         $retval = $this->syscall($this->getCMDs($com));
         if (preg_match('/Permission denied/', $retval)) {
              return "{\"ERROR\": \"Permission denied: ".$params['outdir']."\"}";
+        }else if (preg_match('/cannot create directory/', $retval)) {
+             return "{\"ERROR\": \"Permission denied: ".$params['outdir']."\"}";
         }
         return "{\"Result\":\"Ok\"}";
     }
