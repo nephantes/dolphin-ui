@@ -77,6 +77,22 @@ function getSampleNames(samples_string){
     return sample_name_array
 }
 
+function getTrueSampleNames(samples_string) {
+    var sample_name_array = [];
+    $.ajax({ type: "GET",
+		url: BASE_PATH+"/public/ajax/ngsquerydb.php",
+		data: { p: "getSampleNames", samples: samples_string },
+		async: false,
+		success : function(s)
+		{
+			for(var i = 0; i < s.length; i++) {
+                sample_name_array.push(s[i].samplename);
+            }
+		}
+	});
+    return sample_name_array
+}
+
 function grabReload(groupID){
 	jsonArray = [];
 	$.ajax({ type: "GET",
