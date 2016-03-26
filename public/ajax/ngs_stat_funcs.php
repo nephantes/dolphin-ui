@@ -19,16 +19,18 @@ if ($p == "resetService")
 	if (isset($_GET['wkey'])){$wkey = $_GET['wkey'];}
 	if (isset($_GET['name'])){$name = $_GET['name'];}
 	if (isset($_GET['type'])){$type = $_GET['type'];}
+	if (isset($_GET['clusteruser'])){$clusteruser = $_GET['clusteruser'];}
 
+	$data = $type;
 	if($type == 'hard'){
 		$outdir=$query->queryAVal("
 		SELECT outdir
 		FROM ngs_runparams
 		WHERE id = $run_id
 		");
-		$remove_out = $funcs->removeSuccessFile($wkey, $outdir, $name);
+		$data = json_encode($funcs->removeSuccessFile($run_id, $outdir, $name, $clusteruser));
 	}
-	$data=$query->runSQL("
+	$query->runSQL("
 	DELETE FROM jobs
 	WHERE wkey = '$wkey'
 	AND service_id = (
@@ -38,7 +40,7 @@ if ($p == "resetService")
 		AND service_run_id = $s_id
 		)
 	");
-	$data=$query->runSQL("
+	$query->runSQL("
 	DELETE FROM service_run
 	WHERE wkey = '$wkey'
 	AND service_run_id = $s_id
@@ -51,20 +53,30 @@ else if ($p == 'resetJob')
 	if (isset($_GET['wkey'])){$wkey = $_GET['wkey'];}
 	if (isset($_GET['name'])){$name = $_GET['name'];}
 	if (isset($_GET['type'])){$type = $_GET['type'];}
+	if (isset($_GET['clusteruser'])){$clusteruser = $_GET['clusteruser'];}
 	
+	$data = $type;
 	if($type == 'hard'){
 		$outdir=$query->queryAVal("
 		SELECT outdir
 		FROM ngs_runparams
 		WHERE id = $run_id
 		");
-		$remove_out = $funcs->removeSuccessFile($wkey, $outdir, $name);
+		$data = json_encode($funcs->removeSuccessFile($run_id, $outdir, $name, $clusteruser));
 	}
-	$data=$query->runSQL("
+	$query->runSQL("
 	DELETE FROM jobs
 	WHERE wkey = '$wkey'
 	AND jobname = '$name'
 	");
+}
+else if ($p == 'getClusterUser')
+{
+	$data=json_encode($query->queryAVal("
+	SELECT clusteruser
+	FROM users
+	WHERE id = '".$_SESSION['uid']."'
+	"));
 }
 if (!headers_sent()) {
    header('Cache-Control: no-cache, must-revalidate');
