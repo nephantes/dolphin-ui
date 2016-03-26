@@ -3,7 +3,9 @@ var wkey = '';
 var page_mark_runparams = 0;
 var page_mark_services = 0;
 var page_mark_jobs = 0;
+var selected_service;
 var service_id;
+var clusteruser;
 
 $(function() {
 	"use strict";
@@ -31,6 +33,16 @@ $(function() {
 	if (gids == '') {
 		gids = -1;
 	}
+	
+	$.ajax({ type: "GET",
+		url: BASE_PATH+"/public/ajax/ngs_stat_funcs.php",
+		data: { p: "getClusterUser" },
+		async: false,
+		success : function(s)
+		{
+			clusteruser = s;
+		}
+	});
 	
 	/*##### STATUS TABLE #####*/
 	if (segment == 'status') {
@@ -154,9 +166,8 @@ $(function() {
 						'<div class="progress progress-xs"><div class="progress-bar progress-bar-'+bartype+'" style="width: '+parsed[i].percentComplete+'%"></div></div>',
 						parsed[i].start,
 						parsed[i].finish,
-						'<button id="'+parsed[i].num+'" class="btn btn-danger btn-xs pull-right" onclick="resetService('+run_id+', '+parsed[i].num+', \''+wkey+'\', \''+parsed[i].title+'\', \'hard\', \'services\', this)"><span class="fa fa-times"></span></button>' +
-						'<button id="'+parsed[i].num+'" class="btn btn-warning btn-xs pull-right" onclick="resetService('+run_id+', '+parsed[i].num+', \''+wkey+'\', \''+parsed[i].title+'\', \'soft\', \'services\', this)"><span class="fa fa-times"></span></button>' +
-						'<button id="'+parsed[i].num+'" class="btn btn-primary btn-xs pull-right" onclick="selectService(this.id, \''+wkey+'\')">&nbsp;<span class="fa fa-caret-down"></span>&nbsp;</button>'
+						'<button id="'+parsed[i].num+'" class="btn btn-warning btn-xs pull-right" name="soft" title="Soft Reset" onclick="resetType('+run_id+', '+parsed[i].num+', \''+wkey+'\', \''+parsed[i].title+'\', \'services\', this)"><span class="fa fa-times"></span></button>' +
+						'<button id="'+parsed[i].num+'_select" class="btn btn-primary btn-xs pull-right" title="Select" onclick="selectService(this.id, \''+parsed[i].title+'\', \''+wkey+'\')">&nbsp;<span class="fa fa-caret-down"></span>&nbsp;</button>'
 					]);
 				} // End For
 			}
@@ -278,9 +289,8 @@ $(function() {
 								'<div class="progress progress-xs"><div class="progress-bar progress-bar-'+bartype+'" style="width: '+parsed[i].percentComplete+'%"></div></div>',
 								parsed[i].start,
 								parsed[i].finish,
-								'<button id="'+parsed[i].num+'" class="btn btn-danger btn-xs pull-right" onclick="resetService('+run_id+', '+parsed[i].num+', \''+wkey+'\', \''+parsed[i].title+'\', \'hard\', \'services\', this)"><span class="fa fa-times"></span></button>' +
-								'<button id="'+parsed[i].num+'" class="btn btn-warning btn-xs pull-right" onclick="resetService('+run_id+', '+parsed[i].num+', \''+wkey+'\', \''+parsed[i].title+'\', \'soft\', \'services\', this)"><span class="fa fa-times"></span></button>' +
-								'<button id="'+parsed[i].num+'" class="btn btn-primary btn-xs pull-right" onclick="selectService(this.id, \''+wkey+'\')">&nbsp;<span class="fa fa-caret-down"></span>&nbsp;</button>'
+								'<button id="'+parsed[i].num+'" class="btn btn-warning btn-xs pull-right" name="soft" title="Soft Reset" onclick="resetType('+run_id+', '+parsed[i].num+', \''+wkey+'\', \''+parsed[i].title+'\', \'services\', this)"><span class="fa fa-times"></span></button>' +
+								'<button id="'+parsed[i].num+'_select" class="btn btn-primary btn-xs pull-right" title="Select" onclick="selectService(this.id, \''+parsed[i].title+'\', \''+wkey+'\')">&nbsp;<span class="fa fa-caret-down"></span>&nbsp;</button>'
 							]);
 						} // End For
 					}
@@ -288,7 +298,7 @@ $(function() {
 			runparams.fnSort( [ [4,'asc'] ] );
 			$('#jsontable_services').DataTable().page(page_mark_services).draw(false);
 			
-			if ($('jsontable_jobs') != undefined) {
+			if (service_id != undefined) {
 				var runjob = $('#jsontable_jobs').dataTable();
 				$.ajax({ type: "GET",
 						 url: BASE_PATH +"/ajax/datajobs.php?id=" + service_id,
@@ -297,7 +307,13 @@ $(function() {
 						 {
 							runjob.fnClearTable();
 							var parsed = s;
+							var reset = "";
 							for(var i = 0; i < parsed.length; i++) {
+								if (selected_service != parsed[i].title) {
+									reset = '<button id="'+parsed[i].num+'" class="btn btn-warning btn-xs pull-right" name="soft" title="Soft Reset"onclick="resetType('+run_id+', '+parsed[i].num+', \''+wkey+'\', \''+parsed[i].title+'\', \'jobs\', this)"><span class="fa fa-times"></span></button>'; 
+								}else{
+									reset = "";
+								}
 								runjob.fnAddData([
 									parsed[i].title,
 									parsed[i].duration,
@@ -306,9 +322,8 @@ $(function() {
 									parsed[i].submit,
 									parsed[i].start,
 									parsed[i].finish,
-									'<button id="'+parsed[i].num+'" class="btn btn-danger btn-xs pull-right" onclick="resetJob('+parsed[i].num+', '+parsed[i].num+', \''+wkey+'\', \''+parsed[i].title+'\', \'hard\', \'jobs\', this)"><span class="fa fa-times"></span></button>' +
-									'<button id="'+parsed[i].num+'" class="btn btn-warning btn-xs pull-right" onclick="resetJob('+parsed[i].num+', '+parsed[i].num+', \''+wkey+'\', \''+parsed[i].title+'\', \'soft\', \'jobs\', this)"><span class="fa fa-times"></span></button>' +
-									'<button id="'+parsed[i].num+'" class="btn btn-primary btn-xs pull-right" onclick="selectJob(this.id)">&nbsp;<span class="fa fa-caret-down"></span>&nbsp;</button>'
+									reset +
+									'<button id="'+parsed[i].num+'_select" class="btn btn-primary btn-xs pull-right" title="Select" onclick="selectJob(this.id)">&nbsp;<span class="fa fa-caret-down"></span>&nbsp;</button>'
 								]);
 							} // End For
 							document.getElementById('service_jobs').style.display = 'inline';

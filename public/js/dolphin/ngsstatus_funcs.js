@@ -43,17 +43,25 @@ function getWKey(run_id){
 	return wkey;
 }
 
-function selectService(id, wkey){
-	service_id = id;
+function selectService(id, title, wkey){
+	selected_service = title;
+	service_id = id.split('_')[0];
 	var runparams = $('#jsontable_jobs').dataTable();
 	$.ajax({ type: "GET",
-			 url: BASE_PATH +"/ajax/datajobs.php?id=" + id,
+			 url: BASE_PATH +"/ajax/datajobs.php?id=" + service_id,
 			 async: false,
 			 success : function(s)
 			 {
 				runparams.fnClearTable();
 				var parsed = s;
+				var reset = "";
 				for(var i = 0; i < parsed.length; i++) {
+					console.log(parsed[i].title);
+					if (selected_service != parsed[i].title) {
+						reset = '<button id="'+parsed[i].num+'" class="btn btn-warning btn-xs pull-right" name="soft" title="Soft Reset"onclick="resetType('+run_id+', '+parsed[i].num+', \''+wkey+'\', \''+parsed[i].title+'\', \'jobs\', this)"><span class="fa fa-times"></span></button>'; 
+					}else{
+						reset = "";
+					}
 					runparams.fnAddData([
 						parsed[i].title,
 						parsed[i].duration,
@@ -62,9 +70,8 @@ function selectService(id, wkey){
 						parsed[i].submit,
 						parsed[i].start,
 						parsed[i].finish,
-						'<button id="'+parsed[i].num+'" class="btn btn-danger btn-xs pull-right" onclick="resetJob('+run_id+', '+parsed[i].num+', \''+wkey+'\', \''+parsed[i].title+'\', \'hard\', \'jobs\', this)"><span class="fa fa-times"></span></button>' +
-						'<button id="'+parsed[i].num+'" class="btn btn-warning btn-xs pull-right" onclick="resetJob('+run_id+', '+parsed[i].num+', \''+wkey+'\', \''+parsed[i].title+'\', \'soft\', \'jobs\', this)"><span class="fa fa-times"></span></button>' +
-						'<button id="'+parsed[i].num+'" class="btn btn-primary btn-xs pull-right" onclick="selectJob(this.id)">&nbsp;<span class="fa fa-caret-down"></span>&nbsp;</button>'
+						reset + 
+						'<button id="'+parsed[i].num+'_select" class="btn btn-primary btn-xs pull-right" title="Select" onclick="selectJob(this.id)">&nbsp;<span class="fa fa-caret-down"></span>&nbsp;</button>'
 					]);
 				} // End For
 				document.getElementById('service_jobs').style.display = 'inline';
@@ -75,8 +82,10 @@ function selectService(id, wkey){
 }
 
 function selectJob(id){
+	var id_str = id.split('_')[0]
+	console.log(id_str);
 	$.ajax({ type: "GET",
-			url: BASE_PATH + "/public/ajax/datajobout.php?id=" + id,
+			url: BASE_PATH + "/public/ajax/datajobout.php?id=" + id_str,
 			async: false,
 			success : function(s)
 			{
@@ -302,15 +311,37 @@ function changeRunType(int_type){
 	});
 }
 
+function resetType(run_id, s_id, wkey, name, table_str, button){
+	if (table_str == 'services') {
+		resetService(run_id, s_id, wkey, name, button.name, table_str, button);
+		if (name == "soft") {
+			document.getElementById(s_id+'_select').remove();
+		}
+		button.name = 'hard';
+		button.title = 'Hard Reset';
+		button.setAttribute('class', 'btn btn-danger btn-xs pull-right');
+	}else if (table_str == 'jobs') {
+		resetJob(run_id, s_id, wkey, name, button.name, table_str, button);
+		if (name == "soft") {
+			document.getElementById(s_id+'_select').remove();
+		}
+		button.name = 'hard';
+		button.title = 'Hard Reset';
+		button.setAttribute('class', 'btn btn-danger btn-xs pull-right');
+	}
+}
+
 function resetService(run_id, s_id, wkey, name, type, table_str, button){
 	$.ajax({ type: "GET",
 		url: BASE_PATH+"/public/ajax/ngs_stat_funcs.php",
-		data: { p: 'resetService', run_id: run_id, wkey: wkey, s_id: s_id, name: name, type: type },
+		data: { p: 'resetService', run_id: run_id, wkey: wkey, s_id: s_id, name: name, type: type, clusteruser: clusteruser },
 		async: false,
 		success : function(s)
 		{
 			console.log(s);
-			removeServiceTable(table_str, button);
+			if (type == 'hard') {
+				removeServiceTable(table_str, button);
+			}
 			document.getElementById('service_jobs').style.display = 'none';
 		}	
 	});
@@ -319,12 +350,14 @@ function resetService(run_id, s_id, wkey, name, type, table_str, button){
 function resetJob(run_id, s_id, wkey, name, type, table_str, button){
 	$.ajax({ type: "GET",
 		url: BASE_PATH+"/public/ajax/ngs_stat_funcs.php",
-		data: { p: 'resetJob', run_id: run_id, wkey: wkey, s_id: s_id, name: name, type: type },
+		data: { p: 'resetJob', run_id: run_id, wkey: wkey, s_id: s_id, name: name, type: type, clusteruser: clusteruser },
 		async: false,
 		success : function(s)
 		{
 			console.log(s);
-			removeServiceTable(table_str, button);
+			if (type == 'hard') {
+				removeServiceTable(table_str, button);
+			}
 		}	
 	});
 }
