@@ -15,4 +15,9 @@ class Pipeline extends VanillaModel {
         endforeach;
         return rtrim($group_str, ",");
     }
+	
+	function getGenomes(){
+		$result = $this->query("SELECT * FROM ngs_genome");
+		return json_decode($result, true);
+	}
 }

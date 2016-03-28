@@ -56,16 +56,13 @@
 					<div class="row">
 						<?php echo $html->getStaticSelectionBox("Name the Run", "run_name", "TEXT", 4)?>
 						<?php echo $html->getStaticSelectionBox("Run Description", "run_description", "TEXT", 8)?>
-						<?php echo $html->getStaticSelectionBox("Genome Build", "genomebuild", "<option>human,hg19</option>
-																				<option>hamster,cho-k1</option>
-																				<option>rat,rn5</option>
-																				<option>zebrafish,danRer7</option>
-																				<option>mouse,mm10</option>
-																				<option>mousetest,mm10</option>
-																				<option>s_cerevisiae,sacCer3</option>
-																				<option>c_elegans,ce10</option>
-																				<option>cow,bosTau7</option>
-																				<option>d_melanogaster,dm3</option>", 4)?>
+						<?php
+							$option_string = "";
+							foreach($genomes as $g){
+								$option_string .= "<option>".$g['genome'].",".$g['build']."</option>";
+							}
+								echo $html->getStaticSelectionBox("Genome Build", "genomebuild", $option_string, 4)
+						?>
 						<?php echo $html->getStaticSelectionBox("Mate-paired", "spaired", "<option>yes</option>
 																				<option>no</option>", 4)?>
 						<?php echo $html->getStaticSelectionBox("Resume Run", "resume", "<option>Fresh</option>

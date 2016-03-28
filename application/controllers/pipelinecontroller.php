@@ -19,6 +19,7 @@ class PipelineController extends VanillaController {
         
 		$this->set('field', "Selected");
 		$this->set('selection', $selection);
+		$this->set('genomes', $this->Pipeline->getGenomes());
 	}
     
 	function rerun($run_id, $selection){
@@ -30,6 +31,7 @@ class PipelineController extends VanillaController {
         $this->set('selection', $selection);
 		$this->set('run_id', $run_id);
 		$this->set('field', 'Status');
+		$this->set('genomes', $this->Pipeline->getGenomes());
 	}
 
 	function report(){
