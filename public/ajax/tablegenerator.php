@@ -165,15 +165,31 @@ else if ($p == 'createTableFile')
 	$data = json_encode($user);
 }
 else if ($p == 'convertToTSV')
-{
+{       
 	if (isset($_GET['url'])){$url = $_GET['url'];}
-	
 	$json_data = json_decode(file_get_contents($url));
 	
 	$user = $_SESSION['user'].'_'.date('Y-m-d-H-i-s').'.tsv';
 	$file = fopen('../tmp/files/'.$user, "w");
+	$toggle = true;
+	$json_keys = array(); 
+	foreach($json_data[0] as $key => $value){
+		array_push($json_keys, $key);
+	}
 	foreach($json_data as $jd){
-		fputcsv($file, $jd, chr(9));
+		if($toggle){
+			fwrite($file, implode(" ", $json_keys).PHP_EOL);
+			$toggle = false;
+		}
+		$input = "";
+		foreach($json_keys as $key){
+			if(end($json_keys) != $key){
+				$input .= $jd->$key . " ";
+			}else{  
+				$input .= $jd->$key;
+			}
+		}
+		fwrite($file, $input.PHP_EOL);
 	}
 	fclose($file);
 	$data = json_encode($user);

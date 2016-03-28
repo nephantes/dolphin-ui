@@ -339,16 +339,6 @@ function downloadGeneratedTSV(beforeFormat){
 	if (file_name != '') {
 		var URL = BASE_PATH + '/public/tmp/files/' + file_name; 
 		window.open(URL, '_blank');
-	
-		$.ajax({ type: "GET",
-				url: BASE_PATH+"/public/ajax/tablegenerator.php",
-				data: { p: "removeTSV", file: file_name },
-				async: false,
-				success : function(s)
-				{
-					console.log('test');
-				}
-		});	
 	}
 }
 
