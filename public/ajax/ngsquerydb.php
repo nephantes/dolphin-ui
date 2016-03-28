@@ -340,8 +340,9 @@ else if ($p == 'changeDataGroupNames')
 		FROM groups
 		WHERE id IN (
 			SELECT g_id
-			IN user_group
+			FROM user_group
 			WHERE u_id = " . $_SESSION['uid'] . "
+			)
 		");
 	}else{
 		$data=json_encode("");
