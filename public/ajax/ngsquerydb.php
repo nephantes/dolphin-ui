@@ -338,7 +338,11 @@ else if ($p == 'changeDataGroupNames')
 		$data=$query->queryTable("
 		SELECT id,name
 		FROM groups
-		WHERE owner_id = " . $_SESSION['uid'] . "
+		WHERE id IN (
+			SELECT g_id
+			FROM user_group
+			WHERE u_id = " . $_SESSION['uid'] . "
+			)
 		");
 	}else{
 		$data=json_encode("");
