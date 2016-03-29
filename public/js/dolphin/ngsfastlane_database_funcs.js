@@ -217,13 +217,9 @@ function checkFastlaneInput(info_array){
 		//	Error in submission, do not submit into database
 		return database_checks;
 	}else{
-		//	May submit into database
-		var organism = info_array[0];
-
 		//	Obtain group id
-		var gid = obtainGroupFromName(document.getElementById('groups').value);
+		var gid = document.getElementById('groups').value.toString();
 		var perms = obtainPermsFromRadio();
-		
 		if (experiment_series_id > 0) {
 			//	If adding to a experiment series
 			if (lane_id > 0) {
@@ -233,7 +229,7 @@ function checkFastlaneInput(info_array){
 					for (var a = 0; a < barcode_array.length; a++) {
 						if (sample_file_check.indexOf(barcode_array[a][0]) == -1) {
 							var true_id = insertSample(experiment_series_id, lane_id, barcode_array[a][0],
-										organism, barcode_array[a][1], gid, perms);
+										barcode_array[a][1], gid, perms);
 							true_sample_ids.push(true_id);
 							sample_ids.push(true_id);
 							sample_file_check.push(barcode_array[a][0]);
@@ -246,7 +242,7 @@ function checkFastlaneInput(info_array){
 					for (var a = 0; a < input_array.length; a++) {
 						if (sample_file_check.indexOf(input_array[a][0]) == -1) {
 							var true_id = insertSample(experiment_series_id, lane_id, input_array[a][0],
-									organism, 'nobarcode', gid, perms);
+									'nobarcode', gid, perms);
 							true_sample_ids.push(true_id);
 							sample_ids.push(true_id);
 							sample_file_check.push(input_array[a][0]);
@@ -264,7 +260,7 @@ function checkFastlaneInput(info_array){
 					for (var a = 0; a < barcode_array.length; a++) {
 						if (sample_file_check.indexOf(barcode_array[a][0]) == -1) {
 							var true_id = insertSample(experiment_series_id, lane_id, barcode_array[a][0],
-										organism, barcode_array[a][1], gid, perms);
+										barcode_array[a][1], gid, perms);
 							true_sample_ids.push(true_id);
 							sample_ids.push(true_id);
 							sample_file_check.push(barcode_array[a][0]);
@@ -277,7 +273,7 @@ function checkFastlaneInput(info_array){
 					for (var a = 0; a < input_array.length; a++) {
 						if (sample_file_check.indexOf(input_array[a][0]) == -1) {
 							var true_id = insertSample(experiment_series_id, lane_id, input_array[a][0],
-									organism, 'nobarcode', gid, perms);
+									'nobarcode', gid, perms);
 						true_sample_ids.push(true_id);
 						sample_ids.push(true_id);
 							sample_file_check.push(input_array[a][0]);
@@ -300,7 +296,7 @@ function checkFastlaneInput(info_array){
 				for (var a = 0; a < barcode_array.length; a++) {
 					if (sample_file_check.indexOf(barcode_array[a][0]) == -1) {
 						var true_id = insertSample(experiment_series_id, lane_id, barcode_array[a][0],
-										organism, barcode_array[a][1], gid, perms);
+										barcode_array[a][1], gid, perms);
 							true_sample_ids.push(true_id);
 							sample_ids.push(true_id);
 						sample_file_check.push(barcode_array[a][0]);
@@ -314,7 +310,7 @@ function checkFastlaneInput(info_array){
 				for (var a = 0; a < input_array.length; a++) {
 					if (sample_file_check.indexOf(input_array[a][0]) == -1) {
 						var true_id = insertSample(experiment_series_id, lane_id, input_array[a][0],
-									organism, 'nobarcode', gid, perms);
+									'nobarcode', gid, perms);
 						true_sample_ids.push(true_id);
 						sample_ids.push(true_id);
 						sample_file_check.push(input_array[a][0]);
@@ -353,7 +349,6 @@ function checkFastlaneInput(info_array){
 		console.log(lane_id);
 		console.log(barcode_array);
 		console.log(input_array);
-		console.log(organism);
 		console.log(gid);
 		console.log(perms);
 		return true_sample_ids;
@@ -415,7 +410,7 @@ function insertLane(experiment_id, lane_name, gid, perms){
 	});
 }
 
-function insertSample(experiment_id, lane_id, sample_name, organism, barcode, gid, perms){
+function insertSample(experiment_id, lane_id, sample_name, barcode, gid, perms){
 	var id;
 	if (gid == "" || gid == "0") {
 		gid = "1";
@@ -424,7 +419,7 @@ function insertSample(experiment_id, lane_id, sample_name, organism, barcode, gi
 			type: 	'GET',
 			url: 	BASE_PATH+'/public/ajax/ngsfastlanedb.php',
 			data:  	{ p: 'insertSample', experiment: experiment_id, lane: lane_id, sample: sample_name,
-					organism: organism, barcode: barcode, gids: gid, perms: perms },
+					barcode: barcode, gids: gid, perms: perms },
 			async:	false,
 			success: function(s)
 			{

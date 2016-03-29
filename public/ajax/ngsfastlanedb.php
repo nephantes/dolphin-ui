@@ -70,7 +70,6 @@ if ($p == 'experimentSeriesCheck'){
 	if (isset($_GET['experiment'])){$experiment = $_GET['experiment'];}
 	if (isset($_GET['lane'])){$lane = $_GET['lane'];}
 	if (isset($_GET['sample'])){$sample = $_GET['sample'];}
-	if (isset($_GET['organism'])){$organism = $_GET['organism'];}
 	if (isset($_GET['barcode'])){$barcode = $_GET['barcode'];}
 	if (isset($_GET['gids'])){$gids = $_GET['gids'];}
 	if (isset($_GET['perms'])){$perms = $_GET['perms'];}
@@ -82,24 +81,6 @@ if ($p == 'experimentSeriesCheck'){
 		VALUES ($experiment, $lane, '$sample', '$sample', '$sample', '$barcode',
 		".$_SESSION['uid'].", $gids, $perms, now(), now(), ".$_SESSION['uid'].");
 	");
-	
-	$sample_id = $query->queryAVal("SELECT `id` FROM ngs_samples WHERE series_id = $experiment AND lane_id = $lane and name = '$sample'");
-	$org_array = explode(",", $organism);
-	//	Organism
-	$org_check = "SELECT `id` FROM ngs_organism WHERE `organism` = '".$org_array[0]."'";
-	$org_check_result = $query->queryAVal($org_check);
-	
-	if($org_check_result == NULL || $org_check_result == '' || $org_check_result == '0'){
-		//	Empty
-		$query->runSQL("INSERT INTO `ngs_organism` (`organism`, `organism_symbol`) VALUES ('".$org_array[0]."', '".$org_array[1]."')");
-		$organism_id = $query->queryAVal("SELECT `id` FROM `ngs_organism` WHERE organism = '".$org_array[0]."'");
-		$query->runSQL("UPDATE `ngs_samples` SET `organism_id` = ".$organism_id." WHERE `id` = $sample_id");
-	}else{
-		//	Organism exists
-		$organism_id = $query->queryAVal("SELECT `id` FROM `ngs_organism` WHERE organism = '".$org_array[0]."'");
-		$query->runSQL("UPDATE `ngs_samples` SET `organism_id` = ".$organism_id." WHERE `id` = $sample_id");
-	}
-	
 }else if ($p == 'insertDirectories'){
 	if (isset($_POST['input'])){$input = $_POST['input'];}
 	if (isset($_POST['backup'])){$backup = $_POST['backup'];}
