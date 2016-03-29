@@ -123,6 +123,15 @@ else if ($p == 'removeRunlistSamples')
 		}
 	}
 }
+else if ($p == 'getOldOutdir')
+{
+	if (isset($_GET['run_id'])){$run_id = $_GET['run_id'];}
+	$data=$query->queryAVal("
+	SELECT outdir
+	FROM ngs_runparams
+	WHERE id = $run_id
+	");
+}
 
 if (!headers_sent()) {
    header('Cache-Control: no-cache, must-revalidate');
