@@ -53,7 +53,7 @@ function manageCreateChecklists(id, tablerow){
 				{
 					for(var i = 0; i < s.length; i++){
 						var run_info = [];
-						var run_select = '<select id="'+ s[i].id + '_run_select" class="form-control" onchange="optionChange(this)"><form>';
+						var run_select = '<select id="'+ s[i].id + '_run_select" multiple class="form-control" onchange="optionChange(this)"><form>';
 						for(var x = 0; x < run_ids[s[i].id].length; x = x+3){
 							//Sample id _ Run id _ Run name
 							run_select += '<option id="' + run_ids[s[i].id][x]+ '_' + run_ids[s[i].id][x+1] + '" value="'+ run_ids[s[i].id][x+2] + '">Run ' + run_ids[s[i].id][x] + ': ' + run_ids[s[i].id][x+1] + '</option>'
@@ -88,13 +88,12 @@ function reportSelection(){
 		ids = getBasketInfo().split(",");
 	}
 	for(var y = 0; y < ids.length; y++){
-		var table = $('#jsontable_selected_samples').dataTable();
-		var option_get = table.fnGetData();
-		for(var r = 0; r < option_get.length; r++){
-			var option_selected = $(option_get[r][2])[0];
+		var element = document.getElementById(ids[y] + '_run_select');
+		for(var r = 0; r < element.selectedOptions.length; r++){
+			var option_selected = element.selectedOptions[r]
 			option_selected.click();
-			if (wkeys.indexOf(option_selected.options[selectionHelper[r]].value) < 0) {
-				wkeys.push(option_selected.options[selectionHelper[r]].value);
+			if (wkeys.indexOf(option_selected.value) == -1) {
+				wkeys.push(option_selected.value);
 			}
 		}
 	}
@@ -151,25 +150,28 @@ function reportSelection(){
 }
 
 function sendToTableGen(){
-	var option_get = $('#jsontable_selected_samples').dataTable().fnGetData();
 	var run_array = [];
-	for(var r = 0; r < option_get.length; r++){
-		var option_selected = $(option_get[r][2])[0];
-		var run_id = option_selected.options[selectionHelper[r]].id.split("_")[0]
-		if (run_array[run_id] == undefined) {
-			run_array[run_id] = option_get[r][0];
-		}else{
-			run_array[run_id] = run_array[run_id] + ',' + option_get[r][0];
+	if (getBasketInfo() != undefined) {
+		ids = getBasketInfo().split(",");
+	}
+	for(var y = 0; y < ids.length; y++){
+		var element = document.getElementById(ids[y] + '_run_select');
+		var option_selected = element.selectedOptions;
+		for (var x = 0; x < option_selected.length; x++) {
+			if (run_array[option_selected[x].id.split("_")[0]] == undefined) {
+				run_array[option_selected[x].id.split("_")[0]] = ids[y];
+			}else{
+				run_array[option_selected[x].id.split("_")[0]] += "," + ids[y];
+			}
+			
 		}
-		
 	}
 	
-	var run_ids = [];
 	var samples_send = 'samples=';
 	for(var key in run_array){
-		samples_send += run_array[key] + ';' + key + ':';
-		run_ids.push(key);
+		samples_send += run_array[key].toString() + ';' + key + ':';
 	}
+	console.log(samples_send);
 	samples_send = samples_send.substring(0, samples_send.length - 1);
 	
 	var format_send = '&format=json';
@@ -224,6 +226,16 @@ function sendToTableGen(){
 
 function tableCreatorPage(){
 	var file_values = $('#report_multi_box').val();
+	var ids;
+	var empty_ids = [];
+	if (getBasketInfo() != undefined) {
+		ids = getBasketInfo().split(",");
+		for (var x = 0; x < ids.length; x++) {
+			if (document.getElementById(ids[x]+'_run_select').selectedIndex == -1) {
+				empty_ids.push(ids[x]);
+			}
+		}
+	}
 	
 	if(file_values == null){
 		$('#errorModal').modal({
@@ -231,11 +243,23 @@ function tableCreatorPage(){
 		});
 		document.getElementById('errorLabel').innerHTML ='A file must be selected in order to generate a report!';
 		document.getElementById('errorAreas').innerHTML = '';
+	}else if (ids == undefined){
+		$('#errorModal').modal({
+			show: true
+		});
+		document.getElementById('errorLabel').innerHTML ='No Samples Selected! You cannot generate a table with zero samples.';
+		document.getElementById('errorAreas').innerHTML = '';
+	}else if (empty_ids.length != 0){
+		$('#errorModal').modal({
+			show: true
+		});
+		document.getElementById('errorLabel').innerHTML ='No runs have been Selected for samples '+empty_ids.toString()+'! Please select runs for these samples or remove them.';
+		document.getElementById('errorAreas').innerHTML = '';
 	}else if(file_values.length > 1){
 		$('#errorModal').modal({
 			show: true
 		});
-		document.getElementById('errorLabel').innerHTML ='Multple file selection is under development.<br>Please select only one file for report generation.';
+		document.getElementById('errorLabel').innerHTML ='Please select only one file for report generation.';
 		document.getElementById('errorAreas').innerHTML = '';
 	}else{
 		$.ajax({ type: "GET",
@@ -383,8 +407,16 @@ function deleteTable(id){
 }
 
 function optionChange(selector){
-	selectionHelper[runHelper.indexOf(selector.id.split('_')[0])] = selector.selectedIndex;
-	
+	var options_array = [];
+	for(var x = 0; x < selector.options.length; x++){
+		for(var y = 0; y < selector.selectedOptions.length; y++){
+			if (selector.selectedOptions[y] == selector.options[x]) {
+				options_array.push(y);
+			}
+		}
+	}
+	selectionHelper[runHelper.indexOf(selector.id.split('_')[0])] = options_array;
+	console.log(selector.selectedIndex);
 	reportSelection();
 }
 
@@ -570,7 +602,7 @@ $(function() {
 					if (Object.keys(run_ids).indexOf(sample_ids_array[i]) > -1) {
 						var run_info = [];
 						var wkey_passer = [];
-						var run_select = '<select id="'+ sample_ids_array[i] + '_run_select" class="form-control" onchange="optionChange(this)"><form>';
+						var run_select = '<select id="'+ sample_ids_array[i] + '_run_select" multiple class="form-control" onchange="optionChange(this)"><form>';
 						for(var x = 0; x < run_ids[sample_ids_array[i]].length; x = x+3){
 							if (run_ids[sample_ids_array[i]][x+2] != null) {
 								//	Add wkey's to runID
