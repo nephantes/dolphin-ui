@@ -53,7 +53,7 @@ function manageCreateChecklists(id, tablerow){
 				{
 					for(var i = 0; i < s.length; i++){
 						var run_info = [];
-						var run_select = '<select id="'+ s[i].id + '_run_select" multiple class="form-control" onchange="optionChange(this)"><form>';
+						var run_select = '<select id="'+ s[i].id + '_run_select" multiple class="form-control" size="3" onchange="optionChange(this)"><form>';
 						for(var x = 0; x < run_ids[s[i].id].length; x = x+3){
 							//Sample id _ Run id _ Run name
 							run_select += '<option id="' + run_ids[s[i].id][x]+ '_' + run_ids[s[i].id][x+1] + '" value="'+ run_ids[s[i].id][x+2] + '">Run ' + run_ids[s[i].id][x] + ': ' + run_ids[s[i].id][x+1] + '</option>'
@@ -602,7 +602,7 @@ $(function() {
 					if (Object.keys(run_ids).indexOf(sample_ids_array[i]) > -1) {
 						var run_info = [];
 						var wkey_passer = [];
-						var run_select = '<select id="'+ sample_ids_array[i] + '_run_select" multiple class="form-control" onchange="optionChange(this)"><form>';
+						var run_select = '<select id="'+ sample_ids_array[i] + '_run_select" multiple class="form-control" size="3" onchange="optionChange(this)"><form>';
 						for(var x = 0; x < run_ids[sample_ids_array[i]].length; x = x+3){
 							if (run_ids[sample_ids_array[i]][x+2] != null) {
 								//	Add wkey's to runID
