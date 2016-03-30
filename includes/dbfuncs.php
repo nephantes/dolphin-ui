@@ -159,7 +159,7 @@ class dbfuncs {
    }
    function getSampleQuery($samples)
    {
-     $sql="select nr.wkey, nl.sample_id, ns.samplename from ngs_runparams nr, ngs_runlist nl, ngs_samples ns where ns.id=nl.sample_id and nr.id=nl.run_id and ";
+     $sql="select nr.wkey, nl.sample_id, ns.samplename, nr.id from ngs_runparams nr, ngs_runlist nl, ngs_samples ns where ns.id=nl.sample_id and nr.id=nl.run_id and ";
      $wkey_array =  explode( ':', $samples);
      $runsql="";
      for ($i=0; $i<sizeof($wkey_array); $i++)
