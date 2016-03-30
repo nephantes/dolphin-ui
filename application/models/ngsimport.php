@@ -1107,6 +1107,12 @@ class Ngsimport extends VanillaModel {
 				}
 			}
 			
+			if(isset($this->dir_arr[$dir->dir_tag])){
+				$text.= $this->errorText("Fastq Directory error.  Cannot have duplicate Directory IDs. (".$dir->fastq_dir.").");
+				$this->final_check = false;
+				$dir_check = false;
+			}
+			
 			if($dir_check){
 				$this->dir_arr[$dir->dir_tag]=$dir;
 			}

@@ -241,21 +241,15 @@ if($p == 'exportExcel')
 		"));
 	
 	$stored_dirs = [];
-	$objPHPExcel->getActiveSheet()->setCellValue('C3', 'backup directory');
-    $objPHPExcel->getActiveSheet()->setCellValue('D3', 'amazon bucket');
 	$col_number = 4;
 	foreach($sample_file_directories as $sfd){
 		$objPHPExcel->getActiveSheet()->setCellValue('A'.$col_number, $sfd->id);
 		$objPHPExcel->getActiveSheet()->setCellValue('B'.$col_number, $sfd->fastq_dir);
-		$objPHPExcel->getActiveSheet()->setCellValue('C'.$col_number, $sfd->backup_dir);
-		$objPHPExcel->getActiveSheet()->setCellValue('D'.$col_number, $sfd->amazon_bucket);
 		$col_number++;
 	}
 	foreach($lane_file_directories as $lfd){
 		$objPHPExcel->getActiveSheet()->setCellValue('A'.$col_number, $lfd->id);
 		$objPHPExcel->getActiveSheet()->setCellValue('B'.$col_number, $lfd->fastq_dir);
-		$objPHPExcel->getActiveSheet()->setCellValue('C'.$col_number, $lfd->backup_dir);
-		$objPHPExcel->getActiveSheet()->setCellValue('D'.$col_number, $lfd->amazon_bucket);
 		$col_number++;
 	}
 	

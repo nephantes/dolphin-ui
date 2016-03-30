@@ -166,6 +166,16 @@ $(function() {
 						$.ajax({
 							type: 	'GET',
 							url: 	BASE_PATH+'/public/ajax/initialmappingdb.php',
+							data:  	{ p: 'getOldOutdir', run_id: initial_run_ids[x]},
+							async:	false,
+							success: function(s)
+							{
+								outdir = s;
+							}
+						});
+						$.ajax({
+							type: 	'GET',
+							url: 	BASE_PATH+'/public/ajax/initialmappingdb.php',
 							data:  	{ p: 'checkRunToSamples', run_id: initial_run_ids[x]},
 							async:	false,
 							success: function(s)
