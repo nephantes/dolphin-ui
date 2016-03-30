@@ -113,7 +113,11 @@ $final_array=array();
 foreach ($new_data as $nd_key => $nd_value){
     $new_object=array();
     foreach($nd_value as $v_key => $v_value){
-        $new_object[$oc[$nd_key][$v_key]] = $v_value;
+        if ($type=="summary"){
+            $new_object[$v_key] = $v_value;
+        }else{
+            $new_object[$oc[$nd_key][$v_key]] = $v_value;
+        }
     }
     array_push($final_array, $new_object);
 }
