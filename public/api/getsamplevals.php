@@ -51,24 +51,32 @@ $data=$query->getSampleQuery($samples);
 
 $dat=json_decode($data);
 $sample_array=array();
+$multi_run_array = array();
 for ($i=0; $i<sizeof($dat); $i++)
-{
+{   
+    $c[$dat[$i]->wkey] = $dat[$i]->id;
+    $b[$dat[$i]->wkey].=$dat[$i]->samplename . "_run" . $dat[$i]->id.",";
     $a[$dat[$i]->wkey].=$dat[$i]->samplename.",";
     array_push($sample_array, $dat[$i]->samplename);
 }
 $new_data=array();
 $title=array();
-
 foreach ($a as $i => $row){
     if ($type!="summary"){
         $fields="&fields=$commonfields,$keepcols,$row";
     }
+        $sample_breakdown = explode(",",$b[$i]);
+    array_pop($sample_breakdown);
     $url=API_PATH."/public/api/?source=".API_PATH."/public/pub/".$i."/$file&$fields&$format";
     $json = file_get_contents($url);
-    $dat1 = json_decode($json, $array=TRUE);
+        $dat1 = json_decode($json, $array=TRUE);
     foreach ($dat1[0] as $key => $value){
+        $new_key = array_search($key."_run".$c[$i], $sample_breakdown);
+        if($new_key > -1){
+                $key = $sample_breakdown[$new_key];
+        }
         if (!in_array($key, $title) || in_array($key, $keepcols_array)){
-            array_push($title, $key); 
+            array_push($title, $key);
         }
     }
     if($format == 'json2'){
@@ -87,7 +95,11 @@ foreach ($a as $i => $row){
                    $new_data[$row[$keyfield]]=array();
                 }
                 foreach ($row as $key => $value){
-                    if (!in_array($key, $oc[$row[$keyfield]]) || in_array($key, $keepcols_array) ){ 
+                        $new_key = array_search($key."_run".$c[$i], $sample_breakdown);
+                        if($new_key > -1){
+                                $key = $sample_breakdown[$new_key];
+                        }
+                    if (!in_array($key, $oc[$row[$keyfield]]) || in_array($key, $keepcols_array) ){
                       array_push($new_data[$row[$keyfield]], $value);
                       array_push($oc[$row[$keyfield]] , $key);
                     }
@@ -96,6 +108,7 @@ foreach ($a as $i => $row){
         }
     }
 }
+
 $final_array=array();
 foreach ($new_data as $nd_key => $nd_value){
     $new_object=array();

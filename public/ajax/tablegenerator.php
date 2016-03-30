@@ -153,7 +153,7 @@ else if ($p == 'createTableFile')
 	fwrite($file,$json);
 	fclose($file);
 	
-	if(strpos($url, ".json") > -1){
+	if(strpos($url, "json") > -1){
 		$json2 = file_get_contents($url."2");
 	}else{
 		$json2 = '';
