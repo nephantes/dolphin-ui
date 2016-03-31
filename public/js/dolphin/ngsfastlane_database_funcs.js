@@ -68,7 +68,9 @@ function checkFastlaneInput(info_array){
 			split_inputs = split_inputs.filter(function(n){return n != ''});
 			var input_bool_check = true;
 			for (var y = 0; y < split_inputs.length; y++) {
-				if (!/^[a-zA-Z 0-9\_\.]*$/.test(split_inputs[y])) {
+				console.log(split_inputs);
+				if (!/^[a-zA-Z 0-9\_\. ]*$/.test(split_inputs[y])) {
+					bad_files.push("<font color=\"black\">incorrect file formatting: </font>" + split_inputs[y]);
 					input_bool_check = false;
 				}else{
 					var single_input_array = split_inputs[y].split(' ');

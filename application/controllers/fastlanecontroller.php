@@ -67,11 +67,11 @@ class FastlaneController extends VanillaController {
 			foreach($pass_fail_array as $key=>$index){
 				if($index == 'false'){
 					if($key == 1){
-						$text.="<font color=\"red\">Barcode selection is either empty or not properly formatted.</font><br>";
+						$text.="<font color=\"red\">Barcode selection is either empty or not properly formatted.</font><br><br>";
 					}else if($key == 3){
-						$text.="<font color=\"red\">Experiment Series field is empty or contains improper characters. Please use alpha-numerics, underscores, spaces, and periods only.</font><br>";
+						$text.="<font color=\"red\">Experiment Series field is empty or contains improper characters. Please use alpha-numerics, underscores, spaces, and periods only.</font><br><br>";
 					}else if($key == 4){
-						$text.="<font color=\"red\">Import field is either empty or contains improper characters. Please use alpha-numerics, underscores, spaces, and periods only.</font><br>";
+						$text.="<font color=\"red\">Import field is either empty or contains improper characters. Please use alpha-numerics, underscores, spaces, and periods only.</font><br><br>";
 					}else if($key == 5){
 						$text.="<h3>Input Directory</h3>";
 						if($fastlane_array[6]  == ''){
@@ -88,6 +88,7 @@ class FastlaneController extends VanillaController {
 								$text.="<font color=\"red\">".$bfa."</font><br>";
 							}
 							$text.="<br>";
+							$text.="<font color=\"red\">If the files given are not in the proper fastlane format, please use alpha-numerics, underscores, and periods only.</font><br><br>";
 						}else{
 							$text.="<font color=\"red\">The files given are not in the proper fastlane format.  Please use alpha-numerics, underscores, and periods only.</font><br><br>";
 						}
