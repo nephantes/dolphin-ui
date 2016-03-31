@@ -5,7 +5,7 @@
  **/
 
 $(function() {
-	if (typeof(initialSubmission) != undefined && window.location.href.split("/").indexOf('process') > -1) {
+	if (typeof(initialSubmission) != "undefined" && window.location.href.split("/").indexOf('process') > -1) {
 		console.log(initialSubmission);
 		var initial_split = initialSubmission.split(",");
 		var outdir;

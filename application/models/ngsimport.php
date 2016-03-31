@@ -1160,9 +1160,9 @@ class Ngsimport extends VanillaModel {
 					$file->file_name= trim($this->esc($this->sheetData[$i][$j]));
 					$file->file_name= preg_replace('/\s/', '', $file->file_name);
 					if($j == 'B' && isset($this->sheetData[$i]['C'])){
-						$additional_files = $this->sheetData[$i]['C'];
+						$additional_files = trim($this->sheetData[$i]['C']);
 					}else if ($j == 'C' && isset($this->sheetData[$i]['D'])){
-						$additional_files = $this->sheetData[$i]['D'];
+						$additional_files = trim($this->sheetData[$i]['D']);
 					}
 					if(isset($additional_files)){
 						$comma_check = strpos($file->file_name, ",");
