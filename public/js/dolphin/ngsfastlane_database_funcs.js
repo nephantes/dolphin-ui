@@ -42,7 +42,7 @@ function checkFastlaneInput(info_array){
 			var split_check = true;
 			for (var y = 0; y < split_barcodes.length; y++) {
 				split_barcodes[y].replace('\t', '');
-				if (!/^[a-zA-Z 0-9\_\.]*$/.test(split_barcodes[y])) {
+				if (!/^[a-zA-Z 0-9\_\.\-]*$/.test(split_barcodes[y])) {
 					split_check = false;
 				}else{
 					var single_barcode_array = split_barcodes[y].split(' ');
@@ -69,7 +69,7 @@ function checkFastlaneInput(info_array){
 			var input_bool_check = true;
 			for (var y = 0; y < split_inputs.length; y++) {
 				console.log(split_inputs);
-				if (!/^[a-zA-Z 0-9\_\. ]*$/.test(split_inputs[y])) {
+				if (!/^[a-zA-Z 0-9\_\.\- ]*$/.test(split_inputs[y])) {
 					bad_files.push("<font color=\"black\">incorrect file formatting: </font>" + split_inputs[y]);
 					input_bool_check = false;
 				}else{
@@ -173,7 +173,7 @@ function checkFastlaneInput(info_array){
 				}
 			}
 		}else if(id_array[x] == 'series_name' || id_array[x] == 'lane_name'){
-			if (/^[a-zA-Z 0-9\_\s]*$/.test(info_array[x])) {
+			if (/^[a-zA-Z 0-9\_\-\s]*$/.test(info_array[x])) {
 				database_checks.push(true);
 			}else{
 				database_checks.push(false);
