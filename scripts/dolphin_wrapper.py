@@ -500,8 +500,9 @@ class Dolphin:
                    for t_e in tes:
                      self.prf( fp, stepRSEMCount % locals() )
 
-                 self.writeVisualizationStr( fp, "RSEM", pipe, sep )
-                 self.writeRSeQC ( fp, "RSEM", pipe, sep )
+
+                 self.writeVisualizationStr( fp, type, pipe, sep )
+                 self.writeRSeQC ( fp, type, pipe, sep )
               
               if (pipe['Type']=="Tophat"):
                  gtf = (pipe['CustomGenomeAnnotation'] if ('CustomGenomeAnnotation' in pipe and pipe['CustomGenomeAnnotation'].lower()!="none") else "@GTF" )
