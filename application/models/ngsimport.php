@@ -863,7 +863,7 @@ class Ngsimport extends VanillaModel {
 			
 			//	Name
 			if(isset($samp->samplename)){
-				if($this->checkAlphaNumWithAddChars('\s\_\-', $samp->samplename)){
+				if($this->checkAlphaNumWithAddChars('\_\-', $samp->samplename)){
 					//	Need to check the database for similar names as well at a later date
 					if(isset($this->sample_arr[$samp->name])){
 						$text.= $this->errorText("Sample name already exists in that Import (row " . $i . ")");
@@ -929,7 +929,7 @@ class Ngsimport extends VanillaModel {
 			if(!isset($samp->source_symbol)){
 				$samp->source_symbol = NULL;
 			}else{
-				if(!$this->checkAlphaNumWithAddChars('\s\_\-\,', $samp->source_symbol) && $samp->source_symbol != NULL){
+				if(!$this->checkAlphaNumWithAddChars('\_\-\,', $samp->source_symbol) && $samp->source_symbol != NULL){
 					$text.= $this->errorText("Source symbol does not contain proper characters, please use alpha-numeric characters and underscores (row " . $i . ")");
 					$this->final_check = false;
 					$samp_check = false;
@@ -976,7 +976,7 @@ class Ngsimport extends VanillaModel {
 			//	Donor
 			if(!isset($samp->donor)){
 				$samp->donor = NULL;
-			}elseif(!$this->checkAlphaNumWithAddChars('\s\_\-\,', $samp->donor) && $samp->donor != NULL){
+			}elseif(!$this->checkAlphaNumWithAddChars('\_\-\,', $samp->donor) && $samp->donor != NULL){
 				$text.= $this->errorText("Donor does not contain proper characters, please use alpha-numeric characters and underscores (row " . $i . ")");
 				$this->final_check = false;
 				$samp_check = false;
@@ -1028,7 +1028,7 @@ class Ngsimport extends VanillaModel {
 			//	Antibody Target
 			if(!isset($samp->target)){
 				$samp->target = NULL;
-			}elseif(!$this->checkAlphaNumWithAddChars('\s\_\-\,', $samp->target) && $samp->target != NULL){
+			}elseif(!$this->checkAlphaNumWithAddChars('\_\-\,', $samp->target) && $samp->target != NULL){
 				$text.= $this->errorText("Target does not contain proper characters, please use alpha-numeric characters and underscores (row " . $i . ")");
 				$this->final_check = false;
 				$samp_check = false;
@@ -1207,7 +1207,7 @@ class Ngsimport extends VanillaModel {
 			 */
 			//	Sample/Lane Name
 			if(isset($file->name)){
-				if($this->checkAlphaNumWithAddChars('\s\_\-', $file->name)){
+				if($this->checkAlphaNumWithAddChars('\_\-', $file->name)){
 					if(!(isset($this->sample_arr[$file->name])) & !(isset($this->lane_arr[$file->name]))){
 						$text.= $this->errorText("sample/import name does not match the samples/imports given (row " . $i . ")");
 						$this->final_check = false;
