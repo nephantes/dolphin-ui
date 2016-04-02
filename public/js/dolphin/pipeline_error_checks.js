@@ -129,7 +129,7 @@ function checkFieldIsNotFloat(input){
 
 function checkFieldAlphaNumeric(input){
 	var check = false;
-	var alpha_numeric = /^([0-9]|[a-z]|[A-Z])+([0-9a-zA-Z]+)$/i;
+	var alpha_numeric = /^[0-9a-zA-Z]*$/i;
 	if (!document.getElementById(input).value.match(alpha_numeric)) {
 		check = true;
 	}
@@ -137,7 +137,7 @@ function checkFieldAlphaNumeric(input){
 }
 function checkFieldAlphaNumericAdditionalChars(input, additional){
 	var check = false;
-	var alpha_numeric = new RegExp('^([0-9]|[a-z]|[A-Z]|[' + additional + '])+([0-9a-zA-Z' + additional + ']+)$', 'i');
+	var alpha_numeric = new RegExp('^[0-9a-zA-Z' + additional + ']*$', 'i');
 	if (!document.getElementById(input).value.match(alpha_numeric)) {
 		check = true;
 	}
