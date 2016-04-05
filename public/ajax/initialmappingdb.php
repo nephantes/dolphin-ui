@@ -128,6 +128,7 @@ else if ($p == 'checkRunList')
 	}else{
 		$data = json_encode(array(array(), array(), array(), $sample_ids));
 	}
+	//test
 }
 else if ($p == 'removeRunlistSamples')
 {
