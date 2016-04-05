@@ -222,6 +222,19 @@ class Ngsimport extends VanillaModel {
 		return $samplename;
 	}
 	
+	/*
+	* parseExcel
+	*
+	* Parses the Excel Spreadsheet for all values
+	* Also checks if values are valid for submission
+	*
+	* @param string $gid group id used
+	* @param string $sid security id
+	* @param worksheet $worksheet worksheet information passed from excel
+	* @param sheetData $sheetData data passed from excel
+	* @param bool $passed_final_check passing final_check for multiple iterations.
+	* @return [Bool, String]
+	*/
 	function parseExcel($gid, $sid, $worksheet, $sheetData, $passed_final_check) {
 		$this->worksheet=$worksheet;
 		$this->sheetData=$sheetData;
@@ -231,10 +244,6 @@ class Ngsimport extends VanillaModel {
 		$this->clustername = json_decode($this->query("SELECT clusteruser FROM users WHERE username = '".$_SESSION['user']."'"))[0]->clusteruser;
 		
 		$text = '<li>'.$this->worksheet['worksheetName'].'<br />';
-
-		//$text.='Rows: '.$this->worksheet['totalRows'].' Columns: '.$this->worksheet['totalColumns'].'<br />';
-		//$text.='Cell Range: A1:'.$this->worksheet['lastColumnLetter'].$this->worksheet['totalRows'];
-		//$text.='</li>';
 
 		$this->username=$_SESSION['user'];
 		$sql="select id from users where `username`='$this->username'";
@@ -268,6 +277,16 @@ class Ngsimport extends VanillaModel {
 		return $parseArray;
 	}
 	
+	/*
+	* finalizeExcel
+	*
+	* submits data passed in throught the excel sheet
+	* creates javascript variables for initial run submission.
+	*
+	* @param worksheet $worksheet worksheet information passed from excel
+	* @param sheetData $sheetData data passed from excel
+	* @return String
+	*/
 	function finalizeExcel($worksheet, $sheetData){
 		$this->worksheet=$worksheet;
 		$this->sheetData=$sheetData;
