@@ -418,7 +418,7 @@ function insertExperimentSeries(experiment_name, gid, perms){
 			type: 	'POST',
 			url: 	BASE_PATH+'/public/ajax/ngsfastlanedb.php',
 			data:  	{ p: 'insertExperimentSeries', name: experiment_name, gids: gid, perms: perms },
-			async:	true,
+			async:	false,
 			success: function(s)
 			{
 			}
@@ -433,7 +433,7 @@ function insertLane(experiment_id, lane_name, gid, perms){
 			type: 	'POST',
 			url: 	BASE_PATH+'/public/ajax/ngsfastlanedb.php',
 			data:  	{ p: 'insertLane', experiment: experiment_id, lane: lane_name, gids: gid, perms: perms },
-			async:	true,
+			async:	false,
 			success: function(s)
 			{
 			}
@@ -467,7 +467,7 @@ function insertDirectories(input, backup, amazon, gid, perms){
 			type: 	'POST',
 			url: 	BASE_PATH+'/public/ajax/ngsfastlanedb.php',
 			data:  	{ p: 'insertDirectories', input: input, backup: backup, amazon: amazon, gids: gid, perms: perms },
-			async:	true,
+			async:	false,
 			success: function(s)
 			{
 			}
@@ -482,7 +482,7 @@ function insertTempSampleFiles(filename, sample_id, input_directory_id, gid, per
 			type: 	'POST',
 			url: 	BASE_PATH+'/public/ajax/ngsfastlanedb.php',
 			data:  	{ p: 'insertTempSample', filename: filename, sample_id: sample_id, input: input_directory_id, gids: gid, perms: perms },
-			async:	true,
+			async:	false,
 			success: function(s)
 			{
 			}
@@ -497,7 +497,7 @@ function insertTempLaneFiles(file_name, lane_id, dir_id, gid, perms){
 			type: 	'POST',
 			url: 	BASE_PATH+'/public/ajax/ngsfastlanedb.php',
 			data:  	{ p: 'insertTempLane', file_name: file_name, lane_id: lane_id, dir_id: dir_id, gids: gid, perms: perms },
-			async:	true,
+			async:	false,
 			success: function(s)
 			{
 			}

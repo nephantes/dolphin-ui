@@ -50,39 +50,6 @@ class initialmappingdb_unittest extends PHPUnit_Framework_TestCase
         ob_end_clean();
     }
     
-    public function testCheckRunList(){
-        ob_start();
-        $_GET['p'] = 'checkRunList';
-        $_GET['sample_ids'] = '1';
-        $_GET['run_ids'] = '1';
-        include("initialmappingdb.php");
-        $this->assertEquals(json_decode($data)[0]->run_id,'1');
-        ob_end_clean();
-    }
-    
-    public function testCheckRunParams(){
-        ob_start();
-        $_GET['p'] = 'checkRunParams';
-        $_GET['run_ids'] = '1';
-        include("initialmappingdb.php");
-        $this->assertEquals(json_decode($data),array());
-        ob_end_clean();
-    }
-    
-    public function testCheckRunToSamples(){
-        ob_start();
-        $_GET['p'] = 'checkRunToSamples';
-        $_GET['run_id'] = '1';
-        include("initialmappingdb.php");
-        $this->assertEquals(json_decode($data)[0]->sample_id,'1');
-        $this->assertEquals(json_decode($data)[1]->sample_id,'2');
-        $this->assertEquals(json_decode($data)[2]->sample_id,'3');
-        $this->assertEquals(json_decode($data)[3]->sample_id,'4');
-        $this->assertEquals(json_decode($data)[4]->sample_id,'5');
-        $this->assertEquals(json_decode($data)[5]->sample_id,'6');
-        ob_end_clean();
-    }
-    
     public function testCheckFileToSamples(){
         ob_start();
         $_GET['p'] = 'checkFileToSamples';
