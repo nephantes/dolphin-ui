@@ -116,9 +116,7 @@ $(function() {
 			var run_ids = [];
 			var initial_run_ids = [];
 			var names_to_ids = [];
-			console.log(names_list);
-			console.log(sample_lane);
-			console.log(experiment_series);
+			//	sample names to ids
 			$.ajax({
 				type: 	'GET',
 				url: 	BASE_PATH+'/public/ajax/ngsquerydb.php',
@@ -131,7 +129,7 @@ $(function() {
 					}
 				}
 			});
-			console.log(names_to_ids.toString())
+			//	gathers current run ids
 			$.ajax({
 				type: 	'GET',
 				url: 	BASE_PATH+'/public/ajax/initialmappingdb.php',
@@ -144,8 +142,8 @@ $(function() {
 					}
 				}
 			});
-			console.log(run_ids);
 			if (run_ids.length > 0) {
+				// checks for initial runs
 				$.ajax({
 					type: 	'GET',
 					url: 	BASE_PATH+'/public/ajax/initialmappingdb.php',
@@ -158,11 +156,12 @@ $(function() {
 						}
 					}
 				});
-				console.log(initial_run_ids);
+				
 				if (initial_run_ids.length > 0){
 					for(var x = 0; x < initial_run_ids.length; x++){
 						var added_samples = [];
 						var samples_returned = [];
+						//	Get old outdir
 						$.ajax({
 							type: 	'GET',
 							url: 	BASE_PATH+'/public/ajax/initialmappingdb.php',
@@ -173,6 +172,7 @@ $(function() {
 								outdir = s;
 							}
 						});
+						//	check initial run to current run for new or removed samples
 						$.ajax({
 							type: 	'GET',
 							url: 	BASE_PATH+'/public/ajax/initialmappingdb.php',
@@ -190,10 +190,12 @@ $(function() {
 								}
 							}
 						});
-						console.log(added_samples);
+						//	If samples added
 						if (added_samples.length > 0) {
+							//	insert into runlist
 							var submitted = postInsertRunlist('insertRunlist', added_samples, initial_run_ids[x]);
 							console.log(submitted);
+							//	Remove samples not in runlist
 							$.ajax({
 								type: 	'GET',
 								url: 	BASE_PATH+'/public/ajax/initialmappingdb.php',
@@ -204,15 +206,13 @@ $(function() {
 								}
 							});
 						}
+							//	Insert into run params
 							var runparamsInsert = postInsertRunparams(JSON_OBJECT, outdir, runname, rundesc, perms, group, '');
-							console.log(runparamsInsert);
 					}
 				}
 			}else{
 				//insert new values into ngs_runparams
 				var runparamsInsert = postInsertRunparams(JSON_OBJECT, outdir, runname, rundesc, perms, group, '');
-				console.log(runparamsInsert);
-				console.log(names_to_ids);
 				if (window.location.href.split("/").indexOf('fastlane') == -1) {
 					$.ajax({
 						type: 	'GET',
