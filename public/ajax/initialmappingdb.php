@@ -126,6 +126,7 @@ else if ($p == 'checkRunList')
 		}
 		$data = json_encode(array($added_samples_final, $outdirs_final, $run_ids_final, $sample_ids));
 	}else{
+		//	New run
 		$data = json_encode(array(array(), array(), array(), $sample_ids));
 	}
 }
