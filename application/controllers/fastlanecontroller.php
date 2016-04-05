@@ -26,6 +26,7 @@ class FastlaneController extends VanillaController {
 		
 		$text = '';
 		$bad_samples = '';
+		$bad_files_array = [];
 		$failed_test = false;
 		if(isset($_SESSION['fastlane_values'])){$fastlane_values = $_SESSION['fastlane_values'];}
 		if(isset($_SESSION['barcode_array'])){$barcode_array = $_SESSION['barcode_array'];}
@@ -50,6 +51,10 @@ class FastlaneController extends VanillaController {
 		if($pass_fail_array != []){
 			if($pass_fail_array[0] == "true" || $pass_fail_array == "false"){
 				$text.= "<h3>Errors found during submission:</h3><br>";
+				$text.="<script type='text/javascript'>";
+				$text.="var initialSubmission = undefined;";
+				if(isset($_SESSION['barcode_array'])){$text.="var barcode_array = undefined;";}
+				$text.="</script>";
 			}else{
 				$text.= "<h3>Successful Fastlane submission!</h3><br>";
 				$text.= "Don't forget to add more information about your samples!<br><br>";
@@ -62,18 +67,18 @@ class FastlaneController extends VanillaController {
 			foreach($pass_fail_array as $key=>$index){
 				if($index == 'false'){
 					if($key == 1){
-						$text.="Barcode selection is either empty or not properly formatted<br>";
+						$text.="<font color=\"red\">Barcode selection is either empty or not properly formatted.</font><br><br>";
 					}else if($key == 3){
-						$text.="Experiment Series field is empty<br>";
+						$text.="<font color=\"red\">Experiment Series field is empty or contains improper characters. Please use alpha-numerics, underscores, spaces, and periods only.</font><br><br>";
 					}else if($key == 4){
-						$text.="Experiment field is either empty or contains improper white space<br>";
+						$text.="<font color=\"red\">Import field is either empty or contains improper characters. Please use alpha-numerics, underscores, spaces, and periods only.</font><br><br>";
 					}else if($key == 5){
 						$text.="<h3>Input Directory</h3>";
 						if($fastlane_array[6]  == ''){
 							$text.="<font color=\"red\">Input Directory is Empty</font><br><br>";
 						}else{
 							$text.="Input Directory either contains improper white space or you do not have permissions to access it:<br>";
-							$text.="<font color=\"red\">".$fastlane_array[6]."</font><br><br>";
+							$text.="<font color=\"red\">".$fastlane_array[6]."<br>Please make sure to list the full path to the files. Please use alpha-numerics, underscores, spaces, dashes, backslashes and periods only.</font><br><br>";
 						}
 					}else if($key == 6){
 						$text.="<h3>Files</h3>";
@@ -83,8 +88,9 @@ class FastlaneController extends VanillaController {
 								$text.="<font color=\"red\">".$bfa."</font><br>";
 							}
 							$text.="<br>";
+							$text.="<font color=\"red\">If the files given are not in the proper fastlane format, please use alpha-numerics, underscores, and periods only.</font><br><br>";
 						}else{
-							$text.="<font color=\"red\">The files listed are not in the proper fastlane format.</font><br><br>";
+							$text.="<font color=\"red\">The files given are not in the proper fastlane format.  Please use alpha-numerics, underscores, and periods only.</font><br><br>";
 						}
 					}else if($key == 7){
 						$text.="<h3>Process Directory</h3>";
@@ -92,7 +98,7 @@ class FastlaneController extends VanillaController {
 							$text.="<font color=\"red\">Process Directory is Empty</font><br><br>";
 						}else{
 							$text.="Process Directory either contains improper white space or you do not have permissions to access it:<br>";
-							$text.="<font color=\"red\">".$fastlane_array[8]."</font><br><br>";
+							$text.="<font color=\"red\">".$fastlane_array[8]."<br>Please make sure to list the full path.  Please use alpha-numerics, underscores, spaces, dashes, backslashes and periods only.</font><br><br>";
 						}
 					}else if($key >= 9){
 						$database_sample_bool = true;
@@ -128,6 +134,7 @@ class FastlaneController extends VanillaController {
 		unset($_SESSION['bar_distance']);
 		unset($_SESSION['pass_fail_values']);
 		unset($_SESSION['bad_samples']);
+		unset($_SESSION['bad_files']);
 	}
 	
 	function afterAction(){
