@@ -129,7 +129,7 @@ function checkFieldIsNotFloat(input){
 
 function checkFieldAlphaNumeric(input){
 	var check = false;
-	var alpha_numeric = /^([0-9]|[a-z]|[A-Z])+([0-9a-zA-Z]+)$/i;
+	var alpha_numeric = /^[0-9a-zA-Z]*$/i;
 	if (!document.getElementById(input).value.match(alpha_numeric)) {
 		check = true;
 	}
@@ -137,7 +137,7 @@ function checkFieldAlphaNumeric(input){
 }
 function checkFieldAlphaNumericAdditionalChars(input, additional){
 	var check = false;
-	var alpha_numeric = new RegExp('^([0-9]|[a-z]|[A-Z]|[' + additional + '])+([0-9a-zA-Z' + additional + ']+)$', 'i');
+	var alpha_numeric = new RegExp('^[0-9a-zA-Z' + additional + ']*$', 'i');
 	if (!document.getElementById(input).value.match(alpha_numeric)) {
 		check = true;
 	}
@@ -261,7 +261,7 @@ function pipelineSubmitCheck(non_pipeline, non_pipeline_values, pipeline, pipeli
 		return true;
 	}
 	//	Run outdir nonnumeric
-	if (checkFieldAlphaNumericAdditionalChars('outdir', '\\_\\-\\/')) {
+	if (checkFieldAlphaNumericAdditionalChars('outdir', '\\_\\-\\/\\.')) {
 		displayErrorModal('#errorModal', 'Output Directory must use proper directory syntax');
 		return true;
 	}
@@ -358,8 +358,8 @@ function pipelineSubmitCheck(non_pipeline, non_pipeline_values, pipeline, pipeli
 					displayErrorModal('#errorModal', 'Chip Input is missing a name within ChipSeq');
 					return true;
 				//	correct characters
-				}else if (checkFieldAlphaNumericAdditionalChars('text_chip_'+pipeline_index[x]+'_'+chipseq[y], '\\_')) {
-					displayErrorModal('#errorModal', 'Name must contain alphanumeric or underscore characters only within ChipSeq');
+				}else if (checkFieldAlphaNumericAdditionalChars('text_chip_'+pipeline_index[x]+'_'+chipseq[y], '\\-\\_\\.')) {
+					displayErrorModal('#errorModal', 'Name must contain alphanumeric, dash, and underscore characters only within ChipSeq');
 					return true;
 				//	multiselect
 				}else if (checkChipMultiSelectEmpty('multi_chip_1_'+pipeline_index[x]+'_'+chipseq[y])) {

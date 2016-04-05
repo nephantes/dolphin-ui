@@ -42,7 +42,7 @@ function checkFastlaneInput(info_array){
 			var split_check = true;
 			for (var y = 0; y < split_barcodes.length; y++) {
 				split_barcodes[y].replace('\t', '');
-				if (/[\\|\!\@\#\$\%\^\&\*\+\=\[\]\;\:\<\>\<\?\{\}\(\)]/g.test(split_barcodes[y])) {
+				if (!/^[a-zA-Z 0-9\_\.\-]*$/.test(split_barcodes[y])) {
 					split_check = false;
 				}else{
 					var single_barcode_array = split_barcodes[y].split(' ');
@@ -68,7 +68,9 @@ function checkFastlaneInput(info_array){
 			split_inputs = split_inputs.filter(function(n){return n != ''});
 			var input_bool_check = true;
 			for (var y = 0; y < split_inputs.length; y++) {
-				if (/[\\|\!\@\#\$\%\^\&\*\+\=\[\]\;\:\<\>\<\?\{\}\(\)]/g.test(split_inputs[y])) {
+				console.log(split_inputs);
+				if (!/^[a-zA-Z 0-9\_\.\-\s]*$/.test(split_inputs[y])) {
+					bad_files.push("<font color=\"black\">incorrect file formatting: </font>" + split_inputs[y]);
 					input_bool_check = false;
 				}else{
 					var single_input_array = split_inputs[y].split(' ');
@@ -125,7 +127,7 @@ function checkFastlaneInput(info_array){
 			
 		}else if (id_array[x] == 'input_dir' || id_array[x] == 'backup_dir'){
 			//	Check inputs that should not contain whitespace
-			if (/[\\|\ \!\@\#\$\%\^\&\*\(\)\+\=\[\]\;\:\<\>\<	\?\{\}]/g.test(info_array[x])) {
+			if ((!/^[a-zA-Z0-9\_\.\/\-]*$/.test(info_array[x])) || info_array[x].indexOf("/") != 0) {
 				//	Contains whitespace
 				database_checks.push(false);
 			}else{
@@ -149,6 +151,7 @@ function checkFastlaneInput(info_array){
 				if (id_array[x] == 'input_dir') {
 					dir_check_2 = JSON.parse('{"Result":"Ok"}');
 				}else{
+					console.log(info_array[x]);
 					$.ajax({
 						type: 	'GET',
 						url: 	BASE_PATH+'/public/api/service.php?func=checkPermissions&username='+username.clusteruser+'&outdir=' + info_array[x],
@@ -168,6 +171,12 @@ function checkFastlaneInput(info_array){
 					//	No errors
 					database_checks.push(true);
 				}
+			}
+		}else if(id_array[x] == 'series_name' || id_array[x] == 'lane_name'){
+			if (/^[a-zA-Z 0-9\_\-\s]*$/.test(info_array[x])) {
+				database_checks.push(true);
+			}else{
+				database_checks.push(false);
 			}
 		}else{
 			//	No errors
