@@ -50,7 +50,7 @@ function sendBasketInfo(id){
 	$.ajax({ type: "POST",
 		url: BASE_PATH+"/public/ajax/sessionrequests.php",
 		data: { p:"sendBasketInfo", id:id },
-		async: false,
+		async: true,
 		success : function(s)
 		{
 		}
@@ -123,11 +123,10 @@ function getWKey() {
 }
 
 function removeBasketInfo(id){
-	console.log(id);
 	$.ajax({ type: "POST",
 		url: BASE_PATH+"/public/ajax/sessionrequests.php",
 		data: { p:"removeBasketInfo", id:id },
-		async: false,
+		async: true,
 		success : function(s)
 		{
 		}
@@ -138,7 +137,7 @@ function flushBasketInfo() {
 	$.ajax({ type: "POST",
 		url: BASE_PATH+"/public/ajax/sessionrequests.php",
 		data: { p:"flushBasketInfo"},
-		async: false,
+		async: true,
 		success : function(s)
 		{
 		}
