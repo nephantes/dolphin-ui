@@ -724,7 +724,7 @@ $(function() {
 		$.ajax({ type: "GET",
 			url: BASE_PATH+"/public/ajax/ngs_tables.php",
 			data: { p: samplesType, q: qvar, r: rvar, seg: segment, search: theSearch, uid: uid, gids: gids },
-			async: true,
+			async: false,
 			success : function(s)
 			{
 				sample_data = s;
@@ -771,7 +771,7 @@ $(function() {
 		$.ajax({ type: "GET",
 			url: BASE_PATH+"/public/ajax/ngs_tables.php",
 			data: { p: "getLanes", q: qvar, r: rvar, seg: segment, search: theSearch, uid: uid, gids: gids },
-			async: true,
+			async: false,
 			success : function(s)
 			{
 				lane_data = s;
@@ -789,7 +789,7 @@ $(function() {
 		$.ajax({ type: "GET",
 			url: BASE_PATH+"/public/ajax/ngs_tables.php",
 			data: { p: "getExperimentSeries", q: qvar, r: rvar, seg: segment, search: theSearch, uid: uid, gids: gids },
-			async: true,
+			async: false,
 			success : function(s)
 			{
 				experiment_series_data = s;
