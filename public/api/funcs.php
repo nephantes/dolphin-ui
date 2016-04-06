@@ -148,7 +148,7 @@ class funcs
     function runSQL($sql)
     {
         #sleep(1);
-        usleep(50000);
+        usleep(100000);
         $this->readINI();
         $link = new mysqli($this->dbhost, $this->dbuser, $this->dbpass, $this->db);
         // check connection
@@ -610,6 +610,7 @@ class funcs
            $job_ids.=$job['job_id'].",";
         }
         $job_ids=rtrim($job_ids, ",");
+        if ($jobnum > 0){
         $sql = "insert into jobs(`username`, `wkey`, `run_script`, `jobname`, `workflow_id`, `service_id`, `resources`, `result`, `submit_time`, `job_num`) values ('$username','$wkey','$com','$jobname','$workflow_id','$service_id', '$resources', '$result', now(), '$jobnum')";
 
         $res = $this->runSQL($sql);
@@ -618,7 +619,7 @@ class funcs
             $sql="update jobs set jobstatus=0 where job_id in ($job_ids)";
             $res = $this->runSQL($sql);
         }
-        
+        } 
         return $res;
     }
     
