@@ -123,7 +123,6 @@ function getWKey() {
 }
 
 function removeBasketInfo(id){
-	console.log(id);
 	$.ajax({ type: "POST",
 		url: BASE_PATH+"/public/ajax/sessionrequests.php",
 		data: { p:"removeBasketInfo", id:id },
