@@ -48,7 +48,7 @@ function manageCreateChecklists(id, tablerow){
 		$.ajax({ type: "GET",
 				url: BASE_PATH+"/public/ajax/tablegenerator.php",
 				data: { p: "getTableSamples", search: id },
-				async: false,
+				async: true,
 				success : function(s)
 				{
 					for(var i = 0; i < s.length; i++){
@@ -69,10 +69,10 @@ function manageCreateChecklists(id, tablerow){
 						runHelper.push(s[i].id);
 						selectionHelper.push(0);
 					}
+					checklist_samples.push(id);
+					sendBasketInfo(id);
+					reportSelection();
 				}});
-		checklist_samples.push(id);
-		sendBasketInfo(id);
-		reportSelection();
 	}else{
 		//remove
 		removeTableSamples(id, document.getElementById('sample_removal_'+id));
@@ -543,7 +543,6 @@ function sendToSavedTable(id){
 
 $(function() {
 	"use strict";
-	
 	if(window.location.href.split("/").indexOf('table') < 0 && window.location.href.split("/").indexOf('tablereports') < 0){
 		//	If within tablecreator page, get basket info
 		var sample_ids = getBasketInfo();
@@ -617,10 +616,10 @@ $(function() {
 						]);
 					}
 				}
+				checkCheckedList();
+				reportSelection();
 			}
 		});
-		checkCheckedList();
-		reportSelection();
 	}else if (window.location.href.split("/").indexOf('table') > -1){
 		var table_params;
 		$.ajax({ type: "GET",
