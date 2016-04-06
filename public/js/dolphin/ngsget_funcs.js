@@ -4,11 +4,6 @@
  *Ascription:
  */
 
-//	Variables
-var allCurrentSamples = [];
-var allCurrentLanes = [];
-var allCurrentSeries = [];
-
 function rerunSelected(runID, groupID){
 	var sample_ids = [];
 	$.ajax({ type: "GET",
@@ -152,9 +147,8 @@ function getLanesToSamples(lane_id){
 }
 
 function getAllSampleIds(){
-	if (allCurrentSamples.length == 0) {
-		var samples_returned = [];
-		$.ajax({ type: "GET",
+	samples_returned = [];
+	$.ajax({ type: "GET",
 		url: BASE_PATH+"/public/ajax/ngsquerydb.php",
 		data: { p: "getAllSampleIds" },
 		async: false,
@@ -164,50 +158,41 @@ function getAllSampleIds(){
 			for(var x = 0; x < s.length; x++){
 				samples_returned.push(s[x].id);
 			}
-			allCurrentSamples = samples_returned;
-			
 		}
-		});
-	}
-	return allCurrentSamples;
+	});
+	return samples_returned;
 }
 
 function getAllLaneIds(){
-	if (allCurrentLanes.length == 0) {
-		lanes_returned = [];
-		$.ajax({ type: "GET",
-			url: BASE_PATH+"/public/ajax/ngsquerydb.php",
-			data: { p: "getAllLaneIds" },
-			async: false,
-			success : function(s)
-			{
-				for(var x = 0; x < s.length; x++){
-					lanes_returned.push(s[x].id);
-				}
-				allCurrentLanes = lanes_returned;
+	lanes_returned = [];
+	$.ajax({ type: "GET",
+		url: BASE_PATH+"/public/ajax/ngsquerydb.php",
+		data: { p: "getAllLaneIds" },
+		async: false,
+		success : function(s)
+		{
+			for(var x = 0; x < s.length; x++){
+				lanes_returned.push(s[x].id);
 			}
-		});
-	}
-	return allCurrentLanes;
+		}
+	});
+	return lanes_returned;
 }
 
 function getAllExperimentIds(){
-	if (allCurrentSeries.length == 0) {
-		experiments_returned = [];
-		$.ajax({ type: "GET",
-			url: BASE_PATH+"/public/ajax/ngsquerydb.php",
-			data: { p: "getAllExperimentIds" },
-			async: false,
-			success : function(s)
-			{
-				for(var x = 0; x < s.length; x++){
-					experiments_returned.push(s[x].id);
-				}
-				allCurrentSeries = experiments_returned;
+	experiments_returned = [];
+	$.ajax({ type: "GET",
+		url: BASE_PATH+"/public/ajax/ngsquerydb.php",
+		data: { p: "getAllExperimentIds" },
+		async: false,
+		success : function(s)
+		{
+			for(var x = 0; x < s.length; x++){
+				experiments_returned.push(s[x].id);
 			}
-		});
-	}
-	return allCurrentSeries;
+		}
+	});
+	return experiments_returned;
 }
 
 function getSeriesIdFromLane(lane){

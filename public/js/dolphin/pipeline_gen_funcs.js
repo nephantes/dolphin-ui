@@ -1031,7 +1031,7 @@ function manageChecklists(name, type){
 						}
 					}
 				}
-				if (!lanes_bool) {
+				if (lanes_bool) {
 					if (document.getElementById('lane_checkbox_' + lane_check) != undefined) {
 						var check = document.getElementById('lane_checkbox_' + lane_check);
 						check.checked = !check.checked;
@@ -1049,7 +1049,7 @@ function manageChecklists(name, type){
 						}
 					}
 				}
-				if (!experiment_bool) {
+				if (experiment_bool) {
 					if (document.getElementById('experiment_checkbox_' + experiment_check) != undefined) {
 						var check = document.getElementById('experiment_checkbox_' + experiment_check);
 						check.checked = !check.checked;
