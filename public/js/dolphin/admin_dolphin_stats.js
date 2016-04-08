@@ -15,6 +15,7 @@ $(function() {
                      success : function(text)
                      {
                          responseTopDolphinUsers = text;
+						 console.log(responseTopDolphinUsers)
                      }
             });
 

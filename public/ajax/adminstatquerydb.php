@@ -20,7 +20,7 @@ if($p == "getDailyRuns")
       select * from
       (select * from
       (select b.countDolphin, b.day from
-      (select count(distinct workflow_id) countTotal, DATE_FORMAT(start_time, "%Y-%m-%d") day from jobs group by day order by day) b,
+      (select count(distinct workflow_id) countDolphin, DATE_FORMAT(start_time, "%Y-%m-%d") day from jobs group by day order by day) b
       order by day desc) b limit 30) b order by day asc
       ');
    }else{
