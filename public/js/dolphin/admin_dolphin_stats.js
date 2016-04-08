@@ -201,6 +201,7 @@ $(function() {
                      async: false,
                      success : function(s)
                      {
+						console.log(s);
                         toolTable.fnClearTable();
                         for(var i = 0; i < s.length; i++) {
                         toolTable.fnAddData([
@@ -232,6 +233,7 @@ $(function() {
                      async: false,
                      success : function(s)
                      {
+						console.log(s);
                         toolTable.fnClearTable();
                         for(var i = 0; i < s.length; i++) {
                         toolTable.fnAddData([
@@ -256,6 +258,7 @@ $(function() {
                      async: false,
                      success : function(s)
                      {
+						console.log(s);
                         jobTable.fnClearTable();
                         for(var i = 0; i < s.length; i++) {
                         jobTable.fnAddData([
@@ -287,6 +290,7 @@ $(function() {
                      async: false,
                      success : function(s)
                      {
+						console.log(s);
                         jobTable.fnClearTable();
                         for(var i = 0; i < s.length; i++) {
                         jobTable.fnAddData([
