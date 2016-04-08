@@ -15,23 +15,14 @@ if (isset($_GET['end'])){$end = $_GET['end'];}
 
 if($p == "getDailyRuns")
 {
-   if ($type=="Dolphin"){
-      $data=$query->queryTable('
-      select * from
-      (select * from
-      (select b.countDolphin, b.day from
-      (select count(distinct workflow_id) countDolphin, DATE_FORMAT(start_time, "%Y-%m-%d") day from jobs group by day order by day) b
-      order by day desc) b limit 30) b order by day asc
-      ');
-   }else{
-      $data=$query->queryTable('
-      select * from
-      (select * from
-      (select a.countTotal, a.day from
-      (select count(id) countTotal, DATE_FORMAT(start_time, "%Y-%m-%d") day from galaxy_run group by day order by day) a
-      order by day desc) a limit 30) a order by day asc
-      ');
-   }
+   $data=$query->queryTable('
+   select * from
+   (select * from
+   (select a.countTotal, b.countDolphin, a.day from
+   (select count(id) countTotal, DATE_FORMAT(start_time, "%Y-%m-%d") day from galaxy_run group by day order by day) a,
+   (select count(distinct workflow_id) countDolphin, DATE_FORMAT(start_time, "%Y-%m-%d") day from jobs group by day order by day) b
+   where a.day=b.day order by day desc) a limit 30) a order by day asc
+   ');
 }
 else if($p == "getTopUsers")
 {
