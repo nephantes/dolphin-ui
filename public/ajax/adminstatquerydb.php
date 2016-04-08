@@ -60,7 +60,7 @@ else if($p == "getUsersTime")
       select u.name, u.lab, count(s.service_id) count
       from services s, users u, jobs j
       where u.username=s.username
-      where j.service_id=s.service_id
+      and j.service_id=s.service_id
       $time
       group by s.username
       order by count desc
@@ -86,7 +86,7 @@ else if($p == "getLabsTime")
       select u.lab, count(s.service_id) count
       from services s, users u, jobs j
       where u.username=s.username
-      where j.service_id=s.service_id
+      and j.service_id=s.service_id
       $time
       group by u.lab
       order by count desc
