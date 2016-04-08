@@ -57,7 +57,7 @@ else if($p == "getUsersTime")
    if ($type=="Dolphin"){
       if (isset($start)){$time="and j.`start_time`>='$start' and j.`start_time`<='$end'";}
       $data=$query->queryTable("
-      select u.name, u.lab, count(s.service_id) count
+      select u.name, u.lab, count(distinct s.service_id) count
       from services s, users u, jobs j
       where u.clusteruser=s.username
       and j.service_id=s.service_id
@@ -83,7 +83,7 @@ else if($p == "getLabsTime")
    if (isset($start)){$time="and j.`start_time`>='$start' and j.`start_time`<='$end'";}
    if ($type=="Dolphin"){
       $data=$query->queryTable("
-      select u.lab, count(s.service_id) count
+      select u.lab, count(distinct s.service_id) count
       from services s, users u, jobs j
       where u.clusteruser=s.username
       and j.service_id=s.service_id
