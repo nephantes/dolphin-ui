@@ -59,7 +59,7 @@ else if($p == "getUsersTime")
       $data=$query->queryTable("
       select u.name, u.lab, count(s.service_id) count
       from services s, users u, jobs j
-      where u.username=s.username
+      where u.clusteruser=s.username
       and j.service_id=s.service_id
       $time
       group by s.username
@@ -85,7 +85,7 @@ else if($p == "getLabsTime")
       $data=$query->queryTable("
       select u.lab, count(s.service_id) count
       from services s, users u, jobs j
-      where u.username=s.username
+      where u.clusteruser=s.username
       and j.service_id=s.service_id
       $time
       group by u.lab
