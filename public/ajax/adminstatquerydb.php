@@ -39,7 +39,7 @@ else if($p == "getTopUsers")
       $data=$query->queryTable("
       select u.name, count(distinct j.workflow_id) count
       from jobs j, users u
-      where u.clustername=j.username
+      where u.clusteruser=j.username
       group by j.username
       order by count desc
       limit 20
@@ -63,7 +63,7 @@ else if($p == "getTopUsersTime")
       $data=$query->queryTable("
       select u.name, count(distinct j.workflow_id) count
       from jobs j, users u
-      where u.clustername=j.username 
+      where u.clusteruser=j.username 
       $time
       group by j.username
       order by count desc
