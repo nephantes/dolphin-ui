@@ -192,6 +192,63 @@ $(function() {
 
     });
     labTable.fnSort( [ [1,'desc'] ] );
+	
+	/*##### SERVICE TABLE #####*/
+    
+    var serviceTable = $('#jsontable_Service').dataTable();
+    
+    $.ajax({ type: "GET",   
+                     url: BASE_PATH+"/public/ajax/adminstatquerydb.php",
+                     data: { p: "getServiceTime", type:"Dolphin" },
+                     async: false,
+                     success : function(s)
+                     {
+						console.log(s);
+                        serviceTable.fnClearTable();
+                        for(var i = 0; i < s.length; i++) {
+                        serviceTable.fnAddData([
+                        s[i].servicename,
+                        s[i].count                      
+                        ]);
+                        } // End For
+                     }
+            });
+    
+    $('.daterange_Service').daterangepicker(
+            {
+                ranges: {
+                    'Today': [moment().subtract('days', 1), moment()],
+                    'Yesterday': [moment().subtract('days', 2), moment().subtract('days', 1)],
+                    'Last 7 Days': [moment().subtract('days', 6), moment()],
+                    'Last 30 Days': [moment().subtract('days', 29), moment()],
+                    'This Month': [moment().startOf('month'), moment().endOf('month')],
+                    'Last Month': [moment().subtract('month', 1).startOf('month'), moment().subtract('month', 1).endOf('month')],
+                    'This Year': [moment().startOf('year'), moment().endOf('year')],
+                },
+                startDate: moment().subtract('days', 29),
+                endDate: moment()
+            },
+    function(start, end) {
+            $.ajax({ type: "GET",   
+                     url: BASE_PATH+"/public/ajax/adminstatquerydb.php",
+                     data: { p: "getServiceTime", type:"Dolphin", start:start.format('YYYY-MM-DD'), end:end.format('YYYY-MM-DD') },
+                     async: false,
+                     success : function(s)
+                     {
+						console.log(s);
+                        serviceTable.fnClearTable();
+                        for(var i = 0; i < s.length; i++) {
+                        serviceTable.fnAddData([
+                        s[i].servicename,
+                        s[i].count                      
+                        ]);
+                        } // End For
+                     }
+            });
+
+    });
+    
+    serviceTable.fnSort( [ [1,'desc'] ] );
     
     /*##### JOB TABLE #####*/
     
