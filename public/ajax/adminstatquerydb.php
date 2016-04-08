@@ -53,31 +53,51 @@ else if($p == "getTopUsersTime")
 }
 else if($p == "getUsersTime")
 {
-    $time="";
-    if ($type=="Dolphin"){$dolphin="and dolphin=true";}else{$dolphin="and dolphin=false";}
-    if (isset($start)){$time="and g.`start_time`>='$start' and g.`start_time`<='$end'";}
-    $data=$query->queryTable("
-    select u.name, u.lab, count(g.id) count
-    from galaxy_run g, users u
-    where u.username=g.username
-    $time $dolphin
-    group by g.username
-    order by count desc
-    ");
+   $time="";
+   if (isset($start)){$time="and g.`start_time`>='$start' and g.`start_time`<='$end'";}
+   if ($type=="Dolphin"){
+      $data=$query->queryTable("
+      select u.name, u.lab, count(s.service_id) count
+      from services s, users u
+      where u.username=s.username
+      $time
+      group by s.username
+      order by count desc
+      ");
+   }else{
+      $data=$query->queryTable("
+      select u.name, u.lab, count(g.id) count
+      from galaxy_run g, users u
+      where u.username=g.username
+      $time
+      group by g.username
+      order by count desc
+      ");
+   }
 }
 else if($p == "getLabsTime")
 {
-    $time="";
-    if ($type=="Dolphin"){$dolphin="and dolphin=true";}else{$dolphin="and dolphin=false";}
-    if (isset($start)){$time="and g.`start_time`>='$start' and g.`start_time`<='$end'";}
-    $data=$query->queryTable("
-    select u.lab, count(g.id) count
-    from galaxy_run g, users u
-    where u.username=g.username
-    $time $dolphin
-    group by u.lab
-    order by count desc
-    ");
+   $time="";
+   if (isset($start)){$time="and g.`start_time`>='$start' and g.`start_time`<='$end'";}
+   if ($type=="Dolphin"){
+      $data=$query->queryTable("
+      select u.lab, count(s.service_id) count
+      from services s, users u
+      where u.username=s.username
+      $time
+      group by u.lab
+      order by count desc
+      ");
+   }else{
+      $data=$query->queryTable("
+      select u.lab, count(g.id) count
+      from galaxy_run g, users u
+      where u.username=g.username
+      $time
+      group by u.lab
+      order by count desc
+      ");
+   }
 }
 else if($p == "getToolTime")
 {
