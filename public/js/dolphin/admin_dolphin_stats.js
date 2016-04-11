@@ -15,6 +15,7 @@ $(function() {
                      success : function(text)
                      {
                          responseTopDolphinUsers = text;
+						 console.log(responseTopDolphinUsers)
                      }
             });
 
@@ -192,26 +193,29 @@ $(function() {
 
     });
     labTable.fnSort( [ [1,'desc'] ] );
+	
+	/*##### SERVICE TABLE #####*/
     
-    var toolTable = $('#jsontable_Tool').dataTable();
+    var serviceTable = $('#jsontable_Service').dataTable();
     
     $.ajax({ type: "GET",   
                      url: BASE_PATH+"/public/ajax/adminstatquerydb.php",
-                     data: { p: "getToolTime", type:"Dolphin" },
+                     data: { p: "getServiceTime", type:"Dolphin" },
                      async: false,
                      success : function(s)
                      {
-                        toolTable.fnClearTable();
+						console.log(s);
+                        serviceTable.fnClearTable();
                         for(var i = 0; i < s.length; i++) {
-                        toolTable.fnAddData([
-                        s[i].tool_name,
+                        serviceTable.fnAddData([
+                        s[i].servicename,
                         s[i].count                      
                         ]);
                         } // End For
                      }
             });
     
-    $('.daterange_Tool').daterangepicker(
+    $('.daterange_Service').daterangepicker(
             {
                 ranges: {
                     'Today': [moment().subtract('days', 1), moment()],
@@ -228,14 +232,15 @@ $(function() {
     function(start, end) {
             $.ajax({ type: "GET",   
                      url: BASE_PATH+"/public/ajax/adminstatquerydb.php",
-                     data: { p: "getToolTime", type:"Dolphin", start:start.format('YYYY-MM-DD'), end:end.format('YYYY-MM-DD') },
+                     data: { p: "getServiceTime", type:"Dolphin", start:start.format('YYYY-MM-DD'), end:end.format('YYYY-MM-DD') },
                      async: false,
                      success : function(s)
                      {
-                        toolTable.fnClearTable();
+						console.log(s);
+                        serviceTable.fnClearTable();
                         for(var i = 0; i < s.length; i++) {
-                        toolTable.fnAddData([
-                        s[i].tool_name,
+                        serviceTable.fnAddData([
+                        s[i].servicename,
                         s[i].count                      
                         ]);
                         } // End For
@@ -244,7 +249,7 @@ $(function() {
 
     });
     
-    toolTable.fnSort( [ [1,'desc'] ] );
+    serviceTable.fnSort( [ [1,'desc'] ] );
     
     /*##### JOB TABLE #####*/
     
@@ -256,6 +261,7 @@ $(function() {
                      async: false,
                      success : function(s)
                      {
+						console.log(s);
                         jobTable.fnClearTable();
                         for(var i = 0; i < s.length; i++) {
                         jobTable.fnAddData([
@@ -287,6 +293,7 @@ $(function() {
                      async: false,
                      success : function(s)
                      {
+						console.log(s);
                         jobTable.fnClearTable();
                         for(var i = 0; i < s.length; i++) {
                         jobTable.fnAddData([
