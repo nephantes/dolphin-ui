@@ -22,13 +22,11 @@
         <link href="<?php echo BASE_PATH?>/css/AdminLTE.css" rel="stylesheet" type="text/css" />
         <!-- DATA TABLES -->
         <link href="<?php echo BASE_PATH?>/css/datatables/dataTables.bootstrap.css" rel="stylesheet" type="text/css" />
-
-        <link href="//cdnjs.cloudflare.com/ajax/libs/font-awesome/4.1.0/css/font-awesome.min.css" rel="stylesheet" type="text/css" />
         <link href="//code.jquery.com/ui/1.10.3/themes/smoothness/jquery-ui.css" rel="stylesheet" type="text/css" />
      
         <link href="//cdn.datatables.net/tabletools/2.2.3/css/dataTables.tableTools.css" rel="stylesheet" type="text/css" />
         <link href="//cdn.datatables.net/plug-ins/725b2a2115b/integration/bootstrap/3/dataTables.bootstrap.css" rel="stylesheet" type="text/css" />
-        <link href="//editor.datatables.net/examples/resources/bootstrap/editor.bootstrap.css" rel="stylesheet" type="text/css" />
+        <link href="<?php echo BASE_PATH?>/css/datatables/dataTables.editor.bootstrap.css" rel="stylesheet" type="text/css" />
 
         <link href="<?php echo BASE_PATH?>/css/AdminLTE.css" rel="stylesheet" type="text/css" />
 
