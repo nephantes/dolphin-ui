@@ -49,7 +49,7 @@ $(function() {
     function(start, end) {
         var responseTopGalaxyUsers = '';
             $.ajax({ type: "GET",
-                     url: "/dolphin/public/ajax/adminstatquerydb.php",
+                     url: BASE_PATH+"/public/ajax/adminstatquerydb.php",
                      data: { p: "getTopUsersTime", type:"Galaxy", start:start.format('YYYY-MM-DD'), end:end.format('YYYY-MM-DD') },
                      async: false,
                      success : function(text)
@@ -143,11 +143,12 @@ $(function() {
     
     var labTable = $('#jsontable_Lab').dataTable();
                 $.ajax({ type: "GET",   
-                     url: "/dolphin/public/ajax/adminstatquerydb.php",
+                     url: BASE_PATH+"/public/ajax/adminstatquerydb.php",
                      data: { p: "getLabsTime", type:"Galaxy" },
                      async: false,
                      success : function(s)
                      {
+                        console.log(s);
                         labTable.fnClearTable();
                         for(var i = 0; i < s.length; i++) {
                         labTable.fnAddData([
@@ -173,11 +174,12 @@ $(function() {
             },
             function(start, end) {
             $.ajax({ type: "GET",   
-                     url: "/dolphin/public/ajax/adminstatquerydb.php",
+                     url: BASE_PATH+"/public/ajax/adminstatquerydb.php",
                      data: { p: "getLabsTime", type:"Galaxy", start:start.format('YYYY-MM-DD'), end:end.format('YYYY-MM-DD') },
                      async: false,
                      success : function(s)
                      {
+                        console.log(s);
                         labTable.fnClearTable();
                         for(var i = 0; i < s.length; i++) {
                         labTable.fnAddData([
@@ -194,11 +196,12 @@ $(function() {
     
     var toolTable = $('#jsontable_Tool').dataTable();
     $.ajax({ type: "GET",   
-                     url: "/dolphin/public/ajax/adminstatquerydb.php",
+                     url: BASE_PATH+"/public/ajax/adminstatquerydb.php",
                      data: { p: "getToolTime", type:"Galaxy"},
                      async: false,
                      success : function(s)
                      {
+                        console.log(s);
                         toolTable.fnClearTable();
                         for(var i = 0; i < s.length; i++) {
                         toolTable.fnAddData([
@@ -224,11 +227,12 @@ $(function() {
             },
     function(start, end) {
             $.ajax({ type: "GET",   
-                     url: "/dolphin/public/ajax/adminstatquerydb.php",
+                     url: BASE_PATH+"/public/ajax/adminstatquerydb.php",
                      data: { p: "getToolTime", type:"Galaxy", start:start.format('YYYY-MM-DD'), end:end.format('YYYY-MM-DD') },
                      async: false,
                      success : function(s)
                      {
+                        console.log(s);
                         toolTable.fnClearTable();
                         for(var i = 0; i < s.length; i++) {
                         toolTable.fnAddData([

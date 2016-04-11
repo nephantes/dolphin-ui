@@ -10,6 +10,7 @@ class adminstatquerydb_unittest extends PHPUnit_Framework_TestCase
     public function testGetDailyRuns(){
         ob_start();
 		$_GET['p'] = 'getDailyRuns';
+		$_GET['type'] = 'Dolphin';
 		include("adminstatquerydb.php");
 		$this->assertEquals(json_decode($data),array());
 		ob_end_clean();

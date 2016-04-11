@@ -20,89 +20,145 @@ if($p == "getDailyRuns")
    (select * from
    (select a.countTotal, b.countDolphin, a.day from
    (select count(id) countTotal, DATE_FORMAT(start_time, "%Y-%m-%d") day from galaxy_run group by day order by day) a,
-   (select count(id) countDolphin, DATE_FORMAT(start_time, "%Y-%m-%d") day from galaxy_run where dolphin=TRUE group by day order by day) b
+   (select count(distinct workflow_id) countDolphin, DATE_FORMAT(start_time, "%Y-%m-%d") day from jobs group by day order by day) b
    where a.day=b.day order by day desc) a limit 30) a order by day asc
    ');
 }
 else if($p == "getTopUsers")
 {
-    if ($type=="Dolphin"){$dolphin="and dolphin=true";}else{$dolphin="and dolphin=false";}
-    $data=$query->queryTable("
-    select u.name, count(g.id) count
-    from galaxy_run g, users u
-    where u.username=g.username $dolphin
-    group by g.username
-    order by count desc
-    limit 20
-    ");
+   if ($type=="Dolphin"){
+      $data=$query->queryTable("
+      select u.name, count(distinct j.workflow_id) count
+      from jobs j, users u
+      where u.clusteruser=j.username
+      group by j.username
+      order by count desc
+      limit 20
+      ");
+   }else{
+      $data=$query->queryTable("
+      select u.name, count(g.id) count
+      from galaxy_run g, users u
+      where u.username=g.username
+      group by g.username
+      order by count desc
+      limit 20
+      ");
+   }
 }
 else if($p == "getTopUsersTime")
 {
-    $time="";
-    if ($type=="Dolphin"){$dolphin="and dolphin=true";}else{$dolphin="and dolphin=false";}
-    if (isset($start)){$time="and g.`start_time`>='$start' and g.`start_time`<='$end'";}
-    $data=$query->queryTable("
-    select u.name, count(g.id) count
-    from galaxy_run g, users u
-    where u.username=g.username 
-    $time $dolphin
-    group by g.username
-    order by count desc
-    limit 20
-    ");
+   $time="";
+   if ($type=="Dolphin"){
+      if (isset($start)){$time="and j.`start_time`>='$start' and j.`start_time`<='$end'";}
+      $data=$query->queryTable("
+      select u.name, count(distinct j.workflow_id) count
+      from jobs j, users u
+      where u.clusteruser=j.username 
+      $time
+      group by j.username
+      order by count desc
+      limit 20
+      ");
+   }else{
+      if (isset($start)){$time="and g.`start_time`>='$start' and g.`start_time`<='$end'";}
+      $data=$query->queryTable("
+      select u.name, count(g.id) count
+      from galaxy_run g, users u
+      where u.username=g.username 
+      $time
+      group by g.username
+      order by count desc
+      limit 20
+      ");
+   }
 }
 else if($p == "getUsersTime")
 {
-    $time="";
-    if ($type=="Dolphin"){$dolphin="and dolphin=true";}else{$dolphin="and dolphin=false";}
-    if (isset($start)){$time="and g.`start_time`>='$start' and g.`start_time`<='$end'";}
-    $data=$query->queryTable("
-    select u.name, u.lab, count(g.id) count
-    from galaxy_run g, users u
-    where u.username=g.username
-    $time $dolphin
-    group by g.username
-    order by count desc
-    ");
+   $time="";
+   if ($type=="Dolphin"){
+      if (isset($start)){$time="and j.`start_time`>='$start' and j.`start_time`<='$end'";}
+      $data=$query->queryTable("
+      select u.name, u.lab, count(distinct j.workflow_id) count
+      from users u, jobs j
+      where u.clusteruser=j.username
+      $time
+      group by j.username
+      order by count desc
+      ");
+   }else{
+      if (isset($start)){$time="and g.`start_time`>='$start' and g.`start_time`<='$end'";}
+      $data=$query->queryTable("
+      select u.name, u.lab, count(g.id) count
+      from galaxy_run g, users u
+      where u.username=g.username
+      $time
+      group by g.username
+      order by count desc
+      ");
+   }
 }
 else if($p == "getLabsTime")
 {
-    $time="";
-    if ($type=="Dolphin"){$dolphin="and dolphin=true";}else{$dolphin="and dolphin=false";}
-    if (isset($start)){$time="and g.`start_time`>='$start' and g.`start_time`<='$end'";}
-    $data=$query->queryTable("
-    select u.lab, count(g.id) count
-    from galaxy_run g, users u
-    where u.username=g.username
-    $time $dolphin
-    group by u.lab
-    order by count desc
-    ");
+   $time="";
+   if (isset($start)){$time="and j.`start_time`>='$start' and j.`start_time`<='$end'";}
+   if ($type=="Dolphin"){
+      $data=$query->queryTable("
+      select u.lab, count(distinct j.workflow_id) count
+      from users u, jobs j
+      where u.clusteruser=j.username
+      $time
+      group by u.lab
+      order by count desc
+      ");
+   }else{
+      $data=$query->queryTable("
+      select u.lab, count(g.id) count
+      from galaxy_run g, users u
+      where u.username=g.username
+      $time
+      group by u.lab
+      order by count desc
+      ");
+   }
 }
 else if($p == "getToolTime")
 {
-    $time="";
-    if ($type=="Dolphin"){$dolphin="dolphin=true";}else{$dolphin="dolphin=false";}
-    if (isset($start)){$time="g.`start_time`>='$start' and g.`start_time`<='$end' and";}
-    $data=$query->queryTable("
-    select g.tool_name, count(g.id) count
-    from galaxy_run g
-    where $time $dolphin
-    group by g.tool_name
-    order by count desc
-    ");
+   $time="";
+   if ($type=="Dolphin"){$dolphin="dolphin=true";}else{$dolphin="dolphin=false";}
+   if (isset($start)){$time="g.`start_time`>='$start' and g.`start_time`<='$end' and";}
+   $data=$query->queryTable("
+   select g.tool_name, count(g.id) count
+   from galaxy_run g
+   where $time $dolphin
+   group by g.tool_name
+   order by count desc
+   ");
+}
+else if ($p == "getServiceTime")
+{
+   $time="";
+   if (isset($start)){$time="and j.`submit_time`>='$start' and j.`submit_time`<='$end'";}
+   $data=$query->queryTable("
+   select s.servicename, count(distinct s.service_id) count
+   from jobs j, services s
+   where j.service_id=s.service_id
+   $time
+   group by servicename
+   order by count desc
+   ");
 }
 else if($p == "getJobTime")
 {
-    $time="";
-    if (isset($start)){$time="and j.`submit_time`>='$start' and j.`submit_time`<='$end'";}
-    $data=$query->queryTable("
-    select s.servicename, count(j.job_id) count
-    from jobs j, services s
-    where j.service_id=s.service_id $time
-    group by servicename
-    order by count desc
-    ");
+   $time="";
+   if (isset($start)){$time="and j.`submit_time`>='$start' and j.`submit_time`<='$end'";}
+   $data=$query->queryTable("
+   select s.servicename, count(j.job_id) count
+   from jobs j, services s
+   where j.service_id=s.service_id $time
+   group by servicename
+   order by count desc
+   ");
 }
 
 if (!headers_sent()) {
