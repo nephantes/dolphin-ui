@@ -29,7 +29,7 @@ if (isset($_GET['search'])){$search = $_GET['search'];}
 if (isset($_GET['uid'])){$uid = $_GET['uid'];}
 if (isset($_GET['gids'])){$gids = $_GET['gids'];}
 //	Create permissions statements
-if($uid != "" && $gids != "" && $_SESSION['uid'] != 1){
+if($uid != "" && $gids != "" && $_SESSION['uid'] != "1"){
     $perms = "WHERE (((group_id in ($gids)) AND (perms >= 15)) OR (owner_id = $uid) OR (perms >= 32))";
     $andPerms = "AND (((group_id in ($gids)) AND (perms >= 15)) OR (owner_id = $uid) OR (perms >= 32))";
 }
@@ -74,16 +74,16 @@ if ($p == 'getStatus')	//	Status tables
 	$run_type = "";
 	if($_SESSION['run_type'] == 1){
 		$run_type = "WHERE ((run_name = 'Fastlane Initial Run') OR (run_name = 'Import Initial Run')) ";
-		if($uid != "" && $gids != "" && $_SESSION['uid'] != 1){
+		if($uid != "" && $gids != "" && $_SESSION['uid'] != "1"){
 			$run_type .= "AND (((ngs_runparams.group_id in ($gids)) AND (ngs_runparams.perms >= 15)) OR (ngs_runparams.owner_id = $uid) OR (ngs_runparams.perms >= 32))";
 		}
 	}else if ($_SESSION['run_type'] == 2){
 		$run_type = "WHERE ((run_name != 'Fastlane Initial Run') AND (run_name != 'Import Initial Run')) ";
-		if($uid != "" && $gids != "" && $_SESSION['uid'] != 1){
+		if($uid != "" && $gids != "" && $_SESSION['uid'] != "1"){
 			$run_type .= "AND (((ngs_runparams.group_id in ($gids)) AND (ngs_runparams.perms >= 15)) OR (ngs_runparams.owner_id = $uid) OR (ngs_runparams.perms >= 32))";
 		}
 	}else{
-		if($uid != "" && $gids != "" && $_SESSION['uid'] != 1){
+		if($uid != "" && $gids != "" && $_SESSION['uid'] != "1"){
 			$run_type = "WHERE (((ngs_runparams.group_id in ($gids)) AND (ngs_runparams.perms >= 15)) OR (ngs_runparams.owner_id = $uid) OR (ngs_runparams.perms >= 32))";
 		}
 	}
