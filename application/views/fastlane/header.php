@@ -11,7 +11,7 @@
 
 		<link href="//cdn.datatables.net/tabletools/2.2.3/css/dataTables.tableTools.css" rel="stylesheet" type="text/css" />
 		<link href="//cdn.datatables.net/plug-ins/725b2a2115b/integration/bootstrap/3/dataTables.bootstrap.css" rel="stylesheet" type="text/css" />
-		<link href="//editor.datatables.net/examples/resources/bootstrap/editor.bootstrap.css" rel="stylesheet" type="text/css" />
+		<link href="<?php echo BASE_PATH?>/css/datatables/dataTables.editor.bootstrap.css" rel="stylesheet" type="text/css" />
 
 		<!-- Date Picker -->
 		<link href="<?php echo BASE_PATH?>/css/datepicker/datepicker3.css" rel="stylesheet" type="text/css" />
