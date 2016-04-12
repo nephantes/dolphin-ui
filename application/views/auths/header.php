@@ -4,11 +4,10 @@
         <meta charset="UTF-8">
         <title>Biocore - Dolphin | Log in</title>
         <meta content='width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no' name='viewport'>
-        <link href="//maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css" rel="stylesheet" type="text/css" />
+        <link href="<?php echo BASE_PATH?>/css/bootstrap/bootstrap.min.css" rel="stylesheet" type="text/css" />
         <link href="<?php echo BASE_PATH?>/css/font-awesome-4.6.1/css/font-awesome.min.css" rel="stylesheet" type="text/css" />
         <!-- Theme style -->
-        <link href="css1/AdminLTE.css" rel="stylesheet" type="text/css" />
-
+        <link href="<?php echo BASE_PATH?>/css/AdminLTE.css" rel="stylesheet" type="text/css" />
         <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
         <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
         <!--[if lt IE 9]>

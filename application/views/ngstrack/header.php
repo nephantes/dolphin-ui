@@ -4,15 +4,11 @@
         <meta charset="UTF-8">
         <title>Biocore-Dolphin</title>
         <meta content='width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no' name='viewport'>
-        
-		<meta content='width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no' name='viewport'>
-        <link href="//maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css" rel="stylesheet" type="text/css" />
+        <link href="<?php echo BASE_PATH?>/css/bootstrap/bootstrap.min.css" rel="stylesheet" type="text/css" />
         <link href="<?php echo BASE_PATH?>/css/font-awesome-4.6.1/css/font-awesome.min.css" rel="stylesheet" type="text/css" />
-     
         <link href="//cdn.datatables.net/tabletools/2.2.3/css/dataTables.tableTools.css" rel="stylesheet" type="text/css" />
         <link href="//cdn.datatables.net/plug-ins/725b2a2115b/integration/bootstrap/3/dataTables.bootstrap.css" rel="stylesheet" type="text/css" />
         <link href="<?php echo BASE_PATH?>/css/datatables/dataTables.editor.bootstrap.css" rel="stylesheet" type="text/css" />
-
         <!-- Date Picker -->
         <link href="<?php echo BASE_PATH?>/css/datepicker/datepicker3.css" rel="stylesheet" type="text/css" />
         <!-- Daterange picker -->
@@ -23,7 +19,6 @@
         <link href="<?php echo BASE_PATH?>/css/morris/morris.css" rel="stylesheet" type="text/css" />
         <!-- Theme style -->
         <link href="<?php echo BASE_PATH?>/css/AdminLTE.css" rel="stylesheet" type="text/css" />
-
         <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
         <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
         <!--[if lt IE 9]>
