@@ -165,6 +165,7 @@ function checkFastlaneInput(info_array){
 					}
 				});
 				var dir_check_2;
+				var used_outdir = false;
 				//	Check if root path was not specified
 				if (info_array[x].substring(0,1) != '/'  && info_array[x].indexOf('/') > -1) {
 					info_array[x] = '/' + info_array[x];
@@ -184,10 +185,26 @@ function checkFastlaneInput(info_array){
 							dir_check_2 = JSON.parse(s);
 						}
 					});
+					
+					$.ajax({
+						type: 	'GET',
+						url: 	BASE_PATH+'/public/ajax/ngsquerydb.php',
+						data:  	{ p: 'checkOutputDir', outdir:info_array[x] },
+						async:	false,
+						success: function(s)
+						{
+							if (s.toString() != '') {
+								user_outdir = true;
+							}
+						}
+					});
 				}
 				
 				if (dir_check_1.Result != 'Ok' || dir_check_2.Result != 'Ok') {
 					//	perms errors
+					database_checks.push(false);
+				}else if (user_outdir){
+					//	Outdir already used
 					database_checks.push(false);
 				}else{
 					//	No errors
