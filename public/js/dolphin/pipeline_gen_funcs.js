@@ -1214,8 +1214,6 @@ function manageChecklists(name, type){
 					if (lane_samples[x] == undefined) {
 						lanes_bool = false;
 					}else{
-						console.log(checklist_samples);
-						console.log(lane_samples);
 						if (checklist_samples.indexOf(lane_samples[x]) == -1 && lanes_bool) {
 							lanes_bool = false;
 						}
@@ -1291,7 +1289,6 @@ function manageChecklists(name, type){
 		else
 		{
 			//add
-			checklist_lanes.push(name);
 			var lane_samples = seachLaneToSamples(name);
 			var lane_samples_to_add = [];
 			for (var x = 0; x < lane_samples.length; x++) {
@@ -1447,7 +1444,6 @@ function removeFromDolphinBasketBulk(ids) {
 		for (var samp_data in data) {
 			if (data[samp_data][0] == ids[x]) {
 				data.splice(samp_data, 1);
-				console.log('cool');
 			}
 		}
 		table.fnClearTable();
