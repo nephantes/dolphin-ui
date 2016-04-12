@@ -194,7 +194,7 @@ function checkFastlaneInput(info_array){
 						success: function(s)
 						{
 							console.log(s);
-							if (s.toString() != '') {
+							if (s.toString() != '' && s.toString() != 0) {
 								user_outdir = true;
 							}
 						}
