@@ -1007,7 +1007,6 @@ function manageChecklistsBulk(names){
 	//sample checkbox
 	for(var j = 0; j < names.length; j++){
 		var name = parseInt(names[j]);
-		console.log(name);
 		var sample_search = searchIDDictionary(name);
 		if (sample_search == undefined) {
 			//	No sample found to be displayed
@@ -1083,8 +1082,6 @@ function manageChecklistsBulk(names){
 				}
 			}
 			if (checklist_lanes.indexOf(parseInt(lane_check)) == -1) {
-				console.log(checklist_samples)
-				console.log(lane_samples)
 				for(var x = 0; x < lane_samples.length; x++){
 					if (lane_samples[x] == undefined) {
 						lanes_bool = false;
@@ -1097,7 +1094,6 @@ function manageChecklistsBulk(names){
 				if (lanes_bool) {
 					if (document.getElementById('lane_checkbox_' + lane_check) != undefined) {
 						var check = document.getElementById('lane_checkbox_' + lane_check);
-						console.log(check);
 						check.checked = !check.checked;
 					}
 					checklist_lanes.push(parseInt(lane_check));
@@ -1117,7 +1113,6 @@ function manageChecklistsBulk(names){
 				if (experiment_bool) {
 					if (document.getElementById('experiment_checkbox_' + experiment_check) != undefined) {
 						var check = document.getElementById('experiment_checkbox_' + experiment_check);
-						console.log(check);
 						check.checked = !check.checked;
 					}
 					checklist_experiment_series.push(parseInt(experiment_check));
