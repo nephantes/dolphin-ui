@@ -195,7 +195,7 @@ function checkFastlaneInput(info_array){
 						{
 							console.log(s);
 							if (s.toString() != '' && s.toString() != 0) {
-								user_outdir = true;
+								used_outdir = true;
 							}
 						}
 					});
@@ -204,7 +204,7 @@ function checkFastlaneInput(info_array){
 				if (dir_check_1.Result != 'Ok' || dir_check_2.Result != 'Ok') {
 					//	perms errors
 					database_checks.push(false);
-				}else if (user_outdir){
+				}else if (used_outdir){
 					//	Outdir already used
 					database_checks.push(false);
 				}else{
