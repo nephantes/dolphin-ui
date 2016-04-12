@@ -128,7 +128,7 @@ class ngsquerydb_unittest extends PHPUnit_Framework_TestCase
 		$_GET['p'] = 'checkOutputDir';
 		$_GET['outdir'] = '/export/barcodetest';
 		include("ngsquerydb.php");
-		$this->assertEquals($data,'\/export\/barcodetest');
+		$this->assertEquals($data,'"\/export\/barcodetest"');
 		ob_end_clean();
 	}
 	

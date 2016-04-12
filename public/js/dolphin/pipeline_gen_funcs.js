@@ -1289,6 +1289,7 @@ function manageChecklists(name, type){
 		else
 		{
 			//add
+			checklist_lanes.push(name);
 			var lane_samples = seachLaneToSamples(name);
 			var lane_samples_to_add = [];
 			for (var x = 0; x < lane_samples.length; x++) {
@@ -1296,6 +1297,7 @@ function manageChecklists(name, type){
 					lane_samples_to_add.push(lane_samples[x]);
 				}
 			}
+			console.log(lane_samples_to_add)
 			manageChecklistsBulk(lane_samples_to_add);
 		}
 	}
@@ -1457,7 +1459,8 @@ function removeFromDolphinBasketBulk(ids) {
 }
 
 function clearBasket(){
-	manageChecklistsBulk(checklist_samples);
+	var basket_array = getBasketInfo().split(",");
+	manageChecklistsBulk(basket_array);
 	flushBasketInfo();
 }
 
