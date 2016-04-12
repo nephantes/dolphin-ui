@@ -188,7 +188,7 @@ function checkFastlaneInput(info_array){
 					
 					$.ajax({
 						type: 	'GET',
-						url: 	BASE_PATH+'/public/ajax/ngsquerydb.php',
+						url: 	BASE_PATH+'/public/ajax/ngsfastlanedb.php',
 						data:  	{ p: 'checkOutputDir', outdir:info_array[x] },
 						async:	false,
 						success: function(s)

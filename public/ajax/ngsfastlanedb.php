@@ -135,6 +135,16 @@ if ($p == 'experimentSeriesCheck'){
 	WHERE username = '".$_SESSION['user']."'
 	");
 }
+else if ($p == 'checkOutputDir')
+{
+	if (isset($_GET['outdir'])){$outdir = $_GET['outdir'];}
+	$data=json_encode($query->queryAVal("
+    SELECT outdir
+    FROM ngs_runparams
+    where outdir = '$outdir/initial_run'
+	or outdir = '$outdir//initial_run'
+    "));
+}
 
 if (!headers_sent()) {
    header('Cache-Control: no-cache, must-revalidate');
