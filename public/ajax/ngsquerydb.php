@@ -320,11 +320,20 @@ else if ($p == 'getCustomTSV')
 else if ($p == 'checkOutputDir')
 {
 	if (isset($_GET['outdir'])){$outdir = $_GET['outdir'];}
-	$data=$query->queryAVal("
+	$data=json_encode($query->queryAVal("
     SELECT outdir
     FROM ngs_runparams
     where outdir = '$outdir'
-    ");
+    "));
+}
+else if ($p == 'checkRunID')
+{
+	if (isset($_GET['outdir'])){$outdir = $_GET['outdir'];}
+	$data=json_encode($query->queryAVal("
+    SELECT run_group_id
+    FROM ngs_runparams
+    where outdir = '$outdir'
+    "));
 }
 else if ($p == 'changeDataGroupNames')
 {

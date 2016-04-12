@@ -38,10 +38,10 @@ class FastlaneController extends VanillaController {
 				$fastlane_values = str_replace("\n", ":", $fastlane_values);
 				$fastlane_array = explode(",",$fastlane_values);
 			}
-			if(isset($barcode_array)){
+			if(isset($pass_fail_values)){
 				$pass_fail_array = explode(",",$pass_fail_values);
 			}
-			if(isset($pass_fail_values)){
+			if(isset($bad_samples)){
 				$bad_samples_array = explode(",",$bad_samples);
 			}
 			if(isset($bad_files)){
@@ -69,16 +69,16 @@ class FastlaneController extends VanillaController {
 					if($key == 1){
 						$text.="<font color=\"red\">Barcode selection is either empty or not properly formatted.</font><br><br>";
 					}else if($key == 3){
-						$text.="<font color=\"red\">Experiment Series field is empty or contains improper characters. Please use alpha-numerics, underscores, spaces, and periods only.</font><br><br>";
+						$text.="<font color=\"red\">Experiment Series field is empty or contains improper characters. Please use alpha-numerics, underscores, spaces, and dashes only.</font><br><br>";
 					}else if($key == 4){
-						$text.="<font color=\"red\">Import field is either empty or contains improper characters. Please use alpha-numerics, underscores, spaces, and periods only.</font><br><br>";
+						$text.="<font color=\"red\">Import field is either empty or contains improper characters. Please use alpha-numerics, underscores, spaces, and dashes only.</font><br><br>";
 					}else if($key == 5){
 						$text.="<h3>Input Directory</h3>";
 						if($fastlane_array[6]  == ''){
 							$text.="<font color=\"red\">Input Directory is Empty</font><br><br>";
 						}else{
 							$text.="Input Directory either contains improper white space or you do not have permissions to access it:<br>";
-							$text.="<font color=\"red\">".$fastlane_array[6]."<br>Please make sure to list the full path to the files. Please use alpha-numerics, underscores, spaces, dashes, backslashes and periods only.</font><br><br>";
+							$text.="<font color=\"red\">".$fastlane_array[6]."<br>Please make sure to list the full path to the files. Please use alpha-numerics, underscores, dashes, backslashes and periods only.</font><br><br>";
 						}
 					}else if($key == 6){
 						$text.="<h3>Files</h3>";
@@ -88,9 +88,9 @@ class FastlaneController extends VanillaController {
 								$text.="<font color=\"red\">".$bfa."</font><br>";
 							}
 							$text.="<br>";
-							$text.="<font color=\"red\">If the files given are not in the proper fastlane format, please use alpha-numerics, underscores, and periods only.</font><br><br>";
+							$text.="<font color=\"red\">If the files given are not in the proper fastlane format, please use alpha-numerics, underscores, and dashes only.</font><br><br>";
 						}else{
-							$text.="<font color=\"red\">The files given are not in the proper fastlane format.  Please use alpha-numerics, underscores, and periods only.</font><br><br>";
+							$text.="<font color=\"red\">The files given are not in the proper fastlane format.  Please use alpha-numerics, underscores, and dashes only.</font><br><br>";
 						}
 					}else if($key == 7){
 						$text.="<h3>Process Directory</h3>";
@@ -98,7 +98,7 @@ class FastlaneController extends VanillaController {
 							$text.="<font color=\"red\">Process Directory is Empty</font><br><br>";
 						}else{
 							$text.="Process Directory either contains improper white space or you do not have permissions to access it:<br>";
-							$text.="<font color=\"red\">".$fastlane_array[8]."<br>Please make sure to list the full path.  Please use alpha-numerics, underscores, spaces, dashes, backslashes and periods only.</font><br><br>";
+							$text.="<font color=\"red\">".$fastlane_array[8]."<br>Please make sure to list the full path.  Please use alpha-numerics, underscores, dashes, backslashes and periods only.</font><br><br>";
 						}
 					}else if($key >= 9){
 						$database_sample_bool = true;
@@ -108,6 +108,12 @@ class FastlaneController extends VanillaController {
 					$text.= "Sample created with id #".$index."<br><br>";
 				}
 			}
+			if($database_sample_bool == true){
+				$text.="Samples given are already contained within the database:<br>";
+				foreach($bad_samples_array as $bad){
+					$text.="Sample with name: <font color=\"red\">".$bad."</font><br>";
+				}
+			}
 			if($failed_test){
 				$text.="If you're not sure if you have cluster access, visit <a href='http://umassmed.edu/biocore/resources/galaxy-group/'>this website</a> for more help.<br><br>";
 				$text.="For all additional questions about fastlane, please see our <a href=\"http://dolphin.readthedocs.org/en/master/dolphin-ui/fastlane.html\">documentation</a><br><br>";
@@ -115,13 +121,6 @@ class FastlaneController extends VanillaController {
 			if($index != 'true' && $index != 'false'){
 				$text.='<div class="callout callout-info lead"><h4>We are currently processing your samples to obtain read counts and additional information.<br><br>
 						You can check the status of these initial runs on your NGS Status page.</h4></div>';
-			}
-			
-			if($database_sample_bool == true){
-				$text.="Samples given are already contained within the database:<br>";
-				foreach($bad_samples_array as $bad){
-					$text.="Sample with name: ".$bad."<br>";
-				}
 			}
 		}
 		$text.="<br><br>";
