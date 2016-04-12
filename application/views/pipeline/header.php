@@ -14,7 +14,7 @@
 		<!-- Daterange picker -->
 		<link href="<?php echo BASE_PATH?>/css/daterangepicker/daterangepicker-bs3.css" rel="stylesheet" type="text/css" />
 		<!-- Ionicons -->
-		<link href="//code.ionicframework.com/ionicons/1.5.2/css/ionicons.min.css" rel="stylesheet" type="text/css" />
+		<link href="<?php echo BASE_PATH?>/css/ionicons/ionicons.min.css" rel="stylesheet" type="text/css" />
 		<!-- Morris charts -->
 		<link href="<?php echo BASE_PATH?>/css/morris/morris.css" rel="stylesheet" type="text/css" />
 		<!-- Theme style -->
@@ -22,8 +22,8 @@
 		<!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
 		<!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
 		<!--[if lt IE 9]>
-		<script src="<?php echo BASE_PATH?>/css/html5shiv/3.7.0/html5shiv.min.js"></script>
-		<script src="<?php echo BASE_PATH?>/css/respond/1.3.0/respond.min.js"></script>
+		<script src="<?php echo BASE_PATH?>/js/plugins/html5shiv/3.7.0/html5shiv.min.js"></script>
+		<script src="<?php echo BASE_PATH?>/js/plugins/respond/1.3.0/respond.min.js"></script>
 		<![endif]-->
 		
 		<?php echo $html->getBasePath(BASE_PATH, API_PATH); ?>
