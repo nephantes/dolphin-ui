@@ -6,64 +6,82 @@
 
 function postInsertRunparams(JSON_OBJECT, outputdir, name, description, perms, group, ids){
 
-   var successCheck = false;
-   var runlistCheck = "";
-   var runID = "";
-   var barcode = 1;
-
-   var uid = phpGrab.uid;
-   
-   //find the run group ID
-   var hrefSplit = window.location.href.split("/");
-   var rerunLoc = $.inArray('rerun', hrefSplit);
-   var outdir_check;
-   var runGroupID;
-   $.ajax({
-		type: 	'GET',
-		url: 	BASE_PATH+'/public/ajax/ngsquerydb.php',
-		data:  	{ p: "checkOutputDir", outdir: outputdir},
-		async:	false,
-		success: function(r)
-		{
-			outdir_check = r;
-		}
-	});
-   if(window.location.href.split("/").indexOf('fastlane') > -1){
-		//if from fastlane
-       runGroupID = 'new';
-   }else if (outdir_check != 0) {
-       runGroupID = hrefSplit[rerunLoc+1];
-   }else{
-       //if not a rerun
-       runGroupID = 'new';
-   }
-
-   if (JSON_OBJECT.barcodes == 'none') {
-      barcode = 0;
-   }
-   json = JSON.stringify(JSON_OBJECT);
-   $.ajax({
-           type: 	'POST',
-           url: 	BASE_PATH+'/public/ajax/ngsalterdb.php',
-           data:  	{ p: "submitPipeline", json: json, outdir: outputdir, name: name, desc: description, runGroupID: runGroupID, barcode: barcode, uid: uid, group: group, perms: perms, ids: ids},
-           async:	false,
-           success: function(r)
-           {
-				console.log(r);
+	 console.log(outputdir);
+	 var successCheck = false;
+	 var runlistCheck = "";
+	 var runID = "";
+	 var barcode = 1;
+  
+	 var uid = phpGrab.uid;
+	 
+	 //find the run group ID
+	 var hrefSplit = window.location.href.split("/");
+	 var rerunLoc = $.inArray('rerun', hrefSplit);
+	 var outdir_check = 0;
+	 var runGroupID;
+	 $.ajax({
+		  type: 'GET',
+		  url: BASE_PATH+'/public/ajax/ngsquerydb.php',
+		  data: { p: "checkOutputDir", outdir: outputdir},
+		  async: false,
+		  success: function(r)
+		  {
+			   console.log(r);
+			   outdir_check = r;
+		  },
+		  error: function(request, error)
+		  {
+			   console.log(request);
+			   console.log(error);
+		  }
+	 });
+	 console.log(outdir_check);
+	 if(window.location.href.split("/").indexOf('fastlane') > -1){
+			   //if from fastlane
+			  runGroupID = 'new';
+	 }else if (outdir_check != undefined && outdir_check != 0) {
+		  $.ajax({
+			   type: 'GET',
+			   url: BASE_PATH+'/public/ajax/ngsquerydb.php',
+			   data: { p: "checkRunID", outdir: outputdir},
+			   async: false,
+			   success: function(r)
+			   {
+				   runGroupID = r;
+			   }
+		  });
+	 }else{
+		 //if not a rerun
+		 runGroupID = 'new';
+	 }
+  
+	 if (JSON_OBJECT.barcodes == 'none') {
+		barcode = 0;
+	 }
+	 json = JSON.stringify(JSON_OBJECT);
+	 console.log(runGroupID);
+	  $.ajax({
+		  type: 	'POST',
+		  url: 	BASE_PATH+'/public/ajax/ngsalterdb.php',
+		  data:  	{ p: "submitPipeline", json: json, outdir: outputdir, name: name, desc: description, runGroupID: runGroupID, barcode: barcode, uid: uid, group: group, perms: perms, ids: ids},
+		  async:	false,
+		  success: function(r)
+		  {
+			   console.log(r);
                successCheck = true;
                if (runGroupID == 'new') {
-                   runlistCheck = 'insertRunlist';
-                   runID = r;
+					runlistCheck = 'insertRunlist';
+					runID = r;
                }else{
-				runlistCheck = 'old';
+					runlistCheck = 'old';
 			   }
-           }
-       });
-   if (successCheck) {
-       return [ runlistCheck, runID ];
-   }else{
-       return undefined;
-   }
+          }
+     });
+	 if (successCheck) {
+		 return [ runlistCheck, runID ];
+	 }else{
+		 return undefined;
+	 }
 }
 
 function postInsertRunlist(runlistCheck, sample_ids, runID){
@@ -79,6 +97,7 @@ function postInsertRunlist(runlistCheck, sample_ids, runID){
                success: function(r)
                {
                    successCheck = true;
+				   console.log('inserted');
                }
            });
        }else if (runlistCheck == 'old') {
