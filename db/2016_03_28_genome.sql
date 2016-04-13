@@ -10,7 +10,7 @@ INSERT INTO `biocore`.`ngs_genome` (`id`, `genome`, `build`) VALUES ('3', 'hamst
 INSERT INTO `biocore`.`ngs_genome` (`id`, `genome`, `build`) VALUES ('4', 'rat', 'rn5');
 INSERT INTO `biocore`.`ngs_genome` (`id`, `genome`, `build`) VALUES ('5', 'zebrafish', 'danRer7');
 INSERT INTO `biocore`.`ngs_genome` (`id`, `genome`, `build`) VALUES ('6', 'zebrafish', 'danRer10');
-INSERT INTO `biocore`.`ngs_genome` (`id`, `genome`, `build`) VALUES ('7', 's_cerevisaiae', 'sacCer3');
+INSERT INTO `biocore`.`ngs_genome` (`id`, `genome`, `build`) VALUES ('7', 's_cerevisiae', 'sacCer3');
 INSERT INTO `biocore`.`ngs_genome` (`id`, `genome`, `build`) VALUES ('8', 'c_elegans', 'ce10');
 INSERT INTO `biocore`.`ngs_genome` (`id`, `genome`, `build`) VALUES ('9', 'cow', 'bosTau7');
 INSERT INTO `biocore`.`ngs_genome` (`id`, `genome`, `build`) VALUES ('10', 'd_melanogaster', 'dm3');
