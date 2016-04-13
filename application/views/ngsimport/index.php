@@ -1,7 +1,6 @@
 				<section class="content">
 					<div class="row">
-						<!-- left column -->
-						<div class="col-md-6">
+						<div class="col-md-6"><!-- left column -->
 							<!-- general form elements -->
 							<div class="box box-primary">
 								<div class="box-header">
