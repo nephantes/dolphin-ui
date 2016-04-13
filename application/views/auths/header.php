@@ -14,7 +14,6 @@
         <script src="<?php echo BASE_PATH?>/js/plugins/html5shiv/3.7.0/html5shiv.min.js"></script>
 		<script src="<?php echo BASE_PATH?>/js/plugins/respond/1.3.0/respond.min.js"></script>
         <![endif]-->
-        
         <?php echo $html->getBasePath(BASE_PATH, API_PATH); ?> 
     </head>
     <body class="bg-black">

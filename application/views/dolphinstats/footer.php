@@ -3,9 +3,9 @@
 		<script src="<?php echo BASE_PATH?>/js/bootstrap/jquery.min.js" type="text/javascript"></script>
         <script src="<?php echo BASE_PATH?>/js/bootstrap/bootstrap.min.js" type="text/javascript"></script>
         <script src="<?php echo BASE_PATH?>/js/bootstrap/jquery-ui.min.js" type="text/javascript"></script>
-        <script src="//cdn.datatables.net/1.10.4/js/jquery.dataTables.min.js"></script>
-        <script src="//cdn.datatables.net/plug-ins/725b2a2115b/integration/bootstrap/3/dataTables.bootstrap.js"></script>
-        <script src="//cdn.datatables.net/tabletools/2.2.3/js/dataTables.tableTools.min.js"></script>
+        <script src="<?php echo BASE_PATH?>/js/DataTables/DataTables-1.10.11/js/jquery.dataTables.min.js"></script>
+        <script src="<?php echo BASE_PATH?>/js/DataTables/DataTables-1.10.11/js/dataTables.bootstrap.js"></script>
+        <script src="<?php echo BASE_PATH?>/js/DataTables/DataTables-1.10.11/js/dataTables.tableTools.min.js"></script>
         <!-- Morris.js charts -->
         <script src="<?php echo BASE_PATH?>/js/raphael/2.1.0/raphael-min.js"></script>
         <script src="<?php echo BASE_PATH?>/js/plugins/morris/morris.min.js" type="text/javascript"></script>

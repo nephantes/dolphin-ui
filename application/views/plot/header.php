@@ -22,14 +22,13 @@
         <link href="<?php echo BASE_PATH?>/css/AdminLTE.css" rel="stylesheet" type="text/css" />
         <!-- DATA TABLES -->
         <link href="<?php echo BASE_PATH?>/css/datatables/dataTables.bootstrap.css" rel="stylesheet" type="text/css" />
-        <link href="//code.jquery.com/ui/1.10.3/themes/smoothness/jquery-ui.css" rel="stylesheet" type="text/css" />
-        <link href="//cdn.datatables.net/tabletools/2.2.3/css/dataTables.tableTools.css" rel="stylesheet" type="text/css" />
-        <link href="//cdn.datatables.net/plug-ins/725b2a2115b/integration/bootstrap/3/dataTables.bootstrap.css" rel="stylesheet" type="text/css" />
-        <link href="<?php echo BASE_PATH?>/css/datatables/dataTables.editor.bootstrap.css" rel="stylesheet" type="text/css" />
-        <link href="<?php echo BASE_PATH?>/css/AdminLTE.css" rel="stylesheet" type="text/css" />
-        <link rel="stylesheet" type="text/css" href="//cdn.datatables.net/1.10.4/css/jquery.dataTables.css">
-        <link rel="stylesheet" type="text/css" href="<?php echo BASE_PATH?>/css/datatables/dataTables.editor.css">
-        <link rel="stylesheet" type="text/css" href="<?php echo BASE_PATH?>/js/dataTables/resources/syntax/shCore.css">
+        <link href="<?php echo BASE_PATH?>/css/datatables/jquery-ui.css" rel="stylesheet" type="text/css" />
+        <link href="<?php echo BASE_PATH?>/css/datatables/dataTables.bootstrap.css" rel="stylesheet" type="text/css" />
+        <link href="<?php echo BASE_PATH?>/css/datatables/dataTables.tableTools.css" rel="stylesheet" type="text/css" />
+		<link href="<?php echo BASE_PATH?>/css/datatables/dataTables.editor.bootstrap.css" rel="stylesheet" type="text/css" />
+        <link href="<?php echo BASE_PATH?>/css/datatables/css/jquery.dataTables.css" rel="stylesheet" type="text/css" >
+        <link href="<?php echo BASE_PATH?>/css/datatables/dataTables.editor.css" rel="stylesheet" type="text/css" >
+		<link href="<?php echo BASE_PATH?>/css/AdminLTE.css" rel="stylesheet" type="text/css" />
         <script src="<?php echo BASE_PATH?>/js/d3/snowflake.js" charset="utf-8"></script>
 		<script src="<?php echo BASE_PATH?>/js/d3/d3.v3.min.js" charset="utf-8"></script>
         <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
@@ -47,7 +46,6 @@
                         height:600px;
                     }
         </style>
-        
         <?php echo $html->getBasePath(BASE_PATH, API_PATH); ?>
     </head>
     <body class="skin-blue">
