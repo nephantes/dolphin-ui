@@ -97,8 +97,13 @@ class FastlaneController extends VanillaController {
 						if($fastlane_array[8]  == ''){
 							$text.="<font color=\"red\">Process Directory is Empty</font><br><br>";
 						}else{
-							$text.="Process Directory either contains improper white space or you do not have permissions to access it:<br>";
-							$text.="<font color=\"red\">".$fastlane_array[8]."<br>Please make sure to list the full path.  Please use alpha-numerics, underscores, dashes, backslashes and periods only.</font><br><br>";
+							$text.="Process Directory either contains one of the following:<br>
+									-- Improper white space/characters.<br>
+									-- You do not have permissions to access it.<br>
+									-- The processed directory is being used by another import.<br>For:";
+							$text.="<font color=\"red\">".$fastlane_array[8]."<br><br>
+									Please make sure to list the full path, use alpha-numerics, underscores, dashes, backslashes and periods only,
+									and that the directory is not currently being used by another import before resubmitting.</font><br><br>";
 						}
 					}else if($key >= 9){
 						$database_sample_bool = true;
