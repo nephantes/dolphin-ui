@@ -84,6 +84,9 @@ function checkFastlaneInput(info_array){
 				if (!/^[a-zA-Z 0-9\_\.\-\s\t\,]*$/.test(split_inputs[y])) {
 					bad_files.push("<font color=\"black\">incorrect file formatting: </font>" + split_inputs[y]);
 					input_bool_check = false;
+				}else if (/[0-9]/.test(split_inputs[y].substring(0,1))){
+					bad_files.push("Sample names cannot start with a numeric character.");
+					input_bool_check = false;
 				}else{
 					var single_input_array = split_inputs[y].split(/[\s\t\,]+/);
 					single_input_array = single_input_array.filter(function(n){return n != ''});
