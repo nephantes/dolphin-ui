@@ -79,7 +79,7 @@ function checkFastlaneInput(info_array){
 				}else if (!/^[actgATCG]*$/.test(split_barcodes[y].split(/[\s\t\,]/)[1])) {
 					error_out.push("Barcode " + split_barcodes[y].split(/[\s\t\,]/)[1] + " must contain ATCG only.")
 					split_check = false;
-				}else if (/[0-9]/.test(split_inputs[y].substring(0,1))){
+				}else if (/[0-9]/.test(split_barcodes[y].substring(0,1))){
  					error_out.push("Sample name " + split_barcodes[y].split(/[\s\t\,]/)[0] + " cannot start with a numeric character.");
  					split_check = false;
 				}else{
