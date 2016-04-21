@@ -310,7 +310,10 @@ class Dolphin:
                print >>fp, '@TSIZE=50';
                print >>fp, '@PREVIOUSRSEM=%s'%(previoussplit)
                if ("MarkDuplicates" in pipe and pipe['MarkDuplicates'].lower()=="yes"):
-                   bowtie_params=self.replace_space(self.convert_comma("-N 1 --sensitive --dpad 0 --gbar 99999999 --mp 1,1 --np 1 --score-min L,0,-0.1"))
+                   paired_str=""
+                   if (runparams['spaired'] == "paired"):
+                      paired_str = " --no-mixed --no-discordant " 
+                   bowtie_params=self.replace_space(self.convert_comma("-N 1 --sensitive --dpad 0 --gbar 99999999 --mp 1,1 --np 1 --score-min L,0,-0.1 " + paired_str))
                    filter_out="0"
                    name="RSEMBAM"
                    indexname="rsem_ref.transcripts"
@@ -334,6 +337,7 @@ class Dolphin:
     
              if (pipe['Type']=="ChipSeq"):
                chipinput=self.chip_parse_input(pipe['ChipInput'])
+               print(chipinput)
                bowtie_params=self.remove_space("-k_%s"%(str(pipe['MultiMapper'])))
                description="Chip_Mapping"
                filter_out="0"
@@ -411,7 +415,7 @@ class Dolphin:
         for metric in metrics:
           if( (metric=="CollectRnaSeqMetrics" and (str(type).lower().find("tophat")>1 or str(type).lower().find("rsem")>1  )) or metric != "CollectRnaSeqMetrics" ):
             self.prf( fp, stepPicard % locals() if ((metric in pipe and pipe[metric].lower()=="yes")) else None )
-            if ("MarkDuplicates" in pipe):
+            if ("MarkDuplicates" in pipe and pipe['MarkDuplicates'].lower()=="yes"):
                 type = "dedup"+initialtype
         
         self.prf( fp, stepMergePicard % locals() if (('CollectRnaSeqMetrics' in pipe and pipe['CollectRnaSeqMetrics'].lower()=="yes") or ('CollectMultipleMetrics' in pipe and pipe['CollectMultipleMetrics'].lower()=="yes")) else None )
@@ -485,7 +489,7 @@ class Dolphin:
                      previousrsem = "dedup" + type
                      type=previousrsem
 
-                 if ('split' in runparams and runparams['split'].lower() != 'none'):
+                 if ('split' in runparams and runparams['split'].lower() != 'none'  and 'MarkDuplicates' in pipe and pipe['MarkDuplicates'].lower() == 'yes'):
                     self.prf( fp, '%s'%(stepMergeBAM % locals()) )
                     previousrsem="merge"+previousrsem
                      
@@ -499,8 +503,9 @@ class Dolphin:
                    for t_e in tes:
                      self.prf( fp, stepRSEMCount % locals() )
 
-                 self.writeVisualizationStr( fp, "RSEM", pipe, sep )
-                 self.writeRSeQC ( fp, "RSEM", pipe, sep )
+
+                 self.writeVisualizationStr( fp, type, pipe, sep )
+                 self.writeRSeQC ( fp, type, pipe, sep )
               
               if (pipe['Type']=="Tophat"):
                  gtf = (pipe['CustomGenomeAnnotation'] if ('CustomGenomeAnnotation' in pipe and pipe['CustomGenomeAnnotation'].lower()!="none") else "@GTF" )
@@ -607,15 +612,18 @@ class Dolphin:
         return content
 
     def chip_parse_input(self, content, ncols=8, base64=False, verbose=0):
-        new_content = ""
-        for input in content:
+      new_content = ""
+      try:
+          for input in content:
             new_content += input['name'] + '__tt__'
-            new_content += self.parse_content(input['samples']) + '__tt__'
-            if (input == content(-1)):
-                new_content += self.parse_content(input['input'])
-            else:
-                new_content += self.parse_content(input['input']) + ':'
-        return new_content
+            new_content += self.parse_content(input['samples']) 
+            if ('input' in input and input['input']!=""):
+                new_content += "__tt__"+self.parse_content(input['input']) 
+            if (input != content[-1]):
+                new_content += ":"
+      except Exception, ex:
+        self.stop_err('Error (line:%s)running orkflow\n%s'%(format(sys.exc_info()[-1].tb_lineno), str(ex)))
+      return new_content
 
     # error
     def stop_err(self, msg ):

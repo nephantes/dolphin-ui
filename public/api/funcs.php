@@ -165,7 +165,8 @@ class funcs
     }
     function runSQL($sql)
     {
-        sleep(1);
+        #sleep(1);
+        usleep(100000);
         $this->readINI();
         $link = new mysqli($this->dbhost, $this->dbuser, $this->dbpass, $this->db);
         // check connection
@@ -229,7 +230,7 @@ class funcs
     }
     function getSSH()
     {
-       sleep(1);
+       #sleep(1);
        return "ssh -o ConnectTimeout=30  ". $this->username. "@" . $this->remotehost . " ";
     }
 
@@ -287,6 +288,9 @@ class funcs
        {
          $count=$res[0]['count'];
          $run_script=$res[0]['run_script'];
+         $com = str_replace("'", "\\'", $com);
+         $com = str_replace('$', '\$', $com);
+
          if ($count < 4) 
          {
             $com = $this->getCMDs( $this->python . " " . $run_script); 
@@ -462,7 +466,7 @@ class funcs
     function deleteLastServiceJobs($wkey)
     {
         $sql="DELETE FROM jobs where wkey='$wkey' and service_id = (SELECT service_id FROM service_run where service_run_id = (select max(service_run_id) FROM service_run where wkey='$wkey'))";
-        $result = $this->runSQL($sql);
+        #$result = $this->runSQL($sql);
     } 
  
     function startWorkflow( $params )
@@ -616,12 +620,15 @@ class funcs
         $service_id  = $this->getId("service", $username, $servicename, $wkey, "");
         $sql="select job_id from jobs where `wkey`='$wkey' and `jobname`='$jobname' and jobstatus=1";
         $previous_jobs = $this->queryTable($sql);
+        $com = str_replace("'", "\\'", $com);
+        $com = str_replace('$', '\$', $com);
 
         $job_ids="";
         foreach($previous_jobs as $job){
            $job_ids.=$job['job_id'].",";
         }
         $job_ids=rtrim($job_ids, ",");
+        if ($jobnum > 0){
         $sql = "insert into jobs(`username`, `wkey`, `run_script`, `jobname`, `workflow_id`, `service_id`, `resources`, `result`, `submit_time`, `job_num`) values ('$username','$wkey','$com','$jobname','$workflow_id','$service_id', '$resources', '$result', now(), '$jobnum')";
 
         $res = $this->runSQL($sql);
@@ -630,7 +637,7 @@ class funcs
             $sql="update jobs set jobstatus=0 where job_id in ($job_ids)";
             $res = $this->runSQL($sql);
         }
-        
+        } 
         return $res;
     }
     
