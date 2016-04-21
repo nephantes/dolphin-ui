@@ -5,6 +5,8 @@
  */
 
 var bad_samples = [];
+var id_array = ['genomebuild', 'barcode_sep', 'spaired', 'series_name', 'lane_name', 'input_dir', 'input_files', 'backup_dir', 'amazon_bucket',
+				'Barcode Definitions', 'groups', 'perms'];
 
 /*
  *	Checks fastlane input
@@ -20,6 +22,7 @@ function checkFastlaneInput(info_array){
 	var sample_ids = [];
 	var sample_file_check = [];
 	var true_sample_ids = [];
+	var error_out = [];
 	var username;
 	
 	//	Get cluster username for file checks
@@ -38,31 +41,52 @@ function checkFastlaneInput(info_array){
 	//	For each input passed
 	console.log(info_array);
 	console.log(id_array);
+	var barcode_count = 0;
 	for(var x = 0; x < (id_array.length); x ++){
 		//	Left a field blank that is not barcode definitions or amazon_bucket
 		if (info_array[x] == '' && id_array[x] != 'amazon_bucket' && id_array[x] != 'Barcode Definitions') {
+			if (id_array[x] == 'series_name') {
+				error_out.push("Experiment Series Name cannot be empty.")
+			}else if (id_array[x] == 'lane_name') {
+				error_out.push("Import Name cannot be empty.")
+			}else if (id_array[x] == 'input_dir') {
+				error_out.push("Input Directory cannot be empty")
+			}else if (id_array[x] == 'input_files') {
+				error_out.push("Input Files cannot be empty.")
+			}else if (id_array[x] == 'backup_dir') {
+				error_out.push("Process Directory cannot be empty.")
+			}
 			database_checks.push(false);
 		//	Check Barcode Separation if selected yes for barcode separation
 		}else if (id_array[x] == 'barcode_sep' && info_array[x] == 'yes') {
+			var split_check = true;
 			//	Split barcode submissioned on new lines
 			var split_barcodes = info_array[id_array.length - 3].split('\n');
 			//	remove blank new lines
 			split_barcodes = split_barcodes.filter(function(n){return n != ''});
-			var split_check = true;
+			if (split_barcodes.length == 0) {
+				error_out.push("Barcode Definitions cannot be empty when Barcode Seperation is selected.")
+				split_check = false;
+			}
 			for (var y = 0; y < split_barcodes.length; y++) {
 				//	If proper characters are not being used
-				if (!/^[a-zA-Z0-9\_\.\-\s\t\,]*$/.test(split_barcodes[y])) {
+				if (!/^[a-zA-Z 0-9\_\.\-\s\t\,]*$/.test(split_barcodes[y].split(/[\s\t\,]/)[0])) {
+					error_out.push("Sample name " + split_barcodes[y].split(/[\s\t\,]/)[0] + " Does not contain proper characters.<br> Please make sure to use only alpha-numerics with dashes/periods/backslashes/underscores");
 					split_check = false;
+				}else if (split_barcodes[y].split(/[\s\t\,]/).length != 2) {
+					error_out.push("Barcode submission requires both a sample name and a barcode.")
+					split_check = false;
+				}else if (!/^[actgATCG]*$/.test(split_barcodes[y].split(/[\s\t\,]/)[1])) {
+					error_out.push("Barcode " + split_barcodes[y].split(/[\s\t\,]/)[1] + " must contain ATCG only.")
+					split_check = false;
+				}else if (/[0-9]/.test(split_barcodes[y].substring(0,1))){
+ 					error_out.push("Sample name " + split_barcodes[y].split(/[\s\t\,]/)[0] + " cannot start with a numeric character.");
+ 					split_check = false;
 				}else{
-					var single_barcode_array = split_barcodes[y].split(/[\s\t\,]+/);
+					var single_barcode_array = [split_barcodes[y].split(/[\s\t\,]/)];
 					single_barcode_array = single_barcode_array.filter(function(n){return n != ''});
 					//	Check for proper barcode input length
-					if (single_barcode_array.length != 2) {
-						//	Not proper Barcode input
-						split_check = false;
-					}else{
-						barcode_array.push(single_barcode_array);
-					}
+					barcode_array.push(single_barcode_array);
 				}
 			}
 			//	If a barcode error exists
@@ -74,44 +98,53 @@ function checkFastlaneInput(info_array){
 		//	Input File Checks
 		}else if (id_array[x] == 'input_files'){
 			//	Paired-end libraries
-			var bad_files = [];
-			var split_inputs = info_array[6].split('\n');
+			var input_bool_check = true;
+			if (document.getElementById('Directory_toggle').parentNode.className == "active") {
+					var split_inputs = info_array[6].split(":");
+			}else{
+					var split_inputs = info_array[6].split("\n");
+			}
 			//	Check for blank lines and eliminate them
 			split_inputs = split_inputs.filter(function(n){return n != ''});
-			var input_bool_check = true;
+			if (split_inputs.length == 0) {
+				error_out.push("There are no samples/files selected.");
+				input_bool_check = false;
+			}
 			for (var y = 0; y < split_inputs.length; y++) {
 				//	Check for proper characters
 				if (!/^[a-zA-Z 0-9\_\.\-\s\t\,]*$/.test(split_inputs[y])) {
-					bad_files.push("<font color=\"black\">incorrect file formatting: </font>" + split_inputs[y]);
+					error_out.push("Incorrect file formatting: " + split_inputs[y] + "<br>Please make sure to only alpha-numerics with dashes/periods/underscores");
 					input_bool_check = false;
-				}else if (/[0-9]/.test(split_inputs[y].substring(0,1))){
-					bad_files.push("Sample names cannot start with a numeric character.");
-					input_bool_check = false;
+				}else if(info_array[1] == 'yes'){
+					var single_input_array = split_inputs[y].split(/[\s\t\,]+/);
+					single_input_array = single_input_array.filter(function(n){return n != ''});
+					if (single_input_array.length != 2  && info_array[2] == 'yes') {
+							//      Not proper file input (paired end)
+							error_out.push("Paired-end file submission requires 2 files per line.");
+							input_bool_check = false;
+					}else if (single_input_array.length != 1  && info_array[2] == 'no') {
+							//      Not proper file input (single end)
+							error_out.push("Single-end file submission requires 1 file per line.");
+							input_bool_check = false;
+					}else{
+						input_array.push(single_input_array);
+					}
 				}else{
 					var single_input_array = split_inputs[y].split(/[\s\t\,]+/);
 					single_input_array = single_input_array.filter(function(n){return n != ''});
-					//	if barcode names specified
-					if (info_array[1] == 'yes') {
-						if (single_input_array.length != 2  && info_array[2] == 'yes') {
-							//	Not proper file input (paired end)
-							input_bool_check = false;
-						}else if (single_input_array.length != 1  && info_array[2] == 'no') {
-							//	Not proper file input (single end)
-							input_bool_check = false;
-						}else{
-							single_input_array.unshift(barcode_array[y][0]);
-							input_array.push(single_input_array);
-						}
+					if (single_input_array.length != 3  && info_array[2] == 'yes') {
+						//      Not proper file input (paired end)
+						error_out.push("Paired-end file submission requires a sample name and 2 files.");
+						input_bool_check = false;
+					}else if (single_input_array.length != 2  && info_array[2] == 'no') {
+						//      Not proper file input (single end)
+						error_out.push("Single-end file submission requires a sample name and 1 file.");
+						input_bool_check = false;
+					}else if (/[0-9]/.test(split_inputs[y].substring(0,1))){
+						error_out.push("Sample name " + single_input_array[0] + " cannot start with a numeric character.");
+						input_bool_check = false;
 					}else{
-						if (single_input_array.length != 3  && info_array[2] == 'yes') {
-							//	Not proper file input (paired end)
-							input_bool_check = false;
-						}else if (single_input_array.length != 2  && info_array[2] == 'no') {
-							//	Not proper file input (single end)
-							input_bool_check = false;
-						}else{
-							input_array.push(single_input_array);
-						}
+						input_array.push(single_input_array);
 					}
 				}
 			}
@@ -141,18 +174,22 @@ function checkFastlaneInput(info_array){
 						console.log(file_check);
 						if (file_check.Result != 'Ok' ){
 							input_bool_check = false;
-							bad_files.push("One or more of your files either doesn't exist or you don't have permissions for.  Please make sure the correct files/permissions are given.");
+							error_out.push(file_check.ERROR);
 						}
 					}
 				});
 			}
-			sendProcessData(bad_files, 'bad_files');
 			database_checks.push(input_bool_check);
 		//	Directory Checks
 		}else if (id_array[x] == 'input_dir' || id_array[x] == 'backup_dir'){
 			//	Check inputs that should not contain whitespace
 			if ((!/^[a-zA-Z0-9\_\.\/\-]*$/.test(info_array[x])) || info_array[x].indexOf("/") != 0) {
 				//	Contains whitespace
+				if (id_array[x] == 'input_dir') {
+					error_out.push("Input Directory must contain only alpha-numerics with dashes/periods/backslashes/underscores");
+				}else{
+					error_out.push("Process Directory must contain only alpha-numerics with dashes/periods/backslashes/underscores");
+				}
 				database_checks.push(false);
 			}else{
 				//	Directory Checks
@@ -165,6 +202,9 @@ function checkFastlaneInput(info_array){
 					{
 						console.log(s);
 						dir_check_1 = JSON.parse(s);
+						if (dir_check_1.Result != 'Ok') {
+							error_out.push(dir_check_1.ERROR);
+						}
 					}
 				});
 				var dir_check_2;
@@ -186,6 +226,9 @@ function checkFastlaneInput(info_array){
 						{
 							console.log(s);
 							dir_check_2 = JSON.parse(s);
+							if (dir_check_2.Result != 'Ok') {
+								error_out.push(dir_check_2.ERROR);
+							}
 						}
 					});
 					
@@ -204,11 +247,16 @@ function checkFastlaneInput(info_array){
 					});
 				}
 				
-				if (dir_check_1.Result != 'Ok' || dir_check_2.Result != 'Ok') {
+				if (dir_check_1.Result != 'Ok'){
+					error_out.push(dir_check_1.ERROR);
+					database_checks.push(false);
+				}else if (dir_check_2.Result != 'Ok') {
 					//	perms errors
+					error_out.push(dir_check_2.ERROR);
 					database_checks.push(false);
 				}else if (used_outdir){
 					//	Outdir already used
+					error_out.push("Process directory is already being used.  Either change your process directory or remove the run that is using this directory.");
 					database_checks.push(false);
 				}else{
 					//	No errors
@@ -220,6 +268,11 @@ function checkFastlaneInput(info_array){
 			if (/^[a-zA-Z 0-9\_\-\s]*$/.test(info_array[x])) {
 				database_checks.push(true);
 			}else{
+				if (id_array[x] == 'series_name') {
+					error_out.push("Series name does not have correct formatting.  Please use Alpha-numerics with dashes/underscores/spaces only.");
+				}else{
+					error_out.push("Import name does not have correct formatting.  Please use Alpha-numerics with dashes/underscores/spaces only.");
+				}
 				database_checks.push(false);
 			}
 		}else{
@@ -239,17 +292,9 @@ function checkFastlaneInput(info_array){
 
 	//	Samples
 	if (experiment_series_id > 0 && lane_id > 0) {
-		if (info_array[1] == 'yes') {
-			for(z in barcode_array){
-				if(sampleCheck(experiment_series_id, lane_id, barcode_array[z][0]) != 0){
-					bad_samples.push(barcode_array[z][0]);
-				}
-			}
-		}else{
-			for(z in input_array){
-				if(sampleCheck(experiment_series_id, lane_id, input_array[z][0]) != 0){
-					bad_samples.push(input_array[z][0]);
-				}
+		for(z in input_array){
+			if(sampleCheck(experiment_series_id, lane_id, input_array[z][0]) != 0){
+				bad_samples.push(input_array[z][0]);
 			}
 		}
 		if (bad_samples.length > 0) {
@@ -268,73 +313,20 @@ function checkFastlaneInput(info_array){
 	
 	if (database_checks.indexOf(false) > -1) {
 		//	Error in submission, do not submit into database
+		console.log(error_out);
+		sendProcessData(error_out, 'error_out');
 		return database_checks;
 	}else{
 		//	Obtain group id
 		var gid = document.getElementById('groups').value.toString();
 		var perms = obtainPermsFromRadio();
+		var barcode_count = 0;
 		if (experiment_series_id > 0) {
 			//	If adding to a experiment series
-			if (lane_id > 0) {
-				//	If adding to a lane
-				if (info_array[1] == 'yes') {
-					//	If seperating barcodes
-					for (var a = 0; a < barcode_array.length; a++) {
-						if (sample_file_check.indexOf(barcode_array[a][0]) == -1) {
-							var true_id = insertSample(experiment_series_id, lane_id, barcode_array[a][0],
-										barcode_array[a][1], gid, perms);
-							true_sample_ids.push(true_id);
-							sample_ids.push(true_id);
-							sample_file_check.push(barcode_array[a][0]);
-						}else{
-							sample_ids.push(sampleCheck(experiment_series_id, lane_id, barcode_array[a][0]));
-						}
-					}
-				}else{
-					//	If not separating barcodes
-					for (var a = 0; a < input_array.length; a++) {
-						if (sample_file_check.indexOf(input_array[a][0]) == -1) {
-							var true_id = insertSample(experiment_series_id, lane_id, input_array[a][0],
-									'nobarcode', gid, perms);
-							true_sample_ids.push(true_id);
-							sample_ids.push(true_id);
-							sample_file_check.push(input_array[a][0]);
-						}else{
-							sample_ids.push(sampleCheck(experiment_series_id, lane_id, input_array[a][0]));
-						}
-					}
-				}
-			}else{
+			if (!lane_id > 0) {
 				//	If creating a lane
 				insertLane(experiment_series_id, info_array[4], gid, perms);
-				var lane_id = laneCheck(experiment_series_id, info_array[4]);
-				if (info_array[1] == 'yes') {
-					//	If separating barcodes
-					for (var a = 0; a < barcode_array.length; a++) {
-						if (sample_file_check.indexOf(barcode_array[a][0]) == -1) {
-							var true_id = insertSample(experiment_series_id, lane_id, barcode_array[a][0],
-										barcode_array[a][1], gid, perms);
-							true_sample_ids.push(true_id);
-							sample_ids.push(true_id);
-							sample_file_check.push(barcode_array[a][0]);
-						}else{
-							sample_ids.push(sampleCheck(experiment_series_id, lane_id, barcode_array[a][0]));
-						}
-					}
-				}else{
-					//	If not separating barcodes
-					for (var a = 0; a < input_array.length; a++) {
-						if (sample_file_check.indexOf(input_array[a][0]) == -1) {
-							var true_id = insertSample(experiment_series_id, lane_id, input_array[a][0],
-									'nobarcode', gid, perms);
-						true_sample_ids.push(true_id);
-						sample_ids.push(true_id);
-							sample_file_check.push(input_array[a][0]);
-						}else{
-							sample_ids.push(sampleCheck(experiment_series_id, lane_id, input_array[a][0]));
-						}
-					}
-				}
+				lane_id = laneCheck(experiment_series_id, info_array[4]);
 			}
 		}else{
 			//	If creating an experiment series
@@ -342,33 +334,24 @@ function checkFastlaneInput(info_array){
 			experiment_series_id = experimentSeriesCheck(info_array[3]);
 			
 			insertLane(experiment_series_id, info_array[4], gid, perms);
-			var lane_id = laneCheck(experiment_series_id, info_array[4]);
-			
-			if (info_array[1] == 'yes') {
-				//	If separating barcodes
-				for (var a = 0; a < barcode_array.length; a++) {
-					if (sample_file_check.indexOf(barcode_array[a][0]) == -1) {
-						var true_id = insertSample(experiment_series_id, lane_id, barcode_array[a][0], barcode_array[a][1], gid, perms);
-							true_sample_ids.push(true_id);
-							sample_ids.push(true_id);
-						sample_file_check.push(barcode_array[a][0]);
-						
-					}else{
-						sample_ids.push(sampleCheck(experiment_series_id, lane_id, barcode_array[a][0]));
-					}
-				}
-			}else{
-				//	If not separating barcodes
-				for (var a = 0; a < input_array.length; a++) {
-					if (sample_file_check.indexOf(input_array[a][0]) == -1) {
-						var true_id = insertSample(experiment_series_id, lane_id, input_array[a][0],
-									'nobarcode', gid, perms);
-						true_sample_ids.push(true_id);
-						sample_ids.push(true_id);
-						sample_file_check.push(input_array[a][0]);
-					}else{
-						sample_ids.push(sampleCheck(experiment_series_id, lane_id, input_array[a][0]));
-					}
+			lane_id = laneCheck(experiment_series_id, info_array[4]);
+		}
+		if (info_array[1] == 'yes') {
+			for(var a = 0; a < barcode_array.length; a++){
+				var true_id = insertSample(experiment_series_id, lane_id, barcode_array[a][0][0], barcode_array[a][0][1], gid, perms);
+				true_sample_ids.push(true_id);
+				sample_ids.push(true_id);
+				sample_file_check.push(barcode_array[a][0][0]);
+			}
+		}else{
+			for (var a = 0; a < input_array.length; a++) {
+				if (sample_file_check.indexOf(input_array[a][0]) == -1) {
+					var true_id = insertSample(experiment_series_id, lane_id, input_array[a][0], 'nobarcode', gid, perms);
+					true_sample_ids.push(true_id);
+					sample_ids.push(true_id);
+					sample_file_check.push(input_array[a][0]);
+				}else{
+					sample_ids.push(sampleCheck(experiment_series_id, lane_id, input_array[a][0]));
 				}
 			}
 		}
@@ -381,10 +364,10 @@ function checkFastlaneInput(info_array){
 		for(var g = 0; g < input_array.length; g++){
 			if (info_array[1] == 'yes') {
 				//	If Barcode sep
-				if (input_array[g].length == 2) {
-					insertTempLaneFiles(input_array[g][1], lane_id, input_directory_id, gid, perms);
+				if (input_array[g].length == 1) {
+					insertTempLaneFiles(input_array[g][0], lane_id, input_directory_id, gid, perms);
 				}else{
-					var combined_files = input_array[g][1] + "," + input_array[g][2];
+					var combined_files = input_array[g][0] + "," + input_array[g][1];
 					insertTempLaneFiles(combined_files, lane_id, input_directory_id, gid, perms);
 				}
 			}else{
@@ -591,6 +574,18 @@ function sendProcessData(info_array, post_name){
 			type: 	'GET',
 			url: 	BASE_PATH+'/public/ajax/ngsfastlanedb.php',
 			data:  	{ p: 'sendProcessData', info_array: info_array, post: post_name},
+			async:	false,
+			success: function(s)
+			{
+			}
+	});
+}
+
+function sendProcessDataRaw(info_array, post_name){
+	$.ajax({
+			type: 	'GET',
+			url: 	BASE_PATH+'/public/ajax/ngsfastlanedb.php',
+			data:  	{ p: 'sendProcessDataRaw', info_array: info_array, post: post_name},
 			async:	false,
 			success: function(s)
 			{
