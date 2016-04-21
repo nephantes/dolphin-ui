@@ -310,7 +310,10 @@ class Dolphin:
                print >>fp, '@TSIZE=50';
                print >>fp, '@PREVIOUSRSEM=%s'%(previoussplit)
                if ("MarkDuplicates" in pipe and pipe['MarkDuplicates'].lower()=="yes"):
-                   bowtie_params=self.replace_space(self.convert_comma("-N 1 --sensitive --dpad 0 --gbar 99999999 --mp 1,1 --np 1 --score-min L,0,-0.1"))
+                   paired_str=""
+                   if (runparams['spaired'] == "paired"):
+                      paired_str = " --no-mixed --no-discordant " 
+                   bowtie_params=self.replace_space(self.convert_comma("-N 1 --sensitive --dpad 0 --gbar 99999999 --mp 1,1 --np 1 --score-min L,0,-0.1 " + paired_str))
                    filter_out="0"
                    name="RSEMBAM"
                    indexname="rsem_ref.transcripts"
@@ -412,7 +415,7 @@ class Dolphin:
         for metric in metrics:
           if( (metric=="CollectRnaSeqMetrics" and (str(type).lower().find("tophat")>1 or str(type).lower().find("rsem")>1  )) or metric != "CollectRnaSeqMetrics" ):
             self.prf( fp, stepPicard % locals() if ((metric in pipe and pipe[metric].lower()=="yes")) else None )
-            if ("MarkDuplicates" in pipe):
+            if ("MarkDuplicates" in pipe and pipe['MarkDuplicates'].lower()=="yes"):
                 type = "dedup"+initialtype
         
         self.prf( fp, stepMergePicard % locals() if (('CollectRnaSeqMetrics' in pipe and pipe['CollectRnaSeqMetrics'].lower()=="yes") or ('CollectMultipleMetrics' in pipe and pipe['CollectMultipleMetrics'].lower()=="yes")) else None )
@@ -486,7 +489,7 @@ class Dolphin:
                      previousrsem = "dedup" + type
                      type=previousrsem
 
-                 if ('split' in runparams and runparams['split'].lower() != 'none'):
+                 if ('split' in runparams and runparams['split'].lower() != 'none'  and 'MarkDuplicates' in pipe and pipe['MarkDuplicates'].lower() == 'yes'):
                     self.prf( fp, '%s'%(stepMergeBAM % locals()) )
                     previousrsem="merge"+previousrsem
                      
