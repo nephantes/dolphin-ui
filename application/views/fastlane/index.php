@@ -31,9 +31,9 @@
 									</p>
 									<div class="col-md-11">
 										<label id="read_1_label">First Read</label>
-										<input id="read_1_input" class="form-control margin" type="text" placeholder="_R1">
+										<input id="read_1_input" class="form-control margin" type="text" placeholder="_R1" value="_R1">
 										<label id="read_2_label">Second Read</label>
-										<input id="read_2_input" class="form-control margin" type="text" placeholder="_R2">
+										<input id="read_2_input" class="form-control margin" type="text" placeholder="_R2" value="_R2">
 									</div>
 								</div>
 							</fieldset>   

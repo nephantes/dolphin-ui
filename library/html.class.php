@@ -862,7 +862,7 @@ Single End Example:
 										<div class="col-md-4">
 											<button id="add_selection_file" type="button" class="btn btn-primary pull-right" onclick="addSelection(\'standard\')">Add Selection</i></button>
 											<button id="smart_add_file" type="button" class="btn btn-primary pull-right" onclick="smartSelection()">Add All</i></button>
-											<button id="smart_add_file" type="button" class="btn btn-warning pull-right" onclick="clearSelection()">Clear</i></button>
+											<button id="clear_selection" type="button" class="btn btn-warning pull-right" onclick="clearSelection()">Reset</i></button>
 										</div>
 									</div>
 								</div>
