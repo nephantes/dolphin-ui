@@ -48,7 +48,7 @@ function queryDirectory() {
 			$('#errorModal').modal({
 				show: true
 			});
-			document.getElementById('errorLabel').innerHTML = file_list.split('ls: ')[1];
+			document.getElementById('errorLabel').innerHTML = file_list[0].split('ls: ')[1];
 			document.getElementById('errorAreas').innerHTML = '';
 		}else{
 			//	If Paired end
