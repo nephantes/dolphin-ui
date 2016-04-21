@@ -178,13 +178,13 @@ else if ($p == 'convertToTSV')
 	}
 	foreach($json_data as $jd){
 		if($toggle){
-			fwrite($file, implode(" ", $json_keys).PHP_EOL);
+			fwrite($file, implode("	", $json_keys).PHP_EOL);
 			$toggle = false;
 		}
 		$input = "";
 		foreach($json_keys as $key){
 			if(end($json_keys) != $key){
-				$input .= $jd->$key . " ";
+				$input .= $jd->$key . "	";
 			}else{  
 				$input .= $jd->$key;
 			}
