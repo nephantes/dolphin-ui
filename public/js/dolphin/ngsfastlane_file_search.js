@@ -44,11 +44,11 @@ function queryDirectory() {
 		var R2 = [];
 		//	Grab files from directory
 		var file_list = directoryGrab(directory, r1_search, r2_search);;
-		if (file_list[0] == "" || file_list[0].indexOf("ls: cannot access") > -1) {
+		if (file_list[0] == "" || file_list[0].indexOf("ls: cannot") > -1) {
 			$('#errorModal').modal({
 				show: true
 			});
-			document.getElementById('errorLabel').innerHTML = 'You cannot access this directory.';
+			document.getElementById('errorLabel').innerHTML = file_list.split('ls: ')[1];
 			document.getElementById('errorAreas').innerHTML = '';
 		}else{
 			//	If Paired end
