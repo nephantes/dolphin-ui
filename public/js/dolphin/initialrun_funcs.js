@@ -38,29 +38,20 @@ $(function() {
 				var barcodes = {};
 				barcodes['distance'] = barcode_array.split(',')[0];
 				barcodes['format'] = barcode_array.split(",")[1];
+				barcodes['barcodes'] = initial_split[initial_split.length - 3].replace(/[\s\t\,\:]+/g, ",");
 				JSON_OBJECT['barcodes'] = [barcodes];
-				JSON_OBJECT['adapters'] = initial_split[initial_split.length - 3].split(" ")[1].replace(/\:/g, "__cr____cn__");
 			}
+			JSON_OBJECT['adapters'] = 'none';
 			JSON_OBJECT['quality'] = 'none';
 			JSON_OBJECT['trim'] = 'none';
 			JSON_OBJECT['split'] = 'none';
 			JSON_OBJECT['commonind'] = 'none';
 			JSON_OBJECT['submission'] = '0';
 			
-			var names_list = [];
-			if (initial_split[2] == 'yes') {
-				var names = initial_split[initial_split.length - 3].split(":");
-				for(var y = 0; y < names.length; y++){
-					if (names_list.indexOf(names[y].split(" ")[0]) == -1) {
-						names_list.push(names[y].split(" ")[0]);
-					}
-				}
-			}else{
-				var names = initial_split[7].split(":");
-				for(var y = 0; y < names.length; y++){
-					if (names_list.indexOf(names[y].split(" ")[0]) < 0) {
-						names_list.push(names[y].split(" ")[0]);
-					}
+			var names_list = [];var names = initial_split[7].split(":");
+			for(var y = 0; y < names.length; y++){
+				if (names_list.indexOf(names[y].split(" ")[0]) < 0) {
+					names_list.push(names[y].split(" ")[0]);
 				}
 			}
 			
