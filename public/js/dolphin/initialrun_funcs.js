@@ -58,7 +58,7 @@ $(function() {
 					names_list.push(names[y].split(/[\s\t\,]+/)[0]);
 				}
 			}
-			
+			console.log(names_list)
 			sample_lane = "'" + initial_split[5] + "'";
 			experiment_series = initial_split[4];
 			group = initial_split[initial_split.length - 2];
