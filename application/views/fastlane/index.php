@@ -28,6 +28,9 @@
 									<p id="regexArea">
 										To help determine the correct fastq files listed in your selected directory, Please give the naming scheme for each type of read.
 										To list every single-end fastq file, just leave the field blank.  A naming scheme is required for paired-end fastq files.
+										<br>
+										<br>
+										Please refrain from using the '*' regex.
 									</p>
 									<div class="col-md-11">
 										<label id="read_1_label">First Read</label>
