@@ -519,18 +519,28 @@ class Ngsimport extends VanillaModel {
 					$this->final_check = false;
 					$meta_check = false;
 				}
+				if(!$this->checkAlphaNumWithAddChars('\_\-\.\/', $this->fastq_dir)){
+					$text.= $this->errorText("Fastq Directory does not contain proper characters, please use alpha-numerics, dashes, underscores, periods, and backslashes");
+					$this->final_check = false;
+					$meta_check = false;
+				}
 			}
 			
 			if(isset($this->backup_dir) && ( $this->sheetData[$i]["A"]=="backup directory" || $this->sheetData[$i]["A"]=="processed directory" || $this->sheetData[$i]["A"]=="process directory" )){
 				$permCheck = $this->checkUserPermissions($this->clustername);
 				$dirCheck = $this->checkDirPermissions($this->backup_dir, $this->clustername);
 				if($permCheck != 'pass'){
-					$text.= $this->errorText("Fastq Directory error (".$this->backup_dir."). ".$permCheck);
+					$text.= $this->errorText("Process Directory error (".$this->backup_dir."). ".$permCheck);
 					$this->final_check = false;
 					$meta_check = false;
 				}
 				if($dirCheck != 'pass'){
-					$text.= $this->errorText("Fastq Directory error (".$this->backup_dir."). ".$dirCheck);
+					$text.= $this->errorText("Process Directory error (".$this->backup_dir."). ".$dirCheck);
+					$this->final_check = false;
+					$meta_check = false;
+				}
+				if(!$this->checkAlphaNumWithAddChars('\_\-\.\/', $this->backup_dir)){
+					$text.= $this->errorText("Process Directory does not contain proper characters, please use alpha-numerics, dashes, underscores, periods, and backslashes");
 					$this->final_check = false;
 					$meta_check = false;
 				}
@@ -1143,6 +1153,11 @@ class Ngsimport extends VanillaModel {
 					$this->final_check = false;
 					$dir_check = false;
 				}
+				if(!$this->checkAlphaNumWithAddChars('\_\-\.\/', $this->fastq_dir)){
+					$text.= $this->errorText("Fastq Directory ".$this->fastq_dir." does not contain proper characters, please use alpha-numerics, dashes, underscores, periods, and backslashes");
+					$this->final_check = false;
+					$meta_check = false;
+				}
 			}
 			if(isset($this->dir_arr[$dir->dir_tag])){
 				$text.= $this->errorText("Fastq Directory error.  Cannot have duplicate Directory IDs. (".$dir->fastq_dir.").");
@@ -1263,6 +1278,11 @@ class Ngsimport extends VanillaModel {
 			//	File Name checks
 			if(isset($file->file_name)){
 				$this->file_arr[$file->file_name]=$file;
+				if(!$this->checkAlphaNumWithAddChars('\_\-\,', $this->fastq_dir)){
+					$text.= $this->errorText("File(s) ".$file->file_name." does not contain proper characters, please use alpha-numerics, dashes, and underscores");
+					$this->final_check = false;
+					$meta_check = false;
+				}
 			}else{
 				$text.= $this->errorText("file name is required for submission (row " . $i . ")");
 				$this->final_check = false;
