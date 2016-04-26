@@ -633,7 +633,7 @@ class Dolphin:
             for input in content:
                new_content += input['name'] + '__tt__'
                new_content += self.parse_content(input['samples']) + '__tt__'
-               if (input == content(-1)):
+               if (input == content[-1]):
                    new_content += self.parse_content(input['input'])
                else:
                    new_content += self.parse_content(input['input']) + ':'
