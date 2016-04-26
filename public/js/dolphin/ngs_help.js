@@ -9,17 +9,15 @@ function getInfoBoxData(id){
 	var info_div = document.getElementById(id+'_info');
 	var filled_info_div = document.getElementById(id+'_filled');
 	if (filled_info_div == undefined) {
-		
 		$.ajax({ type: "GET",
-			url: BASE_PATH+"/public/ajax/ngsquerydb.php",
-			data: { p: "getInfoBoxData", fieldname: id },
+			url: BASE_PATH+"/public/ajax/info_box.php?p="+id,
 			async: false,
 			success : function(s)
 			{
 				var added_info = createElement('h5', ['id'], [id+'_filled']);
-				added_info.innerHTML = s[0].help_text;
+				added_info.innerHTML = s;
 				info_div.appendChild(added_info);
-			}
+			},
 		});
 	}
 }
