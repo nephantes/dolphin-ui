@@ -1265,7 +1265,7 @@ class Ngsimport extends VanillaModel {
 						$file_check = false;
 					}
 				}else{
-					$text.= $this->errorText("sample/import name does not contain proper characters, please use alpha-numeric characters and underscores (row " . $i . ")");
+					$text.= $this->errorText("sample/import name does not contain proper characters, please use alpha-numeric characters, dashes, and underscores (row " . $i . ")");
 					$this->final_check = false;
 					$file_check = false;
 				}
@@ -1278,7 +1278,7 @@ class Ngsimport extends VanillaModel {
 			//	File Name checks
 			if(isset($file->file_name)){
 				$this->file_arr[$file->file_name]=$file;
-				if(!$this->checkAlphaNumWithAddChars('\_\-\,\.', $this->fastq_dir)){
+				if(!$this->checkAlphaNumWithAddChars('\_\-\,\.', $file->file_name)){
 					$text.= $this->errorText("File(s) ".$file->file_name." does not contain proper characters, please use alpha-numerics, dashes, underscores, and periods");
 					$this->final_check = false;
 					$meta_check = false;
