@@ -3,6 +3,7 @@ var username;
 var R1_REGEX;
 var R2_REGEX;
 var FILE_LIST_OPTIONS = [];
+var RETURNED_FILES = [];
 
 function searchDirectoryModal() {
 	if (document.getElementById('spaired').value == 'no') {
@@ -43,7 +44,7 @@ function queryDirectory() {
 		var R1 = [];
 		var R2 = [];
 		//	Grab files from directory
-		var file_list = directoryGrab(directory, r1_search, r2_search);;
+		var file_list = directoryGrab(directory);;
 		if (file_list[0] == "" || file_list[0].indexOf("ls: cannot") > -1) {
 			$('#errorModal').modal({
 				show: true
@@ -136,6 +137,7 @@ function directoryGrab(directory){
 			console.log(s);
 			file_array = s.split('\n');
 			file_array.pop();
+			RETURNED_FILES = file_array;
 			console.log(file_array);
 		}
 	});
@@ -170,24 +172,26 @@ function addSelection(type){
 		}
 	}
 	file_string = file_string.substring(0, file_string.length - 3);
-	var name = file_string.split(R1_REGEX)[0];
-	var input = createElement('input', ['id', 'type', 'class', 'value', 'onChange'], [name, 'text', 'form-control', name, 'updateName(this)'])
-	var button_div = createElement('div', ['class'], ['text-center'])
-	var remove_button = createElement('button', ['class', 'type', 'onclick'],['btn btn-danger text-center', 'button', 'removeRow(this)']);
-	var icon = createElement('i', ['class'],['fa fa-times']);
-	remove_button.appendChild(icon);
-	button_div.appendChild(remove_button);
-	if (barcode_bool) {
-		files.fnAddData([
-			file_string,
-			button_div.outerHTML
-		]);
-	}else{
-		files.fnAddData([
-			input.outerHTML,
-			file_string,
-			button_div.outerHTML
-		]);
+	if (file_string != '') {
+		var name = file_string.split(R1_REGEX)[0];
+		var input = createElement('input', ['id', 'type', 'class', 'value', 'onChange'], [name, 'text', 'form-control', name, 'updateName(this)'])
+		var button_div = createElement('div', ['class'], ['text-center'])
+		var remove_button = createElement('button', ['class', 'type', 'onclick'],['btn btn-danger text-center', 'button', 'removeRow(this)']);
+		var icon = createElement('i', ['class'],['fa fa-times']);
+		remove_button.appendChild(icon);
+		button_div.appendChild(remove_button);
+		if (barcode_bool) {
+			files.fnAddData([
+				file_string,
+				button_div.outerHTML
+			]);
+		}else{
+			files.fnAddData([
+				input.outerHTML,
+				file_string,
+				button_div.outerHTML
+			]);
+		}
 	}
 }
 
@@ -233,7 +237,7 @@ function smartSelection(){
 			}
 		}
 		file_string = file_string.substring(0, file_string.length - 3);
-		var name = regex_string;
+		var name = regex_string.split(' | ')[0].split('.')[0];
 		var input = createElement('input', ['id', 'type', 'class', 'value', 'onChange'], [name, 'text', 'form-control', name, 'updateName(this)'])
 		var button_div = createElement('div', ['class'], ['text-center'])
 		var remove_button = createElement('button', ['class', 'type', 'onclick'],['btn btn-danger text-center', 'button', 'removeRow(this)']);
@@ -284,9 +288,11 @@ $(function() {
 		var files = $('#jsontable_dir_files').dataTable();
 		files.fnClearTable();
 		document.getElementById('jsontable_dir_files').style.width = '100%';
+		document.getElementById('jsontable_dir_files').children[0].children[0].children[0].setAttribute('style', 'width:300px');
 		var barcodes = $('#jsontable_barcode_files').dataTable();
 		barcodes.fnClearTable();
 		document.getElementById('jsontable_barcode_files').style.width = '100%';
+		document.getElementById('jsontable_barcode_files').children[0].children[0].children[0].setAttribute('style', 'width:300px');
 	}
 	
 	//	Get cluster username for file checks
