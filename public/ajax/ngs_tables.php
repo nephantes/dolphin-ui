@@ -433,7 +433,7 @@ else	//	if there isn't a search term (experiments, lanes, samples)
 			$sample_perms = "";
 			$time="";
 			if ($uid != "1"){
-				$sample_perms = "AND (((ngs_samples.group_id in ($gids)) AND (ngs_samples.perms >= 15)) OR (ngs_samples.owner_id = $uid))";
+				$sample_perms = "WHERE (((ngs_samples.group_id in ($gids)) AND (ngs_samples.perms >= 15)) OR (ngs_samples.owner_id = $uid))";
 			}
 			if (isset($start)){$time="and `date_created`>='$start' and `date_created`<='$end'";}
 			$data=$query->queryTable("
