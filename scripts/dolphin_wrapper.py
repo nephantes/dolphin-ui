@@ -312,7 +312,7 @@ class Dolphin:
                if ("MarkDuplicates" in pipe and pipe['MarkDuplicates'].lower()=="yes"):
                    paired_str=""
                    if (runparams['spaired'] == "paired"):
-                      paired_str = " --no-mixed --no-discordant " 
+                       paired_str = " --no-mixed --no-discordant " 
                    bowtie_params=self.replace_space(self.convert_comma("-N 1 --sensitive --dpad 0 --gbar 99999999 --mp 1,1 --np 1 --score-min L,0,-0.1 " + paired_str))
                    filter_out="0"
                    name="RSEMBAM"
@@ -374,6 +374,20 @@ class Dolphin:
                print >>fp, '@MBQS=%s'%(pipe['min_base_quality_score'])
                print >>fp, '@MRPAS=%s'%(pipe['minReadsPerAlignmentStart'])
                print >>fp, '@MRIRPS=%s'%(pipe['maxReadsInRegionPerSample'])
+               if ('common' in pipe and pipe['common'] == "yes"):
+                 print >>fp, '@COMMON=%s'%(pipe['common'])
+               if ('clinical' in pipe and pipe['clinical'] == "yes"):
+                 print >>fp, '@CLINICAL=%s'%(pipe['clinical'])
+               if ('enhancers' in pipe and pipe['enhancers'] == "yes"):
+                 print >>fp, '@ENHANCER=%s'%(pipe['enhancers'])
+               if ('promoters' in pipe and pipe['promoters'] == "yes"):
+                 print >>fp, '@PROMOTER=%s'%(pipe['promoters'])
+               if ('motifs' in pipe and pipe['motifs'] != "none"):
+                 print >>fp, '@MOTIFS=%s'%(pipe['motifs'])
+               if ('merge' in pipe and pipe['merge'] != "none"):
+                 print >>fp, '@MERGEALL=%s'%(pipe['merge'])
+               if ('peaks' in pipe and pipe['peaks'] != "none"):
+                 print >>fp, '@PEAKS=%s'%(pipe['peaks'])
 
        print >>fp, '@MAPNAMES=%s'%(mapnames)
        print >>fp, '@PREVIOUSPIPE=%s'%(previous)
@@ -568,7 +582,11 @@ class Dolphin:
                  self.prf( fp, '%s'%(stepDiffMeth % locals()) )             
 
               if (pipe['Type'] == "HaplotypeCaller"):
-                 self.prf( fp, '%s'%(stepHaplotype % locals()) )
+                if (pipe['merge'] == "yes"):
+                    self.prf( fp, '%s'%(stepMergeBAM % locals()) )
+                    type="merge"+type
+                self.prf( fp, '%s'%(stepHaplotype % locals()) )
+                type="haplotypecaller"
 
         level = str(1 if ('clean' in runparams and runparams['clean'].lower() != 'none') else 0)
         print >>fp, '%s'%(stepClean % locals())
@@ -615,7 +633,7 @@ class Dolphin:
             for input in content:
                new_content += input['name'] + '__tt__'
                new_content += self.parse_content(input['samples']) + '__tt__'
-               if (input == content(-1)):
+               if (input == content[-1]):
                    new_content += self.parse_content(input['input'])
                else:
                    new_content += self.parse_content(input['input']) + ':'
