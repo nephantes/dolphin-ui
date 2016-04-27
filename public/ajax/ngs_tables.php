@@ -185,7 +185,11 @@ else if($search != "")	//	If there is a search term(s) (experiments, lanes, samp
 		}
 		else if($p == "getSamples")
 		{
+			$sample_perms = "";
 			$time="";
+			if ($uid != "1"){
+				$sample_perms = "AND (((ngs_samples.group_id in ($gids)) AND (ngs_samples.perms >= 15)) OR (ngs_samples.owner_id = $uid))";
+			}
 			if (isset($start)){$time="and `date_created`>='$start' and `date_created`<='$end'";}
 			$data=$query->queryTable("
 			SELECT ngs_samples.id, ngs_samples.series_id, ngs_samples.lane_id, name, samplename, title, source, organism, molecule, total_reads, barcode, description, avg_insert_size, read_length, concentration, time, biological_replica, technical_replica, spike_ins, adapter,
@@ -194,7 +198,7 @@ else if($search != "")	//	If there is a search term(s) (experiments, lanes, samp
             $innerJoin
             $sampleJoin
 			WHERE $searchQuery
-            AND (((ngs_samples.group_id in ($gids)) AND (ngs_samples.perms >= 15)) OR (ngs_samples.owner_id = $uid))
+            $sample_perms
             $time
 			");
 		}
@@ -229,7 +233,11 @@ else if($search != "")	//	If there is a search term(s) (experiments, lanes, samp
 		}
 		else if($p == "getSamples" && $r != "")
 		{
+			$sample_perms = "";
 			$time="";
+			if ($uid != "1"){
+				$sample_perms = "AND (((ngs_samples.group_id in ($gids)) AND (ngs_samples.perms >= 15)) OR (ngs_samples.owner_id = $uid))";
+			}
 			if (isset($start)){$time="and `date_created`>='$start' and `date_created`<='$end'";}
 			$data=$query->queryTable("
 			SELECT ngs_samples.id, ngs_samples.series_id, ngs_samples.lane_id,name, samplename, title, source, organism, molecule, total_reads, barcode, description, avg_insert_size, read_length, concentration, time, biological_replica, technical_replica, spike_ins, adapter,
@@ -239,13 +247,17 @@ else if($search != "")	//	If there is a search term(s) (experiments, lanes, samp
             $sampleJoin
 			WHERE $searchQuery
 			AND ngs_samples.lane_id = $r
-            AND (((ngs_samples.group_id in ($gids)) AND (ngs_samples.perms >= 15)) OR (ngs_samples.owner_id = $uid))
+            $sample_perms
             $time
 			");
 		}
 		else if($p == "getSamples" && $q != "")
 		{
+			$sample_perms = "";
 			$time="";
+			if ($uid != "1"){
+				$sample_perms = "AND (((ngs_samples.group_id in ($gids)) AND (ngs_samples.perms >= 15)) OR (ngs_samples.owner_id = $uid))";
+			}
 			if (isset($start)){$time="and `date_created`>='$start' and `date_created`<='$end'";}
 			$data=$query->queryTable("
 			SELECT ngs_samples.id, ngs_samples.series_id, ngs_samples.lane_id, name, samplename, title, source, organism, molecule, total_reads, barcode, description, avg_insert_size, read_length, concentration, time, biological_replica, technical_replica, spike_ins, adapter,
@@ -255,7 +267,7 @@ else if($search != "")	//	If there is a search term(s) (experiments, lanes, samp
             $sampleJoin
 			WHERE $searchQuery
 			AND ngs_samples.series_id = $q 
-            AND (((ngs_samples.group_id in ($gids)) AND (ngs_samples.perms >= 15)) OR (ngs_samples.owner_id = $uid))
+            $sample_perms
             $time
 			");
 		}
@@ -304,7 +316,11 @@ else	//	if there isn't a search term (experiments, lanes, samples)
 		}
 		else if($p == "getSamples")
 		{
+			$sample_perms = "";
 			$time="";
+			if ($uid != "1"){
+				$sample_perms = "AND (((ngs_samples.group_id in ($gids)) AND (ngs_samples.perms >= 15)) OR (ngs_samples.owner_id = $uid))";
+			}
 			if (isset($start)){$time="and `date_created`>='$start' and `date_created`<='$end'";}
 			$data=$query->queryTable("
 			SELECT ngs_samples.id, ngs_samples.series_id, ngs_samples.lane_id,name, samplename, title, source, organism, molecule, total_reads, barcode, description, avg_insert_size, read_length, concentration, time, biological_replica, technical_replica, spike_ins, adapter,
@@ -313,7 +329,7 @@ else	//	if there isn't a search term (experiments, lanes, samples)
             $innerJoin
             $sampleJoin
 			WHERE ngs_samples.$q = \"$r\"
-            AND (((ngs_samples.group_id in ($gids)) AND (ngs_samples.perms >= 15)) OR (ngs_samples.owner_id = $uid))
+            $sample_perms
             $time
 			");
 		}
@@ -344,7 +360,11 @@ else	//	if there isn't a search term (experiments, lanes, samples)
 		}
 		else if($p == "getSamples" && $r != "")
 		{
+			$sample_perms = "";
 			$time="";
+			if ($uid != "1"){
+				$sample_perms = "AND (((ngs_samples.group_id in ($gids)) AND (ngs_samples.perms >= 15)) OR (ngs_samples.owner_id = $uid))";
+			}
 			if (isset($start)){$time="and `date_created`>='$start' and `date_created`<='$end'";}
 			$data=$query->queryTable("
 			SELECT ngs_samples.id, ngs_samples.series_id, ngs_samples.lane_id, name, samplename, title, source, organism, molecule, total_reads, barcode, description, avg_insert_size, read_length, concentration, time, biological_replica, technical_replica, spike_ins, adapter,
@@ -353,13 +373,17 @@ else	//	if there isn't a search term (experiments, lanes, samples)
             $innerJoin
             $sampleJoin
 			WHERE ngs_samples.lane_id = $r
-            AND (((ngs_samples.group_id in ($gids)) AND (ngs_samples.perms >= 15)) OR (ngs_samples.owner_id = $uid))
+            $sample_perms
             $time
 			");
 		}
 		else if($p == "getSamples" && $q != "")
 		{
+			$sample_perms = "";
 			$time="";
+			if ($uid != "1"){
+				$sample_perms = "AND (((ngs_samples.group_id in ($gids)) AND (ngs_samples.perms >= 15)) OR (ngs_samples.owner_id = $uid))";
+			}
 			if (isset($start)){$time="and `date_created`>='$start' and `date_created`<='$end'";}
 			$data=$query->queryTable("
 			SELECT ngs_samples.id, ngs_samples.series_id, ngs_samples.lane_id, name, samplename, title, source, organism, molecule, total_reads, barcode, description, avg_insert_size, read_length, concentration, time, biological_replica, technical_replica, spike_ins, adapter,
@@ -368,7 +392,7 @@ else	//	if there isn't a search term (experiments, lanes, samples)
             $innerJoin
             $sampleJoin
 			WHERE ngs_samples.series_id = $q
-            AND (((ngs_samples.group_id in ($gids)) AND (ngs_samples.perms >= 15)) OR (ngs_samples.owner_id = $uid))
+            $sample_perms
             $time
 			");
 		}
@@ -406,7 +430,11 @@ else	//	if there isn't a search term (experiments, lanes, samples)
 		}
 		else if($p == "getSamples")
 		{
+			$sample_perms = "";
 			$time="";
+			if ($uid != "1"){
+				$sample_perms = "AND (((ngs_samples.group_id in ($gids)) AND (ngs_samples.perms >= 15)) OR (ngs_samples.owner_id = $uid))";
+			}
 			if (isset($start)){$time="and `date_created`>='$start' and `date_created`<='$end'";}
 			$data=$query->queryTable("
 			SELECT ngs_samples.id, ngs_samples.series_id, ngs_samples.lane_id, name, samplename, title, source, organism, molecule, total_reads, barcode, description, avg_insert_size, read_length, concentration, time, biological_replica, technical_replica, spike_ins, adapter,
@@ -414,7 +442,7 @@ else	//	if there isn't a search term (experiments, lanes, samples)
 			FROM ngs_samples
             $innerJoin
             $sampleJoin
-            WHERE (((ngs_samples.group_id in ($gids)) AND (ngs_samples.perms >= 15)) OR (ngs_samples.owner_id = $uid))
+            $sample_perms
             $time
 			");
 		}
