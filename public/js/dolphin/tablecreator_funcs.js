@@ -342,6 +342,13 @@ function saveTable() {
 		});
 }
 
+function downloadTSV(file_name){
+	if (file_name != '') {
+		var URL = BASE_PATH + '/public/tmp/files/' + file_name; 
+		window.open(URL, '_blank');
+	}
+}
+
 function downloadGeneratedTSV(beforeFormat){
 	var url = API_PATH +"/public/api/getsamplevals.php?" + beforeFormat + 'format=json'
 	var file_name = '';
@@ -632,6 +639,7 @@ $(function() {
 				table_params = s;
 			}
 		});
+		document.getElementsByClassName('box-title')[0].innerHTML = "Table Generated - File: " + table_params['parameters'].split('file=')[1].split('&')[0]
 		var beforeFormat = table_params.parameters.split('format=')[0];
 		var json_obj = '';
 		var export_table = document.getElementById('downloadOptions');
@@ -653,7 +661,11 @@ $(function() {
 		li += '<li><a onclick="changeTableType(\'XML\', \''+beforeFormat+'\')" style="cursor:pointer">XML link</a></li>';
 		li += debrowser_string;
 		li += '<li class="divider"></li>';
-		li += '<li><a value="Download TSV" onclick="downloadGeneratedTSV(\''+beforeFormat+'\')" style="cursor:pointer">Download TSV</a></li>';
+		if (table_params.file != null && table_params.file != '') {
+			li += '<li><a value="Download TSV" onclick="downloadTSV(\''+table_params.file+'\')" style="cursor:pointer">Download TSV</a></li>';
+		}else{
+			li += '<li><a value="Download TSV" onclick="downloadGeneratedTSV(\''+beforeFormat+'\')" style="cursor:pointer">Download TSV</a></li>';
+		}
 		
 		ul.innerHTML = li;
 		export_table.appendChild(ul);
@@ -697,6 +709,12 @@ $(function() {
 									'<li class="divider"></li>';
 							}
                         }
+						var file_str = ""
+						if (s[x].file != '' && s[x].file != undefined) {
+							file_str = '<li><a value="Download TSV" onclick="downloadTSV(\''+s[x].file+'\')">Download TSV</a></li>';
+						}else{
+							file_str = '<li><a value="Download TSV" onclick="downloadGeneratedTSV(\''+s[x].parameters+'\')">Download TSV</a></li>';
+						}
 						runparams.fnAddData([
 							s[x].id,
 							s[x].name,
@@ -707,6 +725,7 @@ $(function() {
 								'<ul class="dropdown-menu" role="menu">' + 
 									'<li><a id="' + s[x].id+'" onclick="sendToSavedTable(this.id)">View</a></li>' +
 									'<li><a id="' + s[x].id+'" onclick="sendTableToPlot(\''+s[x].file+'\')">Plot Table</a></li>' +
+									file_str + 
 									'<li class="divider"></li>' +
 									debrowser_string +
 									'<li><a id="' + s[x].id+'" onclick="changeTableData(this.id)">Change Table Permissions</a></li>' +
