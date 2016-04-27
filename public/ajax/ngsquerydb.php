@@ -244,15 +244,6 @@ else if ($p == 'obtainAmazonKeys')
                 SELECT g_id FROM user_group WHERE u_id = ".$_SESSION['uid'].")))
     ");
 }
-else if ($p == 'getInfoBoxData')
-{
-    if (isset($_GET['fieldname'])){$fieldname = $_GET['fieldname'];}
-    $data=$query->queryTable("
-    SELECT help_text
-    FROM ngs_help
-    WHERE field_name = '$fieldname';
-    ");
-}
 else if ($p == 'checkAmazonPermissions')
 {
     if (isset($_GET['a_id'])){$a_id = $_GET['a_id'];}
