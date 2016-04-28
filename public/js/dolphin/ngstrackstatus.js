@@ -1,4 +1,5 @@
 var run_id = '0';
+var directory = '';
 var wkey = '';
 var page_mark_runparams = 0;
 var page_mark_services = 0;
@@ -139,7 +140,19 @@ $(function() {
 				run_id = s;
 			}
 		});
+		$.ajax({ type: "GET",
+			url: BASE_PATH +"/ajax/ngs_stat_funcs.php",
+			data: { p: 'getAdvStatusDirectory', run_id: run_id },
+			async: false,
+			success : function(s)
+			{
+				console.log(s);
+				directory = s;
+			}
+		});
+		
 	wkey = getWKey(run_id);
+	document.getElementsByClassName('box-title')[0].innerHTML = "Services - Run "+run_id + " Directory: - " + directory;
 	var runparams = $('#jsontable_services').dataTable();
 	console.log(wkey);
 	
