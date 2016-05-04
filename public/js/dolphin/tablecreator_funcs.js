@@ -550,7 +550,8 @@ function sendToSavedTable(id){
 
 $(function() {
 	"use strict";
-	if(window.location.href.split("/").indexOf('table') < 0 && window.location.href.split("/").indexOf('tablereports') < 0){
+	if(window.location.href.split("/").indexOf('table') < 0 && window.location.href.split("/").indexOf('tablereports') < 0 &&
+	   window.location.href.split("/").indexOf('search') == -1){
 		//	If within tablecreator page, get basket info
 		var sample_ids = getBasketInfo();
 		checklist_samples = [];
@@ -676,66 +677,68 @@ $(function() {
 			document.getElementById('save_table_button').remove();
 		}
 	}else{
-		var runparams = $('#jsontable_table_viewer').dataTable({
-			//"scrollX": true
-		});
-		$.ajax({ type: "GET",
-				url: BASE_PATH+"/public/ajax/tablegenerator.php",
-				data: { p: "getCreatedTables", gids: phpGrab.gids},
-				async: true,
-				success : function(s)
-				{
-					console.log(s);
-					runparams.fnClearTable();
-					for(var x = 0; x < s.length; x++){
-						var splitParameters = s[x].parameters.split('&');
-						var splitSampleRuns = splitParameters[0].split('samples=')[1].split(":");
-						var stringSampleRuns = '';
-						for(var run in splitSampleRuns){
-							if (run == splitSampleRuns.length - 1) {
-								stringSampleRuns += 'Run: ' + splitSampleRuns[run].split(';')[1] + ' Samples: ' + splitSampleRuns[run].split(';')[0];
-							}else{
-								stringSampleRuns += 'Run: ' + splitSampleRuns[run].split(';')[1] + ' Samples: ' + splitSampleRuns[run].split(';')[0] + ' | ';
+		if (window.location.href.split("/").indexOf('search') == -1) {
+			var runparams = $('#jsontable_table_viewer').dataTable({
+				//"scrollX": true
+			});
+			$.ajax({ type: "GET",
+					url: BASE_PATH+"/public/ajax/tablegenerator.php",
+					data: { p: "getCreatedTables", gids: phpGrab.gids},
+					async: true,
+					success : function(s)
+					{
+						console.log(s);
+						runparams.fnClearTable();
+						for(var x = 0; x < s.length; x++){
+							var splitParameters = s[x].parameters.split('&');
+							var splitSampleRuns = splitParameters[0].split('samples=')[1].split(":");
+							var stringSampleRuns = '';
+							for(var run in splitSampleRuns){
+								if (run == splitSampleRuns.length - 1) {
+									stringSampleRuns += 'Run: ' + splitSampleRuns[run].split(';')[1] + ' Samples: ' + splitSampleRuns[run].split(';')[0];
+								}else{
+									stringSampleRuns += 'Run: ' + splitSampleRuns[run].split(';')[1] + ' Samples: ' + splitSampleRuns[run].split(';')[0] + ' | ';
+								}
 							}
-						}
-						var debrowser_string = '';
-						var datafile = splitParameters[1].split('file=')[1].split(',').join(', ');
-						if (datafile.indexOf('rsem') > -1 || datafile.indexOf('mRNA') > -1 || datafile.indexOf('tRNA') > -1) {
-							if (s[x].file != null && s[x].file != '') {
-								debrowser_string = '<li><a id="' + s[x].id+'" onclick="sendTableToDebrowser(\''+API_PATH+'/public/tmp/files/'+s[x].file+'\')">Send to DEBrowser</a></li>' +
-									'<li class="divider"></li>';
-							}else{
-								debrowser_string = '<li><a id="' + s[x].id+'" onclick="sendTableToDebrowser(\''+API_PATH+'/public/api/getsamplevals.php?'+s[x].parameters+'\')">Send to DEBrowser</a></li>' +
-									'<li class="divider"></li>';
+							var debrowser_string = '';
+							var datafile = splitParameters[1].split('file=')[1].split(',').join(', ');
+							if (datafile.indexOf('rsem') > -1 || datafile.indexOf('mRNA') > -1 || datafile.indexOf('tRNA') > -1) {
+								if (s[x].file != null && s[x].file != '') {
+									debrowser_string = '<li><a id="' + s[x].id+'" onclick="sendTableToDebrowser(\''+API_PATH+'/public/tmp/files/'+s[x].file+'\')">Send to DEBrowser</a></li>' +
+										'<li class="divider"></li>';
+								}else{
+									debrowser_string = '<li><a id="' + s[x].id+'" onclick="sendTableToDebrowser(\''+API_PATH+'/public/api/getsamplevals.php?'+s[x].parameters+'\')">Send to DEBrowser</a></li>' +
+										'<li class="divider"></li>';
+								}
 							}
-                        }
-						var file_str = ""
-						if (s[x].file != '' && s[x].file != undefined) {
-							file_str = '<li><a value="Download TSV" onclick="downloadTSV(\''+s[x].file+'\')">Download TSV</a></li>';
-						}else{
-							file_str = '<li><a value="Download TSV" onclick="downloadGeneratedTSV(\''+s[x].parameters+'\')">Download TSV</a></li>';
+							var file_str = ""
+							if (s[x].file != '' && s[x].file != undefined) {
+								file_str = '<li><a value="Download TSV" onclick="downloadTSV(\''+s[x].file+'\')">Download TSV</a></li>';
+							}else{
+								file_str = '<li><a value="Download TSV" onclick="downloadGeneratedTSV(\''+s[x].parameters+'\')">Download TSV</a></li>';
+							}
+							runparams.fnAddData([
+								s[x].id,
+								s[x].name,
+								stringSampleRuns,
+								splitParameters[1].split('file=')[1].split(',').join(', '),
+								'<div class="btn-group pull-right">' +
+									'<button type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown" aria-expanded="true">Options <span class="fa fa-caret-down"></span></button>' +
+									'<ul class="dropdown-menu" role="menu">' + 
+										'<li><a id="' + s[x].id+'" onclick="sendToSavedTable(this.id)">View</a></li>' +
+										'<li><a id="' + s[x].id+'" onclick="sendTableToPlot(\''+s[x].file+'\')">Plot Table</a></li>' +
+										file_str + 
+										'<li class="divider"></li>' +
+										debrowser_string +
+										'<li><a id="' + s[x].id+'" onclick="changeTableData(this.id)">Change Table Permissions</a></li>' +
+										'<li class="divider"></li>' +
+										'<li><a href="" id="' + s[x].id+'" onclick="deleteTable(this.id)">Delete</a></li>' +
+									'</ul>'+
+								'</div>'
+							]);
 						}
-						runparams.fnAddData([
-							s[x].id,
-							s[x].name,
-							stringSampleRuns,
-							splitParameters[1].split('file=')[1].split(',').join(', '),
-							'<div class="btn-group pull-right">' +
-								'<button type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown" aria-expanded="true">Options <span class="fa fa-caret-down"></span></button>' +
-								'<ul class="dropdown-menu" role="menu">' + 
-									'<li><a id="' + s[x].id+'" onclick="sendToSavedTable(this.id)">View</a></li>' +
-									'<li><a id="' + s[x].id+'" onclick="sendTableToPlot(\''+s[x].file+'\')">Plot Table</a></li>' +
-									file_str + 
-									'<li class="divider"></li>' +
-									debrowser_string +
-									'<li><a id="' + s[x].id+'" onclick="changeTableData(this.id)">Change Table Permissions</a></li>' +
-									'<li class="divider"></li>' +
-									'<li><a href="" id="' + s[x].id+'" onclick="deleteTable(this.id)">Delete</a></li>' +
-								'</ul>'+
-							'</div>'
-						]);
 					}
-				}
-		});
+			});
+		}
 	}
 });
