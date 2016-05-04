@@ -226,7 +226,7 @@ function rerunLoad() {
 								for(var z = 0; z < chip.length; z++){
 									var chiptable = $('#json_chiptable').dataTable();
 									chiptable.fnAddData([
-										'<input class="form-control" type="text" value="'+chip[z].name+'">',
+										'<input id="'+chip[z].name+'" class="form-control" type="text" value="'+chip[z].name+'" onChange="updateChipName(this)">',
 										chip[z].samples.replace(",", ", "),
 										chip[z].input.replace(",", ", "),
 										remove_button.outerHTML
@@ -1914,10 +1914,7 @@ function findPipelineValues(){
 		var masterDiv = document.getElementById('select_child_'+currentPipelineID[y]).getElementsByTagName('*');
 		var conditions_array = [];
 		var conditions_type_array = [];
-		var chip_counter = 0;
-		var chip_name = "";
-		var chip_array_samples = [];
-		var chip_array_inputs = [];
+		var chip_bool = true;
 		var multireset = false;
 		for (var x = 0; x < masterDiv.length; x++) {
 			if (multireset == true) {
@@ -1926,35 +1923,34 @@ function findPipelineValues(){
 				multireset = false;
 			}
 			var e = masterDiv[x];
+			console.log(e);
 			if (e.type != undefined && e.type != "button") {
-				if (e.id.match('chip')) {
-					if (e.type == "select-multiple") {
-						if (chip_array_samples.length == 0) {
-							var chip_array_samples = getMultipleSelectionBox(e);
-						}else{
-							var chip_array_inputs = getMultipleSelectionBox(e);
-							if (chip_array_samples.length > 0) {
-								var input_array = {};
-								input_array["name"] = chip_name.toString();
-								input_array["samples"] = chip_array_samples.toString();
-								input_array["input"] = chip_array_inputs.toString();
-								if (JSON_OBJECT[USED_DICT[dict_counter]] == undefined) {
-									JSON_OBJECT[USED_DICT[dict_counter]] = [];
-								}
-								JSON_OBJECT[USED_DICT[dict_counter]].push(input_array);
-								chip_name = "";
-								chip_array_samples = [];
-								chip_array_inputs = [];
-								chip_counter++;
-								if (chip_counter == currentChipInputID.length) {
-									dict_counter++;
-								}
+				if (USED_DICT == CHIPSEQ_JSON_DICT && chip_bool) {
+					if (e.name == "json_chiptable_length") {
+						var chip_table = $('#json_chiptable').dataTable();
+						var table_data = chip_table.fnGetData();
+						var table_nodes = chip_table.fnGetNodes();
+						var value_str = "";
+						//      For every selected entry
+						for(var y = 0; y < table_data.length; y++){
+							console.log(table_nodes[y])
+							chip_object = {};
+							chip_object['name'] = table_nodes[y].children[0].children[0].id
+							chip_object['samples'] = table_data[y][1].split(", ").toString();
+							chip_object['input'] = table_data[y][2].split(", ").toString();
+							if (JSON_OBJECT[USED_DICT[dict_counter]] == undefined) {
+								JSON_OBJECT[USED_DICT[dict_counter]] = [];
 							}
+							JSON_OBJECT[USED_DICT[dict_counter]].push(chip_object);
 						}
+						console.log(JSON_OBJECT[USED_DICT[dict_counter]])
 					}else{
-						chip_name = e.value.replace(/\r\n|\r|\n/g, "__cr____cn__");
+						dict_counter--;
+						if (e.id.match("text_1_")) {
+							chip_bool = false;
+							x--;
+						}
 					}
-					dict_counter--;
 				}else if (e.type == "select-multiple") {
 					if (conditions_array.length == 0) {
 						var current_cond = getMultipleSelectionBox(e);
@@ -1982,6 +1978,8 @@ function findPipelineValues(){
 							JSON_OBJECT[USED_DICT[dict_counter]] = 'no';
 						}
 					}else if(e.type != 'radio'){
+						console.log(e)
+						console.log(JSON_OBJECT)
 						JSON_OBJECT[USED_DICT[dict_counter]] = e.value.replace(/\r\n|\r|\n/g, "__cr____cn__");
 					}else{
 						if (e.checked) {
@@ -2307,7 +2305,7 @@ function addChipSeqInput(id){
 	remove_button.appendChild(icon);
 	
 	chip_table.fnAddData([
-		'<input class="form-control" type="text" value="'+name_first+'">',
+		'<input id="'+ name_first+'" class="form-control" type="text" value="'+name_first+'" onChange="updateChipName(this)">',
 		name_string,
 		input_string,
 		remove_button.outerHTML
@@ -2334,7 +2332,7 @@ function smartAdd(){
 	
 	for(var x = 0; x < name.length; x++){
 		chip_table.fnAddData([
-			'<input class="form-control" type="text" value="'+name[x].value+'">',
+			'<input id="'+name[x].value+'" class="form-control" type="text" value="'+name[x].value+'" onChange="updateChipName(this)">',
 			name[x].value,
 			input_string,
 			"test"
@@ -2342,6 +2340,12 @@ function smartAdd(){
 		name[x].remove();
 		x--;
 	}
+}
+
+function updateChipName(input){
+	console.log(input.value);
+	input.id = input.value;
+	console.log(input.id);
 }
 
 function removeChip(button){
