@@ -644,10 +644,6 @@ class funcs
         $field=$params['field']; 
         $jobnum=$params['jobnum'];
         $result=$params['result'];
-        if ($result == 0) {
-            $sql = "UPDATE ngs_runparams set run_status=3 where wkey='$wkey'";
-            $this->runSQL($sql);
-        }
         $workflow_id = $this->getWorkflowId($wkey);
         $service_id  = $this->getId("service", $username, $servicename, $wkey, "");
         if ($field=="end_time")
