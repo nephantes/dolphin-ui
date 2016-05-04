@@ -216,33 +216,24 @@ function rerunLoad() {
 								additionalPipes();
 								document.getElementById('select_'+i).value = pipelineDict[2];
 								pipelineSelect(i);
-								//Chip Input
+								//Chip Input Menus
+								
+								//Chip Input Table
 								var chip = splt1[i].ChipInput
+								var remove_button = createElement('button', ['class', 'type', 'onclick'],['btn btn-xs btn-danger text-center', 'button', 'removeChip(this)']);
+								var icon = createElement('i', ['class'],['fa fa-times']);
+								remove_button.appendChild(icon);
 								for(var z = 0; z < chip.length; z++){
-									addChipSeqInput(i);
-									document.getElementById('text_chip_'+i+'_'+z).value = chip[z].name;
-									//handle for multiple selections
-									var chip_samples = [];
-									if (chip[z].samples != undefined) {
-										chip_samples = chip[z].samples.split(",");
+									var chiptable = $('#json_chiptable').dataTable();
+									chiptable.fnAddData([
+										'<input class="form-control" type="text" value="'+chip[z].name+'">',
+										chip[z].samples.replace(",", ", "),
+										chip[z].input.replace(",", ", "),
+										remove_button.outerHTML
+									]);
+									for(var k = 0; k < chip[z].samples.split(", ").length; k++){
+										document.getElementById('0_1_'+ chip[z].samples.split(", ")[k]).remove();
 									}
-									var chip_input = [];
-									if (chip[z].samples != undefined) {
-										chip_input = chip[z].input.split(",");
-									}
-									var selected_chip_samples = document.getElementById('multi_chip_1_'+i+'_'+z);
-									for(var h = 0; h < selected_chip_samples.options.length; h++){
-										if (chip_samples.indexOf(selected_chip_samples.options[h].value) != -1) {
-											selected_chip_samples.options[h].selected = true;
-										}
-									}
-									var selected_chip_inputs = document.getElementById('multi_chip_2_'+i+'_'+z);
-									for(var h = 0; h < selected_chip_inputs.options.length; h++){
-										if (chip_input.indexOf(selected_chip_inputs.options[h].value) != -1) {
-											selected_chip_inputs.options[h].selected = true;
-										}
-									}
-									selectChipCondition(1, i, z);
 								}
 								document.getElementById('text_1_'+i).value = splt1[i].MultiMapper;
 								document.getElementById('text_2_'+i).value = splt1[i].TagSize;
@@ -527,10 +518,22 @@ function pipelineSelect(num){
 			
 		}else if (pipeType == pipelineDict[2]) {
 			//ChipSeq Pipeline
+			console.log(id);
 			divAdj = mergeTidy(divAdj, 12,
 					[ [createElement('label', ['class','TEXTNODE'], ['box-title', 'Chip Input Definitions:'])],
-					[createElement('div', ['id', 'class'], ['div_chip_'+num, ''])],
-					[createElement('button', ['id', 'value', 'type', 'class', 'onclick'], ['div_add_'+num, 'Add Chip Input', 'button', 'btn btn-primary', 'addChipSeqInput('+num+')'])] ]);
+					[createElement('div', ['id', 'class'], ['div_chip_'+num, ''])] ]);
+			divAdj = mergeTidy(divAdj, 12,
+					[ [createElement('label', ['class','TEXTNODE'], ['box-title', 'Samples:']),
+					createElement('select',['id', 'class', 'type', 'multiple', 'size'],['multi_chip_1', 'form-control', 'select-multiple', 'multiple', '4'])],
+					[createElement('label', ['class','TEXTNODE'], ['box-title', 'Inputs:']),
+					createElement('select',['id', 'class', 'type', 'multiple', 'size', 'onchange'],['multi_chip_2', 'form-control', 'select-multiple', 'multiple', '4', ''])] ]);
+			divAdj.appendChild(createElement('button', ['id', 'value', 'type', 'class', 'onclick'], ['div_add', 'Add Chip Input', 'button', 'btn btn-primary pull-left margin', 'addChipSeqInput('+num+')']));
+			divAdj.appendChild(createElement('button', ['id', 'value', 'type', 'class', 'onclick'], ['div_add', 'Add All', 'button', 'btn btn-primary pull-left margin', 'smartAdd()']));
+			divAdj.appendChild(createElement('button', ['id', 'value', 'type', 'class', 'onclick'], ['div_rmv', 'Reset', 'button', 'btn btn-danger pull-right margin', 'resetChip()']));
+			//	Table
+			var chip_table = createElement('table', ['id', 'class'], ['json_chiptable', 'table table-hover table-striped table-condensed table-scrollable'])
+				chip_table.innerHTML = "<thead><tr><th>Name</th><th>Sample</th><th>Inputs</th><th>Remove</th></tr></thead><tbody></tbody>";
+			divAdj.appendChild(chip_table);
 			divAdj = mergeTidy(divAdj, 6,
 					[ [createElement('label', ['class','TEXTNODE'], ['box-title', 'Multimapper:']),
 					createElement('input', ['id', 'class', 'type', 'value'], ['text_1_'+num, 'form-control', 'text', '1'])],
@@ -698,6 +701,12 @@ function pipelineSelect(num){
 					document.getElementById('multi_select_2_'+num).appendChild(createElement('option', ['id', 'value'], [num+'_2_'+sample_names[x], sample_names[x]]));
 					document.getElementById(num+'_2_'+sample_names[x]).innerHTML = sample_names[x]
 			}
+		}
+		
+		if (chip_table != undefined) {
+			var chip_data_table = $('#json_chiptable').dataTable();
+			document.getElementById('json_chiptable').style.width = "";
+			populateChipSelection();
 		}
 		
 		//adjust global pipeline counter
@@ -2241,22 +2250,15 @@ function tophatCustomOptions(num){
 	}
 }
 
-function addChipSeqInput(id){
-	var master_div = document.getElementById('div_chip_'+id);
-	var div = createElement('div', ['id', 'class'], ['div_chip_child_'+currentChipCount, 'col-md-12 margin']);
+function populateChipSelection() {
+	var names = document.getElementById('multi_chip_1');
+	names.innerHTML = "";
+	var input = document.getElementById('multi_chip_2');
+	input.innerHTML = "";
 	var sample_names = getTrueSampleNames(window.location.href.split('/')[window.location.href.split('/').length - 1].replace('$', ''));
-	div = mergeTidy(div, 4,
-			[ [createElement('label', ['class','TEXTNODE'], ['box-title', 'Name']),
-			createElement('input', ['id', 'class', 'type', 'value'], ['text_chip_'+id+'_'+currentChipCount, 'form-control', 'text', ''])],
-			[createElement('label', ['class','TEXTNODE'], ['box-title', 'Samples:']),
-			createElement('select',['id', 'class', 'type', 'multiple', 'size', 'onchange'],['multi_chip_1_'+id+'_'+currentChipCount, 'form-control', 'select-multiple', 'multiple', '4', 'selectChipCondition(1, '+id+', '+currentChipCount+')'])],
-			[createElement('label', ['class','TEXTNODE'], ['box-title', 'Inputs:']),
-			createElement('select',['id', 'class', 'type', 'multiple', 'size', 'onchange'],['multi_chip_2_'+id+'_'+currentChipCount, 'form-control', 'select-multiple', 'multiple', '4', ''])] ]);
-	div.appendChild(createElement('button', ['id', 'value', 'type', 'class', 'onclick'], ['div_rmv_'+currentChipCount, 'Remove Input', 'button', 'btn btn-primary pull-right margin', 'removeChipSeqInput('+id+', '+currentChipCount+')']));
-	master_div.appendChild(div);
 	
 	//CHIP MULTI_SELECT
-	if (document.getElementById('multi_chip_1_'+id+'_'+currentChipCount) != null) {
+	if (document.getElementById('multi_chip_1') != null) {
 		var adj_sample_names = sample_names;
 		for(var x = 0; x < currentChipInputID.length; x++){
 			if (currentChipInputVal[currentChipInputID.indexOf(currentChipInputID[x])] != undefined) {
@@ -2266,113 +2268,91 @@ function addChipSeqInput(id){
 		
 		for(var x = 0; x < sample_names.length; x++){
 			if (adj_sample_names.indexOf(sample_names[x]) > -1) {
-				document.getElementById('multi_chip_1_'+id+'_'+currentChipCount).appendChild(createElement('option', ['id', 'value'], [id+'_'+currentChipCount+'_1_'+sample_names[x], sample_names[x]]));
-				document.getElementById(id+'_'+currentChipCount+'_1_'+sample_names[x]).innerHTML = sample_names[x]
+				document.getElementById('multi_chip_1').appendChild(createElement('option', ['id', 'value'], [currentChipCount+'_1_'+sample_names[x], sample_names[x]]));
+				document.getElementById(currentChipCount+'_1_'+sample_names[x]).innerHTML = sample_names[x]
 			}else{
-				document.getElementById('multi_chip_1_'+id+'_'+currentChipCount).appendChild(createElement('option', ['id', 'value', 'style', 'disabled'], [id+'_'+currentChipCount+'_1_'+sample_names[x], sample_names[x], 'opacity: 0.4', 'true']));
-				document.getElementById(id+'_'+currentChipCount+'_1_'+sample_names[x]).innerHTML = sample_names[x]
+				document.getElementById('multi_chip_1').appendChild(createElement('option', ['id', 'value', 'style', 'disabled'], [currentChipCount+'_1_'+sample_names[x], sample_names[x], 'opacity: 0.4', 'true']));
+				document.getElementById(currentChipCount+'_1_'+sample_names[x]).innerHTML = sample_names[x]
 			}
-			
-			document.getElementById('multi_chip_2_'+id+'_'+currentChipCount).appendChild(createElement('option', ['id', 'value'], [id+'_'+currentChipCount+'_2_'+sample_names[x], sample_names[x]]));
-			document.getElementById(id+'_'+currentChipCount+'_2_'+sample_names[x]).innerHTML = sample_names[x]
+			document.getElementById('multi_chip_2').appendChild(createElement('option', ['id', 'value'], [currentChipCount+'_2_'+sample_names[x], sample_names[x]]));
+			document.getElementById(currentChipCount+'_2_'+sample_names[x]).innerHTML = sample_names[x]
 		}
-		
+	}
+}
+
+function addChipSeqInput(id){
+	var name = document.getElementById('multi_chip_1').selectedOptions;
+	var name_first = name[0].value;
+	var name_string = "";
+	for(var x = 0; x < name.length; x++){
+		name_string += name[x].value;
+		if (x + 1 != name.length) {
+			name_string += ", ";
+		}
+		name[x].remove();
+		x--;
 	}
 	
-	if (adj_sample_names.length == 0){
-		removeChipSeqInput(id, currentChipCount);
-		$('#errorModal').modal({
-			show: true
-		});
-		document.getElementById('errorLabel').innerHTML ='No availible samples to use for a new chip input';
-		document.getElementById('errorAreas').innerHTML = '';
-	}else if(!chipSampleErrorCheck(currentChipCount)){
-		currentChipInputID.push(currentChipCount);
-		currentChipCount++;
-		currentChipInputVal.push([]);
-	}else{
-		removeChipSeqInput(id, currentChipCount);
-		$('#errorModal').modal({
-			show: true
-		});
-		document.getElementById('errorLabel').innerHTML ='You must first fill out your previous input before adding a new input';
-		document.getElementById('errorAreas').innerHTML = '';
+	var input = document.getElementById('multi_chip_2').selectedOptions;
+	var input_string = '';
+	for(var x = 0; x < input.length; x++){
+		input_string += input[x].value;
+		if (x + 1 != input.length) {
+			input_string += ", ";
+		}
+	}
+	var chip_table = $('#json_chiptable').dataTable();
+	var remove_button = createElement('button', ['class', 'type', 'onclick'],['btn btn-xs btn-danger text-center', 'button', 'removeChip(this)']);
+	var icon = createElement('i', ['class'],['fa fa-times']);
+	remove_button.appendChild(icon);
+	
+	chip_table.fnAddData([
+		'<input class="form-control" type="text" value="'+name_first+'">',
+		name_string,
+		input_string,
+		remove_button.outerHTML
+	]);
+}
+
+function resetChip() {
+	var chip_table = $('#json_chiptable').dataTable();
+	chip_table.fnClearTable();
+	populateChipSelection();
+}
+
+function smartAdd(){
+	var name = document.getElementById('multi_chip_1').options;
+	var input = document.getElementById('multi_chip_2').selectedOptions;
+	var input_string = '';
+	for(var x = 0; x < input.length; x++){
+		input_string += input[x].value;
+		if (x + 1 != input.length) {
+			input_string += ", ";
+		}
+	}
+	var chip_table = $('#json_chiptable').dataTable();
+	
+	for(var x = 0; x < name.length; x++){
+		chip_table.fnAddData([
+			'<input class="form-control" type="text" value="'+name[x].value+'">',
+			name[x].value,
+			input_string,
+			"test"
+		]);
+		name[x].remove();
+		x--;
 	}
 }
 
-function chipSampleErrorCheck(chip_id){
-	//Check previous seleciton
-	var check = false;
-	var check_array = [];
-	if (currentChipInputVal[currentChipInputVal.length - 1] != undefined) {
-		if (currentChipInputVal[currentChipInputVal.length - 1].length == 0) {
-			check = true;
-		}
+function removeChip(button){
+	var names = document.getElementById('multi_chip_1')
+	var barcode_bool = false;
+	var chip_table = $('#json_chiptable').dataTable();
+	var row = $(button).closest('tr');
+	var names_used = row.children()[1].innerHTML.split(', ');
+	for(var x = 0; x < names_used.length; x++){
+		names.innerHTML += '<option value="'+names_used[x]+'">'+names_used[x]+'</option>'
 	}
-	return check;
-}
-
-function removeChipSeqInput(pipeNum, chip_id) {
-	var index = currentChipInputID.indexOf(chip_id);
-	if (currentChipInputID[index] != undefined) {
-		var removed_array = currentChipInputVal[index];
-		console.log(removed_array);
-		for(var y = 0; y < currentChipInputID.length; y++){
-			if (currentChipInputID[y] != chip_id) {
-				var options = document.getElementById('multi_chip_1_'+pipeNum+'_'+currentChipInputID[y]).options;
-				for (var z = 0; z < options.length; z++) {
-					if (removed_array.indexOf(options[z].value) > -1) {
-						options[z].style = 'opacity: 1.0';
-						options[z].disabled = false;
-					}
-				}
-			}
-		}
-		currentChipInputID.splice(index, 1);
-	}
-	if (currentChipInputVal[index] != undefined) {
-		currentChipInputVal.splice(index, 1);
-	}
-	var div = document.getElementById('div_chip_child_' + chip_id);
-	div.parentNode.removeChild(div);
-}
-
-function selectChipCondition(condition, pipeNum, chipNum){
-	var selection = document.getElementById('multi_chip_'+condition+'_'+pipeNum+'_'+chipNum);
-	var option_storage = [];
-	for (var x = 0; x < selection.options.length; x++) {
-		var opt = selection.options[x];
-		if (opt.selected) {
-			option_storage.push(opt.value);
-		}
-	}
-	if (currentChipInputVal[currentChipInputID.indexOf(chipNum)] == undefined) {
-		currentChipInputVal.push(option_storage);
-	}else{
-		currentChipInputVal[currentChipInputID.indexOf(chipNum)] = option_storage;
-	}
-	var selected_array = []
-	for(var y = 0; y < currentChipInputVal.length; y++){
-		for(var z = 0; z < currentChipInputVal[y].length; z++){
-			selected_array.push(currentChipInputVal[y][z]);
-		}
-	}
-	console.log(selected_array)
-	for(var y = 0; y < currentChipInputID.length; y++){
-		if (currentChipInputID[y] != chipNum) {
-			var options = document.getElementById('multi_chip_1_'+pipeNum+'_'+currentChipInputID[y]).options;
-			for (var z = 0; z < options.length; z++) {
-				if (selected_array.indexOf(options[z].value) > -1 && options[z].selected == false) {
-					options[z].style = 'opacity: 0.4';
-					options[z].disabled = true;
-				}else{
-					options[z].style = 'opacity: 1.0';
-					options[z].disabled = false;
-				}
-			}
-		}
-	}
-	if(document.getElementById('text_chip_'+pipeNum+'_'+chipNum).value == '' && option_storage.length != 0){
-		document.getElementById('text_chip_'+pipeNum+'_'+chipNum).value = option_storage[0]
-	}
+	chip_table.fnDeleteRow(row);
+	chip_table.fnDraw();
 }
