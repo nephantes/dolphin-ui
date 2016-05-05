@@ -363,3 +363,35 @@ function resetJob(run_id, s_id, wkey, name, type, table_str, button){
 		}	
 	});
 }
+
+function progressBars(){
+	var percent_array = [];
+	var progress_array = [];
+	
+	$.ajax({ type: "GET",
+		url: BASE_PATH + "/public/ajax/dataprogress.php",
+		data: { wkey: wkey },
+		async: false,
+		success : function(s)
+		{
+			console.log(s);
+			for(var x = 0; x < s.length; x++){
+				var active = ""
+				if (s[x][4] == "yellow") {
+					active = "active";
+				}
+				var percent = ((s[x][2]/ s[x][1])*100.00).toFixed(0).toString();
+				if (percent == 'NaN') {
+					percent =  0;
+					active = "active";
+					s[x][4] = "yellow";
+				}
+				percent = percent.toString() + '%';
+				
+				percent_array.push('<span class="pull-right badge bg-'+s[x][4]+'">'+percent+'</span>');
+				progress_array.push('<div class="progress '+active+'"><div class="progress-bar progress-bar-'+s[x][4]+' '+s[x][3]+'" style="width: '+percent+'"></div></div>');
+			}
+		}
+	});
+	return [percent_array, progress_array];
+}
