@@ -74,6 +74,13 @@ else if($p == 'deleteSelected')
 	if (isset($_GET['lanes'])){$lanes = $_GET['lanes'];}
 	if (isset($_GET['experiments'])){$experiments = $_GET['experiments'];}
 	
+	//	Deleted_Samples table
+	$query->runSQL("INSERT INTO ngs_deleted_samples (sample_id, samplename, lane_id, experiment_series_id, user_delete, date)
+					SELECT id, samplename, lane_id, series_id, ".$_SESSION['uid'].", NOW()
+					from ngs_samples
+					where id in ($samples)
+				   ");
+	
 	//	EXPERIMENT SERIES
 	if ($experiments != ""){
 		$query->runSQL("DELETE FROM ngs_experiment_series WHERE id IN ($experiments)");
