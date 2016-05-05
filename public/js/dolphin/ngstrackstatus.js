@@ -176,7 +176,7 @@ $(function() {
 						parsed[i].title,
 						parsed[i].duration,
 						'<span class="pull-right badge bg-'+colortype+'">'+parsed[i].percentComplete.split(".")[0]+'%</span>',
-						'<div class="progress progress-xs"><div class="progress-bar progress-bar-'+bartype+'" style="width: '+parsed[i].percentComplete+'%"></div></div>',
+						'<div class="progress progress-xs active"><div class="progress-bar progress-bar-'+bartype+' progress-bar-striped" style="width: '+parsed[i].percentComplete+'%"></div></div>',
 						parsed[i].start,
 						parsed[i].finish,
 						'<button id="'+parsed[i].num+'" class="btn btn-warning btn-xs pull-right" name="soft" title="Soft Reset" onclick="resetType('+run_id+', '+parsed[i].num+', \''+wkey+'\', \''+parsed[i].title+'\', \'services\', this)"><span class="fa fa-times"></span></button>' +
@@ -299,7 +299,7 @@ $(function() {
 								parsed[i].title,
 								parsed[i].duration,
 								'<span class="pull-right badge bg-'+colortype+'">'+parsed[i].percentComplete.split(".")[0]+'%</span>',
-								'<div class="progress progress-xs"><div class="progress-bar progress-bar-'+bartype+'" style="width: '+parsed[i].percentComplete+'%"></div></div>',
+								'<div class="progress progress-xs active"><div class="progress-bar progress-bar-'+bartype+' progress-bar-striped" style="width: '+parsed[i].percentComplete+'%"></div></div>',
 								parsed[i].start,
 								parsed[i].finish,
 								'<button id="'+parsed[i].num+'" class="btn btn-warning btn-xs pull-right" name="soft" title="Soft Reset" onclick="resetType('+run_id+', '+parsed[i].num+', \''+wkey+'\', \''+parsed[i].title+'\', \'services\', this)"><span class="fa fa-times"></span></button>' +

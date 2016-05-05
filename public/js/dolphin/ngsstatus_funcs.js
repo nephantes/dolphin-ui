@@ -365,7 +365,27 @@ function resetJob(run_id, s_id, wkey, name, type, table_str, button){
 }
 
 function progressBars(){
+	var percent_array = [];
+	var progress_array = [];
 	
-	var out_string = '<span class="pull-right badge bg-'+colortype+'">'+parsed[i].percentComplete.split(".")[0]+'%</span>' + 
-					'<div class="progress progress-xs"><div class="progress-bar progress-bar-'+bartype+'" style="width: '+parsed[i].percentComplete+'%"></div></div>';
+	$.ajax({ type: "GET",
+		url: BASE_PATH + "/public/ajax/dataprogress.php",
+		data: { wkey: wkey },
+		async: false,
+		success : function(s)
+		{
+			for(var x = 0; x < s.length; x++){
+				var active = ""
+				var progress_bar_striped = ""
+				if (s[x][3] == "yellow") {
+					active = "active";
+					progress_bar_striped = "progress-bar-striped";
+				}
+				percent_array.push('<span class="pull-right badge bg-'+s[x][4]+'">'+(s[x][2] * 1.0 / s[x][1])+'%</span>');
+				progress_array.push('<div class="progress '+active+'"><div class="progress-bar progress-bar-'+s[x][3]+' '+progress_bar_striped+'" style="width: '+(s[x][2] * 1.0 / s[x][1])+'%"></div></div>');
+			}
+		}
+	});
+	
+	return [percent_array, progress_array];
 }
