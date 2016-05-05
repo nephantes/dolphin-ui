@@ -170,6 +170,41 @@ function checkGenomeType(input, genome){
 	return check;
 }
 
+function checkEmptyDataTable(table_string){
+	var check = false;
+	var table = $(table_string).dataTable();
+	var table_nodes = table.fnGetNodes();
+	if (table_nodes.length == 0) {
+		check = true;
+	}
+	return check;
+}
+
+function checkDataTableContentsIDEmpty(table_string, content_num){
+	var check = false;
+	var table = $(table_string).dataTable();
+	var table_nodes = table.fnGetNodes();
+	for (var x = 0; x < table_nodes.length; x++){
+		if (table_nodes[x].children[0].children[content_num].id == "" || table_nodes[x].children[0].children[content_num].id == undefined) {
+			check = true
+		}
+	}
+	return check;
+}
+
+function checkDataTableContentsIDRegex(table_string, content_num, regex_string){
+	var check = false;
+	var table = $(table_string).dataTable();
+	var table_nodes = table.fnGetNodes();
+	var regex = new RegExp(regex_string);
+	for (var x = 0; x < table_nodes.length; x++){
+		if (!regex.test(table_nodes[x].children[0].children[content_num].id)) {
+			check = true
+		}
+	}
+	return check;
+}
+
 //	END GENERIC FUNCTIONS
 //	************************************************************************
 //	START GROUPED FUNCTIONS
@@ -359,21 +394,17 @@ function pipelineSubmitCheck(non_pipeline, non_pipeline_values, pipeline, pipeli
 			}
 		//	ChipSeq
 		}else if (name == 'ChipSeq') {
-			//	Chip Inputs
-			for(var y = 0; y < chipseq.length; y++){
-				//	name
-				if (checkFieldsEmpty('text_chip_'+pipeline_index[x]+'_'+chipseq[y])) {
-					displayErrorModal('#errorModal', 'Chip Input is missing a name within ChipSeq');
-					return true;
-				//	correct characters
-				}else if (checkFieldAlphaNumericAdditionalChars('text_chip_'+pipeline_index[x]+'_'+chipseq[y], '\\-\\_\\.')) {
-					displayErrorModal('#errorModal', 'Name must contain alphanumeric, dash, and underscore characters only within ChipSeq');
-					return true;
-				//	multiselect
-				}else if (checkChipMultiSelectEmpty('multi_chip_1_'+pipeline_index[x]+'_'+chipseq[y])) {
-					displayErrorModal('#errorModal', 'Samples cannot be empty within ChipSeq');
-					return true;
-				}
+			//	name
+			if (checkDataTableContentsIDEmpty('#json_chiptable', 0)) {
+				displayErrorModal('#errorModal', 'Chip Input is missing a name within ChipSeq');
+				return true;
+			//	correct characters
+			}else if (checkDataTableContentsIDRegex('#json_chiptable', 0, '^[a-zA-Z0-9\\-\\_]+$')) {
+				displayErrorModal('#errorModal', 'Name must contain alpha-numeric, dash, and underscore characters only within ChipSeq');
+				return true;
+			}else if (checkEmptyDataTable('#json_chiptable')) {
+				displayErrorModal('#errorModal', 'You must select a Sample input for Chip before you run ChipSeq.');
+				return true;
 			}
 			
 			//	extFactor is empty and selected
