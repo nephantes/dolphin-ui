@@ -220,7 +220,7 @@ function rerunLoad() {
 								
 								//Chip Input Table
 								var chip = splt1[i].ChipInput
-								var remove_button = createElement('button', ['class', 'type', 'onclick'],['btn btn-xs btn-danger text-center', 'button', 'removeChip(this)']);
+								var remove_button = createElement('button', ['class', 'type', 'onclick'],['btn btn-xs btn-danger text-center pull-right', 'button', 'removeChip(this)']);
 								var icon = createElement('i', ['class'],['fa fa-times']);
 								remove_button.appendChild(icon);
 								for(var z = 0; z < chip.length; z++){
@@ -527,9 +527,10 @@ function pipelineSelect(num){
 					createElement('select',['id', 'class', 'type', 'multiple', 'size'],['multi_chip_1', 'form-control', 'select-multiple', 'multiple', '4'])],
 					[createElement('label', ['class','TEXTNODE'], ['box-title', 'Inputs:']),
 					createElement('select',['id', 'class', 'type', 'multiple', 'size', 'onchange'],['multi_chip_2', 'form-control', 'select-multiple', 'multiple', '4', ''])] ]);
-			divAdj.appendChild(createElement('button', ['id', 'value', 'type', 'class', 'onclick'], ['div_add', 'Add Chip Input', 'button', 'btn btn-primary pull-left margin', 'addChipSeqInput('+num+')']));
-			divAdj.appendChild(createElement('button', ['id', 'value', 'type', 'class', 'onclick'], ['div_add', 'Add All', 'button', 'btn btn-primary pull-left margin', 'smartAdd()']));
-			divAdj.appendChild(createElement('button', ['id', 'value', 'type', 'class', 'onclick'], ['div_rmv', 'Reset', 'button', 'btn btn-danger pull-right margin', 'resetChip()']));
+			divAdj = mergeTidy(divAdj, 12,
+					[ [createElement('button', ['id', 'value', 'type', 'class', 'onclick'], ['div_add', 'Add Chip Input', 'button', 'btn btn-primary pull-left margin', 'addChipSeqInput('+num+')']),
+					createElement('button', ['id', 'value', 'type', 'class', 'onclick'], ['div_add', 'Add All', 'button', 'btn btn-primary pull-left margin', 'smartAdd()']),
+					createElement('button', ['id', 'value', 'type', 'class', 'onclick'], ['div_rmv', 'Reset', 'button', 'btn btn-danger pull-right margin', 'resetChip()'])] ]);
 			//	Table
 			var chip_table = createElement('table', ['id', 'class'], ['json_chiptable', 'table table-hover table-striped table-condensed table-scrollable'])
 				chip_table.innerHTML = "<thead><tr><th>Name</th><th>Sample</th><th>Inputs</th><th>Remove</th></tr></thead><tbody></tbody>";
@@ -2298,7 +2299,7 @@ function addChipSeqInput(id){
 		}
 	}
 	var chip_table = $('#json_chiptable').dataTable();
-	var remove_button = createElement('button', ['class', 'type', 'onclick'],['btn btn-xs btn-danger text-center', 'button', 'removeChip(this)']);
+	var remove_button = createElement('button', ['class', 'type', 'onclick'],['btn btn-xs btn-danger text-center pull-right', 'button', 'removeChip(this)']);
 	var icon = createElement('i', ['class'],['fa fa-times']);
 	remove_button.appendChild(icon);
 	
@@ -2327,7 +2328,7 @@ function smartAdd(){
 		}
 	}
 	var chip_table = $('#json_chiptable').dataTable();
-	var remove_button = createElement('button', ['class', 'type', 'onclick'],['btn btn-xs btn-danger text-center', 'button', 'removeChip(this)']);
+	var remove_button = createElement('button', ['class', 'type', 'onclick'],['btn btn-xs btn-danger text-center pull-right', 'button', 'removeChip(this)']);
 	var icon = createElement('i', ['class'],['fa fa-times']);
 	remove_button.appendChild(icon);
 	
