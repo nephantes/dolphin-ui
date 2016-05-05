@@ -2327,13 +2327,16 @@ function smartAdd(){
 		}
 	}
 	var chip_table = $('#json_chiptable').dataTable();
+	var remove_button = createElement('button', ['class', 'type', 'onclick'],['btn btn-xs btn-danger text-center', 'button', 'removeChip(this)']);
+	var icon = createElement('i', ['class'],['fa fa-times']);
+	remove_button.appendChild(icon);
 	
 	for(var x = 0; x < name.length; x++){
 		chip_table.fnAddData([
 			'<input id="'+name[x].value+'" class="form-control" type="text" value="'+name[x].value+'" onChange="updateChipName(this)">',
 			name[x].value,
 			input_string,
-			"test"
+			remove_button.outerHTML
 		]);
 		name[x].remove();
 		x--;
