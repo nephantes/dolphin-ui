@@ -363,3 +363,9 @@ function resetJob(run_id, s_id, wkey, name, type, table_str, button){
 		}	
 	});
 }
+
+function progressBars(){
+	
+	var out_string = '<span class="pull-right badge bg-'+colortype+'">'+parsed[i].percentComplete.split(".")[0]+'%</span>' + 
+					'<div class="progress progress-xs"><div class="progress-bar progress-bar-'+bartype+'" style="width: '+parsed[i].percentComplete+'%"></div></div>';
+}
