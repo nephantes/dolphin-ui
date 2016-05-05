@@ -1923,7 +1923,6 @@ function findPipelineValues(){
 				multireset = false;
 			}
 			var e = masterDiv[x];
-			console.log(e);
 			if (e.type != undefined && e.type != "button") {
 				if (USED_DICT == CHIPSEQ_JSON_DICT && chip_bool) {
 					if (e.name == "json_chiptable_length") {
@@ -1933,7 +1932,6 @@ function findPipelineValues(){
 						var value_str = "";
 						//      For every selected entry
 						for(var y = 0; y < table_data.length; y++){
-							console.log(table_nodes[y])
 							chip_object = {};
 							chip_object['name'] = table_nodes[y].children[0].children[0].id
 							chip_object['samples'] = table_data[y][1].split(", ").toString();
@@ -2343,9 +2341,7 @@ function smartAdd(){
 }
 
 function updateChipName(input){
-	console.log(input.value);
 	input.id = input.value;
-	console.log(input.id);
 }
 
 function removeChip(button){
