@@ -34,7 +34,7 @@ foreach($service as $s){
 	Select CONCAT("id_", CAST(j.job_id AS CHAR)) id, j.job_id num, jobname title,
 	j.job_num, TIME_TO_SEC(timediff(j.end_time, j.start_time)) duration, 
 	 j.result result, submit_time submit, j.start_time start, j.end_time finish from 
-	jobs j, service_run sr where sr.wkey=j.wkey and sr.service_id=j.service_id and j.jobstatus=1 and sr.service_run_id='.$s->id.'
+	jobs j, service_run sr where sr.wkey=j.wkey and sr.service_id=j.service_id and j.jobstatus=1 and sr.service_run_id='.substr($s->id,3).'
 	order by start;
 	'));
 	
@@ -44,9 +44,9 @@ foreach($service as $s){
 	$barcolor = "yellow";
 	foreach ($service_job as $sj){
 		$count++;
-		if($sj->result == 3){
+		if($sj->result == '3'){
 			$finished++;
-		}else if($sj->result == 1){
+		}else if($sj->result == '0'){
 			$barcolor = "red";
 			$bartype = "";
 		}
@@ -55,8 +55,9 @@ foreach($service as $s){
 		$bartype = "";
 		$barcolor = "green";
 	}
-	array_push($data, array($s->id, $count, $finished, $bartype, $barcolor));
+	array_push($data, array(substr($s->id,3), $count, $finished, $bartype, $barcolor));
 }
+$data = json_encode($data);
 
 if (!headers_sent()) {
    header('Cache-Control: no-cache, must-revalidate');

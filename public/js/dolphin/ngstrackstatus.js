@@ -154,7 +154,8 @@ $(function() {
 	wkey = getWKey(run_id);
 	document.getElementsByClassName('box-title')[0].innerHTML = "Services - Run "+run_id + " Directory: - " + directory;
 	var runparams = $('#jsontable_services').dataTable();
-	console.log(wkey);
+	console.log(wkey);	
+	var progress_bars = progressBars();
 	
 	$.ajax({ type: "GET",
 			 url: BASE_PATH + "/public/ajax/dataservice.php?wkey=" + wkey,
@@ -175,8 +176,8 @@ $(function() {
 					runparams.fnAddData([
 						parsed[i].title,
 						parsed[i].duration,
-						'<span class="pull-right badge bg-'+colortype+'">'+parsed[i].percentComplete.split(".")[0]+'%</span>',
-						'<div class="progress progress-xs active"><div class="progress-bar progress-bar-'+bartype+' progress-bar-striped" style="width: '+parsed[i].percentComplete+'%"></div></div>',
+						progress_bars[0][i],
+						progress_bars[1][i],
 						parsed[i].start,
 						parsed[i].finish,
 						'<button id="'+parsed[i].num+'" class="btn btn-warning btn-xs pull-right" name="soft" title="Soft Reset" onclick="resetType('+run_id+', '+parsed[i].num+', \''+wkey+'\', \''+parsed[i].title+'\', \'services\', this)"><span class="fa fa-times"></span></button>' +
@@ -280,6 +281,7 @@ $(function() {
 			$('#jsontable_runparams').DataTable().page(page_mark_runparams).draw(false);
 		}else if (segment == 'advstatus') {
 			var runparams = $('#jsontable_services').dataTable();
+			var progress_bars = progressBars();
 			$.ajax({ type: "GET",
 					 url: BASE_PATH + "/public/ajax/dataservice.php?wkey=" + wkey,
 					 async: false,
@@ -298,8 +300,8 @@ $(function() {
 							runparams.fnAddData([
 								parsed[i].title,
 								parsed[i].duration,
-								'<span class="pull-right badge bg-'+colortype+'">'+parsed[i].percentComplete.split(".")[0]+'%</span>',
-								'<div class="progress progress-xs active"><div class="progress-bar progress-bar-'+bartype+' progress-bar-striped" style="width: '+parsed[i].percentComplete+'%"></div></div>',
+								progress_bars[0][i],
+								progress_bars[1][i],
 								parsed[i].start,
 								parsed[i].finish,
 								'<button id="'+parsed[i].num+'" class="btn btn-warning btn-xs pull-right" name="soft" title="Soft Reset" onclick="resetType('+run_id+', '+parsed[i].num+', \''+wkey+'\', \''+parsed[i].title+'\', \'services\', this)"><span class="fa fa-times"></span></button>' +
