@@ -231,8 +231,8 @@ function rerunLoad() {
 										chip[z].input.replace(",", ", "),
 										remove_button.outerHTML
 									]);
-									for(var k = 0; k < chip[z].samples.split(", ").length; k++){
-										document.getElementById('0_1_'+ chip[z].samples.split(", ")[k]).remove();
+									for(var k = 0; k < chip[z].samples.split(",").length; k++){
+										document.getElementById('0_1_'+ chip[z].samples.split(",")[k]).remove();
 									}
 								}
 								document.getElementById('text_1_'+i).value = splt1[i].MultiMapper;
