@@ -10,23 +10,35 @@ $data = "test";
 if (isset($_GET['p'])){$p = $_GET['p'];}
 
 if($p == "experiments"){
-	$data = "This table represents all of the Experiment Series you have access to viewing.<br><br>
-	You can select all of the samples within a specific experiment series by clicking the checkbox
-	to the right.<br><br>For more information about the Experiment Series, you can click on the
-	expand button to the left of this info box.<br><br>If you have permissions, you can change the
-	information within the table by clicking on the cell you want to alter.";
+	$data = "This table represents all of the Experiment Series you have access to viewing.
+			<br><br>
+			You can select all of the samples within a specific experiment series by clicking the checkbox
+			to the right.
+			<br><br>
+			For more information about the Experiment Series, you can click on the
+			expand button to the left of this info box.
+			<br><br>
+			If you have permissions, you can change the
+			information within the table by clicking on the cell you want to alter.";
 }else if($p == "lanes"){
-	$data = "This table represents all of the Imports you have access to viewing.<br><br>You can
-	select all of the samples within a specific import by clicking on the checkbox to the right.<br><br>
-	For more information about the Imports, you can click on the expand button to the left of this info
-	box.<br><br>If you have permissions, you can alter the information within a specific cell by
-	clicking on the cell.";
+	$data = "This table represents all of the Imports you have access to viewing.
+			<br><br>
+			You can select all of the samples within a specific import by clicking on the checkbox to the right.
+			<br><br>
+			For more information about the Imports, you can click on the expand button to the left of this info box.
+			<br><br>
+			If you have permissions, you can alter the information within a specific cell by
+			clicking on the cell.";
 }else if ($p == "samples"){
-	$data = "This table represents all of the Samples you have access to viewing.<br><br>You can
-	select a sample by clicking on the checkbox to the right.<br><br>For more information about the
-	Samples, you can click on the expand button to the left of this info box.<br><br>If you have
-	permissions, you can alter the information in a specific cell by clicking on the cell you wish
-	to alter.<br><br>If viewing this table on the selection page, these are all the samples you have selected.";
+	$data = "This table represents all of the Samples you have access to viewing.
+			<br><br>
+			You can select a sample by clicking on the checkbox to the right.
+			<br><br>
+			For more information about the samples, you can click on the expand button to the left of this info box.
+			<br><br>
+			If you have permissions, you can alter the information in a specific cell by clicking on the cell you wish to alter.
+			<br><br>
+			If viewing this table on the selection page, these are all the samples you have selected.";
 }else if($p == "run_name"){
 	$data = "Give a specific name for this particular run.";
 }else if($p == "run_description"){
@@ -38,62 +50,123 @@ if($p == "experiments"){
 }else if($p == "resume"){
 	$data = "Is this a Run a new run, or a continuation of a previous run.";
 }else if($p == "outdir"){
-	$data = "Please specify the full path for your backup directory.<br><br>Example:<br>/share/data/umw_biocore/genome_data/mousetest";
+	$data = "Please specify the full path for your backup directory.
+			<br><br>
+			Example:<br>/share/data/umw_biocore/genome_data/mousetest";
 }else if($p == "fastqc"){
-	$data = "Would you like to perform FastQC?<br><br>For more information on Fastqc, you can check out their website
-	<a href=\"http://www.bioinformatics.babraham.ac.uk/projects/fastqc/\" style=\"color:blue\">here.</a><br><br>FastQC Version: 0.10.1";
+	$data = "Would you like to perform FastQC?
+			<br><br>
+			For more information on Fastqc, you can check out their website
+			<a href=\"http://www.bioinformatics.babraham.ac.uk/projects/fastqc/\" style=\"color:blue\">here.</a>
+			<br><br>
+			FastQC Version: 0.10.1";
 }else if($p == "adapters"){
-	$data = "If you would like to perform adapter removal, Expand this box and select the yes checkbox.<br><br>Removes 3'
-	Adapter Sequences. You can enter a single sequence or multiple sequences in different lines. Reverse sequences will
-	not be removed.<br><br>Dolphin uses Trimmomatic for adapter removal, for more information about Trimmomatic you can
-	click <a href\"http://www.usadellab.org/cms/uploads/supplementary/Trimmomatic/TrimmomaticManual_V0.32.pdf\" style=\"color:blue\">here.
-	</a><br><br>Trimmomatic Version: 0.32";
+	$data = "If you would like to perform adapter removal, Expand this box and select the yes checkbox.
+			<br><br>
+			Removes 3' Adapter Sequences. You can enter a single sequence or multiple sequences in different lines. Reverse sequences will not be removed.
+			<br><br>
+			Dolphin uses Trimmomatic for adapter removal, for more information about Trimmomatic you can click
+			<a href\"http://www.usadellab.org/cms/uploads/supplementary/Trimmomatic/TrimmomaticManual_V0.32.pdf\" style=\"color:blue\">here.</a>
+			<br><br>
+			Trimmomatic Version: 0.32";
 }else if($p == "custom"){
 	$data = "If you would like to define your own custom sequence sets, Expand this box and click the 'Add a Custom Sequence Set' button.
-	<br><br>You may add more than one custom sequence set.<br><br>In order to map your reads to a custom sequence, you first must create
-	an index file and that fasta must be in the same folder.<br><br>The index directory must include the full path and the name of the
-	index file must only be the prefix of the fasta.<br><br>You may include additional Bowtie parameters in commandline form as well
-	as a discription of the index created.<br><br>You may also select whether or not you want the reads mapped to this index filtered
-	out of your total reads.<br><br>Example Bowtie parameters:<br>-build /fasta/path prefix<br><br>Dolphin uses Bowtie2 to create your
-	custom index file.  For more information on Bowtie2 you can click <a href=\"http://bowtie-bio.sourceforge.net/bowtie2/manual.shtml\" style=\"color:blue\">
-	here.</a><br><br>Bowtie Version: 2.1.0";
+			<br><br>
+			You may add more than one custom sequence set.
+			<br><br>
+			In order to map your reads to a custom sequence, you first must create an index file and that fasta must be in the same folder.
+			<br><br>
+			The index directory must include the full path and the name of the index file must only be the prefix of the fasta.
+			<br><br>
+			You may include additional Bowtie parameters in commandline form as well as a discription of the index created.
+			<br><br>
+			You may also select whether or not you want the reads mapped to this index filtered out of your total reads.
+			<br><br>
+			Example Bowtie parameters:
+			<br>
+			-build /fasta/path prefix
+			<br><br>
+			Dolphin uses Bowtie2 to create your custom index file.  For more information on Bowtie2 you can click
+			<a href=\"http://bowtie-bio.sourceforge.net/bowtie2/manual.shtml\" style=\"color:blue\">here.</a>
+			<br><br>
+			Bowtie Version: 2.1.0";
 }else if($p == "pipeline"){
-	$data = "If you would like to run additional pipelines, Expand this box and select a pipeline in which you would like to run.<br><br>
-	For ChipSeq analysis, you must define Chip input definitions in a column format separated by ';'.  The first column is the name to give
-	the output files.  The second column contains a comma sepatared list of library names, and the third column has a comma separated list
-	of the input samples.<br><br>To perform DESEQ, you must also run an RSEM pipeline.<br><br>You may only run 1 RSEM pipeline.<br><br>
-	To perform DiffMeth, you must also run a BisulphiteMapping pipeline.<br><br>You may only run 1 BisulphiteMapping pipeline.<br><br>
-	Pipelines will be run in sequential order from top to bottom.<br><br>RNASeqRSEM uses
-	<a href=\"http://deweylab.biostat.wisc.edu/rsem/README.html\" style=\"color:blue\">RSEM</a> and
-	<a href=\"http://bowtie-bio.sourceforge.net/manual.shtml\" style=\"color:blue\">Bowtie</a>, Tophat uses
-	<a href=\"https://ccb.jhu.edu/software/tophat/manual.shtml\" style=\"color:blue\">Tophat2</a> and
-	<a href=\"http://bowtie-bio.sourceforge.net/bowtie2/manual.shtml\" style=\"color:blue\"> Bowtie2 </a>, DESeq uses
-	<a href=\"https://bioconductor.org/packages/release/bioc/html/DESeq2.html\" style=\"color:blue\">DESeq2</a>, ChipSeq uses
-	<a href=\"http://liulab.dfci.harvard.edu/MACS/README.html\" style=\"color:blue\">Macs</a>, BisulphiteMapping uses
-	<a href=\"http://bmcbioinformatics.biomedcentral.com/articles/10.1186/1471-2105-10-232\" style=\"color:blue\">BSMap</a>, and DiffMeth uses
-	<a href=\"https://code.google.com/p/methylkit/\" style=\"color:blue\">Methyl Kit</a>.  For more information, click on the program of interest.
-	<br><br>RSEM Version: 1.2.26<br>Bowtie Version: 0.12.9<br>Bowtie2 Version: 2.1.0<br>Tophat2 Version:2.0.9<br>DESeq2 Version: 1.10.2<br>
-	Macs Version: 1.4.2<br>BSMap Version: 2.9<br>MethylKit Version: 0.9.2";
+	$data = "If you would like to run additional pipelines, Expand this box and select a pipeline in which you would like to run.
+			<br><br>
+			For ChipSeq analysis, you must define Chip input definitions in a column format separated by ';'.  The first column is the name to give
+			the output files.  The second column contains a comma sepatared list of library names, and the third column has a comma separated list
+			of the input samples.
+			<br><br>
+			To perform DESEQ, you must also run an RSEM pipeline.
+			<br><br>
+			You may only run 1 RSEM pipeline.
+			<br><br>
+			To perform DiffMeth, you must also run a BisulphiteMapping pipeline.
+			<br><br>
+			You may only run 1 BisulphiteMapping pipeline.
+			<br><br>
+			Pipelines will be run in sequential order from top to bottom.
+			<br><br>
+			RNASeqRSEM uses
+			<a href=\"http://deweylab.biostat.wisc.edu/rsem/README.html\" style=\"color:blue\">RSEM</a> and
+			<a href=\"http://bowtie-bio.sourceforge.net/manual.shtml\" style=\"color:blue\">Bowtie</a>, Tophat uses
+			<a href=\"https://ccb.jhu.edu/software/tophat/manual.shtml\" style=\"color:blue\">Tophat2</a> and
+			<a href=\"http://bowtie-bio.sourceforge.net/bowtie2/manual.shtml\" style=\"color:blue\"> Bowtie2 </a>, DESeq uses
+			<a href=\"https://bioconductor.org/packages/release/bioc/html/DESeq2.html\" style=\"color:blue\">DESeq2</a>, ChipSeq uses
+			<a href=\"http://liulab.dfci.harvard.edu/MACS/README.html\" style=\"color:blue\">Macs</a>, BisulphiteMapping uses
+			<a href=\"http://bmcbioinformatics.biomedcentral.com/articles/10.1186/1471-2105-10-232\" style=\"color:blue\">BSMap</a>, and DiffMeth uses
+			<a href=\"https://code.google.com/p/methylkit/\" style=\"color:blue\">Methyl Kit</a>.  For more information, click on the program of interest.
+			<br><br>
+			RSEM Version: 1.2.26
+			<br>
+			Bowtie Version: 0.12.9
+			<br>
+			Bowtie2 Version: 2.1.0
+			<br>
+			Tophat2 Version:2.0.9
+			<br>
+			DESeq2 Version: 1.10.2
+			<br>
+			Macs Version: 1.4.2
+			<br>
+			BSMap Version: 2.9
+			<br>
+			MethylKit Version: 0.9.2";
 }else if($p == "split"){
-	$data = "If you would like to split your fastq files, Expand this box and select the yes checkbox.<br><br>You can specify the number of reads per file below.";
+	$data = "If you would like to split your fastq files, Expand this box and select the yes checkbox.
+			<br><br>
+			You can specify the number of reads per file below.";
 }else if($p == "quality"){
-	$data = "If you would like to perform quality filtering, Expand this box and select the yes checkbox.<br><br>This performs a variety of
-	useful trimming tasks for illumina paired-end and single ended data.<br><br>Dolphin uses Trimmomatic for quality filtering, for more
-	information about Trimmomatic you can click
-	<a href\"http://www.usadellab.org/cms/uploads/supplementary/Trimmomatic/TrimmomaticManual_V0.32.pdf\" style=\"color:blue\">here.</a><br><br>
-	Trimmomatic Version: 0.32";
+	$data = "If you would like to perform quality filtering, Expand this box and select the yes checkbox.
+			<br><br>
+			This performs a variety of useful trimming tasks for illumina paired-end and single ended data.
+			<br><br>
+			Dolphin uses Trimmomatic for quality filtering, for more information about Trimmomatic you can click
+			<a href\"http://www.usadellab.org/cms/uploads/supplementary/Trimmomatic/TrimmomaticManual_V0.32.pdf\" style=\"color:blue\">here.</a>
+			<br><br>
+			Trimmomatic Version: 0.32";
 }else if($p == "trim"){
-	$data = "If you would like to perform trimming, Expand this box and select the yes checkbox.<br><br>This trims both the 3' and 5' ends
-	for both single-ended or paired-end reads.<br><br>Dolphin uses Trimmomatic for trimming, for more information about Trimmomatic you
-	can click <a href\"http://www.usadellab.org/cms/uploads/supplementary/Trimmomatic/TrimmomaticManual_V0.32.pdf\" style=\"color:blue\">here.
-	</a><br><br>Trimmomatic Version: 0.32";
+	$data = "If you would like to perform trimming, Expand this box and select the yes checkbox.
+			<br><br>
+			This trims both the 3' and 5' ends for both single-ended or paired-end reads.
+			<br><br>
+			Dolphin uses Trimmomatic for trimming, for more information about Trimmomatic you can click
+			<a href\"http://www.usadellab.org/cms/uploads/supplementary/Trimmomatic/TrimmomaticManual_V0.32.pdf\" style=\"color:blue\">here.</a>
+			<br><br>
+			Trimmomatic Version: 0.32";
 }else if($p == "commonind"){
-	$data = "If you would like to map your reads sequentially to common RNAs, Expand this box and select the RNAs you would like to map.<br><br>
-	Bowtie2 map your reads sequentially to common RNAs below. Mapped reads will be removed to go to the next step. To change the default parameters,
-	please use 'change parameters' box.<br><br>You can give Bowtie specific parameters by selecting the 'Change Parameters' button.<br><br>Dolphin
-	uses <a href=\"http://bowtie-bio.sourceforge.net/bowtie2/manual.shtml\" style=\"color:blue\">Bowtie2</a> and
-	<a href=\"http://bedtools.readthedocs.org/en/latest/index.html\" style=\"color:blue\">Bedtools</a> for common RNA mapping/removal.  For more
-	information you can click on the links of the program.<br><br>Bowtie2 Version: 2.1.0<br>Bedtools Version: 2.17.0";
+	$data = "If you would like to map your reads sequentially to common RNAs, Expand this box and select the RNAs you would like to map.
+			<br><br>
+			Bowtie2 map your reads sequentially to common RNAs below. Mapped reads will be removed to go to the next step. To change the default parameters,
+			please use 'change parameters' box.
+			<br><br>
+			You can give Bowtie specific parameters by selecting the 'Change Parameters' button.
+			<br><br>
+			Dolphin uses <a href=\"http://bowtie-bio.sourceforge.net/bowtie2/manual.shtml\" style=\"color:blue\">Bowtie2</a> and
+			<a href=\"http://bedtools.readthedocs.org/en/latest/index.html\" style=\"color:blue\">Bedtools</a> for common RNA mapping/removal.  For more
+			information you can click on the links of the program.<br><br>Bowtie2 Version: 2.1.0
+			<br>
+			Bedtools Version: 2.17.0";
 }else if($p == "barcode_sep"){
 	$data = "Select yes if you wish to perform barcode separation.";
 }else if($p == "Barcode Definitions"){
