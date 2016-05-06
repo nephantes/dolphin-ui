@@ -15,20 +15,26 @@ if($p == "experiments"){
 			You can select all of the samples within a specific experiment series by clicking the checkbox
 			to the right.
 			<br><br>
-			For more information about the Experiment Series, you can click on the
+			To display more information about the Experiment Series, you can click on the
 			expand button to the left of this info box.
 			<br><br>
-			If you have permissions, you can change the
-			information within the table by clicking on the cell you want to alter.";
+			You can soft the information within this table by searching for specific key phrases in the upper right search box, or by clicking on the
+			headers of the table to sort based on that columns ascending or descending order.
+			<br><br>
+			If you have permissions, you can change the information within the table by clicking on the cell you want to alter, altering the information
+			and then pressing enter to save the change.  To cancel the alterations, simply hit the 'esc' key.";
 }else if($p == "lanes"){
 	$data = "This table represents all of the Imports you have access to viewing.
 			<br><br>
 			You can select all of the samples within a specific import by clicking on the checkbox to the right.
 			<br><br>
-			For more information about the Imports, you can click on the expand button to the left of this info box.
+			To view more information about the Imports, you can click on the expand button to the left of this info box.
 			<br><br>
-			If you have permissions, you can alter the information within a specific cell by
-			clicking on the cell.";
+			You can soft the information within this table by searching for specific key phrases in the upper right search box, or by clicking on the
+			headers of the table to sort based on that columns ascending or descending order.
+			<br><br>
+			If you have permissions, you can alter the information within a specific cell by clicking on the cell you want to alter, altering the information
+			and then pressing enter to save the change.  To cancel the alterations, simply hit the 'esc' key.";
 }else if ($p == "samples"){
 	$data = "This table represents all of the Samples you have access to viewing.
 			<br><br>
@@ -36,7 +42,11 @@ if($p == "experiments"){
 			<br><br>
 			For more information about the samples, you can click on the expand button to the left of this info box.
 			<br><br>
-			If you have permissions, you can alter the information in a specific cell by clicking on the cell you wish to alter.
+			You can soft the information within this table by searching for specific key phrases in the upper right search box, or by clicking on the
+			headers of the table to sort based on that columns ascending or descending order.
+			<br><br>
+			If you have permissions, you can alter the information in a specific cell by clicking on the cell you want to alter, altering the information
+			and then pressing enter to save the change.  To cancel the alterations, simply hit the 'esc' key.
 			<br><br>
 			If viewing this table on the selection page, these are all the samples you have selected.";
 }else if($p == "run_name"){
@@ -52,7 +62,9 @@ if($p == "experiments"){
 }else if($p == "outdir"){
 	$data = "Please specify the full path for your backup directory.
 			<br><br>
-			Example:<br>/share/data/umw_biocore/genome_data/mousetest";
+			Example:
+			<br>
+			/share/data/umw_biocore/genome_data/mousetest";
 }else if($p == "fastqc"){
 	$data = "Would you like to perform FastQC?
 			<br><br>
@@ -170,68 +182,139 @@ if($p == "experiments"){
 }else if($p == "barcode_sep"){
 	$data = "Select yes if you wish to perform barcode separation.";
 }else if($p == "Barcode Definitions"){
-	$data = "Please enter the barcode for each sample in this format:<br><br>File_name barcode<br><br>Example barcodes:<br><br>control_rep1
-	CCGAGT<br>control_rep2 GATTTG<br>control_rep3 TTAGAC<br>exper_rep1 AACTCG<br>exper_rep2 CTGGGC<br>exper_rep3 GGTCTA";
+	$data = "Please enter the barcode for each sample in this format:
+			<br><br>
+			File_name barcode
+			<br><br>
+			Example barcodes:
+			<br><br>
+			control_rep1 CCGAGT
+			<br>
+			control_rep2 GATTTG
+			<br>
+			control_rep3 TTAGAC
+			<br>
+			exper_rep1 AACTCG
+			<br>
+			exper_rep2 CTGGGC
+			<br>
+			exper_rep3 GGTCTA";
 }else if($p == "series_name"){
-	$data = "Please enter the experiment series name.<br>If adding to an already existing experiment series, please enter the exact name.";
+	$data = "Please enter the experiment series name.
+			<br>
+			If adding to an already existing experiment series, please enter the exact name.";
 }else if($p == "lane_name"){
-	$data = "Import a specific name for your group of samples.<br><br>This is specific name can be either a lane name or something completely
-	customizable.<br><br>If adding to an already existing Import name, please enter the exact name.";
+	$data = "Import a specific name for your group of samples.
+			<br><br>
+			This is specific name can be either a lane name or something completely customizable.
+			<br><br>
+			If adding to an already existing Import name, please enter the exact name.";
 }else if($p == "input_dir"){
-	$data = "For input directory please use the full path in the cluster.<br><br>Example:<br>/share/data/umw_biocore/genome_data/mousetest";
+	$data = "For input directory please use the full path in the cluster.
+			<br><br>
+			Example:
+			<br>
+			/share/data/umw_biocore/genome_data/mousetest";
 }else if($p == "input_files"){
-	$data = "No Barcode separation:<br><br>For \"Input Parameters\" please enter 2 columns for single end or 3 columns for paired end libraries.<br>
-	First column represents the name of the libraries.<br>Please use only letters, numbers and the _ character.<br> The second (and possible third
-	for paired-end) column(s) is the file name of the library.<br>(Ex: your_library.fastq)<br> Each file will be added with the path you entered in
-	\"Input Directory\" section.<br><br>Barcode separation:<br><br>For \"Input Parameters\" please enter the file names 1 column for single and 2
-	columns for paired end lanes.<br>(Ex: your_library.fastq)<br>Each file will be added with the path you entered in \"Input Directory\" section.";
+	$data = "No Barcode separation:
+			<br><br>
+			For \"Input Parameters\" please enter 2 columns for single end or 3 columns for paired end libraries.
+			<br>
+			First column represents the name of the libraries.
+			<br>
+			Please use only letters, numbers and the _ character.
+			<br>
+			The second (and possible third for paired-end) column(s) is the file name of the library.
+			<br>
+			(Ex: your_library.fastq)
+			<br>
+			Each file will be added with the path you entered in \"Input Directory\" section.
+			<br><br>
+			Barcode separation:
+			<br><br>
+			For \"Input Parameters\" please enter the file names 1 column for single and 2 columns for paired end lanes.
+			<br>
+			(Ex: your_library.fastq)
+			<br>
+			Each file will be added with the path you entered in \"Input Directory\" section.";
 }else if($p == "permissions"){
 	$data = "Who will be able to view this run?";
 }else if($p == "backup_dir"){
-	$data = "Please specify the full path for your backup directory.<br><br>Example:<br>/share/data/umw_biocore/genome_data/mousetest";
+	$data = "Please specify the full path for your backup directory.
+			<br><br>
+			Example:
+			<br>
+			/share/data/umw_biocore/genome_data/mousetest";
 }else if($p == "amazon_bucket"){
-	$data = "Please specify your Amazon bucket.<br><br>If you would like to use our amazon options, please contact an admin at biocore@umassmed.edu
-	with your security keys to set up this service.";
+	$data = "Please specify your Amazon bucket.
+			<br><br>
+			If you would like to use our amazon options, please contact an admin at biocore@umassmed.edu with your security keys to set up this service.";
 }else if($p == "runparams"){
-	$data = "This table displays all of your runs, their current status, and options you have available for each run.<br><br>If your run is not
-	queued, you may click on the status button to see advanced information about the run's steps.<br><br>The options button will display your current
-	options you have for this run.  Rerun allows you to re-run this run but you will be able to alter parameters.  Resume will re-run this run with
-	no change in parameters.  Stop will stop a currently running run.  Delete will delete this run from your status page.  Reset will allow you to start
-	this run from the beginning.<br><br>If the run is complete, you may look at the runs results by selecting reports, or you can plot the runs results
-	using the plots option.";
+	$data = "This table displays all of your runs, their current status, and options you have available for each run.
+			<br><br>
+			If your run is not queued, you may click on the status button to see advanced information about the run's steps.
+			<br><br>
+			The options button will display your current options you have for this run.  Rerun allows you to re-run this run but you will be able to alter parameters.
+			Resume will re-run this run with no change in parameters.  Stop will stop a currently running run.  Delete will delete this run from your status page.
+			Reset will allow you to start this run from the beginning.
+			<br><br>
+			If the run is complete, you may look at the runs results by selecting reports, or you can plot the runs results using the plots option.";
 }else if($p == "services"){
-	$data = "This table shows all of the services performed within the run.<br><br>To break down a service even further into it's seperate steps,
-	click on the 'Select Service' button on the right.";
+	$data = "This table shows all of the services performed within the run.
+			<br><br>
+			To break down a service even further into it's seperate steps, click on the 'Select Service' button on the right.";
 }else if($p == "jobs"){
-	$data = "This table shows all of the jobs within a specific service.<br><br>To see the standard output of the job, click on the 'Select Job' button on the right.";
+	$data = "This table shows all of the jobs within a specific service.
+			<br><br>
+			To see the standard output of the job, click on the 'Select Job' button on the right.";
 }else if($p == "initial_mapping"){
-	$data = "This table shows the initial mapping summary.<br><br>For each sample selected this table will show the total number of reads within the sample,
-	and if common RNA mapping was selected, it will also show the reads that mapped to each common RNA.<br><br>The selection box under the table also lets
-	you view addional information about the common RNA mapping.<br><br>Once you have selected the results to view, a button will appear where you can download
-	the specific file, clear the selected table, or view a link showing the data in a specific format.";
+	$data = "This table shows the initial mapping summary.
+			<br><br>
+			For each sample selected this table will show the total number of reads within the sample, and if common RNA mapping was selected,
+			it will also show the reads that mapped to each common RNA.
+			<br><br>
+			The selection box under the table also lets you view addional information about the common RNA mapping.
+			<br><br>
+			Once you have selected the results to view, a button will appear where you can download the specific file, clear the selected table,
+			or view a link showing the data in a specific format.";
 }else if($p == "summary"){
 	$data = "To view FastQC summary results, expand this box and select the results you wish to view.  The summary includes information on all of the
-	samples selected within one file.";
+			samples selected within one file.";
 }else if($p == "details"){
 	$data = "To view detailed FastQC summary results, expand this box and select the results you wish to view.  The detailed results includes
-	all of the FastQC results for the specific sample.";
+			all of the FastQC results for the specific sample.";
 }else if($p == "RSEM"){
-	$data = "To view RSEM results, Expand this box and select the results file you wish to view.<br><br>Once you have selected the results to view,
-	a button will appear where you can download the specific file, clear the selected table, or view a link showing the data in a specific format.";
+	$data = "To view RSEM results, Expand this box and select the results file you wish to view.
+			<br><br>
+			Once you have selected the results to view, a button will appear where you can download the specific file, clear the selected table,
+			or view a link showing the data in a specific format.";
 }else if($p == "DESEQ"){
-	$data = "To view DESEQ results, Expand this box and select the results file you wish to view.<br><br>Once you have selected the results to view,
-	a button will appear where you can download the specific file, clear the selected table, or view a link showing the data in a specific format.";
+	$data = "To view DESEQ results, Expand this box and select the results file you wish to view.
+			<br><br>
+			Once you have selected the results to view, a button will appear where you can download the specific file, clear the selected table,
+			or view a link showing the data in a specific format.";
 }else if($p == "excel_import"){
-	$data = "Select an excel file to upload specified data from within the cluster. <br>An example excel sheet is provided for if the data is in a
-	single directory or multiple directories below.<br><br>The excel sheet selected must be similar to the example provided.<br>Then select the group
-	to submit under as well as who will be able to see the data.";
+	$data = "Select an excel file to upload specified data from within the cluster.
+			<br>
+			An example excel sheet is provided for if the data is in a single directory or multiple directories below.
+			<br><br>
+			The excel sheet selected must be similar to the example provided.
+			<br>
+			Then select the group to submit under as well as who will be able to see the data.";
 }else if($p == "plot_control_panel"){
-	$data = "This panel displays all the information you can manipulate in order to show various plots.<br><br>First, select a file source.
-	If you have an external file you wish to view, select the 'Input TSV file location' and insert the files location in the box that appears.<br><br>
-	The X and Y axis manipulate the X and Y axis on the scatterplot while the pseudo count and the color axis maniuplates how the scatterplot data
-	is being displayed.<br><br>By selecting columns, you manipulate the heatmaps data display as well as the barplot.<br><br>You can query specific
-	genes by searching for genes (comma separated) and hitting the submit button.<br><br>Selected genes on the scatter plot will be displayed within
-	the 'Selected Region' box.";
+	$data = "This panel displays all the information you can manipulate in order to show various plots.
+			<br><br>
+			First, select a file source. If you have an external file you wish to view, select the 'Input TSV file location' and insert the files location \
+			in the box that appears.
+			<br><br>
+			The X and Y axis manipulate the X and Y axis on the scatterplot while the pseudo count and the color axis maniuplates how the scatterplot data
+			is being displayed.
+			<br><br>
+			By selecting columns, you manipulate the heatmaps data display as well as the barplot.
+			<br><br>
+			You can query specific genes by searching for genes (comma separated) and hitting the submit button.
+			<br><br>
+			Selected genes on the scatter plot will be displayed within the 'Selected Region' box.";
 }else if($p == "bar_format"){
 	$data = "Select the location of the barcodes for barcode separation.";
 }else if($p == "bar_distance"){
@@ -245,33 +328,39 @@ if($p == "experiments"){
 }else if($p == "run_types"){
 	$data = "Change the type of run you would like displayed within the table above.";
 }else if($p == "picard"){
-	$data = "To view Picard results, Expand this box and select the results file you wish to view.<br><br>Once you have selected the results to view,
-	a button will appear where you can download the specific file, clear the selected table, or view a link showing the data in a specific format.";
+	$data = "To view Picard results, Expand this box and select the results file you wish to view.
+			<br><br>
+			Once you have selected the results to view, a button will appear where you can download the specific file, clear the selected table,
+			or view a link showing the data in a specific format.";
 }else if($p == "rseqc"){
-	$data = "To view RSeQC results, Expand this box and select the results file you wish to view.<br><br>Once you have selected the results to view,
-	a button will appear where you can download the specific file, clear the selected table, or view a link showing the data in a specific format.";
+	$data = "To view RSeQC results, Expand this box and select the results file you wish to view.
+			<br><br>
+			Once you have selected the results to view, a button will appear where you can download the specific file, clear the selected table,
+			or view a link showing the data in a specific format.";
 }else if($p == "user_profile"){
 	$data = "This table displays all of your user information within our system obtained from our cluster network.";
 }else if($p == "amazon"){
 	$data = "This table displays the amazon bucket information you have access to.  Only the owner of the bucket may alter or view the
-	entirety of the information displayed here.";
+			entirety of the information displayed here.";
 }else if($p == "table_viewer"){
-	$data = "This table displays all of your previously created custom tables.<br><br>View allows you to view the table you created, Plot table will
-	send you to the plots section with the table as the tsv for plotting, and Delete will delete the selected table.";
+	$data = "This table displays all of your previously created custom tables.
+			<br><br>
+			View allows you to view the table you created, Plot table will send you to the plots section with the table as the tsv for plotting,
+			and Delete will delete the selected table.";
 }else if($p == "generated"){
 	$data = "This table displays the table generated from your sample selection.";
 }else if($p == "table_export"){
 	$data = "By clicking on the 'plus' button, an option with various download types for this data will apear for selection.  Select the type of
-	download you desire and you will be re-directed to a page with the data in that format.";
+			download you desire and you will be re-directed to a page with the data in that format.";
 }else if($p == "selected_samples"){
 	$data = "This table is the list of samples you have selected to generate into a table.  You may choose the specific run you wish to gather
-	information from and also remove the sample from the list by clicking on the red 'X'.";
+			information from and also remove the sample from the list by clicking on the red 'X'.";
 }else if($p == "table_create"){
 	$data = "By hitting the 'plus' button, an expanded list of samples you have permissions to and have runs with data will be listed.
-	By clicking on the checkboxes to the right, you can add or removal additional samples without having to go back to the sample browser.";
+			By clicking on the checkboxes to the right, you can add or removal additional samples without having to go back to the sample browser.";
 }else if($p == "report_section"){
 	$data = "When samples are selected, all possible files you can pair will be shown in this box.  If a file is greyed-out, then not all of
-	your runs contain this file to generate a table.  Only select one file you wish to join upon.";
+			your runs contain this file to generate a table.  Only select one file you wish to join upon.";
 }
 
 if (!headers_sent()) {
