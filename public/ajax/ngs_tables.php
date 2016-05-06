@@ -57,6 +57,7 @@ $sampleBackup = "CASE
 					WHEN (SELECT COUNT(*) FROM ngs_fastq_files WHERE checksum != backup_checksum AND (backup_checksum != '' AND backup_checksum IS NOT NULL) AND ngs_samples.id = ngs_fastq_files.sample_id) > 0 THEN 'btn-danger'
 					WHEN (SELECT COUNT(*) FROM ngs_fastq_files WHERE date_modified < DATE_SUB(now(), INTERVAL 2 MONTH) AND ngs_samples.id = ngs_fastq_files.sample_id) > 0 THEN 'btn-primary'
 					WHEN (SELECT COUNT(*) FROM ngs_fastq_files WHERE (backup_checksum = '' OR backup_checksum IS NULL) AND ngs_samples.id = ngs_fastq_files.sample_id) > 0 THEN ''
+					WHEN (SELECT COUNT(*) FROM ngs_fastq_files WHERE ngs_samples.id = ngs_fastq_files.sample_id) = 0 THEN ''
 					ELSE 'btn-success'
 				END AS backup";
 //	inner join for lane tables
@@ -66,6 +67,7 @@ $laneBackup = "CASE
 					WHEN (SELECT COUNT(*) FROM ngs_fastq_files WHERE checksum != backup_checksum AND (backup_checksum != '' AND backup_checksum IS NOT NULL) AND ngs_lanes.id = ngs_fastq_files.lane_id) > 0 THEN 'btn-danger'
 					WHEN (SELECT COUNT(*) FROM ngs_fastq_files WHERE date_modified < DATE_SUB(now(), INTERVAL 2 MONTH) AND ngs_lanes.id = ngs_fastq_files.lane_id) > 0 THEN 'btn-primary'
 					WHEN (SELECT COUNT(*) FROM ngs_fastq_files WHERE (backup_checksum = '' OR backup_checksum IS NULL) AND ngs_lanes.id = ngs_fastq_files.lane_id) > 0 THEN ''
+					WHEN (SELECT COUNT(*) FROM ngs_fastq_files WHERE ngs_lanes.id = ngs_fastq_files.lane_id) = 0 THEN ''
 					ELSE 'btn-success'
 				END AS backup";
 //	inner join for experiment tables
