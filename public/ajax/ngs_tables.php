@@ -50,24 +50,25 @@ $innerJoin = "LEFT JOIN ngs_source
                 ON ngs_samples.instrument_model_id = ngs_instrument_model.id
                 LEFT JOIN ngs_treatment_manufacturer
                 ON ngs_samples.treatment_manufacturer_id = ngs_treatment_manufacturer.id";
+$amazon_str = "AND ngs_fastq_files.dir_id = (SELECT amazon_bucket FROM ngs_dirs WHERE ngs_fastq_files.dir_id = ngs_dirs.id AND (amazon_bucket != '' AND amazon_bucket NOT NULL))";
 //	inner join for specific samples tables
 $sampleJoin = "LEFT JOIN ngs_fastq_files
                 ON ngs_samples.id = ngs_fastq_files.sample_id";
 $sampleBackup = "CASE
-					WHEN (SELECT COUNT(*) FROM ngs_fastq_files WHERE checksum != backup_checksum AND (backup_checksum != '' AND backup_checksum IS NOT NULL) AND ngs_samples.id = ngs_fastq_files.sample_id) > 0 THEN '<td><button class=\"btn btn-danger\" disabled></td>'
-					WHEN (SELECT COUNT(*) FROM ngs_fastq_files WHERE date_modified < DATE_SUB(now(), INTERVAL 2 MONTH) AND ngs_samples.id = ngs_fastq_files.sample_id) > 0 THEN '<td><button class=\"btn btn-primary\" disabled></td>'
-					WHEN (SELECT COUNT(*) FROM ngs_fastq_files WHERE (backup_checksum = '' OR backup_checksum IS NULL) AND ngs_samples.id = ngs_fastq_files.sample_id) > 0 THEN '<td><button class=\"btn\" disabled></td>'
-					WHEN (SELECT COUNT(*) FROM ngs_fastq_files WHERE ngs_samples.id = ngs_fastq_files.sample_id) = 0 THEN '<td></td>'
+					WHEN (SELECT COUNT(*) FROM ngs_fastq_files WHERE checksum != backup_checksum AND (backup_checksum != '' AND backup_checksum IS NOT NULL) AND ngs_samples.id = ngs_fastq_files.sample_id $amazon_str) > 0 THEN '<td><button class=\"btn btn-danger\" disabled></td>'
+					WHEN (SELECT COUNT(*) FROM ngs_fastq_files WHERE (backup_checksum = '' OR backup_checksum IS NULL) AND ngs_samples.id = ngs_fastq_files.sample_id $amazon_str) > 0 THEN '<td><button class=\"btn\" disabled></td>'
+					WHEN (SELECT COUNT(*) FROM ngs_fastq_files WHERE date_modified < DATE_SUB(now(), INTERVAL 2 MONTH) AND ngs_samples.id = ngs_fastq_files.sample_id $amazon_str) > 0 THEN '<td><button class=\"btn btn-primary\" disabled></td>'
+					WHEN (SELECT COUNT(*) FROM ngs_fastq_files WHERE ngs_samples.id = ngs_fastq_files.sample_id $amazon_str) = 0 THEN '<td></td>'
 					ELSE '<td><button class=\"btn btn-success\" disabled></td>'
 				END AS backup";
 //	inner join for lane tables
 $laneJoin = "LEFT JOIN ngs_facility
                 ON ngs_lanes.facility_id = ngs_facility.id";
 $laneBackup = "CASE
-					WHEN (SELECT COUNT(*) FROM ngs_fastq_files WHERE checksum != backup_checksum AND (backup_checksum != '' AND backup_checksum IS NOT NULL) AND ngs_lanes.id = ngs_fastq_files.lane_id) > 0 THEN '<td><button class=\"btn btn-danger\" disabled></td>'
-					WHEN (SELECT COUNT(*) FROM ngs_fastq_files WHERE date_modified < DATE_SUB(now(), INTERVAL 2 MONTH) AND ngs_lanes.id = ngs_fastq_files.lane_id) > 0 THEN '<td><button class=\"btn btn-primary\" disabled></td>'
-					WHEN (SELECT COUNT(*) FROM ngs_fastq_files WHERE (backup_checksum = '' OR backup_checksum IS NULL) AND ngs_lanes.id = ngs_fastq_files.lane_id) > 0 THEN '<td><button class=\"btn\" disabled></td>'
-					WHEN (SELECT COUNT(*) FROM ngs_fastq_files WHERE ngs_lanes.id = ngs_fastq_files.lane_id) = 0 THEN '<td></td>'
+					WHEN (SELECT COUNT(*) FROM ngs_fastq_files WHERE checksum != backup_checksum AND (backup_checksum != '' AND backup_checksum IS NOT NULL) AND ngs_lanes.id = ngs_fastq_files.lane_id $amazon_str) > 0 THEN '<td><button class=\"btn btn-danger\" disabled></td>'
+					WHEN (SELECT COUNT(*) FROM ngs_fastq_files WHERE (backup_checksum = '' OR backup_checksum IS NULL) AND ngs_lanes.id = ngs_fastq_files.lane_id $amazon_str) > 0 THEN '<td><button class=\"btn\" disabled></td>'
+					WHEN (SELECT COUNT(*) FROM ngs_fastq_files WHERE date_modified < DATE_SUB(now(), INTERVAL 2 MONTH) AND ngs_lanes.id = ngs_fastq_files.lane_id $amazon_str) > 0 THEN '<td><button class=\"btn btn-primary\" disabled></td>'
+					WHEN (SELECT COUNT(*) FROM ngs_fastq_files WHERE ngs_lanes.id = ngs_fastq_files.lane_id $amazon_str) = 0 THEN '<td></td>'
 					ELSE '<td><button class=\"btn btn-success\" disabled></td>'
 				END AS backup";
 //	inner join for experiment tables
