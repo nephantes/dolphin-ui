@@ -50,7 +50,7 @@ $innerJoin = "LEFT JOIN ngs_source
                 ON ngs_samples.instrument_model_id = ngs_instrument_model.id
                 LEFT JOIN ngs_treatment_manufacturer
                 ON ngs_samples.treatment_manufacturer_id = ngs_treatment_manufacturer.id";
-$amazon_str = "AND ngs_fastq_files.dir_id = (SELECT ngs_dirs.id FROM ngs_dirs WHERE ngs_fastq_files.dir_id = ngs_dirs.id AND (ngs_dirs.amazon_bucket != '' AND ngs_dirs.amazon_bucket IS NOT NULL))";
+$amazon_str = "AND ngs_fastq_files.dir_id = (SELECT ngs_dirs.id FROM ngs_dirs WHERE ngs_fastq_files.dir_id = ngs_dirs.id AND (ngs_dirs.amazon_bucket LIKE '%s3://%'))"
 //	inner join for specific samples tables
 $sampleJoin = "LEFT JOIN ngs_fastq_files
                 ON ngs_samples.id = ngs_fastq_files.sample_id";
