@@ -104,7 +104,7 @@
 									</div>
 									<div class="tab-pane" id="groups">
 										<div id="user_groups" class="margin">
-											<?php echo $html->getRespBoxTableStreamNoExpand("Group Information", "groups", ['ID', 'Group Name', 'Date Created', 'Options'], ['id','name','date_created','options']); ?>
+											<?php echo $html->getRespBoxTableStreamNoExpand("Group Information", "profile_groups", ['ID', 'Group Name', 'Date Created', 'Options'], ['id','name','date_created','options']); ?>
 										</div>
 										<div>
 											<button type="button" id="requestgroup" class="btn btn-primary" onclick="requestNewGroup()">Create a New Group</button>

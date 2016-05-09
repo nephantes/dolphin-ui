@@ -1146,11 +1146,14 @@ Single End Example:
 		return $html;
 	}
 	function getInfoBox($id){
-		$left_help_boxes = ['plot_control_panel', 'run_name', 'genomebuild', 'adapter', 'split', 'custom', 'pipeline'];
-		if(in_array($id, $left_help_boxes)){
-				$width = '200px';
+		$smaller_boxes = ['plot_control_panel'];
+		$left_help_boxes = ['run_name', 'genomebuild', 'perms'];
+		if(in_array($id, $smaller_boxes)){
+			$width = '250px';
+		}else if(in_array($id, $left_help_boxes)){
+			$width = '350px';
 		}else{
-				$width = '400px';
+			$width = '400px';
 		}
 		$html = '';
 		$html.= '<div class="navbar-right margin">

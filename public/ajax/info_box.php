@@ -18,7 +18,7 @@ if($p == "experiments"){
 			To display more information about the Experiment Series, you can click on the
 			expand button to the left of this info box.
 			<br><br>
-			You can soft the information within this table by searching for specific key phrases in the upper right search box, or by clicking on the
+			You can sort the information within this table by searching for specific key phrases in the upper right search box, or by clicking on the
 			headers of the table to sort based on that columns ascending or descending order.
 			<br><br>
 			If you have permissions, you can change the information within the table by clicking on the cell you want to alter, altering the information
@@ -28,9 +28,13 @@ if($p == "experiments"){
 			<br><br>
 			You can select all of the samples within a specific import by clicking on the checkbox to the right.
 			<br><br>
+			The 'Backup' column displays the status of the import's samples amazon backup status.  Backups will only be prompted if correct amazon credentials
+			are supplies on sample imports.  The status can be 1 of 4 colors: grey means the backup is pending, red stands for a checksum mismatch, blue means
+			the backup has no errors but is over 2 months old, and green means the upload is current.
+			<br><br>
 			To view more information about the Imports, you can click on the expand button to the left of this info box.
 			<br><br>
-			You can soft the information within this table by searching for specific key phrases in the upper right search box, or by clicking on the
+			You can sort the information within this table by searching for specific key phrases in the upper right search box, or by clicking on the
 			headers of the table to sort based on that columns ascending or descending order.
 			<br><br>
 			If you have permissions, you can alter the information within a specific cell by clicking on the cell you want to alter, altering the information
@@ -40,9 +44,13 @@ if($p == "experiments"){
 			<br><br>
 			You can select a sample by clicking on the checkbox to the right.
 			<br><br>
+			The 'Backup' column displays the status of the samples amazon backup status.  Backups will only be prompted if correct amazon credentials
+			are supplies on sample imports.  The status can be 1 of 4 colors: grey means the backup is pending, red stands for a checksum mismatch, blue means
+			the backup has no errors but is over 2 months old, and green means the upload is current.
+			<br><br>
 			For more information about the samples, you can click on the expand button to the left of this info box.
 			<br><br>
-			You can soft the information within this table by searching for specific key phrases in the upper right search box, or by clicking on the
+			You can sort the information within this table by searching for specific key phrases in the upper right search box, or by clicking on the
 			headers of the table to sort based on that columns ascending or descending order.
 			<br><br>
 			If you have permissions, you can alter the information in a specific cell by clicking on the cell you want to alter, altering the information
@@ -88,7 +96,8 @@ if($p == "experiments"){
 			<br><br>
 			In order to map your reads to a custom sequence, you first must create an index file and that fasta must be in the same folder.
 			<br><br>
-			The index directory must include the full path and the name of the index file must only be the prefix of the fasta.
+			The index directory must include the full path and the name of the index file must only be the prefix of the fasta. Index files and Fasta files
+			also need to have the same prefix.
 			<br><br>
 			You may include additional Bowtie parameters in commandline form as well as a discription of the index created.
 			<br><br>
@@ -103,7 +112,12 @@ if($p == "experiments"){
 			<br><br>
 			Bowtie Version: 2.1.0";
 }else if($p == "pipeline"){
-	$data = "If you would like to run additional pipelines, Expand this box and select a pipeline in which you would like to run.
+	$data = "If you would like to run additional pipelines, Expand this box, click the 'Add Pipeline' button, and select a pipeline in which you would like to run.
+			<br><br>
+			The Deduplication process for RSEM, Tophat, and ChipSeq is only possible with paired-end reads.  If selecting 'Mark Duplicates' please be sure that your read
+			data is paired end
+			<br><br>
+			RSEM custom genome index and annotation files need to have the same prefix in order to use them.
 			<br><br>
 			For ChipSeq analysis, you must define Chip input definitions in a column format separated by ';'.  The first column is the name to give
 			the output files.  The second column contains a comma sepatared list of library names, and the third column has a comma separated list
@@ -169,8 +183,8 @@ if($p == "experiments"){
 }else if($p == "commonind"){
 	$data = "If you would like to map your reads sequentially to common RNAs, Expand this box and select the RNAs you would like to map.
 			<br><br>
-			Bowtie2 map your reads sequentially to common RNAs below. Mapped reads will be removed to go to the next step. To change the default parameters,
-			please use 'change parameters' box.
+			Bowtie2 map your reads sequentially to common RNAs below. Mapped reads will be removed to go to the next step. Sequential mapping occurs on RNAs from left to right.
+			To change the default parameters, please use 'change parameters' box.
 			<br><br>
 			You can give Bowtie specific parameters by selecting the 'Change Parameters' button.
 			<br><br>
@@ -182,9 +196,10 @@ if($p == "experiments"){
 }else if($p == "barcode_sep"){
 	$data = "Select yes if you wish to perform barcode separation.";
 }else if($p == "Barcode Definitions"){
-	$data = "Please enter the barcode for each sample in this format:
+	$data = "Please enter the sample name and barcode for each sample.
 			<br><br>
-			File_name barcode
+			The format for submission of samples and barcodes is mimiced below.  Each line should be it's sample name, followed by a space, and finished with the barcode.
+			For multiple barcodes, simply split your samples/barcodes with new lines.
 			<br><br>
 			Example barcodes:
 			<br><br>
@@ -210,13 +225,21 @@ if($p == "experiments"){
 			<br><br>
 			If adding to an already existing Import name, please enter the exact name.";
 }else if($p == "input_dir"){
-	$data = "For input directory please use the full path in the cluster.
+	$data = "Enter the full path of the Fastq files.
+			<br><br>
+			For input directory please use the full path in the cluster.
+			<br><br>
+			You can search the cluster for this directory and the files within it by selecting the 'Search Directory' button.
+			Selecting this button will prompt you with how to find your specific fastq files with a regex search.  For paired-end reads, the regex search must
+			find the exact same number of reads for each regex in order to display results within the 'Input Files' tab.
 			<br><br>
 			Example:
 			<br>
 			/share/data/umw_biocore/genome_data/mousetest";
 }else if($p == "input_files"){
-	$data = "No Barcode separation:
+	$data = "<b>Manual Selection:</b>
+			<br><br>
+			No Barcode separation:
 			<br><br>
 			For \"Input Parameters\" please enter 2 columns for single end or 3 columns for paired end libraries.
 			<br>
@@ -236,11 +259,18 @@ if($p == "experiments"){
 			<br>
 			(Ex: your_library.fastq)
 			<br>
-			Each file will be added with the path you entered in \"Input Directory\" section.";
+			Each file will be added with the path you entered in \"Input Directory\" section.
+			<br><br>
+			<b>Directory Selection:</b>
+			<br><br>
+			After searching your input directory you will be switched to the 'Directory' tab within the input files section.  A list of files should appear (both paired-end if selected)
+			above an empty table with some options.  Hightlight the files you wish to add to a sample and click the 'Add Sample' button.  The 'Add All' button takes your original
+			regex search and attempts to create samples based on that regex.  You can remove samples by clicking on the corresponding red 'X' or to start over completely, hit the
+			'Reset' button.";
 }else if($p == "permissions"){
 	$data = "Who will be able to view this run?";
 }else if($p == "backup_dir"){
-	$data = "Please specify the full path for your backup directory.
+	$data = "Enter the directory path you would like the results to be located.
 			<br><br>
 			Example:
 			<br>
@@ -254,9 +284,9 @@ if($p == "experiments"){
 			<br><br>
 			If your run is not queued, you may click on the status button to see advanced information about the run's steps.
 			<br><br>
-			The options button will display your current options you have for this run.  Rerun allows you to re-run this run but you will be able to alter parameters.
-			Resume will re-run this run with no change in parameters.  Stop will stop a currently running run.  Delete will delete this run from your status page.
-			Reset will allow you to start this run from the beginning.
+			The options button will display your current options you have for this run.  Rerun allows you to re-run this run with the option to alter alter the run parameters.
+			Resume will resume this run with no change in parameters where the run last left off.  Reset will reset the status of this run and allow the run to start fresh from the
+			beginning.  Stop will stop a currently running run.  Delete will delete this run from your status page.
 			<br><br>
 			If the run is complete, you may look at the runs results by selecting reports, or you can plot the runs results using the plots option.";
 }else if($p == "services"){
@@ -361,6 +391,17 @@ if($p == "experiments"){
 }else if($p == "report_section"){
 	$data = "When samples are selected, all possible files you can pair will be shown in this box.  If a file is greyed-out, then not all of
 			your runs contain this file to generate a table.  Only select one file you wish to join upon.";
+}else if($p == "email_address"){
+	$data = "This is the email address that will be alerted when a run finishes successfully";
+}else if($p == "email_check"){
+	$data = "Would you like to be sent an email whenever runs successfully finish?";
+}else if($p == "profile_groups"){
+	$data = "This table displays all of the groups that you are a part of.  All users can view all of the current users within a group.
+			<br><br>
+			Owners of groups can add members to their groups, accept new member requests, change the owner of a group, or delete a group.
+			<br><br>
+			To create a group, simply click the 'Create a New Group' button and give the name of your group to create.  To request to be added to a specific
+			group, click the 'Join a Group' button and select the group you wish to be added to.";
 }
 
 if (!headers_sent()) {
