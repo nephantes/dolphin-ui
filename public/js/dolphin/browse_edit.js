@@ -326,3 +326,14 @@ function clearElementHighlighted(){
 	element_highlighted_type = null;
 	element_highlighted_onclick = null;
 }
+
+function resubmitAmazon(){
+	$.ajax({ type: "GET",
+			url: BASE_PATH+"/public/ajax/browse_edit.php",
+			data: { p: 'amazon_reupload', samples: checklist_samples.toString() },
+			async: false,
+			success : function(s)
+			{
+			}
+	});
+}

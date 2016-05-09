@@ -285,7 +285,7 @@ function generateStreamTable(type, queryData, queryType, qvar, rvar, seg, theSea
 			}else if (type == 'lanes') {
 				return "<tr><td>"+record.id+"</td><td>"+"<a href=\""+BASE_PATH+"/search/details/experiments/"+record.id+'/'+theSearch+"\">"+record.name+"</a>"+"</td><td onclick=\"editBox("+uid+", "+record.id+", 'facility', 'ngs_lanes', this)\">"+record.facility+
 					"</td><td onclick=\"editBox("+uid+", "+record.id+", 'total_reads', 'ngs_lanes', this)\">"+record.total_reads+"</td><td onclick=\"editBox("+uid+", "+record.id+", 'total_samples', 'ngs_lanes', this)\">"+record.total_samples+"</td>"+
-					"<td>"+record.backup+"<td onclick=\"editBox("+uid+", "+record.id+", 'cost', 'ngs_lanes', this)\">"+record.cost+"</td><td onclick=\"editBox("+uid+", "+record.id+", 'phix_requested', 'ngs_lanes', this)\">"+record.phix_requested+"</td>"+
+					""+record.backup+"<td onclick=\"editBox("+uid+", "+record.id+", 'cost', 'ngs_lanes', this)\">"+record.cost+"</td><td onclick=\"editBox("+uid+", "+record.id+", 'phix_requested', 'ngs_lanes', this)\">"+record.phix_requested+"</td>"+
 					"<td onclick=\"editBox("+uid+", "+record.id+", 'phix_in_lane', 'ngs_lanes', this)\">"+record.phix_in_lane+"</td><td onclick=\"editBox("+uid+", "+record.id+", 'notes', 'ngs_lanes', this)\">"+record.notes+"</td>"+
 					"<td><input type=\"checkbox\" class=\"ngs_checkbox\" name=\""+record.id+"\" id=\"lane_checkbox_"+record.id+"\" onClick=\"manageChecklists(this.name, 'lane_checkbox')\">"+"</td></tr>";
 					
@@ -301,7 +301,7 @@ function generateStreamTable(type, queryData, queryType, qvar, rvar, seg, theSea
 			if (type == 'samples') {
 				if (queryType == 'getSamples') {
 					return "<tr><td>"+record.id+"</td><td>"+"<a href=\""+BASE_PATH+"/search/details/samples/"+record.id+'/'+theSearch+"\">"+sample_name+"</a>"+"</td><td onclick=\"editBox("+uid+", "+record.id+", 'title', 'ngs_samples', this)\">"+record.title+
-						"</td><td onclick=\"editBox("+uid+", "+record.id+", 'source', 'ngs_samples', this)\">"+record.source+"</td><td onclick=\"editBox("+uid+", "+record.id+", 'organism', 'ngs_samples', this)\">"+record.organism+"</td><td onclick=\"editBox("+uid+", "+record.id+", 'molecule', 'ngs_samples', this)\">"+record.molecule+"</td><td>"+
+						"</td><td onclick=\"editBox("+uid+", "+record.id+", 'source', 'ngs_samples', this)\">"+record.source+"</td><td onclick=\"editBox("+uid+", "+record.id+", 'organism', 'ngs_samples', this)\">"+record.organism+"</td><td onclick=\"editBox("+uid+", "+record.id+", 'molecule', 'ngs_samples', this)\">"+record.molecule+"</td>"+
 						""+record.backup+"<td>"+initialRunWarning+"<input type=\"checkbox\" class=\"ngs_checkbox\" name=\""+record.id+"\" id=\"sample_checkbox_"+record.id+"\" onClick=\"manageChecklists(this.name, 'sample_checkbox')\">"+"</td></tr>";
 				}else if (queryType == 'table_create') {
 					return "<tr><td>"+record.id+"</td><td>"+"<a href=\""+BASE_PATH+"/search/details/samples/"+record.id+'/'+theSearch+"\">"+sample_name+"</a>"+"</td><td onclick=\"editBox("+uid+", "+record.id+", 'title', 'ngs_samples', this)\">"+record.title+
@@ -313,7 +313,7 @@ function generateStreamTable(type, queryData, queryType, qvar, rvar, seg, theSea
 				}
 			}else if (type == 'lanes') {
 				return "<tr><td>"+record.id+"</td><td>"+"<a href=\""+BASE_PATH+"/search/details/experiments/"+record.id+'/'+theSearch+"\">"+record.name+"</a>"+"</td><td onclick=\"editBox("+uid+", "+record.id+", 'facility', 'ngs_lanes', this)\">"+record.facility+
-					"</td><td onclick=\"editBox("+uid+", "+record.id+", 'total_reads', 'ngs_lanes', this)\">"+record.total_reads+"</td><td onclick=\"editBox("+uid+", "+record.id+", 'total_samples', 'ngs_lanes', this)\">"+record.total_samples+"</td><td>"+
+					"</td><td onclick=\"editBox("+uid+", "+record.id+", 'total_reads', 'ngs_lanes', this)\">"+record.total_reads+"</td><td onclick=\"editBox("+uid+", "+record.id+", 'total_samples', 'ngs_lanes', this)\">"+record.total_samples+"</td>"+
 					""+record.backup+"<td><input type=\"checkbox\" class=\"ngs_checkbox\" name=\""+record.id+"\" id=\"lane_checkbox_"+record.id+"\" onClick=\"manageChecklists(this.name, 'lane_checkbox')\">"+"</td></tr>";
 					
 			}else if(type == 'experiments'){
