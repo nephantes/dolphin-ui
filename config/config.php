@@ -38,6 +38,7 @@ define('DB_NAME', $ini_array['DB_NAME']);
 define('DB_USER', $ini_array['DB_USER']);
 define('DB_PASSWORD', $ini_array['DB_PASSWORD']);
 define('DB_HOST', $ini_array['DB_HOST']);
+define('DB_PORT', $ini_array['DB_PORT']);
 define('DOLPHIN_TOOLS_SRC_PATH', $ini_array['DOLPHIN_TOOLS_SRC_PATH']);
 define('REMOTE_HOST', $ini_array['REMOTE_HOST']);
 define('JOB_STATUS', $ini_array['JOB_STATUS']);

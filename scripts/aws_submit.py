@@ -4,6 +4,7 @@ import urllib,urllib2
 import warnings
 import json
 import boto3
+import MySQLdb
 from boto3.s3.transfer import S3Transfer
 from botocore.client import Config
 from sys import argv, exit, stderr
@@ -153,16 +154,13 @@ class botoSubmit:
             
 def main():
     #docker: http://localhost/dolphin/api/service.php
-    url = 'http://localhost/dolphin/api/service.php'
+    url = sys.argv[1]+'/api/service.php'
     tablename="ngs_temp_sample_files"
-    #inputdir = sys.argv[1]
     
     f = funcs()
     boto = botoSubmit(url, f)
     amazon = boto.getAmazonCredentials('kucukura')
-    samplelist=boto.getSampleList(sys.argv[1], 'none')
-    
-    print samplelist
+    samplelist=boto.getSampleList(sys.argv[2], 'none')
     
     processedLibs=[]
     amazon_bucket=""
@@ -192,9 +190,26 @@ def main():
                     boto.uploadFile(amazon, amazon_bucket, backup_dir, libname+'.2.fastq.gz' )
                 else:
                     boto.uploadFile(amazon, amazon_bucket, backup_dir, libname+'.fastq.gz' )
+                try:
+                    db = MySQLdb.connect(
+                        host = sys.argv[6],
+                        user = sys.argv[4],
+                        passwd = sys.argv[5],
+                        db = sys.argv[3],
+                        port = int(sys.argv[7]))
+                    cursor = db.cursor()
+                    cursor.execute("UPDATE ngs_fastq_files SET backup_checksum = NULL, aws_status = 0 WHERE sample_id in ("+sample_id+")")
+                    #print sql
+                    print cursor.fetchall()
+                    cursor.close()
+                    db.commit()
+                    db.close()
+                except Exception, ex:
+                    print ex
             else:
                 print "ERROR 86: The # of read counts doesn't match: %s",libname
                 sys.exit(86)
+    
     sys.exit(0)
 
 if __name__ == "__main__":

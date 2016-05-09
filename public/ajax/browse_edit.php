@@ -177,16 +177,14 @@ else if ($p == 'intialRunCheck')
 else if ($p == 'amazon_reupload')
 {
 	if (isset($_GET['samples'])){$samples = $_GET['samples'];}
-	$cmd = "cd ../../scripts && python aws_submit.py $samples 2>&1 &";
-	$PID_COMMAND = popen( $cmd, "r" );
-	$PID =fread($PID_COMMAND, 2096);
-	pclose($PID_COMMAND);
 	$data=$query->runSQL("
 		UPDATE ngs_fastq_files
 		SET aws_status = 2
 		WHERE sample_id in ($samples)
 		");
-	$data = json_encode('submited');
+	$cmd = "cd ../../scripts && python aws_submit.py ".API_PATH." $samples ".DB_NAME." ".DB_USER." ".DB_PASSWORD." ".DB_HOST." ".DB_PORT." 2>&1 &";
+	$PID_COMMAND = popen( $cmd, "r" );
+	pclose($PID_COMMAND);
 }
 
 if (!headers_sent()) {
