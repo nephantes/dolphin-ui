@@ -208,7 +208,7 @@ function obtainGroups(){
 				delete s[i].u_id;
 				delete s[i].owner_id;
 			}
-			groupsStreamTable = createStreamTable('groups', s, "", true, [20,50], 20, true, true);
+			groupsStreamTable = createStreamTable('profile_groups', s, "", true, [20,50], 20, true, true);
 		}
 	});
 }
