@@ -182,9 +182,9 @@ else if ($p == 'amazon_reupload')
 	$PID =fread($PID_COMMAND, 2096);
 	pclose($PID_COMMAND);
 	$data=$query->runSQL("
-		UPDATE ngs_runparams
-		SET wrapper_pid = $PID
-		WHERE id = '$idKey'
+		UPDATE ngs_fastq_files
+		SET aws_status = 2
+		WHERE sample_id in ($samples)
 		");
 	$data = json_encode('submited');
 }

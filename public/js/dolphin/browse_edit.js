@@ -334,6 +334,7 @@ function resubmitAmazon(){
 			async: false,
 			success : function(s)
 			{
+				window.location.reload();
 			}
 	});
 }
