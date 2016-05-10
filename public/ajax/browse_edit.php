@@ -182,7 +182,8 @@ else if ($p == 'amazon_reupload')
 		SET aws_status = 2
 		WHERE sample_id in ($samples)
 		");
-	$cmd = "cd ../../scripts && python aws_submit.py ".API_PATH." $samples ".DB_NAME." ".DB_USER." ".DB_PASSWORD." ".DB_HOST." ".DB_PORT." 2>&1 &";
+	$cmd = "cd ../../scripts && python aws_submit.py ".API_PATH." $samples ".DB_NAME." ".DB_USER." ".DB_PASSWORD." ".DB_HOST." ".DB_PORT.
+			" 2>&1 > ../tmp/logs/aws_uploads/".date("Y_m_d_H_i").".log &";
 	$PID_COMMAND = popen( $cmd, "r" );
 	pclose($PID_COMMAND);
 }
