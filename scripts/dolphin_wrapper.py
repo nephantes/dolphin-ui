@@ -503,6 +503,14 @@ class Dolphin:
                  bamsupport="no"
                  type="rsem"
                  previousrsem = "@PREVIOUSRSEM"
+                 if ('split' in runparams and runparams['split'].lower() != 'none'  and 'MarkDuplicates' in pipe and pipe['MarkDuplicates'].lower() == 'yes'):
+                     type = "rsem_ref.transcripts"
+                     if ('CustomGenomeIndex' in pipe and pipe['CustomGenomeIndex'].lower()!="none"):
+                          indexsuffix = pipe['CustomGenomeIndex']
+                          type = os.path.basename(indexsuffix)
+                     self.prf( fp, '%s'%(stepMergeBAM % locals()) )
+                     previousrsem="merge"+type
+
                  if('MarkDuplicates' in pipe and pipe['MarkDuplicates'].lower()=='yes'):
                      genome_bam="no"
                      bamsupport="yes"
@@ -511,12 +519,9 @@ class Dolphin:
                           indexsuffix = pipe['CustomGenomeIndex']
                           type = os.path.basename(indexsuffix)
                      self.writeDedupForRSEM(pipe, type, fp, sep)
-                     previousrsem = "dedup" + type
+                     previousrsem = "dedup" + previousrsem 
                      type=previousrsem
 
-                 if ('split' in runparams and runparams['split'].lower() != 'none'  and 'MarkDuplicates' in pipe and pipe['MarkDuplicates'].lower() == 'yes'):
-                    self.prf( fp, '%s'%(stepMergeBAM % locals()) )
-                    previousrsem="merge"+previousrsem
                      
                  rsemref = (pipe['CustomGenomeIndex'] if ('CustomGenomeIndex' in pipe and pipe['CustomGenomeIndex'].lower()!="none") else "@RSEMREF" )
 
