@@ -974,13 +974,8 @@ class funcs
       {
       
         $runparamsid=$params['sampleids'];
-        $barcode=$params['barcode'];
 
-        if (strtolower($barcode) != "none"){
-           $sql = "SELECT DISTINCT ns.id sample_id, sf.id file_id, d.id dir_id, ns.lane_id, ns.samplename, sf.file_name, d.fastq_dir, d.backup_dir, d.amazon_bucket, ns.owner_id, ns.group_id, ns.perms FROM ngs_runlist nr, ngs_samples ns, ngs_temp_lane_files sf, ngs_dirs d where sf.lane_id=ns.lane_id and d.id=sf.dir_id and ns.id=nr.sample_id and ns.id in ($runparamsid)";
-        }else{
-           $sql = "SELECT DISTINCT ns.id sample_id, sf.id file_id, d.id dir_id, ns.lane_id, ns.samplename, sf.file_name, d.fastq_dir, d.backup_dir, d.amazon_bucket, ns.owner_id, ns.group_id, ns.perms FROM ngs_runlist nr, ngs_samples ns, ngs_temp_sample_files sf, ngs_dirs d where sf.sample_id=ns.id and d.id=sf.dir_id and ns.id=nr.sample_id and ns.id in ($runparamsid)";
-        }
+        $sql = "SELECT DISTINCT ns.id sample_id, sf.id file_id, d.id dir_id, ns.lane_id, ns.samplename, sf.file_name, d.fastq_dir, d.backup_dir, d.amazon_bucket, ns.owner_id, ns.group_id, ns.perms FROM ngs_runlist nr, ngs_samples ns, ngs_fastq_files sf, ngs_dirs d where sf.sample_id=ns.id and d.id=sf.dir_id and ns.id=nr.sample_id and ns.id in ($runparamsid)";
 
         return $this->queryTable($sql); 
       }
