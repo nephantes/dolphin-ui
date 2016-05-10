@@ -174,6 +174,18 @@ else if ($p == 'intialRunCheck')
 	if (isset($_GET['samples'])){$samples = $_GET['samples'];}
 	$data=$query->queryTable("SELECT sample_id FROM ngs_fastq_files WHERE sample_id IN ($samples) AND total_reads > 0");
 }
+else if ($p == 'amazon_reupload')
+{
+	if (isset($_GET['samples'])){$samples = $_GET['samples'];}
+	$data=$query->runSQL("
+		UPDATE ngs_fastq_files
+		SET aws_status = 2
+		WHERE sample_id in ($samples)
+		");
+	$cmd = "cd ../../scripts && python aws_submit.py ".API_PATH." $samples ".DB_NAME." ".DB_USER." ".DB_PASSWORD." ".DB_HOST." ".DB_PORT." 2>&1 &";
+	$PID_COMMAND = popen( $cmd, "r" );
+	pclose($PID_COMMAND);
+}
 
 if (!headers_sent()) {
    header('Cache-Control: no-cache, must-revalidate');
