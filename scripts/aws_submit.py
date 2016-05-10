@@ -10,7 +10,7 @@ from botocore.client import Config
 from sys import argv, exit, stderr
 from optparse import OptionParser
 from config import *
-sys.path.insert(0, '/usr/local/share/dolphin_tools/src')
+sys.path.insert(0, sys.argv[8])
 from funcs import *
 
 class botoSubmit:
