@@ -334,6 +334,7 @@ function resubmitAmazon(){
 			async: false,
 			success : function(s)
 			{
+				console.log(s);
 				window.location.reload();
 			}
 	});
