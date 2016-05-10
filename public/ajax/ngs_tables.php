@@ -161,7 +161,7 @@ else if ($p == "getSelectedSamples")	//	Selected samples table
 	
 	$sample_perms = "";
 	if ($uid != "1"){
-		$sample_perms = "WHERE (((ngs_samples.group_id in ($gids)) AND (ngs_samples.perms >= 15)) OR (ngs_samples.owner_id = $uid))";
+		$sample_perms = "AND (((ngs_samples.group_id in ($gids)) AND (ngs_samples.perms >= 15)) OR (ngs_samples.owner_id = $uid))";
 	}
 	
 	$time="";
