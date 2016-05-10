@@ -10,7 +10,7 @@ from botocore.client import Config
 from sys import argv, exit, stderr
 from optparse import OptionParser
 from config import *
-sys.path.insert(0, '/usr/local/share/dolphin_tools/src')
+sys.path.insert(0, sys.argv[8])
 from funcs import *
 
 class botoSubmit:
@@ -165,6 +165,7 @@ def main():
     processedLibs=[]
     amazon_bucket=""
     for sample in samplelist:
+        print "\n"
         sample_id=sample['sample_id']
         file_id=sample['file_id']
         libname=sample['samplename']  
@@ -176,39 +177,37 @@ def main():
         if (filename.find(',')!=-1):
            PAIRED="Yes"
     
-        if (not [libname, sample_id] in processedLibs):
-            boto.processFastqFiles(sample, PAIRED)
-            processedLibs.append([libname, sample_id])
+        boto.processFastqFiles(sample, PAIRED)
+        processedLibs.append([libname, sample_id])
 
         amazon_bucket = str(re.sub('s3://', '', amazon_bucket))
-        for libname, sample_id in processedLibs:
-            print libname + ":" + str(sample_id)
-            if (boto.checkReadCounts(sample_id, tablename) and amazon):
-                if (filename.find(',')!=-1):
-                    files=filename.split(',')
-                    boto.uploadFile(amazon, amazon_bucket, backup_dir, libname+'.1.fastq.gz' )
-                    boto.uploadFile(amazon, amazon_bucket, backup_dir, libname+'.2.fastq.gz' )
-                else:
-                    boto.uploadFile(amazon, amazon_bucket, backup_dir, libname+'.fastq.gz' )
-                try:
-                    db = MySQLdb.connect(
-                        host = sys.argv[6],
-                        user = sys.argv[4],
-                        passwd = sys.argv[5],
-                        db = sys.argv[3],
-                        port = int(sys.argv[7]))
-                    cursor = db.cursor()
-                    cursor.execute("UPDATE ngs_fastq_files SET backup_checksum = NULL, aws_status = 0 WHERE sample_id in ("+sample_id+")")
-                    #print sql
-                    print cursor.fetchall()
-                    cursor.close()
-                    db.commit()
-                    db.close()
-                except Exception, ex:
-                    print ex
+        print libname + ":" + str(sample_id)
+        if (boto.checkReadCounts(sample_id, tablename) and amazon):
+            if (filename.find(',')!=-1):
+                files=filename.split(',')
+                boto.uploadFile(amazon, amazon_bucket, backup_dir, libname+'.1.fastq.gz' )
+                boto.uploadFile(amazon, amazon_bucket, backup_dir, libname+'.2.fastq.gz' )
             else:
-                print "ERROR 86: The # of read counts doesn't match: %s",libname
-                sys.exit(86)
+                boto.uploadFile(amazon, amazon_bucket, backup_dir, libname+'.fastq.gz' )
+            try:
+                db = MySQLdb.connect(
+                    host = sys.argv[6],
+                    user = sys.argv[4],
+                    passwd = sys.argv[5],
+                    db = sys.argv[3],
+                    port = int(sys.argv[7]))
+                cursor = db.cursor()
+                cursor.execute("UPDATE ngs_fastq_files SET backup_checksum = NULL, aws_status = 0 WHERE sample_id in ("+sample_id+")")
+                #print sql
+                print cursor.fetchall()
+                cursor.close()
+                db.commit()
+                db.close()
+            except Exception, ex:
+                print ex
+        else:
+            print "ERROR 86: The # of read counts doesn't match: %s",libname
+            sys.exit(86)
     
     sys.exit(0)
 
