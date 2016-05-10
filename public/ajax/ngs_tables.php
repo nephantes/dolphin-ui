@@ -167,7 +167,9 @@ else if ($p == "getSelectedSamples")	//	Selected samples table
 	FROM ngs_samples
     $innerJoin
 	$sampleJoin
-	WHERE $searchQuery $andPerms $time
+	WHERE $searchQuery 
+	AND (((ngs_samples.group_id in ($gids)) AND (ngs_samples.perms >= 15)) OR (ngs_samples.owner_id = $uid) OR (ngs_samples.perms >= 32))
+	$time
 	");
 }
 else if($search != "")	//	If there is a search term(s) (experiments, lanes, samples)
