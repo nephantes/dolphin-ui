@@ -158,6 +158,12 @@ else if ($p == "getSelectedSamples")	//	Selected samples table
 			$typeCount = $typeCount + 1;
 		}
 	}
+	
+	$sample_perms = "";
+	if ($uid != "1"){
+		$sample_perms = "WHERE (((ngs_samples.group_id in ($gids)) AND (ngs_samples.perms >= 15)) OR (ngs_samples.owner_id = $uid))";
+	}
+	
 	$time="";
 	if (isset($start)){$time="and `date_created`>='$start' and `date_created`<='$end'";}
 	$data=$query->queryTable("
@@ -168,7 +174,7 @@ else if ($p == "getSelectedSamples")	//	Selected samples table
     $innerJoin
 	$sampleJoin
 	WHERE $searchQuery 
-	AND (((ngs_samples.group_id in ($gids)) AND (ngs_samples.perms >= 15)) OR (ngs_samples.owner_id = $uid) OR (ngs_samples.perms >= 32))
+	$sample_perms
 	$time
 	");
 }

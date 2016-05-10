@@ -5,19 +5,48 @@ import warnings
 import json
 import boto3
 import MySQLdb
+import ConfigParser
 from boto3.s3.transfer import S3Transfer
 from botocore.client import Config
 from sys import argv, exit, stderr
 from optparse import OptionParser
 from config import *
-sys.path.insert(0, sys.argv[8])
+from workflowdefs import *
+sys.path.insert(0, sys.argv[4])
 from funcs import *
 
 class botoSubmit:
     f=""
-    def __init__(self, url, f ):
-        self.url = url
+    config = ConfigParser.ConfigParser()
+    params_section = ''
+    
+    def __init__(self, f, params_section):
         self.f = f
+        self.params_section = params_section
+        
+    def setURL(self, url):
+        self.url = url
+        
+    def runSQL(self, sql):
+        try:
+            print self.params_section
+            db = MySQLdb.connect(
+                host = self.config.get(self.params_section, "db_host"),
+                user = self.config.get(self.params_section, "db_user"),
+                passwd = self.config.get(self.params_section, "db_password"),
+                db = self.config.get(self.params_section, "db_name"),
+                port = int(self.config.get(self.params_section, "db_port")))
+            cursor = db.cursor()
+            cursor.execute(sql)
+            #print sql
+            results = cursor.fetchall()
+            cursor.close()
+            del cursor
+            db.commit()
+            db.close()
+            return results
+        except Exception, ex:
+            print ex
         
     def getAmazonCredentials(self, username):
         data = urllib.urlencode({'func':'getAmazonCredentials', 'username':username})
@@ -153,14 +182,30 @@ class botoSubmit:
             print ex
             
 def main():
-    #docker: http://localhost/dolphin/api/service.php
-    url = sys.argv[1]+'/api/service.php'
-    tablename="ngs_temp_sample_files"
-    
     f = funcs()
-    boto = botoSubmit(url, f)
+    params_section = ""
+    
+    #define options
+    parser = OptionParser()
+    parser.add_option("-r", "--rungroupid", dest="rpid")
+    parser.add_option("-b", "--backup", dest="backup")
+    parser.add_option("-w", "--wkey", dest="wkey")
+    parser.add_option("-c", "--config", dest="config")
+    # parse
+    options, args = parser.parse_args()
+    # retrieve options
+    rpid    = options.rpid
+    BACKUP  = options.backup
+    WKEY    = options.wkey
+    params_section = options.config
+    
+    boto = botoSubmit(f, params_section)
+    boto.config.read("../config/config.ini")
+    url = boto.config.get(params_section, "api_path")+'/api/service.php'
+    boto.setURL(url)
+    
     amazon = boto.getAmazonCredentials('kucukura')
-    samplelist=boto.getSampleList(sys.argv[2], 'none')
+    samplelist=boto.getSampleList(sys.argv[3], 'none')
     
     processedLibs=[]
     amazon_bucket=""
@@ -182,29 +227,14 @@ def main():
 
         amazon_bucket = str(re.sub('s3://', '', amazon_bucket))
         print libname + ":" + str(sample_id)
-        if (boto.checkReadCounts(sample_id, tablename) and amazon):
+        if (boto.checkReadCounts(sample_id, 'ngs_fastq_files') and amazon):
             if (filename.find(',')!=-1):
                 files=filename.split(',')
                 boto.uploadFile(amazon, amazon_bucket, backup_dir, libname+'.1.fastq.gz' )
                 boto.uploadFile(amazon, amazon_bucket, backup_dir, libname+'.2.fastq.gz' )
             else:
                 boto.uploadFile(amazon, amazon_bucket, backup_dir, libname+'.fastq.gz' )
-            try:
-                db = MySQLdb.connect(
-                    host = sys.argv[6],
-                    user = sys.argv[4],
-                    passwd = sys.argv[5],
-                    db = sys.argv[3],
-                    port = int(sys.argv[7]))
-                cursor = db.cursor()
-                cursor.execute("UPDATE ngs_fastq_files SET backup_checksum = NULL, aws_status = 0 WHERE sample_id in ("+sample_id+")")
-                #print sql
-                print cursor.fetchall()
-                cursor.close()
-                db.commit()
-                db.close()
-            except Exception, ex:
-                print ex
+            boto.runSQL("UPDATE ngs_fastq_files SET backup_checksum = NULL, aws_status = 0 WHERE sample_id in ("+sample_id+")")
         else:
             print "ERROR 86: The # of read counts doesn't match: %s",libname
             sys.exit(86)
