@@ -5,19 +5,48 @@ import warnings
 import json
 import boto3
 import MySQLdb
+import ConfigParser
 from boto3.s3.transfer import S3Transfer
 from botocore.client import Config
 from sys import argv, exit, stderr
 from optparse import OptionParser
 from config import *
+from workflowdefs import *
 sys.path.insert(0, sys.argv[8])
 from funcs import *
 
 class botoSubmit:
     f=""
+    config = ConfigParser.ConfigParser()
+    params_section = ''
+    
     def __init__(self, url, f ):
         self.url = url
         self.f = f
+        self.params_section = params_section
+        
+    def runSQL(self, sql):
+        try:
+            db = MySQLdb.connect(
+                host = self.config.get(self.params_section, "db_host"),
+                user = self.config.get(self.params_section, "db_user"),
+                passwd = self.config.get(self.params_section, "db_password"),
+                db = self.config.get(self.params_section, "db_name"),
+                port = int(self.config.get(self.params_section, "db_port")))
+    
+            cursor = db.cursor()
+            cursor.execute(sql)
+            #print sql
+            results = cursor.fetchall()
+            cursor.close()
+            del cursor
+            return results
+          
+        except Exception, ex:
+            print ex
+        finally:
+            db.commit()
+            db.close()
         
     def getAmazonCredentials(self, username):
         data = urllib.urlencode({'func':'getAmazonCredentials', 'username':username})
