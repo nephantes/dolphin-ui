@@ -434,6 +434,10 @@ function pipelineSubmitCheck(non_pipeline, non_pipeline_values, pipeline, pipeli
 			if (checkFieldsEmpty('text_1_'+pipeline_index[x])) {
 				displayErrorModal('#errorModal', 'Name field cannot be empty within DESeq');
 				return true;
+			//	Check naming
+			}else if (checkFieldAlphaNumericAdditionalChars('text_1_'+pipeline_index[x], '\\_\\-')) {
+				displayErrorModal('#errorModal', 'DESeq name field must be alpha-numeric characters, dashes, or underscores');
+				return true;
 			//	Check Multiple Selection
 			}else if (checkFieldMultiSelectEmpty('multi_select_1_'+pipeline_index[x], 'multi_select_2_'+pipeline_index[x])) {
 				displayErrorModal('#errorModal', 'Conditions 1 and 2 cannot be empty within DESeq');
@@ -479,6 +483,10 @@ function pipelineSubmitCheck(non_pipeline, non_pipeline_values, pipeline, pipeli
 			//	Name is empty
 			if (checkFieldsEmpty('text_1_'+pipeline_index[x])) {
 				displayErrorModal('#errorModal', 'Name field cannot be empty within DiffMeth');
+				return true;
+			//	Name characters
+			}else if (checkFieldAlphaNumericAdditionalChars('text_1_'+pipeline_index[x], '\\_\\-')) {
+				displayErrorModal('#errorModal', 'DiffMeth name field must be alpha-numeric characters, dashes, or underscores');
 				return true;
 			//	Check Multiple Selection
 			}else if (checkFieldMultiSelectEmpty('multi_select_1_'+pipeline_index[x], 'multi_select_2_'+pipeline_index[x])) {
