@@ -53,7 +53,6 @@ else if ($p == "updateRecheckChecksum")
     if (isset($_GET['dirname'])){$dirname = rawurldecode($_GET['dirname']);}
     if (isset($_GET['hashstr'])){$hashstr = rawurldecode($_GET['hashstr']);}
     $data=$query->queryTable("
-    SET SQL_SAFE_UPDATES = 0;
     UPDATE  ngs_fastq_files nff, 
     (SELECT nff.id FROM ngs_fastq_files nff, ngs_dirs nd
     where nff.dir_id = nd.id AND 
