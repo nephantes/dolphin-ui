@@ -62,6 +62,12 @@ else if ($p == "updateRecheckChecksum")
     set nff.checksum_recheck='$hashstr'
     where a.id=nff.id
     ");
+    $data=$query->queryTable("
+    SELECT nff.id FROM ngs_fastq_files nff, ngs_dirs nd
+    where nff.dir_id = nd.id AND 
+    nff.file_name='$input' AND 
+    nd.backup_dir='$dirname'
+    ");
 }
 
 if (!headers_sent()) {
