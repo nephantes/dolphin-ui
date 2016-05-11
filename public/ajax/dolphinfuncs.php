@@ -16,7 +16,9 @@ if($p == "getFileList")
     $data=$query->queryTable("
     SELECT d.fastq_dir, f.file_name, d.amazon_bucket 
     FROM ngs_fastq_files f, ngs_dirs d 
-    where d.id=f.dir_id and (f.backup_checksum='' or isnull(f.backup_checksum))
+    where d.id=f.dir_id and d.amazon_bucket!='' and
+    d.amazon_bucket != 'none' and
+    (f.backup_checksum='' or isnull(f.backup_checksum))
     ");
 }
 else if($p == "updateHashBackup")
@@ -27,14 +29,24 @@ else if($p == "updateHashBackup")
    print $input."<br>";
    print $dirname."<br>";
    print $hashstr."<br>";
-   $data=$query->queryTable("
-   SET SQL_SAFE_UPDATES = 0;
+   print "<br><br>
    UPDATE  ngs_fastq_files nff, 
    (SELECT nff.id FROM ngs_fastq_files nff, ngs_dirs nd
    where nff.dir_id = nd.id AND 
    nff.file_name='$input' AND 
    nd.fastq_dir='$dirname') a 
-   set nff.backup_checksum='$hashstr'
+   set nff.backup_checksum='$hashstr',
+   date_modified=NOW()
+   where a.id=nff.id
+   ";
+   $data=$query->queryTable("
+   UPDATE  ngs_fastq_files nff, 
+   (SELECT nff.id FROM ngs_fastq_files nff, ngs_dirs nd
+   where nff.dir_id = nd.id AND 
+   nff.file_name='$input' AND 
+   nd.fastq_dir='$dirname') a 
+   set nff.backup_checksum='$hashstr',
+   date_modified=NOW()
    where a.id=nff.id
    ");
 }
