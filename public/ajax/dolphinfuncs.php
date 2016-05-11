@@ -38,6 +38,31 @@ else if($p == "updateHashBackup")
    where a.id=nff.id
    ");
 }
+else if ($p == "getSelectedFileList")
+{
+    if (isset($_GET['samples'])){$samples = rawurldecode($_GET['samples']);}
+    $data=$query->queryTable("
+    SELECT d.backup_dir, f.file_name
+    FROM ngs_fastq_files f, ngs_dirs d 
+    where d.id=f.dir_id and f.sample_id in ($samples)
+    ");
+}
+else if ($p == "updateRecheckChecksum")
+{
+    if (isset($_GET['input'])){$input = rawurldecode($_GET['input']);}
+    if (isset($_GET['dirname'])){$dirname = rawurldecode($_GET['dirname']);}
+    if (isset($_GET['hashstr'])){$hashstr = rawurldecode($_GET['hashstr']);}
+    $data=$query->queryTable("
+    SET SQL_SAFE_UPDATES = 0;
+    UPDATE  ngs_fastq_files nff, 
+    (SELECT nff.id FROM ngs_fastq_files nff, ngs_dirs nd
+    where nff.dir_id = nd.id AND 
+    nff.file_name='$input' AND 
+    nd.backup_dir='$dirname') a 
+    set nff.checksum_recheck='$hashstr'
+    where a.id=nff.id
+    ");
+}
 
 if (!headers_sent()) {
    header('Cache-Control: no-cache, must-revalidate');
