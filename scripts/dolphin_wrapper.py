@@ -442,16 +442,22 @@ class Dolphin:
       except Exception, ex:
         self.stop_err('Error (line:%s)running writePicardWorkflow\n%s'%(format(sys.exc_info()[-1].tb_lineno), str(ex)))
 
-    def writeDedupForRSEM(self, pipe, type, fp, sep):
+    def writeDedupForRSEM(self, pipe, runparams, type, fp, sep):
       try:
+        type = "rsem_ref.transcripts"
         if ('CustomGenomeIndex' in pipe and pipe['CustomGenomeIndex'].lower()!="none"): 
             indexsuffix = pipe['CustomGenomeIndex']
             indexname = os.path.basename(indexsuffix)
+            type = indexname
         else:
             indexname = "RSEMBAM"
 
         self.prf( fp, stepSeqMapping % locals() )
+        if ('split' in runparams and runparams['split'].lower() != 'none'):
+            self.prf( fp, '%s'%(stepMergeBAM % locals()) )
+            type = "merge" + type
         self.writePicard (fp, type, pipe, sep )
+        return type
       except Exception, ex:
         self.stop_err('Error (line:%s)running dedupForRSEM\n%s'%(format(sys.exc_info()[-1].tb_lineno), str(ex)))
 
@@ -503,23 +509,12 @@ class Dolphin:
                  bamsupport="no"
                  type="rsem"
                  previousrsem = "@PREVIOUSRSEM"
-                 if ('split' in runparams and runparams['split'].lower() != 'none'  and 'MarkDuplicates' in pipe and pipe['MarkDuplicates'].lower() == 'yes'):
-                     type = "rsem_ref.transcripts"
-                     if ('CustomGenomeIndex' in pipe and pipe['CustomGenomeIndex'].lower()!="none"):
-                          indexsuffix = pipe['CustomGenomeIndex']
-                          type = os.path.basename(indexsuffix)
-                     self.prf( fp, '%s'%(stepMergeBAM % locals()) )
-                     previousrsem="merge"+type
 
                  if('MarkDuplicates' in pipe and pipe['MarkDuplicates'].lower()=='yes'):
                      genome_bam="no"
                      bamsupport="yes"
-                     type = "rsem_ref.transcripts"
-                     if ('CustomGenomeIndex' in pipe and pipe['CustomGenomeIndex'].lower()!="none"):
-                          indexsuffix = pipe['CustomGenomeIndex']
-                          type = os.path.basename(indexsuffix)
-                     self.writeDedupForRSEM(pipe, type, fp, sep)
-                     previousrsem = "dedup" + previousrsem 
+                     type = self.writeDedupForRSEM(pipe, runparams, type, fp, sep)
+                     previousrsem = "dedup" + type
                      type=previousrsem
 
                      
