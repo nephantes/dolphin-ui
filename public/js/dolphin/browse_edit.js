@@ -339,3 +339,16 @@ function resubmitAmazon(){
 			}
 	});
 }
+
+function recheckChecksum() {
+	$.ajax({ type: "GET",
+		url: BASE_PATH+"/public/ajax/browse_edit.php",
+		data: { p: 'checksum_recheck', samples: checklist_samples.toString() },
+		async: false,
+		success : function(s)
+		{
+			console.log(s);
+			window.location.reload();
+		}
+	});
+}

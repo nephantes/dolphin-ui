@@ -187,6 +187,14 @@ else if ($p == 'amazon_reupload')
 	pclose($PID_COMMAND);
 	$data = json_encode($cmd);
 }
+else if ($p == "checksum_recheck")
+{
+	if (isset($_GET['samples'])){$samples = $_GET['samples'];}
+	$cmd = "cd ../../scripts && mkdir -p ../tmp/logs/checksum_recheck && python md5sum_check.py ".BASE_PATH." $samples  2>&1 > ../tmp/logs/checksum_recheck/".date("Y_m_d_H_i").".log &";
+	$PID_COMMAND = popen( $cmd, "r" );
+	pclose($PID_COMMAND);
+	$data = json_encode($cmd);
+}
 
 if (!headers_sent()) {
    header('Cache-Control: no-cache, must-revalidate');
