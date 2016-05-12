@@ -10,6 +10,7 @@ var libraries = [];
 var table_array = [];
 var currentResultSelection = '--- Select a Result ---';
 var tableDirectionNum = 0;
+var RNA_count = 0;
 var type_dictionary = ['rRNA', 'miRNA', 'piRNA', 'tRNA', 'snRNA', 'rmsk', 'ercc'];
 
 function parseTSV(jsonName, url_path){
@@ -36,6 +37,7 @@ function parseMoreTSV(jsonNameArray, url_path){
 			async: false,
 			success : function(s)
 			{
+				console.log(s);
 				for( var j = 0; j < s.length; j++){
 					var parsed = [];
 					for(var k = 0; k < jsonNameArray.length; k++){
@@ -511,6 +513,124 @@ function numberWithCommas(x) {
 	return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
 }
 
+function populateTable(summary_files) {
+	var tophatCheck = true;
+	var tophatCount = 0;
+	var rsemCheck = true;
+	var rsemCount = 0;
+	for (var z = 0; z < summary_files.length; z++) {
+		if (/rsem/.test(summary_files[z]['file'])) {
+			tophatCount++;
+		}else if (/rsem/.test(summary_files[z]['file'])) {
+			rsemCount++;
+		}
+	}
+	if (tophatCount > 1) {
+		tophatCheck = false;
+	}
+	if (rsemCount > 1) {
+		rsemCheck = false;
+	}
+	
+	if (summary_files.length > 0) {
+		document.getElementById('tablerow').appendChild(createElement('th', ['id'], ['unused']));
+		document.getElementById('unused').innerHTML = 'Reads Left';
+		document.getElementById('tablerow').appendChild(createElement('th', ['id'], ['selection']));
+		document.getElementById('selection').innerHTML = 'Selected';
+		for (var z = 0; z < summary_files.length; z++) {
+			if (z == 0){
+				if (summary_files.length == 1) {
+					var table_array_raw = (parseMoreTSV(['File','Total Reads','Reads 1','Reads >1','Unmapped Reads'], summary_files[z]['file']));
+					for(var x = 0; x < table_array_raw.length; x++){
+						var table_array_push = [table_array_raw[x][0], table_array_raw[x][1], parseInt(table_array_raw[x][2].split(" ")[0]) + parseInt(table_array_raw[x][3].split(" ")[0]), table_array_raw[x][4].split(" ")[0]];
+						table_array.push(table_array_push);
+					}
+				}else{
+					var table_array_raw = (parseMoreTSV(['File','Total Reads','Reads 1','Reads >1'], summary_files[z]['file']));
+					for(var x = 0; x < table_array_raw.length; x++){
+						var table_array_push = [table_array_raw[x][0], table_array_raw[x][1], parseInt(table_array_raw[x][2].split(" ")[0]) + parseInt(table_array_raw[x][3].split(" ")[0])];
+						table_array.push(table_array_push);
+					}
+				}
+			}else if (/RNA/.test(summary_files[z]['file'])) {
+				if (RNA_count == z + 1) {
+					console.log(summary_files[z]['file']);
+					var parsed_add = parseMoreTSV(['Reads 1','Reads >1','Unmapped Reads'], summary_files[z]['file']);
+					for(var x = 0; x < table_array.length; x ++){
+						var concat_array = table_array[x];
+						table_array[x] = concat_array.concat([parseInt(parsed_add[x][0].split(" ")[0]) + parseInt(parsed_add[x][1].split(" ")[0]), parsed_add[x][2].split(" ")[0]]);
+					}
+				}else{
+					var parsed_add = parseMoreTSV(['Reads 1','Reads >1'], summary_files[z]['file']);
+					for(var x = 0; x < table_array.length; x ++){
+						var concat_array = table_array[x];
+						table_array[x] = concat_array.concat([ parseInt(parsed_add[x][0].split(" ")[0]) + parseInt(parsed_add[x][1].split(" ")[0]) ]);
+					}
+				}
+			}else if (/picard/.test(summary_files[z]['file'])){
+				var parsed_add = parseMoreTSV(['Reads 1','Reads >1'], summary_files[z]['file']);
+				for(var x = 0; x < table_array.length; x ++){
+					var concat_array = table_array[x];
+					table_array[x] = concat_array.concat([ parseInt(parsed_add[x][0].split(" ")[0]) + parseInt(parsed_add[x][1].split(" ")[0]) ]);
+				}
+			}else if (/tophat/.test(summary_files[z]['file'])){
+				var parsed_add = parseMoreTSV(['Reads 1','Reads >1'], summary_files[z]['file']);
+				for(var x = 0; x < table_array.length; x ++){
+					var concat_array = table_array[x];
+					table_array[x] = concat_array.concat([ parseInt(parsed_add[x][0].split(" ")[0]) + parseInt(parsed_add[x][1].split(" ")[0]) ]);
+				}
+			}else if (/rsem/.test(summary_files[z]['file'])){
+				var parsed_add = parseMoreTSV(['Reads 1','Reads >1'], summary_files[z]['file']);
+				for(var x = 0; x < table_array.length; x ++){
+					var concat_array = table_array[x];
+					table_array[x] = concat_array.concat([ parseInt(parsed_add[x][0].split(" ")[0]) + parseInt(parsed_add[x][1].split(" ")[0]) ]);
+				}
+			}else if (/chip/.test(summary_files[z]['file'])){
+				var parsed_add = parseMoreTSV(['Reads 1','Reads >1'], summary_files[z]['file']);
+				for(var x = 0; x < table_array.length; x ++){
+					var concat_array = table_array[x];
+					table_array[x] = concat_array.concat([ parseInt(parsed_add[x][0].split(" ")[0]) + parseInt(parsed_add[x][1].split(" ")[0]) ]);
+				}
+			}
+		}
+		
+		var separator = 3;
+		if (table_array.length == 1) {
+			separator = 4;
+		}
+		//Initial Mapping Results
+		var reports_table = $('#jsontable_initial_mapping').dataTable();
+		reports_table.fnClearTable();
+		document.getElementById('jsontable_initial_mapping').setAttribute('style','overflow-x:scroll');
+		for (var x = 0; x < (table_array.length); x++) {
+			var row_array = table_array[x];
+			var reads_total = row_array[1];
+			row_array[1] = numberWithCommas(row_array[1]);
+			for(var y = 2; y < row_array.length; y++){
+				row_array[y] = numberWithCommas(row_array[y] + " (" + ((row_array[y]/reads_total)*100).toFixed(2) + " %)");
+			}
+			row_array.push("<input type=\"checkbox\" class=\"ngs_checkbox\" name=\"" + row_array[0] + "\" id=\"lib_checkbox_"+x+"\" onClick=\"storeLib(this.name)\">");
+			reports_table.fnAddData(row_array);
+		}
+		createDropdown(summary_rna_type, 'initial_mapping');
+	}else if (read_counts.length > 0) {
+		var reports_table = $('#jsontable_initial_mapping').dataTable();
+		reports_table.fnClearTable();
+		for(var y = 0; y < read_counts.length; y++){
+			if (samplenames[y] == '' || samplenames[y] == null || samplenames[y] == undefined) {
+				reports_table.fnAddData([libraries[y], numberWithCommas(read_counts[y])]);
+			}else{
+				reports_table.fnAddData([samplenames[y], numberWithCommas(read_counts[y])]);
+			}
+		}
+	}else{
+		document.getElementById('empty_div').innerHTML = '<h3 class="text-center">Your results have not been generated yet.  If your run has errored out, please contact your Dolphin Admin.' +
+				'  If your run is currently running or queued, please be patient as the data is being generated.</h3>';
+		document.getElementById('send_to_plots').disabled = true;
+		document.getElementById('initial_mapping_exp').remove();
+	}
+}
+
 $(function() {
 	"use strict";
 	if (phpGrab.theSegment == 'report') {
@@ -565,12 +685,24 @@ $(function() {
 		});
 		
 		var summary_rna_type = [];
+		console.log(summary_files)
 		for (var z = 0; z < summary_files.length; z++) {
-			summary_rna_type.push(summary_files[z]['file'].split("/")[summary_files[z]['file'].split("/").length - 1].split(".")[0]);
-		}
-		for (var z = 0; z < summary_files.length; z++) {
-			document.getElementById('tablerow').appendChild(createElement('th', ['id'], [summary_rna_type[z]]));
-			document.getElementById(summary_rna_type[z]).innerHTML = summary_rna_type[z];
+			if (/RNA/.test(summary_files[z]['file'])) {
+				var RNA = summary_files[z]['file'].split("/")[summary_files[z]['file'].split("/").length - 1].split(".")[0];
+				summary_rna_type.push(RNA);
+				document.getElementById('tablerow').appendChild(createElement('th', ['id'], [RNA]));
+				document.getElementById(summary_rna_type[z]).innerHTML = RNA;
+				RNA_count++;
+			}else if (/tophat/.test(summary_files[z]['file'])){
+				document.getElementById('tablerow').appendChild(createElement('th', ['id'], ['Genomic Reads Aligned']));
+				document.getElementById(summary_rna_type[z]).innerHTML = 'Genomic Reads Aligned';
+			}else if (/rsem/.test(summary_files[z]['file'])){
+				document.getElementById('tablerow').appendChild(createElement('th', ['id'], ['Transcriptomic Reads Aligned']));
+				document.getElementById(summary_rna_type[z]).innerHTML = 'Transcriptomic Reads Aligned';
+			}else if (/chip/.test(summary_files[z]['file'])){
+				document.getElementById('tablerow').appendChild(createElement('th', ['id'], ['Transcriptomic Reads Aligned']));
+				document.getElementById(summary_rna_type[z]).innerHTML = 'Transcriptomic Reads Aligned';
+			}
 		}
 		
 		var samplenames = [];
@@ -606,80 +738,10 @@ $(function() {
 					}
 				}
 		});
-		
+		console.log(read_counts)
 		console.log(summary_files);
 		
-		if (summary_files.length > 0) {
-			document.getElementById('tablerow').appendChild(createElement('th', ['id'], ['unused']));
-			document.getElementById('unused').innerHTML = 'Reads Left';
-			document.getElementById('tablerow').appendChild(createElement('th', ['id'], ['selection']));
-			document.getElementById('selection').innerHTML = 'Selected';
-			for (var z = 0; z < summary_files.length; z++) {
-				if (z == 0){
-					if (summary_files.length == 1) {
-						var table_array_raw = (parseMoreTSV(['File','Total Reads','Reads 1','Reads >1','Unmapped Reads'], summary_files[z]['file']));
-						for(var x = 0; x < table_array_raw.length; x++){
-							var table_array_push = [table_array_raw[x][0], table_array_raw[x][1], parseInt(table_array_raw[x][2].split(" ")[0]) + parseInt(table_array_raw[x][3].split(" ")[0]), table_array_raw[x][4].split(" ")[0]];
-							table_array.push(table_array_push);
-						}
-					}else{
-						var table_array_raw = (parseMoreTSV(['File','Total Reads','Reads 1','Reads >1'], summary_files[z]['file']));
-						for(var x = 0; x < table_array_raw.length; x++){
-							var table_array_push = [table_array_raw[x][0], table_array_raw[x][1], parseInt(table_array_raw[x][2].split(" ")[0]) + parseInt(table_array_raw[x][3].split(" ")[0])];
-							table_array.push(table_array_push);
-						}
-					}
-				}else if (z == summary_files.length - 1) {
-					console.log(summary_files[z]['file']);
-					var parsed_add = parseMoreTSV(['Reads 1','Reads >1','Unmapped Reads'], summary_files[z]['file']);
-					for(var x = 0; x < table_array.length; x ++){
-						var concat_array = table_array[x];
-						table_array[x] = concat_array.concat([parseInt(parsed_add[x][0].split(" ")[0]) + parseInt(parsed_add[x][1].split(" ")[0]), parsed_add[x][2].split(" ")[0]]);
-					}
-				}else{
-					var parsed_add = parseMoreTSV(['Reads 1','Reads >1'], summary_files[z]['file']);
-					for(var x = 0; x < table_array.length; x ++){
-						var concat_array = table_array[x];
-						table_array[x] = concat_array.concat([ parseInt(parsed_add[x][0].split(" ")[0]) + parseInt(parsed_add[x][1].split(" ")[0]) ]);
-					}
-				}
-			}
-			
-			var separator = 3;
-			if (table_array.length == 1) {
-				separator = 4;
-			}
-			//Initial Mapping Results
-			var reports_table = $('#jsontable_initial_mapping').dataTable();
-			reports_table.fnClearTable();
-			document.getElementById('jsontable_initial_mapping').setAttribute('style','overflow-x:scroll');
-			for (var x = 0; x < (table_array.length); x++) {
-				var row_array = table_array[x];
-				var reads_total = row_array[1];
-				row_array[1] = numberWithCommas(row_array[1]);
-				for(var y = 2; y < row_array.length; y++){
-					row_array[y] = numberWithCommas(row_array[y] + " (" + ((row_array[y]/reads_total)*100).toFixed(2) + " %)");
-				}
-				row_array.push("<input type=\"checkbox\" class=\"ngs_checkbox\" name=\"" + row_array[0] + "\" id=\"lib_checkbox_"+x+"\" onClick=\"storeLib(this.name)\">");
-				reports_table.fnAddData(row_array);
-			}
-			createDropdown(summary_rna_type, 'initial_mapping');
-		}else if (read_counts.length > 0) {
-			var reports_table = $('#jsontable_initial_mapping').dataTable();
-			reports_table.fnClearTable();
-			for(var y = 0; y < read_counts.length; y++){
-				if (samplenames[y] == '' || samplenames[y] == null || samplenames[y] == undefined) {
-					reports_table.fnAddData([libraries[y], numberWithCommas(read_counts[y])]);
-				}else{
-					reports_table.fnAddData([samplenames[y], numberWithCommas(read_counts[y])]);
-				}
-			}
-		}else{
-			document.getElementById('empty_div').innerHTML = '<h3 class="text-center">Your results have not been generated yet.  If your run has errored out, please contact your Dolphin Admin.' +
-					'  If your run is currently running or queued, please be patient as the data is being generated.</h3>';
-			document.getElementById('send_to_plots').disabled = true;
-			document.getElementById('initial_mapping_exp').remove();
-		}
+		populateTable(summary_files);
 		
 		//Create a check for FASTQC output????
 		if (getFastQCBool(run_id)) {
