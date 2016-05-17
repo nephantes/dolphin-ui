@@ -440,7 +440,6 @@ class Dolphin:
         if (('CollectRnaSeqMetrics' in pipe and pipe['CollectRnaSeqMetrics'].lower()=="yes") or ('CollectMultipleMetrics' in pipe and pipe['CollectMultipleMetrics'].lower()=="yes")):
             self.prf( fp, stepMergePicard % locals())
             self.prf( fp, stepPCRDups % locals())
-            self.runSQL("insert into report_list (wkey, version, type, file) values ('"+ self.params_section[0]+"', 'picard_tools_1.131', 'summary', 'picard_"+type+"/pcrdups.txt')")
       except Exception, ex:
         self.stop_err('Error (line:%s)running writePicardWorkflow\n%s'%(format(sys.exc_info()[-1].tb_lineno), str(ex)))
 
@@ -523,7 +522,6 @@ class Dolphin:
                  rsemref = (pipe['CustomGenomeIndex'] if ('CustomGenomeIndex' in pipe and pipe['CustomGenomeIndex'].lower()!="none") else "@RSEMREF" )
 
                  self.prf( fp, stepRSEM % locals() )
-                 #self.runSQL("insert into report_list (wkey, version, type, file) values ('"+ self.params_section[0]+"', 'samtools', 'summary', '"+type+"/*.flagstat.txt')")
                  gis = ("genes","isoforms")
                  tes = ("expected_count", "tpm") 
 
@@ -548,7 +546,6 @@ class Dolphin:
                     type="dedup"+type
                  self.writeVisualizationStr( fp, type, pipe, sep )
                  self.writeRSeQC ( fp, type, pipe, sep )
-                 self.runSQL("insert into report_list (wkey, version, type, file) values ('"+ self.params_section[0]+"', 'samtools', 'summary', '"+type+"/*.flagstat.txt')")
 
               if (pipe['Type'] == "DESeq"):
                  deseq_name =( pipe['Name'] if ('Name' in pipe) else '' )
