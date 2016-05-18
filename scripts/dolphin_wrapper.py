@@ -436,10 +436,10 @@ class Dolphin:
             self.prf( fp, stepPicard % locals() if ((metric in pipe and pipe[metric].lower()=="yes")) else None )
             if ("MarkDuplicates" in pipe and pipe['MarkDuplicates'].lower()=="yes"):
                 type = "dedup"+initialtype
+                self.prf( fp, stepPCRDups % locals())
         
         if (('CollectRnaSeqMetrics' in pipe and pipe['CollectRnaSeqMetrics'].lower()=="yes") or ('CollectMultipleMetrics' in pipe and pipe['CollectMultipleMetrics'].lower()=="yes")):
             self.prf( fp, stepMergePicard % locals())
-            self.prf( fp, stepPCRDups % locals())
       except Exception, ex:
         self.stop_err('Error (line:%s)running writePicardWorkflow\n%s'%(format(sys.exc_info()[-1].tb_lineno), str(ex)))
 
