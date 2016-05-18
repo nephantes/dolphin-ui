@@ -437,8 +437,9 @@ class Dolphin:
             if ("MarkDuplicates" in pipe and pipe['MarkDuplicates'].lower()=="yes"):
                 type = "dedup"+initialtype
         
-        self.prf( fp, stepMergePicard % locals() if (('CollectRnaSeqMetrics' in pipe and pipe['CollectRnaSeqMetrics'].lower()=="yes") or ('CollectMultipleMetrics' in pipe and pipe['CollectMultipleMetrics'].lower()=="yes")) else None )
-     
+        if (('CollectRnaSeqMetrics' in pipe and pipe['CollectRnaSeqMetrics'].lower()=="yes") or ('CollectMultipleMetrics' in pipe and pipe['CollectMultipleMetrics'].lower()=="yes")):
+            self.prf( fp, stepMergePicard % locals())
+            self.prf( fp, stepPCRDups % locals())
       except Exception, ex:
         self.stop_err('Error (line:%s)running writePicardWorkflow\n%s'%(format(sys.exc_info()[-1].tb_lineno), str(ex)))
 
@@ -543,7 +544,6 @@ class Dolphin:
                  self.writePicard (fp, type, pipe, sep )
                  if ("MarkDuplicates" in pipe and pipe['MarkDuplicates'].lower()=="yes"):
                     type="dedup"+type
-
                  self.writeVisualizationStr( fp, type, pipe, sep )
                  self.writeRSeQC ( fp, type, pipe, sep )
 

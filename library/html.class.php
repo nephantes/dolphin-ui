@@ -1040,7 +1040,7 @@ Single End Example:
 				<div id="'.$id.'_exp_body" class="box-solid box-body" style="'.$exp_body.'">';
 				
 				if($id == "initial_mapping"){
-					$html.= $this->getInitialMappingTable();
+					$html.= $this->getInitialMapping();
 				}else if ($id == 'table_create'){
 					if(!isset($_SESSION['ngs_samples'])){	
 						$html .= $this->getRespBoxTableStream("Samples", "samples", ["id","Sample Name","Title","Source","Organism","Molecule","Selected"], ["id","name","title","source","organism","molecule","total_reads"]);
@@ -1073,6 +1073,29 @@ Single End Example:
 		</table>';
 		
 	return $html;
+	}
+	function getInitialMapping(){
+		$html = '';
+		$html.= '<div class="nav-tabs-custom">
+					<ul id="tabList" class="nav nav-tabs">
+						<li class="active">
+							<a href="#table" data-toggle="tab" aria-expanded="true">Tables</a>
+						</li>
+						<li class>
+							<a href="#plots" data-toggle="tab" aria-expanded="true">Plots</a>
+						</li>
+					</ul>
+					<div class="tab-content">
+						<div class="tab-pane active" id="table">';
+		$html.= $this->getInitialMappingTable();				
+		$html.= ' 		</div>
+						<div class="tab-pane active" id="plots">
+							<div id="plot_container" style="min-width: 310px;margin: 0 auto">
+							</div>
+						</div>
+					</div>
+				</div>';
+		return $html;
 	}
 	function getPipelinesButton(){
 	$html = '';
