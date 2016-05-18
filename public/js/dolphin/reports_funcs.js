@@ -802,7 +802,7 @@ $(function() {
 				rsem_toggle = true;
 				rsem_categories.push(sample_obj);
 				for (var data in table_data[sample_obj]) {
-					if (/RNA/.test(data) || /rsem/.test(data)) {
+					if (/RNA/.test(data) || /rsem/.test(data) || /rmsk/.test(data) || /ercc/.test(data) || /genome/.test(data)) {
 						if (rsem_series[data] == undefined) {
 							var name = data;
 							if (data == 'rsem') {
@@ -822,8 +822,9 @@ $(function() {
 				tophat_toggle = true;
 				tophat_categories.push(sample_obj);
 				for (var data in table_data[sample_obj]) {
-					if (/RNA/.test(data) || /tophat/.test(data)) {
+					if (/RNA/.test(data) || /tophat/.test(data) || /rmsk/.test(data) || /ercc/.test(data) || /genome/.test(data)) {
 						if (tophat_series[data] == undefined) {
+							var name = data;
 							if (data == 'tophat') {
 								name = 'reads mapped'
 							}else if (data == 'tophat_dedup') {
@@ -841,8 +842,9 @@ $(function() {
 				chip_toggle = true;
 				chip_categories.push(sample_obj);
 				for (var data in table_data[sample_obj]) {
-					if (/RNA/.test(data) || /tophat/.test(data)) {
+					if (/RNA/.test(data) || /chip/.test(data) || /rmsk/.test(data) || /ercc/.test(data) || /genome/.test(data)) {
 						if (chip_series[data] == undefined) {
+							var name = data;
 							if (data == 'chip') {
 								name = 'reads mapped'
 							}else if (data == 'chip_dedup') {
@@ -884,29 +886,7 @@ $(function() {
 			}
 			createHighchart(chip_categories, chip_final_series, 'Distribution of Chip Reads', 'Percentage of Reads', 'plots', 'chip_plot');
 		}
-		/*
-		var categories = ['sample_1 (Genome)', 'sample_1 (Transcript)', 'sample_2 (Genome)', 'sample_2 (Transcript)', 'sample_3 (Genome)', 'sample_3 (Transcript)',
-						'sample_4 (Genome)', 'sample_4 (Transcript)', 'sample_5 (Genome)', 'sample_5 (Transcript)', 'sample_6 (Genome)', 'sample_6 (Transcript)'];
-		var series = [{
-				name: 'rRNA',
-				data: [5, 5, 4, 4, 2, 2, 5, 5, 4, 4, 2, 2]
-			}, {
-				name: 'tRNA',
-				data: [2, 2, 3, 3, 1, 1, 5, 5, 4, 4, 2, 2]
-			}, {
-				name: 'Reads mapped',
-				data: [60, 50, 40, 40, 50, 50, 55, 59, 42, 44, 28, 29]
-			}, {
-				name: 'Reads deduped',
-				data: [13, 13, 12, 12, 13, 13, 15, 15, 14, 14, 12, 12]
-			}];
-		var title = 'test title';
-		var yaxis = 'yaxis';
-		var master_container = 'plots';
-		var container = 'test_plot';
-		createHighchart(categories, series, title, yaxis, master_container, container);
-		createHighchart(categories, series, title, yaxis, master_container, container + '2');
-		*/
+		
 		//Create a check for FASTQC output????
 		if (getFastQCBool(run_id)) {
 			createSummary(true);
