@@ -317,7 +317,7 @@ class Dolphin:
                    filter_out="0"
                    name="RSEMBAM"
                    if ('CustomGenomeIndex' in pipe and pipe['CustomGenomeIndex'].lower()!="none"): 
-                       indexsuffix = pipe['CustomGenomeIndex'] 
+                       indexsuffix = pipe['CustomGenomeIndex'] + ".transcripts"
                        indexname = os.path.basename(indexsuffix)
                        name = indexname
                    else:
@@ -447,7 +447,7 @@ class Dolphin:
       try:
         type = "rsem_ref.transcripts"
         if ('CustomGenomeIndex' in pipe and pipe['CustomGenomeIndex'].lower()!="none"): 
-            indexsuffix = pipe['CustomGenomeIndex']
+            indexsuffix = pipe['CustomGenomeIndex'] + ".transcripts"
             indexname = os.path.basename(indexsuffix)
             type = indexname
         else:
