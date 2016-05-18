@@ -705,6 +705,7 @@ $(function() {
 		});
 		
 		var summary_rna_type = [];
+		var non_rna_object = {}
 		console.log(summary_files)
 		for (var z = 0; z < summary_files.length; z++) {
 			if (/RNA/.test(summary_files[z]['file'])) {
@@ -722,39 +723,45 @@ $(function() {
 				}
 			}else if (/flagstat/.test(summary_files[z]['file'])){
 				if (/rsem/.test(summary_files[z]['file'])){
-					if (document.getElementById('Transcriptomic Reads Aligned (RSEM)') == undefined) {
-						document.getElementById('tablerow').appendChild(createElement('th', ['id'], ['Transcriptomic Reads Aligned (RSEM)']));
-						document.getElementById('Transcriptomic Reads Aligned (RSEM)').innerHTML = 'Transcriptomic Reads Aligned (RSEM)';
-					}
+					non_rna_object['rsem'] = true;
 				}else if (/tophat/.test(summary_files[z]['file'])){
-					if (document.getElementById('Genomic Reads Aligned (Tophat)') == undefined) {
-						document.getElementById('tablerow').appendChild(createElement('th', ['id'], ['Genomic Reads Aligned (Tophat)']));
-						document.getElementById('Genomic Reads Aligned (Tophat)').innerHTML = 'Genomic Reads Aligned (Tophat)';
-					}
+					non_rna_object['tophat'] = true;
 				}else if (/chip/.test(summary_files[z]['file'])){
-					if (document.getElementById('Genomic Reads Aligned (Chip)') == undefined) {
-						document.getElementById('tablerow').appendChild(createElement('th', ['id'], ['Genomic Reads Aligned (Chip)']));
-						document.getElementById('Genomic Reads Aligned (Chip)').innerHTML = 'Genomic Reads Aligned (Chip)';
-					}
+					non_rna_object['chip'] = true;
 				}
 			}else if (/picard/.test(summary_files[z]['file'])){
 				if (/rsem/.test(summary_files[z]['file'])){
-					if (document.getElementById('Deduplicated Reads (RSEM)') == undefined) {
-					document.getElementById('tablerow').appendChild(createElement('th', ['id'], ['Deduplicated Reads (RSEM)']));
-					document.getElementById('Deduplicated Reads (RSEM)').innerHTML = 'Deduplicated Reads (RSEM)';
-				}
+					non_rna_object['rsem_dedup'] = true;
 				}else if (/tophat/.test(summary_files[z]['file'])){
-					if (document.getElementById('Deduplicated Reads (Tophat)') == undefined) {
-					document.getElementById('tablerow').appendChild(createElement('th', ['id'], ['Deduplicated Reads (Tophat)']));
-					document.getElementById('Deduplicated Reads (Tophat)').innerHTML = 'Deduplicated Reads (Tophat)';
-				}
+					non_rna_object['tophat_dedup'] = true;
 				}else if (/chip/.test(summary_files[z]['file'])){
-					if (document.getElementById('Deduplicated Reads (Chip)') == undefined) {
-					document.getElementById('tablerow').appendChild(createElement('th', ['id'], ['Deduplicated Reads (Chip)']));
-					document.getElementById('Deduplicated Reads (Chip)').innerHTML = 'Deduplicated Reads (Chip)';
-				}
+					non_rna_object['chip_dedup'] = true;
 				}
 			}
+		}
+		if (non_rna_object['rsem']){
+			document.getElementById('tablerow').appendChild(createElement('th', ['id'], ['Transcriptomic Reads Aligned (RSEM)']));
+			document.getElementById('Transcriptomic Reads Aligned (RSEM)').innerHTML = 'Transcriptomic Reads Aligned (RSEM)';
+		}
+		if (non_rna_object['rsem_dedup']){
+			document.getElementById('tablerow').appendChild(createElement('th', ['id'], ['Deduplicated Reads (RSEM)']));
+			document.getElementById('Deduplicated Reads (RSEM)').innerHTML = 'Deduplicated Reads (RSEM)';
+		}
+		if (non_rna_object['tophat']){
+			document.getElementById('tablerow').appendChild(createElement('th', ['id'], ['Genomic Reads Aligned (Tophat)']));
+			document.getElementById('Genomic Reads Aligned (Tophat)').innerHTML = 'Genomic Reads Aligned (Tophat)';
+		}
+		if (non_rna_object['tophat_dedup']){
+			document.getElementById('tablerow').appendChild(createElement('th', ['id'], ['Deduplicated Reads (Tophat)']));
+			document.getElementById('Deduplicated Reads (Tophat)').innerHTML = 'Deduplicated Reads (Tophat)';
+		}
+		if (non_rna_object['chip']){
+			document.getElementById('tablerow').appendChild(createElement('th', ['id'], ['Genomic Reads Aligned (Chip)']));
+			document.getElementById('Genomic Reads Aligned (Chip)').innerHTML = 'Genomic Reads Aligned (Chip)';
+		}
+		if (non_rna_object['chip_dedup']){
+			document.getElementById('tablerow').appendChild(createElement('th', ['id'], ['Deduplicated Reads (Chip)']));
+			document.getElementById('Deduplicated Reads (Chip)').innerHTML = 'Deduplicated Reads (Chip)';
 		}
 		
 		var samplenames = [];
