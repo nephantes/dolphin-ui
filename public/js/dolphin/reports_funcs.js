@@ -332,6 +332,33 @@ function showTable(type){
 		if (temp_libs.length <= 0) {
 			lib_checklist = [];
 		}
+		
+		if (type == 'rseqc' && /counts.tsv/.test(currentResultSelection)) {
+			var name_gather_bool = true;
+			var rseqc_categories = [];
+			var rseqc_series = [];
+			for (var cat in objList) {
+				var series_object = {};
+				var data_array = [];
+				for (ser in objList[cat]) {
+					if (ser == 'region') {
+						series_object['name'] = objList[cat][ser];
+					}else{
+						if (name_gather_bool) {
+							rseqc_categories.push(ser);
+						}
+						data_array.push(parseInt(objList[cat][ser]));
+					}
+				}
+				name_gather_bool = false;
+				series_object['data'] = data_array;
+				rseqc_series.push(series_object);
+			}
+			console.log(rseqc_categories)
+			console.log(rseqc_series)
+			createHighchart(rseqc_categories, rseqc_series, 'RSeQC Count Results', 'Comparitive Sample Percentages', 'rseqc_table_div', 'rseqc_plot', 'normal');
+			showHighchart('rseqc_table_div');
+		}
 	}else{
 		var masterDiv = document.getElementById('select_'+type+'_div');
 		if (document.getElementById('clear_' + type + '_button_div') == null) {
@@ -486,7 +513,6 @@ function downloadReports(buttonType, type){
 	var URL = API_PATH + '/public/api/?source=' + API_PATH + '/public/pub/' + wkey + '/' + temp_currentResultSelection + '&format=' + buttonType;
 	if (buttonType == 'debrowser') {
         URL = API_PATH + '/public/api/?source=' + API_PATH + '/public/pub/' + wkey + '/' + temp_currentResultSelection + '&format=JSON';
-		console.log(URL);
 		$.ajax({ type: "GET",
                         url: BASE_PATH+"/public/ajax/sessionrequests.php",
                         data: { p: "sendToDebrowser", table: URL },
@@ -546,7 +572,7 @@ function numberWithCommas(x) {
 function populateTable(summary_files, samplenames, libraries, read_counts) {
 	var RNA_types = [];
 	for (var z = 0; z < summary_files.length; z++) {
-		if (/RNA/.test(summary_files[z]['file'])) {
+		if (/RNA/.test(summary_files[z]['file']) || /ercc/.test(summary_files[z]['file']) || /rmsk/.test(summary_files[z]['file'])) {
 			RNA_types.push(summary_files[z]['file'].split("/")[1].split(".")[0]);
 		}
 	}
@@ -557,7 +583,7 @@ function populateTable(summary_files, samplenames, libraries, read_counts) {
 		}
 		
 		for (var z = 0; z < summary_files.length; z++) {
-			if (/RNA/.test(summary_files[z]['file'])) {
+			if (/RNA/.test(summary_files[z]['file']) || /ercc/.test(summary_files[z]['file']) || /rmsk/.test(summary_files[z]['file'])) {
 				var RNA_name = '';
 				for (RNA in RNA_types) {
 					if (RNA_types[RNA] == summary_files[z]['file'].split("/")[1].split(".")[0]) {
@@ -597,7 +623,6 @@ function populateTable(summary_files, samplenames, libraries, read_counts) {
 		document.getElementById('jsontable_initial_mapping').setAttribute('style','overflow-x:scroll');
 		for (key in table_data) {
 			sample_data = table_data[key];
-			console.log(sample_data)
 			row_array = [key];
 			if (sample_data['total_reads'] != undefined) { row_array.push(sample_data['total_reads']) }
 			for (RNA in RNA_types) {
@@ -621,7 +646,6 @@ function populateTable(summary_files, samplenames, libraries, read_counts) {
 	}else if (read_counts.length > 0) {
 		var reports_table = $('#jsontable_initial_mapping').dataTable();
 		reports_table.fnClearTable();
-		console.log(read_counts)
 		for(var y = 0; y < read_counts.length; y++){
 			if (samplenames[y] == '' || samplenames[y] == null || samplenames[y] == undefined) {
 				reports_table.fnAddData([libraries[y], numberWithCommas(read_counts[y])]);
@@ -706,13 +730,12 @@ $(function() {
 		
 		var summary_rna_type = [];
 		var non_rna_object = {}
-		console.log(summary_files)
 		for (var z = 0; z < summary_files.length; z++) {
-			if (/RNA/.test(summary_files[z]['file'])) {
+			if (/RNA/.test(summary_files[z]['file']) || /ercc/.test(summary_files[z]['file']) || /rmsk/.test(summary_files[z]['file'])) {
 				var RNA = summary_files[z]['file'].split("/")[summary_files[z]['file'].split("/").length - 1].split(".")[0];
 				summary_rna_type.push(RNA);
 				document.getElementById('tablerow').appendChild(createElement('th', ['id'], [RNA]));
-				document.getElementById(summary_rna_type[z]).innerHTML = RNA;
+				document.getElementById(RNA).innerHTML = RNA;
 				if (document.getElementById('unused') != undefined) {
 					document.getElementById('unused').remove();
 					document.getElementById('tablerow').appendChild(createElement('th', ['id'], ['unused']));
@@ -783,7 +806,6 @@ $(function() {
 					}
 				}
 		});
-		console.log(samplenames);
 		var read_counts = [];
 		
 		$.ajax({ type: "GET",
@@ -874,7 +896,7 @@ $(function() {
 			for (var series in rsem_series) {
 				rsem_final_series.push(rsem_series[series]);
 			}
-			createHighchart(rsem_categories, rsem_final_series, 'Distribution of RSEM Reads', 'Percentage of Reads', 'plots', 'rsem_plot');
+			createHighchart(rsem_categories, rsem_final_series, 'Distribution of RSEM Reads', 'Percentage of Reads', 'plots', 'rsem_plot', 'percent');
 		}
 		
 		if (tophat_toggle) {
@@ -883,7 +905,7 @@ $(function() {
 				tophat_final_series.push(tophat_series[series]);
 			}
 			console.log(tophat_final_series)
-			createHighchart(tophat_categories, tophat_final_series, 'Distribution of Tophat Reads', 'Percentage of Reads', 'plots', 'tophat_plot');
+			createHighchart(tophat_categories, tophat_final_series, 'Distribution of Tophat Reads', 'Percentage of Reads', 'plots', 'tophat_plot', 'percent');
 		}
 		
 		if (chip_toggle) {
@@ -891,7 +913,7 @@ $(function() {
 			for (var series in chip_series) {
 				chip_final_series.push(chip_series[series]);
 			}
-			createHighchart(chip_categories, chip_final_series, 'Distribution of Chip Reads', 'Percentage of Reads', 'plots', 'chip_plot');
+			createHighchart(chip_categories, chip_final_series, 'Distribution of Chip Reads', 'Percentage of Reads', 'plots', 'chip_plot', 'percent');
 		}
 		
 		//Create a check for FASTQC output????
