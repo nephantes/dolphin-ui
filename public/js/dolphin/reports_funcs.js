@@ -354,8 +354,9 @@ function showTable(type){
 				series_object['data'] = data_array;
 				rseqc_series.push(series_object);
 			}
-			console.log(rseqc_categories)
-			console.log(rseqc_series)
+			
+			document.getElementById('rseqc_table_div').appendChild(createElement('button', ['id', 'class', 'onclick'], ['switch_plot', 'btn btn-primary margin', 'switchStacking("rseqc_table_div", "rseqc_plot")']))
+			document.getElementById('switch_plot').innerHTML = 'Switch Plot Type';
 			createHighchart(rseqc_categories, rseqc_series, 'RSeQC Count Results', 'Comparitive Sample Percentages', 'rseqc_table_div', 'rseqc_plot', 'normal');
 			showHighchart('rseqc_table_div');
 		}
