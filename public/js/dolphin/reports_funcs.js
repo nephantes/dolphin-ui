@@ -705,6 +705,7 @@ $(function() {
 		});
 		
 		var summary_rna_type = [];
+		var non_rna_object = {}
 		console.log(summary_files)
 		for (var z = 0; z < summary_files.length; z++) {
 			if (/RNA/.test(summary_files[z]['file'])) {
@@ -722,39 +723,45 @@ $(function() {
 				}
 			}else if (/flagstat/.test(summary_files[z]['file'])){
 				if (/rsem/.test(summary_files[z]['file'])){
-					if (document.getElementById('Transcriptomic Reads Aligned (RSEM)') == undefined) {
-						document.getElementById('tablerow').appendChild(createElement('th', ['id'], ['Transcriptomic Reads Aligned (RSEM)']));
-						document.getElementById('Transcriptomic Reads Aligned (RSEM)').innerHTML = 'Transcriptomic Reads Aligned (RSEM)';
-					}
+					non_rna_object['rsem'] = true;
 				}else if (/tophat/.test(summary_files[z]['file'])){
-					if (document.getElementById('Genomic Reads Aligned (Tophat)') == undefined) {
-						document.getElementById('tablerow').appendChild(createElement('th', ['id'], ['Genomic Reads Aligned (Tophat)']));
-						document.getElementById('Genomic Reads Aligned (Tophat)').innerHTML = 'Genomic Reads Aligned (Tophat)';
-					}
+					non_rna_object['tophat'] = true;
 				}else if (/chip/.test(summary_files[z]['file'])){
-					if (document.getElementById('Genomic Reads Aligned (Chip)') == undefined) {
-						document.getElementById('tablerow').appendChild(createElement('th', ['id'], ['Genomic Reads Aligned (Chip)']));
-						document.getElementById('Genomic Reads Aligned (Chip)').innerHTML = 'Genomic Reads Aligned (Chip)';
-					}
+					non_rna_object['chip'] = true;
 				}
 			}else if (/picard/.test(summary_files[z]['file'])){
 				if (/rsem/.test(summary_files[z]['file'])){
-					if (document.getElementById('Deduplicated Reads (RSEM)') == undefined) {
-					document.getElementById('tablerow').appendChild(createElement('th', ['id'], ['Deduplicated Reads (RSEM)']));
-					document.getElementById('Deduplicated Reads (RSEM)').innerHTML = 'Deduplicated Reads (RSEM)';
-				}
+					non_rna_object['rsem_dedup'] = true;
 				}else if (/tophat/.test(summary_files[z]['file'])){
-					if (document.getElementById('Deduplicated Reads (Tophat)') == undefined) {
-					document.getElementById('tablerow').appendChild(createElement('th', ['id'], ['Deduplicated Reads (Tophat)']));
-					document.getElementById('Deduplicated Reads (Tophat)').innerHTML = 'Deduplicated Reads (Tophat)';
-				}
+					non_rna_object['tophat_dedup'] = true;
 				}else if (/chip/.test(summary_files[z]['file'])){
-					if (document.getElementById('Deduplicated Reads (Chip)') == undefined) {
-					document.getElementById('tablerow').appendChild(createElement('th', ['id'], ['Deduplicated Reads (Chip)']));
-					document.getElementById('Deduplicated Reads (Chip)').innerHTML = 'Deduplicated Reads (Chip)';
-				}
+					non_rna_object['chip_dedup'] = true;
 				}
 			}
+		}
+		if (non_rna_object['rsem']){
+			document.getElementById('tablerow').appendChild(createElement('th', ['id'], ['Transcriptomic Reads Aligned (RSEM)']));
+			document.getElementById('Transcriptomic Reads Aligned (RSEM)').innerHTML = 'Transcriptomic Reads Aligned (RSEM)';
+		}
+		if (non_rna_object['rsem_dedup']){
+			document.getElementById('tablerow').appendChild(createElement('th', ['id'], ['Deduplicated Reads (RSEM)']));
+			document.getElementById('Deduplicated Reads (RSEM)').innerHTML = 'Deduplicated Reads (RSEM)';
+		}
+		if (non_rna_object['tophat']){
+			document.getElementById('tablerow').appendChild(createElement('th', ['id'], ['Genomic Reads Aligned (Tophat)']));
+			document.getElementById('Genomic Reads Aligned (Tophat)').innerHTML = 'Genomic Reads Aligned (Tophat)';
+		}
+		if (non_rna_object['tophat_dedup']){
+			document.getElementById('tablerow').appendChild(createElement('th', ['id'], ['Deduplicated Reads (Tophat)']));
+			document.getElementById('Deduplicated Reads (Tophat)').innerHTML = 'Deduplicated Reads (Tophat)';
+		}
+		if (non_rna_object['chip']){
+			document.getElementById('tablerow').appendChild(createElement('th', ['id'], ['Genomic Reads Aligned (Chip)']));
+			document.getElementById('Genomic Reads Aligned (Chip)').innerHTML = 'Genomic Reads Aligned (Chip)';
+		}
+		if (non_rna_object['chip_dedup']){
+			document.getElementById('tablerow').appendChild(createElement('th', ['id'], ['Deduplicated Reads (Chip)']));
+			document.getElementById('Deduplicated Reads (Chip)').innerHTML = 'Deduplicated Reads (Chip)';
 		}
 		
 		var samplenames = [];
@@ -802,7 +809,7 @@ $(function() {
 				rsem_toggle = true;
 				rsem_categories.push(sample_obj);
 				for (var data in table_data[sample_obj]) {
-					if (/RNA/.test(data) || /rsem/.test(data)) {
+					if (/RNA/.test(data) || /rsem/.test(data) || /rmsk/.test(data) || /ercc/.test(data) || /genome/.test(data)) {
 						if (rsem_series[data] == undefined) {
 							var name = data;
 							if (data == 'rsem') {
@@ -822,8 +829,9 @@ $(function() {
 				tophat_toggle = true;
 				tophat_categories.push(sample_obj);
 				for (var data in table_data[sample_obj]) {
-					if (/RNA/.test(data) || /tophat/.test(data)) {
+					if (/RNA/.test(data) || /tophat/.test(data) || /rmsk/.test(data) || /ercc/.test(data) || /genome/.test(data)) {
 						if (tophat_series[data] == undefined) {
+							var name = data;
 							if (data == 'tophat') {
 								name = 'reads mapped'
 							}else if (data == 'tophat_dedup') {
@@ -841,8 +849,9 @@ $(function() {
 				chip_toggle = true;
 				chip_categories.push(sample_obj);
 				for (var data in table_data[sample_obj]) {
-					if (/RNA/.test(data) || /tophat/.test(data)) {
+					if (/RNA/.test(data) || /chip/.test(data) || /rmsk/.test(data) || /ercc/.test(data) || /genome/.test(data)) {
 						if (chip_series[data] == undefined) {
+							var name = data;
 							if (data == 'chip') {
 								name = 'reads mapped'
 							}else if (data == 'chip_dedup') {
@@ -884,29 +893,7 @@ $(function() {
 			}
 			createHighchart(chip_categories, chip_final_series, 'Distribution of Chip Reads', 'Percentage of Reads', 'plots', 'chip_plot');
 		}
-		/*
-		var categories = ['sample_1 (Genome)', 'sample_1 (Transcript)', 'sample_2 (Genome)', 'sample_2 (Transcript)', 'sample_3 (Genome)', 'sample_3 (Transcript)',
-						'sample_4 (Genome)', 'sample_4 (Transcript)', 'sample_5 (Genome)', 'sample_5 (Transcript)', 'sample_6 (Genome)', 'sample_6 (Transcript)'];
-		var series = [{
-				name: 'rRNA',
-				data: [5, 5, 4, 4, 2, 2, 5, 5, 4, 4, 2, 2]
-			}, {
-				name: 'tRNA',
-				data: [2, 2, 3, 3, 1, 1, 5, 5, 4, 4, 2, 2]
-			}, {
-				name: 'Reads mapped',
-				data: [60, 50, 40, 40, 50, 50, 55, 59, 42, 44, 28, 29]
-			}, {
-				name: 'Reads deduped',
-				data: [13, 13, 12, 12, 13, 13, 15, 15, 14, 14, 12, 12]
-			}];
-		var title = 'test title';
-		var yaxis = 'yaxis';
-		var master_container = 'plots';
-		var container = 'test_plot';
-		createHighchart(categories, series, title, yaxis, master_container, container);
-		createHighchart(categories, series, title, yaxis, master_container, container + '2');
-		*/
+		
 		//Create a check for FASTQC output????
 		if (getFastQCBool(run_id)) {
 			createSummary(true);

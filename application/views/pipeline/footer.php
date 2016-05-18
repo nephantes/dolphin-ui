@@ -18,6 +18,7 @@
 		<!-- AdminLTE for demo purposes -->
 		<script src='<?php echo BASE_PATH?>/js/dolphin/js_to_html_funcs.js' type="text/javascript"></script>
 		<script src="<?php echo BASE_PATH?>/js/Highcharts-4.2.5/js/highcharts.js"></script>
+		<script src="<?php echo BASE_PATH?>/js/Highcharts-4.2.5/js/modules/exporting.js"></script>
 		<script src="<?php echo BASE_PATH?>/js/dolphin/highchart_funcs.js" type="text/javascript"></script>
 		<script src="<?php echo BASE_PATH?>/js/dolphin/sessionget_funcs.js" type="text/javascript"></script>
 		<script src='<?php echo BASE_PATH?>/js/dolphin/pipeline_gen_funcs.js' type="text/javascript"></script>
