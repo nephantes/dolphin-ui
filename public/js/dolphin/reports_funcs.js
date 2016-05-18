@@ -10,7 +10,7 @@ var libraries = [];
 var table_array = [];
 var currentResultSelection = '--- Select a Result ---';
 var tableDirectionNum = 0;
-var RNA_count = 0;
+var table_data = {};
 var type_dictionary = ['rRNA', 'miRNA', 'piRNA', 'tRNA', 'snRNA', 'rmsk', 'ercc'];
 
 function parseTSV(jsonName, url_path){
@@ -544,7 +544,6 @@ function numberWithCommas(x) {
 }
 
 function populateTable(summary_files, samplenames, libraries, read_counts) {
-	var table_data = {};
 	var RNA_types = [];
 	for (var z = 0; z < summary_files.length; z++) {
 		if (/RNA/.test(summary_files[z]['file'])) {
@@ -647,8 +646,13 @@ function checkTableOutput(sample_data, ui_id, row_array) {
 	return row_array
 }
 
+$('a[data-toggle="tab"]').on('shown.bs.tab', function (e) {
+	showHighchart('plots');
+});
+
 $(function() {
 	"use strict";
+	
 	if (phpGrab.theSegment == 'report') {
 		var run_id = '0';
 		var samples = [];
@@ -791,6 +795,118 @@ $(function() {
 		
 		createDropdown(summary_rna_type, 'initial_mapping');
 		
+		
+		
+		for (var sample_obj in table_data) {
+			if (table_data[sample_obj]['rsem'] != undefined) {
+				rsem_toggle = true;
+				rsem_categories.push(sample_obj);
+				for (var data in table_data[sample_obj]) {
+					if (/RNA/.test(data) || /rsem/.test(data)) {
+						if (rsem_series[data] == undefined) {
+							var name = data;
+							if (data == 'rsem') {
+								name = 'reads mapped'
+							}else if (data == 'rsem_dedup') {
+								name = 'dedup reads'
+							}
+							rsem_series[data] = {name: name, data: [parseInt(table_data[sample_obj][data])]}
+						}else{
+							rsem_series[data]['data'].push(parseInt(table_data[sample_obj][data]))
+						}
+					}
+				}
+			}
+			
+			if (table_data[sample_obj]['tophat_dedup'] != undefined) {
+				tophat_toggle = true;
+				tophat_categories.push(sample_obj);
+				for (var data in table_data[sample_obj]) {
+					if (/RNA/.test(data) || /tophat/.test(data)) {
+						if (tophat_series[data] == undefined) {
+							if (data == 'tophat') {
+								name = 'reads mapped'
+							}else if (data == 'tophat_dedup') {
+								name = 'dedup reads'
+							}
+							tophat_series[data] = {name: name, data: [parseInt(table_data[sample_obj][data])]}
+						}else{
+							tophat_series[data]['data'].push(parseInt(table_data[sample_obj][data]))
+						}
+					}
+				}
+			}
+			
+			if (table_data[sample_obj]['chip_dedup'] != undefined) {
+				chip_toggle = true;
+				chip_categories.push(sample_obj);
+				for (var data in table_data[sample_obj]) {
+					if (/RNA/.test(data) || /tophat/.test(data)) {
+						if (chip_series[data] == undefined) {
+							if (data == 'chip') {
+								name = 'reads mapped'
+							}else if (data == 'chip_dedup') {
+								name = 'dedup reads'
+							}
+							chip_series[data] = {name: name, data: [parseInt(table_data[sample_obj][data])]}
+						}else{
+							chip_series[data]['data'].push(parseInt(table_data[sample_obj][data]))
+						}
+					}
+				}
+			}
+		}
+		console.log(rsem_series)
+		console.log(tophat_series)
+		console.log(chip_series)
+		
+		if (rsem_toggle) {
+			var rsem_final_series = [];
+			for (var series in rsem_series) {
+				rsem_final_series.push(rsem_series[series]);
+			}
+			createHighchart(rsem_categories, rsem_final_series, 'Distribution of RSEM Reads', 'Percentage of Reads', 'plots', 'rsem_plot');
+		}
+		
+		if (tophat_toggle) {
+			var tophat_final_series = [];
+			for (var series in tophat_series) {
+				tophat_final_series.push(tophat_series[series]);
+			}
+			console.log(tophat_final_series)
+			createHighchart(tophat_categories, tophat_final_series, 'Distribution of Tophat Reads', 'Percentage of Reads', 'plots', 'tophat_plot');
+		}
+		
+		if (chip_toggle) {
+			var chip_final_series = [];
+			for (var series in chip_series) {
+				chip_final_series.push(chip_series[series]);
+			}
+			createHighchart(chip_categories, chip_final_series, 'Distribution of Chip Reads', 'Percentage of Reads', 'plots', 'chip_plot');
+		}
+		/*
+		var categories = ['sample_1 (Genome)', 'sample_1 (Transcript)', 'sample_2 (Genome)', 'sample_2 (Transcript)', 'sample_3 (Genome)', 'sample_3 (Transcript)',
+						'sample_4 (Genome)', 'sample_4 (Transcript)', 'sample_5 (Genome)', 'sample_5 (Transcript)', 'sample_6 (Genome)', 'sample_6 (Transcript)'];
+		var series = [{
+				name: 'rRNA',
+				data: [5, 5, 4, 4, 2, 2, 5, 5, 4, 4, 2, 2]
+			}, {
+				name: 'tRNA',
+				data: [2, 2, 3, 3, 1, 1, 5, 5, 4, 4, 2, 2]
+			}, {
+				name: 'Reads mapped',
+				data: [60, 50, 40, 40, 50, 50, 55, 59, 42, 44, 28, 29]
+			}, {
+				name: 'Reads deduped',
+				data: [13, 13, 12, 12, 13, 13, 15, 15, 14, 14, 12, 12]
+			}];
+		var title = 'test title';
+		var yaxis = 'yaxis';
+		var master_container = 'plots';
+		var container = 'test_plot';
+		createHighchart(categories, series, title, yaxis, master_container, container);
+		createHighchart(categories, series, title, yaxis, master_container, container + '2');
+		*/
 		//Create a check for FASTQC output????
 		if (getFastQCBool(run_id)) {
 			createSummary(true);

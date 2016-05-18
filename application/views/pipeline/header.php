@@ -26,6 +26,13 @@
 		<script src="<?php echo BASE_PATH?>/js/plugins/html5shiv/3.7.0/html5shiv.min.js"></script>
 		<script src="<?php echo BASE_PATH?>/js/plugins/respond/1.3.0/respond.min.js"></script>
 		<![endif]-->
+		<style>
+			.tab-content > .tab-pane:not(.active) {
+				display: block;
+				height: 0;
+				overflow-y: hidden;
+			}
+		</style>
 		<?php echo $html->getBasePath(BASE_PATH, API_PATH); ?>
 	</head>
 	<body class="skin-blue">
