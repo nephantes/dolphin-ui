@@ -12,6 +12,8 @@ var currentResultSelection = '--- Select a Result ---';
 var tableDirectionNum = 0;
 var table_data = {};
 var type_dictionary = ['rRNA', 'miRNA', 'piRNA', 'tRNA', 'snRNA', 'rmsk', 'ercc'];
+var intial_mapping_header = [];
+var initial_mapping_table = [];
 
 function parseTSV(jsonName, url_path){
 	var parsedArray = [];
@@ -644,7 +646,9 @@ function populateTable(summary_files, samplenames, libraries, read_counts) {
 			for(var y = 2; y < row_array.length; y++){
 				row_array[y] = numberWithCommas(row_array[y] + " (" + ((row_array[y]/reads_total)*100).toFixed(2) + " %)");
 			}
+			console.log(row_array)
 			reports_table.fnAddData(row_array);
+			initial_mapping_table.push(row_array);
 		}
 	}else if (read_counts.length > 0) {
 		var reports_table = $('#jsontable_initial_mapping').dataTable();
@@ -652,8 +656,10 @@ function populateTable(summary_files, samplenames, libraries, read_counts) {
 		for(var y = 0; y < read_counts.length; y++){
 			if (samplenames[y] == '' || samplenames[y] == null || samplenames[y] == undefined) {
 				reports_table.fnAddData([libraries[y], numberWithCommas(read_counts[y])]);
+				initial_mapping_table.push([libraries[y], numberWithCommas(read_counts[y])]);
 			}else{
 				reports_table.fnAddData([samplenames[y], numberWithCommas(read_counts[y])]);
+				initial_mapping_table.push([samplenames[y], numberWithCommas(read_counts[y])])
 			}
 		}
 	}else{
@@ -671,6 +677,29 @@ function checkTableOutput(sample_data, ui_id, row_array) {
 		row_array.push("");
 	}
 	return row_array
+}
+
+function downloadInitialMapping() {
+	var textString = "";
+	for (var object in $('#jsontable_initial_mapping').dataTable().dataTableSettings[0].aoColumns) {
+		if (object == $('#jsontable_initial_mapping').dataTable().dataTableSettings[0].aoColumns.length - 1) {
+			textString += $('#jsontable_initial_mapping').dataTable().dataTableSettings[0].aoColumns[object].sTitle + "\n";
+		}else{
+			textString += $('#jsontable_initial_mapping').dataTable().dataTableSettings[0].aoColumns[object].sTitle + "\t";
+		}
+	}
+	var textFile = null;
+	for (var sample_array in initial_mapping_table) {
+		textString += initial_mapping_table[sample_array].join("\t") + "\n";
+	}
+    var data = new Blob([textString], {type: 'text/plain'});
+	if (textFile !== null) {
+		window.URL.revokeObjectURL(textFile);
+    }
+	textFile = window.URL.createObjectURL(data);
+	var link = document.getElementById('download_link');
+	link.href = textFile;
+    link.click()
 }
 
 $('a[data-toggle="tab"]').on('shown.bs.tab', function (e) {
@@ -824,7 +853,9 @@ $(function() {
 		});
 		
 		populateTable(summary_files, samplenames, libraries, read_counts);
-		
+		document.getElementById('jsontable_initial_mapping_wrapper').appendChild(createElement('button', ['id', 'class', 'onclick'], ['initial_download_button', 'btn btn-primary margin', 'downloadInitialMapping()']))
+		document.getElementById('initial_download_button').innerHTML = 'Download Initial Table';
+		document.getElementById('jsontable_initial_mapping_wrapper').appendChild(createElement('a', ['id', 'download', 'style'], ['download_link', 'initial_mapping.txt', 'display:none']))
 		createDropdown(summary_rna_type, 'initial_mapping');
 		
 		for (var sample_obj in table_data) {
