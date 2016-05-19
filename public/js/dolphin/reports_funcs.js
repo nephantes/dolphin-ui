@@ -891,10 +891,10 @@ $(function() {
 			if (table_data[sample_obj]['chip_dedup'] == undefined && table_data[sample_obj]['tophat_dedup'] == undefined && table_data[sample_obj]['rsem_dedup'] == undefined) {
 				base_categories.push(sample_obj);
 				for (var data in table_data[sample_obj]) {
-					if (!/rsem/.test(data) || !/tophat/.test(data) || !/chip/.test(data)) {
+					if (!/rsem/.test(data) || !/tophat/.test(data) || !/chip/.test(data) || !/total_reads/.test(data) || !/unmapped/.test(data)) {
 						if (base_series[data] == undefined) {
 							var name = data;
-							chip_series[data] = {name: name, data: [parseInt(table_data[sample_obj][data])]}
+							base_series[data] = {name: name, data: [parseInt(table_data[sample_obj][data])]}
 						}else{
 							base_series[data]['data'].push(parseInt(table_data[sample_obj][data]))
 						}
