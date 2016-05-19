@@ -362,7 +362,7 @@ function showTable(type){
 			
 			document.getElementById('rseqc_table_div').appendChild(createElement('button', ['id', 'class', 'onclick'], ['switch_plot', 'btn btn-primary margin', 'switchStacking("rseqc_table_div", "rseqc_plot")']))
 			document.getElementById('switch_plot').innerHTML = 'Switch Plot Type';
-			createHighchart(rseqc_categories, rseqc_series, 'RSeQC Count Results', 'Comparitive Sample Percentages', 'rseqc_table_div', 'rseqc_plot', 'normal');
+			createHighchart(rseqc_categories, rseqc_series, 'RSeQC Count Results', 'Comparitive Sample Percentages', 'rseqc_table_div', 'rseqc_plot', 'percent');
 			showHighchart('rseqc_table_div');
 		}
 	}else{
@@ -856,8 +856,9 @@ $(function() {
 		});
 		
 		populateTable(summary_files, samplenames, libraries, read_counts);
-		document.getElementById('jsontable_initial_mapping_wrapper').appendChild(createElement('button', ['id', 'class', 'onclick'], ['initial_download_button', 'btn btn-primary margin', 'downloadInitialMapping()']))
-		document.getElementById('initial_download_button').innerHTML = 'Download Initial Table';
+		var table_div = document.getElementById('jsontable_initial_mapping_wrapper').children[0]
+		table_div.appendChild(createElement('button', ['id', 'class', 'onclick'], ['initial_download_button', 'btn btn-primary margin pull-right', 'downloadInitialMapping()']), table_div.children[0])
+		document.getElementById('initial_download_button').innerHTML = 'Download Table';
 		document.getElementById('jsontable_initial_mapping_wrapper').appendChild(createElement('a', ['id', 'download', 'style'], ['download_link', 'initial_mapping.txt', 'display:none']))
 		createDropdown(summary_rna_type, 'initial_mapping');
 		
@@ -947,9 +948,9 @@ $(function() {
 			for (var series in rsem_series) {
 				rsem_final_series.push(rsem_series[series]);
 			}
-			createHighchart(rsem_categories, rsem_final_series, 'Distribution of RSEM Reads', 'Percentage of Reads', 'plots', 'rsem_plot', 'percent');
 			document.getElementById('plots').appendChild(createElement('button', ['id', 'class', 'onclick', 'style'], ['rsem_switch', 'btn btn-primary margin', 'switchStacking("plots", "rsem_plot")', 'display:none']))
 			document.getElementById('rsem_switch').innerHTML = 'Switch RSEM Plot Type';
+			createHighchart(rsem_categories, rsem_final_series, 'Distribution of RSEM Reads', 'Percentage of Reads', 'plots', 'rsem_plot', 'percent');
 		}
 		
 		if (tophat_toggle) {
@@ -958,9 +959,9 @@ $(function() {
 				tophat_final_series.push(tophat_series[series]);
 			}
 			console.log(tophat_final_series)
-			createHighchart(tophat_categories, tophat_final_series, 'Distribution of Tophat Reads', 'Percentage of Reads', 'plots', 'tophat_plot', 'percent');
 			document.getElementById('plots').appendChild(createElement('button', ['id', 'class', 'onclick', 'style'], ['tophat_switch', 'btn btn-primary margin', 'switchStacking("plots", "tophat_plot")', 'display:none']))
 			document.getElementById('tophat_switch').innerHTML = 'Switch Tophat Plot Type';
+			createHighchart(tophat_categories, tophat_final_series, 'Distribution of Tophat Reads', 'Percentage of Reads', 'plots', 'tophat_plot', 'percent');
 		}
 		
 		if (chip_toggle) {
@@ -968,9 +969,9 @@ $(function() {
 			for (var series in chip_series) {
 				chip_final_series.push(chip_series[series]);
 			}
-			createHighchart(chip_categories, chip_final_series, 'Distribution of Chip Reads', 'Percentage of Reads', 'plots', 'chip_plot', 'percent');
 			document.getElementById('plots').appendChild(createElement('button', ['id', 'class', 'onclick', 'style'], ['chip_switch', 'btn btn-primary margin', 'switchStacking("plots", "chip_plot")', 'display:none']))
 			document.getElementById('chip_switch').innerHTML = 'Switch Chip Plot Type';
+			createHighchart(chip_categories, chip_final_series, 'Distribution of Chip Reads', 'Percentage of Reads', 'plots', 'chip_plot', 'percent');
 		}
 		
 		if (!chip_toggle && !tophat_toggle && !rsem_toggle) {
@@ -978,9 +979,9 @@ $(function() {
 			for (var series in base_series) {
 				base_final_series.push(base_series[series]);
 			}
-			createHighchart(base_categories, base_final_series, 'Distribution of Reads', 'Percentage of Reads', 'plots', 'base_plot', 'percent');
 			document.getElementById('plots').appendChild(createElement('button', ['id', 'class', 'onclick', 'style'], ['base_switch', 'btn btn-primary margin', 'switchStacking("plots", "base_plot")', 'display:none']))
 			document.getElementById('base_switch').innerHTML = 'Switch Plot Type';
+			createHighchart(base_categories, base_final_series, 'Distribution of Reads', 'Percentage of Reads', 'plots', 'base_plot', 'percent');
         }
 		
 		//Create a check for FASTQC output????
