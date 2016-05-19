@@ -2,6 +2,8 @@ var rsem_toggle = false;
 var tophat_toggle = false;
 var chip_toggle = false;
 
+var base_categories = [];
+var base_series = [];
 var rsem_categories = [];
 var rsem_series = {};
 var tophat_categories = [];

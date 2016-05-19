@@ -887,6 +887,20 @@ $(function() {
 					}
 				}
 			}
+			
+			if (table_data[sample_obj]['chip_dedup'] == undefined && table_data[sample_obj]['tophat_dedup'] == undefined && table_data[sample_obj]['rsem_dedup'] == undefined) {
+				base_categories.push(sample_obj);
+				for (var data in table_data[sample_obj]) {
+					if (!/rsem/.test(data) || !/tophat/.test(data) || !/chip/.test(data)) {
+						if (base_series[data] == undefined) {
+							var name = data;
+							chip_series[data] = {name: name, data: [parseInt(table_data[sample_obj][data])]}
+						}else{
+							base_series[data]['data'].push(parseInt(table_data[sample_obj][data]))
+						}
+					}
+				}
+            }
 		}
 		console.log(rsem_series)
 		console.log(tophat_series)
@@ -916,6 +930,14 @@ $(function() {
 			}
 			createHighchart(chip_categories, chip_final_series, 'Distribution of Chip Reads', 'Percentage of Reads', 'plots', 'chip_plot', 'percent');
 		}
+		
+		if (!chip_toggle && !tophat_toggle && !rsem_toggle) {
+            var base_final_series = [];
+			for (var series in base_series) {
+				base_final_series.push(base_series[series]);
+			}
+			createHighchart(base_categories, base_final_series, 'Distribution of Reads', 'Percentage of Reads', 'plots', 'base_plot', 'percent');
+        }
 		
 		//Create a check for FASTQC output????
 		if (getFastQCBool(run_id)) {
