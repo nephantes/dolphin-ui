@@ -945,7 +945,7 @@ $(function() {
 				rsem_final_series.push(rsem_series[series]);
 			}
 			createHighchart(rsem_categories, rsem_final_series, 'Distribution of RSEM Reads', 'Percentage of Reads', 'plots', 'rsem_plot', 'percent');
-			document.getElementById('plots').appendChild(createElement('button', ['id', 'class', 'onclick'], ['rsem_switch', 'btn btn-primary margin', 'switchStacking("plots", "rsem_plot")']))
+			document.getElementById('plots').appendChild(createElement('button', ['id', 'class', 'onclick', 'style'], ['rsem_switch', 'btn btn-primary margin', 'switchStacking("plots", "rsem_plot")', 'display:none']))
 			document.getElementById('rsem_switch').innerHTML = 'Switch RSEM Plot Type';
 		}
 		
@@ -956,7 +956,7 @@ $(function() {
 			}
 			console.log(tophat_final_series)
 			createHighchart(tophat_categories, tophat_final_series, 'Distribution of Tophat Reads', 'Percentage of Reads', 'plots', 'tophat_plot', 'percent');
-			document.getElementById('plots').appendChild(createElement('button', ['id', 'class', 'onclick'], ['tophat_switch', 'btn btn-primary margin', 'switchStacking("plots", "tophat_plot")']))
+			document.getElementById('plots').appendChild(createElement('button', ['id', 'class', 'onclick', 'style'], ['tophat_switch', 'btn btn-primary margin', 'switchStacking("plots", "tophat_plot")', 'display:none']))
 			document.getElementById('tophat_switch').innerHTML = 'Switch Tophat Plot Type';
 		}
 		
@@ -966,7 +966,7 @@ $(function() {
 				chip_final_series.push(chip_series[series]);
 			}
 			createHighchart(chip_categories, chip_final_series, 'Distribution of Chip Reads', 'Percentage of Reads', 'plots', 'chip_plot', 'percent');
-			document.getElementById('plots').appendChild(createElement('button', ['id', 'class', 'onclick'], ['chip_switch', 'btn btn-primary margin', 'switchStacking("plots", "chip_plot")']))
+			document.getElementById('plots').appendChild(createElement('button', ['id', 'class', 'onclick', 'style'], ['chip_switch', 'btn btn-primary margin', 'switchStacking("plots", "chip_plot")', 'display:none']))
 			document.getElementById('chip_switch').innerHTML = 'Switch Chip Plot Type';
 		}
 		
@@ -976,7 +976,7 @@ $(function() {
 				base_final_series.push(base_series[series]);
 			}
 			createHighchart(base_categories, base_final_series, 'Distribution of Reads', 'Percentage of Reads', 'plots', 'base_plot', 'percent');
-			document.getElementById('plots').appendChild(createElement('button', ['id', 'class', 'onclick'], ['base_switch', 'btn btn-primary margin', 'switchStacking("plots", "base_plot")']))
+			document.getElementById('plots').appendChild(createElement('button', ['id', 'class', 'onclick', 'style'], ['base_switch', 'btn btn-primary margin', 'switchStacking("plots", "base_plot")', 'display:none']))
 			document.getElementById('base_switch').innerHTML = 'Switch Plot Type';
         }
 		
