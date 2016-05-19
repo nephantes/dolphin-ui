@@ -185,6 +185,9 @@ function createDropdown(mapping_list, type){
 		var opt = createElement('option', ['id','value'], [mapping_list[x], mapping_list[x]]);
 		opt.innerHTML = mapping_list[x];
 		document.getElementById('select_' + type + '_report').appendChild(opt);
+		if (type_dictionary.indexOf(mapping_list[x]) == -1) {
+			type_dictionary.push(mapping_list[x]);
+		}
 	}
 }
 
@@ -243,6 +246,7 @@ function showTable(type){
 		objList[d] = newObj
 	}
 	var keys = obtainObjectKeys(objList[0]);
+	console.log(keys)
 	
 	if(currentResultSelection.split(".")[currentResultSelection.split(".").length - 1] == "tsv" || type_dictionary.indexOf(currentResultSelection) > -1){
 		var masterDiv = document.getElementById(type+'_exp_body');
