@@ -573,7 +573,7 @@ function numberWithCommas(x) {
 function populateTable(summary_files, samplenames, libraries, read_counts) {
 	var RNA_types = [];
 	for (var z = 0; z < summary_files.length; z++) {
-		if (!/rsem/.test(summary_files[z]['file']) || !/tophat/.test(summary_files[z]['file']) || !/chip/.test(summary_files[z]['file'])) {
+		if (!/picard/.test(summary_files[z]['file']) || !/flagstat/.test(summary_files[z]['file'])) {
 			RNA_types.push(summary_files[z]['file'].split("/")[1].split(".")[0]);
 		}
 	}
