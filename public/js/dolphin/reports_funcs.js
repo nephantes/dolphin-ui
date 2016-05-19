@@ -575,7 +575,6 @@ function populateTable(summary_files, samplenames, libraries, read_counts) {
 	for (var z = 0; z < summary_files.length; z++) {
 		if (!/picard/.test(summary_files[z]['file']) && !/flagstat/.test(summary_files[z]['file'])) {
 			console.log(summary_files[z]['file'])
-			console.log(!/picard/.test(summary_files[z]['file']) && !/flagstat/.test(summary_files[z]['file']))
 			RNA_types.push(summary_files[z]['file'].split("/")[1].split(".")[0]);
 		}
 	}
