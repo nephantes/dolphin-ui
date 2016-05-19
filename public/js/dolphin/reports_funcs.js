@@ -573,7 +573,7 @@ function numberWithCommas(x) {
 function populateTable(summary_files, samplenames, libraries, read_counts) {
 	var RNA_types = [];
 	for (var z = 0; z < summary_files.length; z++) {
-		if (/RNA/.test(summary_files[z]['file']) || /ercc/.test(summary_files[z]['file']) || /rmsk/.test(summary_files[z]['file'])) {
+		if (!/picard/.test(summary_files[z]['file']) || !/flagstat/.test(summary_files[z]['file'])) {
 			RNA_types.push(summary_files[z]['file'].split("/")[1].split(".")[0]);
 		}
 	}
@@ -584,7 +584,7 @@ function populateTable(summary_files, samplenames, libraries, read_counts) {
 		}
 		
 		for (var z = 0; z < summary_files.length; z++) {
-			if (/RNA/.test(summary_files[z]['file']) || /ercc/.test(summary_files[z]['file']) || /rmsk/.test(summary_files[z]['file'])) {
+			if (!/picard/.test(summary_files[z]['file']) || !/flagstat/.test(summary_files[z]['file'])) {
 				var RNA_name = '';
 				for (RNA in RNA_types) {
 					if (RNA_types[RNA] == summary_files[z]['file'].split("/")[1].split(".")[0]) {
@@ -732,7 +732,7 @@ $(function() {
 		var summary_rna_type = [];
 		var non_rna_object = {}
 		for (var z = 0; z < summary_files.length; z++) {
-			if (/RNA/.test(summary_files[z]['file']) || /ercc/.test(summary_files[z]['file']) || /rmsk/.test(summary_files[z]['file'])) {
+			if (!/flagstat/.test(summary_files[z]['file']) || !/picard/.test(summary_files[z]['file'])) {
 				var RNA = summary_files[z]['file'].split("/")[summary_files[z]['file'].split("/").length - 1].split(".")[0];
 				summary_rna_type.push(RNA);
 				document.getElementById('tablerow').appendChild(createElement('th', ['id'], [RNA]));
@@ -832,7 +832,7 @@ $(function() {
 				rsem_toggle = true;
 				rsem_categories.push(sample_obj);
 				for (var data in table_data[sample_obj]) {
-					if (/RNA/.test(data) || /rsem/.test(data) || /rmsk/.test(data) || /ercc/.test(data) || /genome/.test(data)) {
+					if (!/chip/.test(data) || !/tophat/.test(data)) {
 						if (rsem_series[data] == undefined) {
 							var name = data;
 							if (data == 'rsem') {
@@ -852,7 +852,7 @@ $(function() {
 				tophat_toggle = true;
 				tophat_categories.push(sample_obj);
 				for (var data in table_data[sample_obj]) {
-					if (/RNA/.test(data) || /tophat/.test(data) || /rmsk/.test(data) || /ercc/.test(data) || /genome/.test(data)) {
+					if (!/chip/.test(data) || !/rsem/.test(data)) {
 						if (tophat_series[data] == undefined) {
 							var name = data;
 							if (data == 'tophat') {
@@ -872,7 +872,7 @@ $(function() {
 				chip_toggle = true;
 				chip_categories.push(sample_obj);
 				for (var data in table_data[sample_obj]) {
-					if (/RNA/.test(data) || /chip/.test(data) || /rmsk/.test(data) || /ercc/.test(data) || /genome/.test(data)) {
+					if (!/rsem/.test(data) || !/tophat/.test(data)) {
 						if (chip_series[data] == undefined) {
 							var name = data;
 							if (data == 'chip') {
