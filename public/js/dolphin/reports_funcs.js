@@ -12,7 +12,6 @@ var currentResultSelection = '--- Select a Result ---';
 var tableDirectionNum = 0;
 var table_data = {};
 var type_dictionary = ['rRNA', 'miRNA', 'piRNA', 'tRNA', 'snRNA', 'rmsk', 'ercc'];
-var intial_mapping_header = [];
 var initial_mapping_table = [];
 
 function parseTSV(jsonName, url_path){
