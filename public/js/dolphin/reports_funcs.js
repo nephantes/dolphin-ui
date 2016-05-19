@@ -12,6 +12,7 @@ var currentResultSelection = '--- Select a Result ---';
 var tableDirectionNum = 0;
 var table_data = {};
 var type_dictionary = ['rRNA', 'miRNA', 'piRNA', 'tRNA', 'snRNA', 'rmsk', 'ercc'];
+var initial_mapping_table = [];
 
 function parseTSV(jsonName, url_path){
 	var parsedArray = [];
@@ -184,6 +185,9 @@ function createDropdown(mapping_list, type){
 		var opt = createElement('option', ['id','value'], [mapping_list[x], mapping_list[x]]);
 		opt.innerHTML = mapping_list[x];
 		document.getElementById('select_' + type + '_report').appendChild(opt);
+		if (type_dictionary.indexOf(mapping_list[x]) == -1) {
+			type_dictionary.push(mapping_list[x]);
+		}
 	}
 }
 
@@ -242,6 +246,7 @@ function showTable(type){
 		objList[d] = newObj
 	}
 	var keys = obtainObjectKeys(objList[0]);
+	console.log(keys)
 	
 	if(currentResultSelection.split(".")[currentResultSelection.split(".").length - 1] == "tsv" || type_dictionary.indexOf(currentResultSelection) > -1){
 		var masterDiv = document.getElementById(type+'_exp_body');
@@ -573,7 +578,8 @@ function numberWithCommas(x) {
 function populateTable(summary_files, samplenames, libraries, read_counts) {
 	var RNA_types = [];
 	for (var z = 0; z < summary_files.length; z++) {
-		if (!/picard/.test(summary_files[z]['file']) || !/flagstat/.test(summary_files[z]['file'])) {
+		if (!/picard/.test(summary_files[z]['file']) && !/flagstat/.test(summary_files[z]['file'])) {
+			console.log(summary_files[z]['file'])
 			RNA_types.push(summary_files[z]['file'].split("/")[1].split(".")[0]);
 		}
 	}
@@ -584,13 +590,14 @@ function populateTable(summary_files, samplenames, libraries, read_counts) {
 		}
 		
 		for (var z = 0; z < summary_files.length; z++) {
-			if (!/picard/.test(summary_files[z]['file']) || !/flagstat/.test(summary_files[z]['file'])) {
+			if (!/picard/.test(summary_files[z]['file']) && !/flagstat/.test(summary_files[z]['file'])) {
 				var RNA_name = '';
 				for (RNA in RNA_types) {
 					if (RNA_types[RNA] == summary_files[z]['file'].split("/")[1].split(".")[0]) {
 						RNA_name = RNA_types[RNA];
 					}
 				}
+				console.log(RNA_types)
 				var table_array_raw = (parseMoreTSV(['File','Total Reads','Reads 1','Reads >1','Unmapped Reads'], summary_files[z]['file']));
 				for(var x = 0; x < table_array_raw.length; x++){
 					table_data[table_array_raw[x][0]][RNA_name] = parseInt(table_array_raw[x][2].split(" ")[0]) + parseInt(table_array_raw[x][3].split(" ")[0]);
@@ -642,7 +649,9 @@ function populateTable(summary_files, samplenames, libraries, read_counts) {
 			for(var y = 2; y < row_array.length; y++){
 				row_array[y] = numberWithCommas(row_array[y] + " (" + ((row_array[y]/reads_total)*100).toFixed(2) + " %)");
 			}
+			console.log(row_array)
 			reports_table.fnAddData(row_array);
+			initial_mapping_table.push(row_array);
 		}
 	}else if (read_counts.length > 0) {
 		var reports_table = $('#jsontable_initial_mapping').dataTable();
@@ -650,8 +659,10 @@ function populateTable(summary_files, samplenames, libraries, read_counts) {
 		for(var y = 0; y < read_counts.length; y++){
 			if (samplenames[y] == '' || samplenames[y] == null || samplenames[y] == undefined) {
 				reports_table.fnAddData([libraries[y], numberWithCommas(read_counts[y])]);
+				initial_mapping_table.push([libraries[y], numberWithCommas(read_counts[y])]);
 			}else{
 				reports_table.fnAddData([samplenames[y], numberWithCommas(read_counts[y])]);
+				initial_mapping_table.push([samplenames[y], numberWithCommas(read_counts[y])])
 			}
 		}
 	}else{
@@ -669,6 +680,29 @@ function checkTableOutput(sample_data, ui_id, row_array) {
 		row_array.push("");
 	}
 	return row_array
+}
+
+function downloadInitialMapping() {
+	var textString = "";
+	for (var object in $('#jsontable_initial_mapping').dataTable().dataTableSettings[0].aoColumns) {
+		if (object == $('#jsontable_initial_mapping').dataTable().dataTableSettings[0].aoColumns.length - 1) {
+			textString += $('#jsontable_initial_mapping').dataTable().dataTableSettings[0].aoColumns[object].sTitle + "\n";
+		}else{
+			textString += $('#jsontable_initial_mapping').dataTable().dataTableSettings[0].aoColumns[object].sTitle + "\t";
+		}
+	}
+	var textFile = null;
+	for (var sample_array in initial_mapping_table) {
+		textString += initial_mapping_table[sample_array].join("\t") + "\n";
+	}
+    var data = new Blob([textString], {type: 'text/plain'});
+	if (textFile !== null) {
+		window.URL.revokeObjectURL(textFile);
+    }
+	textFile = window.URL.createObjectURL(data);
+	var link = document.getElementById('download_link');
+	link.href = textFile;
+    link.click()
 }
 
 $('a[data-toggle="tab"]').on('shown.bs.tab', function (e) {
@@ -732,7 +766,7 @@ $(function() {
 		var summary_rna_type = [];
 		var non_rna_object = {}
 		for (var z = 0; z < summary_files.length; z++) {
-			if (!/flagstat/.test(summary_files[z]['file']) || !/picard/.test(summary_files[z]['file'])) {
+			if (!/flagstat/.test(summary_files[z]['file']) && !/picard/.test(summary_files[z]['file'])) {
 				var RNA = summary_files[z]['file'].split("/")[summary_files[z]['file'].split("/").length - 1].split(".")[0];
 				summary_rna_type.push(RNA);
 				document.getElementById('tablerow').appendChild(createElement('th', ['id'], [RNA]));
@@ -822,17 +856,17 @@ $(function() {
 		});
 		
 		populateTable(summary_files, samplenames, libraries, read_counts);
-		
+		document.getElementById('jsontable_initial_mapping_wrapper').appendChild(createElement('button', ['id', 'class', 'onclick'], ['initial_download_button', 'btn btn-primary margin', 'downloadInitialMapping()']))
+		document.getElementById('initial_download_button').innerHTML = 'Download Initial Table';
+		document.getElementById('jsontable_initial_mapping_wrapper').appendChild(createElement('a', ['id', 'download', 'style'], ['download_link', 'initial_mapping.txt', 'display:none']))
 		createDropdown(summary_rna_type, 'initial_mapping');
-		
-		
 		
 		for (var sample_obj in table_data) {
 			if (table_data[sample_obj]['rsem'] != undefined) {
 				rsem_toggle = true;
 				rsem_categories.push(sample_obj);
 				for (var data in table_data[sample_obj]) {
-					if (!/chip/.test(data) || !/tophat/.test(data)) {
+					if (!/chip/.test(data) && !/tophat/.test(data) && !/total_reads/.test(data) && !/unmapped/.test(data)) {
 						if (rsem_series[data] == undefined) {
 							var name = data;
 							if (data == 'rsem') {
@@ -852,7 +886,7 @@ $(function() {
 				tophat_toggle = true;
 				tophat_categories.push(sample_obj);
 				for (var data in table_data[sample_obj]) {
-					if (!/chip/.test(data) || !/rsem/.test(data)) {
+					if (!/chip/.test(data) && !/rsem/.test(data) && !/total_reads/.test(data) && !/unmapped/.test(data)) {
 						if (tophat_series[data] == undefined) {
 							var name = data;
 							if (data == 'tophat') {
@@ -872,7 +906,7 @@ $(function() {
 				chip_toggle = true;
 				chip_categories.push(sample_obj);
 				for (var data in table_data[sample_obj]) {
-					if (!/rsem/.test(data) || !/tophat/.test(data)) {
+					if (!/rsem/.test(data) && !/tophat/.test(data) && !/total_reads/.test(data) && !/unmapped/.test(data)) {
 						if (chip_series[data] == undefined) {
 							var name = data;
 							if (data == 'chip') {
@@ -891,7 +925,8 @@ $(function() {
 			if (table_data[sample_obj]['chip_dedup'] == undefined && table_data[sample_obj]['tophat_dedup'] == undefined && table_data[sample_obj]['rsem_dedup'] == undefined) {
 				base_categories.push(sample_obj);
 				for (var data in table_data[sample_obj]) {
-					if (!/rsem/.test(data) || !/tophat/.test(data) || !/chip/.test(data) || !/total_reads/.test(data) || !/unmapped/.test(data)) {
+					if (!/rsem/.test(data) && !/tophat/.test(data) && !/chip/.test(data) && !/total_reads/.test(data)) {
+						console.log(data)
 						if (base_series[data] == undefined) {
 							var name = data;
 							base_series[data] = {name: name, data: [parseInt(table_data[sample_obj][data])]}
@@ -905,6 +940,7 @@ $(function() {
 		console.log(rsem_series)
 		console.log(tophat_series)
 		console.log(chip_series)
+		console.log(base_series)
 		
 		if (rsem_toggle) {
 			var rsem_final_series = [];
@@ -912,6 +948,8 @@ $(function() {
 				rsem_final_series.push(rsem_series[series]);
 			}
 			createHighchart(rsem_categories, rsem_final_series, 'Distribution of RSEM Reads', 'Percentage of Reads', 'plots', 'rsem_plot', 'percent');
+			document.getElementById('plots').appendChild(createElement('button', ['id', 'class', 'onclick', 'style'], ['rsem_switch', 'btn btn-primary margin', 'switchStacking("plots", "rsem_plot")', 'display:none']))
+			document.getElementById('rsem_switch').innerHTML = 'Switch RSEM Plot Type';
 		}
 		
 		if (tophat_toggle) {
@@ -921,6 +959,8 @@ $(function() {
 			}
 			console.log(tophat_final_series)
 			createHighchart(tophat_categories, tophat_final_series, 'Distribution of Tophat Reads', 'Percentage of Reads', 'plots', 'tophat_plot', 'percent');
+			document.getElementById('plots').appendChild(createElement('button', ['id', 'class', 'onclick', 'style'], ['tophat_switch', 'btn btn-primary margin', 'switchStacking("plots", "tophat_plot")', 'display:none']))
+			document.getElementById('tophat_switch').innerHTML = 'Switch Tophat Plot Type';
 		}
 		
 		if (chip_toggle) {
@@ -929,6 +969,8 @@ $(function() {
 				chip_final_series.push(chip_series[series]);
 			}
 			createHighchart(chip_categories, chip_final_series, 'Distribution of Chip Reads', 'Percentage of Reads', 'plots', 'chip_plot', 'percent');
+			document.getElementById('plots').appendChild(createElement('button', ['id', 'class', 'onclick', 'style'], ['chip_switch', 'btn btn-primary margin', 'switchStacking("plots", "chip_plot")', 'display:none']))
+			document.getElementById('chip_switch').innerHTML = 'Switch Chip Plot Type';
 		}
 		
 		if (!chip_toggle && !tophat_toggle && !rsem_toggle) {
@@ -937,6 +979,8 @@ $(function() {
 				base_final_series.push(base_series[series]);
 			}
 			createHighchart(base_categories, base_final_series, 'Distribution of Reads', 'Percentage of Reads', 'plots', 'base_plot', 'percent');
+			document.getElementById('plots').appendChild(createElement('button', ['id', 'class', 'onclick', 'style'], ['base_switch', 'btn btn-primary margin', 'switchStacking("plots", "base_plot")', 'display:none']))
+			document.getElementById('base_switch').innerHTML = 'Switch Plot Type';
         }
 		
 		//Create a check for FASTQC output????
@@ -987,6 +1031,5 @@ $(function() {
 		}else{
 			document.getElementById('rseqc_exp').remove();
 		}
-		//reports_table.fnAdjustColumnSizing(true);
 	}
 });
