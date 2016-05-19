@@ -60,14 +60,21 @@ function showHighchart(container) {
 function switchStacking(master_container, container) {
 	var chart = $('#'+container).highcharts()
 	var stacking = 'percent'
+	var yaxis = 'Percentage of Reads';
 	if (chart.options.plotOptions.column.stacking == 'percent') {
 		stacking = 'line'
+		yaxis = 'Number of Reads'
 	}
 	$('#'+container).highcharts({
 		chart: chart.options.chart,
         title: chart.options.title,
         xAxis: chart.options.xAxis,
-        yAxis: chart.options.yAxis,
+        yAxis: {
+            min: 0,
+            title: {
+                text: yaxis
+            }
+        },
         tooltip: chart.options.tooltip,
         plotOptions: {
             column: {
