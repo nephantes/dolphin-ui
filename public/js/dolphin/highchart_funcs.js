@@ -9,7 +9,7 @@ var tophat_series = {};
 var chip_categories = [];
 var chip_series = {};
 
-function createHighchart(categories, series, title, yaxis, master_container, container) {
+function createHighchart(categories, series, title, yaxis, master_container, container, stacking) {
 	var master = document.getElementById(master_container);
 	console.log(master);
 	master.appendChild(createElement('div', ['id', 'style'], [container, 'min-width: 310px;margin: 0 auto']))
@@ -35,7 +35,7 @@ function createHighchart(categories, series, title, yaxis, master_container, con
         },
         plotOptions: {
             column: {
-                stacking: 'percent'
+                stacking: stacking
             }
         },
         series: series
@@ -53,4 +53,29 @@ function showHighchart(container) {
 			node.setAttribute('style', 'display:show');
 		}
 	}
+}
+
+function switchStacking(master_container, container) {
+	var chart = $('#'+container).highcharts()
+	var stacking = 'percent'
+	if (chart.options.plotOptions.column.stacking == 'percent') {
+		stacking = 'line'
+	}
+	document.getElementById(container).remove()
+	var master = document.getElementById(master_container);
+	console.log(master);
+	master.appendChild(createElement('div', ['id', 'style'], [container, 'min-width: 310px;margin: 0 auto']))
+	$('#'+container).highcharts({
+		chart: chart.options.chart,
+        title: chart.options.title,
+        xAxis: chart.options.xAxis,
+        yAxis: chart.options.yAxis,
+        tooltip: chart.options.tooltip,
+        plotOptions: {
+            column: {
+                stacking: stacking
+            }
+        },
+        series: chart.options.series
+	})
 }
