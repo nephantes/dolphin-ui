@@ -444,22 +444,23 @@ class Ngsimport extends VanillaModel {
 		$request = "";
 		foreach($this->file_name_arr as $fna){
 			if(end($this->file_name_arr) == $fna){
-					$request .= $fna;
+				$request .= $fna;
 			}else{
-					$request .= $fna . ',';
+				$request .= $fna . ',';
 			}
 		}
 		$params['username'] = $clustername;
 		$params['file'] = $request;
-		$result = $funcs->checkFile($params);
-		$valid_fastq = json_decode('['.$result.']');
-		if(isset($valid_fastq[0]->ERROR)){
+		$result = stripslashes($funcs->checkFile($params));
+		$valid_fastq = json_decode('['.str_replace("\n","",$result).']', true);
+		if(isset($valid_fastq[0]['ERROR'])){
 			$this->final_check = false;
-			$error_array = explode("ls: ",$valid_fastq[0]->ERROR);
+			$error_array = explode("ls: ",$valid_fastq[0]['ERROR']);
 			return implode("<br>", array_splice($error_array, 1));
 		}
 		return 'pass';
-        }
+	}
+
 	
 	/*
 	 *	getMeta()
