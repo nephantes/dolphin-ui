@@ -1209,6 +1209,10 @@ $(function() {
 				}
 		});
 		
+		//	Merge RNA summary
+		summary_dictionary.splice.apply(summary_dictionary, [2, 0].concat(summary_RNA));
+		html_summary_dictionary.splice.apply(html_summary_dictionary, [2, 0].concat(summary_RNA));
+		
 		//	Gather/organize sample data
 		populateTable(summary_files, samplenames, libraries, read_counts);
 
