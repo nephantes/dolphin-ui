@@ -407,6 +407,9 @@ function pipelineSubmitCheck(non_pipeline, non_pipeline_values, pipeline, pipeli
 			}else if (!checkFieldCheckboxChecked('checkbox_1_'+pipeline_index[x]) && (!checkFieldSelection('spaired', 'no'))){
 				displayErrorModal('#errorModal', 'Deduplication can not be performed on single-end reads');
 				return true;
+			}else if (!checkFieldCheckboxChecked('checkbox_2_'+pipeline_index[x]) && !checkFieldCheckboxChecked('checkbox_3_'+pipeline_index[x])){
+				displayErrorModal('#errorModal', 'You cannot perform RNA-Seq QC while No Genome BAM is selected.');
+				return true;
 			}
 		//	Tophat
 		}else if (name == 'Tophat') {
@@ -485,7 +488,7 @@ function pipelineSubmitCheck(non_pipeline, non_pipeline_values, pipeline, pipeli
 		//	BisulphiteMapping
 		}else if (name == 'BisulphiteMapping') {
 			//	Digestion Site is empty
-			if (checkFieldsEmpty('text_1_'+pipeline_index[x])) {
+			if (checkFieldsEmpty('text_1_'+pipeline_index[x]) && checkFieldCheckboxChecked(pipeline_index[x]+'_WGBS')) {
 				displayErrorModal('#errorModal', 'Digestion Site field cannot be empty within BisulphiteMapping');
 				return true;
 			//	extFactor is empty and selected

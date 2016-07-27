@@ -158,16 +158,17 @@ function sendToTableGen(){
 		ids = getBasketInfo().split(",");
 	}
 	for(var y = 0; y < ids.length; y++){
+		console.log(ids)
+		console.log(runIDHelper)
 		var keys = Object.keys(runIDHelper);
-		for (var x = 0; x < keys.length; x++) {
-			if (run_array[runIDHelper[keys[x]]] == undefined) {
-				run_array[runIDHelper[keys[x]]] = ids[y];
-			}else{
-				run_array[runIDHelper[keys[x]]] += "," + ids[y];
-			}
+		console.log(keys)
+		if (run_array[runIDHelper[ids[y]]] == undefined) {
+			run_array[runIDHelper[ids[y]]] = ids[y];
+		}else{
+			run_array[runIDHelper[ids[y]]] += "," + ids[y];
 		}
 	}
-	
+	console.log(run_array);
 	var samples_send = 'samples=';
 	for(var key in run_array){
 		samples_send += run_array[key].toString() + ';' + key + ':';
@@ -189,7 +190,11 @@ function sendToTableGen(){
 	var common_send = '';
 	var key_send = '';
 	var keepcols_send = '';
-	if (file_send.indexOf('.counts.') > -1) {
+	if (file_send.indexOf('RSeQC') > -1) {
+		//RSeQC
+		common_send = '&common=region'
+		key_send = '&key=region';
+	}else if (file_send.indexOf('.counts.') > -1) {
 		//counts
 		common_send = '&common=id,len'
 		key_send = '&key=id';
@@ -215,10 +220,6 @@ function sendToTableGen(){
 			common_send = '&common=metric';
 			key_send = '&key=metric';
 		}
-	}else if (file_send.indexOf('RSeQC') > -1) {
-		//RSeQC
-		common_send = '&common=region'
-		key_send = '&key=region';
 	}
 	
 	var filter_send = '';
