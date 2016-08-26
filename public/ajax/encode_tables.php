@@ -15,31 +15,38 @@ if($p == 'getDonors')
 {
 	if (isset($_GET['samples'])){$samples = $_GET['samples'];}
 	$data=$query->queryTable("
-		SELECT *
+		SELECT ngs_donor.id as donor_id, ngs_donor.donor, ngs_donor.life_stage, ngs_donor.age,
+		ngs_donor.sex, ngs_donor.donor_acc, ngs_donor.donor_uuid, ngs_samples.id as sample_id,
+		ngs_lab.lab, ngs_lab.id as lab_id, ngs_organism.organism, ngs_samples.organism_id, 
+		ngs_experiment_series.id as experiment_series_id, ngs_experiment_series.`grant`
 		FROM ngs_donor
-		WHERE id
-		IN (SELECT ngs_samples.donor_id FROM ngs_samples WHERE id IN ($samples))
-		");
-}
-else if($p == 'getExperiments')
-{
-	if (isset($_GET['samples'])){$samples = $_GET['samples'];}
-	$data=$query->queryTable("
-		SELECT DISTINCT ngs_samples.id as sample_id, ngs_samples.samplename, ngs_lab.lab, ngs_experiment_series.`grant`, ngs_library_strategy.library_strategy,
-		ngs_lab.id as lab_id, ngs_protocols.id as protocol_id, ngs_samples.description, ngs_samples.experiment_acc, ngs_samples.experiment_uuid,
-		ngs_library_strategy.id as library_strategy_id, ngs_experiment_series.id as experiment_series_id,
-		ngs_organism.organism, ngs_samples.organism_id
-		FROM ngs_samples
+		LEFT JOIN ngs_samples
+		ON ngs_samples.donor_id = ngs_donor.id
 		LEFT JOIN ngs_organism
 		ON ngs_samples.organism_id = ngs_organism.id
 		LEFT JOIN ngs_experiment_series
 		ON ngs_experiment_series.id = ngs_samples.series_id
 		LEFT JOIN ngs_lab
 		ON ngs_lab.id = ngs_experiment_series.lab_id
+		WHERE ngs_donor.id
+		IN (SELECT ngs_samples.donor_id FROM ngs_samples WHERE ngs_samples.id IN ($samples))
+		");
+}
+else if($p == 'getExperiments')
+{
+	if (isset($_GET['samples'])){$samples = $_GET['samples'];}
+	$data=$query->queryTable("
+		SELECT DISTINCT ngs_samples.id as sample_id, ngs_samples.samplename, ngs_protocols.id as protocol_id,
+		ngs_samples.description, ngs_samples.experiment_acc, ngs_samples.experiment_uuid,
+		ngs_library_strategy.id as library_strategy_id, ngs_library_strategy.library_strategy,
+		ngs_samples.source_id as source_id, ngs_source.source
+		FROM ngs_samples
 		LEFT JOIN ngs_protocols
 		ON ngs_protocols.id = ngs_samples.protocol_id
 		LEFT JOIN ngs_library_strategy
 		ON ngs_library_strategy.id = ngs_protocols.library_strategy_id
+		LEFT JOIN ngs_source
+		ON ngs_source.id = ngs_samples.source_id
 		WHERE ngs_samples.id in ($samples)
 		");
 }
@@ -62,10 +69,12 @@ else if($p == 'getBiosamples')
 	$data=$query->queryTable("
 		SELECT ngs_samples.id as sample_id, ngs_samples.samplename, ngs_donor.donor, ngs_biosample_term.biosample_term_name, ngs_biosample_term.biosample_term_id,
 		ngs_biosample_term.id as biosample_id, ngs_lanes.id as lane_id, ngs_donor.id as donor_id, ngs_biosample_term.biosample_type, ngs_lanes.date_received,
-		ngs_lanes.date_submitted
+		ngs_treatment.id as treatment_id, ngs_lanes.date_submitted, ngs_samples.biosample_acc, ngs_samples.biosample_uuid, ngs_treatment.name
 		FROM ngs_samples
 		LEFT JOIN ngs_biosample_term
 		ON ngs_samples.biosample_id = ngs_biosample_term.id
+		LEFT JOIN ngs_treatment
+		ON ngs_samples.treatment_id = ngs_treatment.id
 		LEFT JOIN ngs_lanes
 		ON ngs_samples.lane_id = ngs_lanes.id
 		LEFT JOIN ngs_donor
@@ -78,10 +87,14 @@ else if($p == 'getLibraries')
 	if (isset($_GET['samples'])){$samples = $_GET['samples'];}
 	$data=$query->queryTable("
 		SELECT ngs_samples.id as sample_id, ngs_samples.samplename, ngs_molecule.molecule, ngs_protocols.extraction, ngs_samples.read_length,
-		ngs_molecule.id as molecule_id, ngs_protocols.id as protocol_id
+		ngs_molecule.id as molecule_id, ngs_protocols.id as protocol_id, ngs_samples.instrument_model_id as imid, instrument_model,
+		ngs_samples.spike_ins, ngs_protocols.crosslinking_method, ngs_protocols.fragmentation_method, ngs_samples.library_acc,
+		ngs_samples.library_uuid
 		FROM ngs_samples
 		LEFT JOIN ngs_molecule
 		ON ngs_samples.molecule_id = ngs_molecule.id
+		LEFT JOIN ngs_instrument_model
+		ON ngs_samples.instrument_model_id = ngs_instrument_model.id
 		LEFT JOIN ngs_protocols
 		ON ngs_samples.protocol_id = ngs_protocols.id
 		WHERE ngs_samples.id in ($samples)
@@ -104,9 +117,12 @@ else if($p == 'getReplicates')
 {
 	if (isset($_GET['samples'])){$samples = $_GET['samples'];}
 	$data=$query->queryTable("
-		SELECT id, samplename, biological_replica, technical_replica
+		SELECT ngs_samples.id as sample_id, samplename, biological_replica, technical_replica, ngs_antibody_target.target, ngs_antibody_target.id as antibody_id,
+		ngs_samples.replicate_uuid
 		FROM ngs_samples
-		where id in ($samples)
+		LEFT JOIN ngs_antibody_target
+		ON ngs_samples.antibody_lot_id = ngs_antibody_target.id
+		where ngs_samples.id in ($samples)
 		");
 }
 
