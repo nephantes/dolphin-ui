@@ -21,7 +21,7 @@ if($p == 'getSampleDataInfo')
 							 protocol_id, lane_id, organism, source,
 							 biosample_acc, biosample_uuid, library_acc, library_uuid, replicate_uuid,
 							 experiment_acc, experiment_uuid, treatment_id, antibody_lot_id, biosample_id,
-							 biosample_term_name, biosample_term_id, biosample_type
+							 biosample_term_name, biosample_term_id, biosample_type, ngs_samples.description
 							 FROM ngs_samples
 							 LEFT JOIN ngs_donor
 							 ON ngs_donor.id = ngs_samples.donor_id
@@ -92,14 +92,50 @@ else if ($p == 'submitAccessionAndUuid')
 	if (isset($_GET['accession'])){$accession = $_GET['accession'];}
 	if (isset($_GET['uuid'])){$uuid = $_GET['uuid'];}
 	if($type == 'treatment' || $type == "replicate"){
-		$data=$query->runSQL("UPDATE `" . $table . "` " .
-							"SET `" . $type . "_uuid` = '" . $uuid . "' " .
-							"WHERE id = " . $item);
+		$data=$query->runSQL("UPDATE $table
+							SET ".$type."_uuid = '$uuid'
+							WHERE id = $item");	
 	}else{
-		$data=$query->runSQL("UPDATE `" . $table . "` " .
-							"SET `" . $type . "_acc` = '" . $accession . "', `" . $type . "_uuid` = '" . $uuid . "' " .
-							"WHERE id = " . $item);	
+		$data=$query->runSQL("UPDATE $table
+							SET ".$type."_acc = '$accession', ".$type."_uuid = '$uuid'
+							WHERE id = $item");	
 	}
+}
+else if ($p == 'endLog')
+{
+	$current_samps = [];
+	$push_new_samps = [];
+	$file = end(explode("/",$_SESSION['encode_log']));
+	if (isset($_GET['sample_ids'])){$sample_ids = $_GET['sample_ids'];}
+	$update_samps = json_decode($query->queryTable("
+		SELECT sample_id
+		FROM encode_submissions
+		WHERE sample_id in (".implode(",",$sample_ids).")
+	"));
+	foreach($update_samps as $us){
+		array_push($current_samps, $us->sample_id);
+	}
+	if(count($current_samps) > 0){
+		$query->runSQL("
+			UPDATE encode_submissions
+			SET sub_status = 'Up to Date', output_file = '$file'
+			WHERE sample_id in (".implode(",",$current_samps).")
+		");	
+	}
+	$new_samps = array_diff($sample_ids, $current_samps);
+	foreach($new_samps as $ns){
+		array_push($push_new_samps, "( $ns, 'Up to Date', '$file' )");
+	}
+	if(count($push_new_samps) > 0){
+		$query->runSQL("
+			INSERT INTO `encode_submissions`
+			(sample_id, sub_status, output_file)
+			VALUES
+			".implode(",",$push_new_samps)."
+		");
+	}
+	unset($_SESSION['encode_log']);
+	$data = json_encode($file);
 }
 
 header('Cache-Control: no-cache, must-revalidate');
