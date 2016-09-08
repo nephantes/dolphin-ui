@@ -29,9 +29,18 @@ var antibody_accs = [];
 var replicate_ids = [];
 var replicate_uuids = [];
 var submission = true;
-	
+var id_hash = {
+		donor: 0,
+		experiment: 0,
+		treatment: 0,
+		biosample: 0,
+		library: 0,
+		antibody_lot: 0,
+		replicate: 0
+	}
 //	RNA, DNA
 var nucleic_acid_term_id = ['SO:0000356', 'SO:0000352'];
+var log_str = '';
 
 function resetGlobals(){
 	sample_info = [];
@@ -54,6 +63,16 @@ function resetGlobals(){
 	antibody_accs = [];
 	replicate_ids = [];
 	replicate_uuids = [];
+	id_hash = {
+		donor: 0,
+		experiment: 0,
+		treatment: 0,
+		biosample: 0,
+		library: 0,
+		antibody_lot: 0,
+		replicate: 0
+	};
+	log_str = '';
 }
 
 
@@ -126,6 +145,37 @@ function checkForEncodeSubmission(type){
 				boolBreak = false;
 				errorMsg += '<b>Molecule</b> for <b>sample id: ' + sample_info[x].id + '</b> is not defined.<br>';
 			}
+			if (sample_info[x].source == undefined) {
+				boolPass = false;
+				boolBreak = false;
+				errorMsg += '<b>Source</b> for <b>sample id: ' + sample_info[x].id + '</b> is not defined.<br>';
+			}
+			if (sample_info[x].description == undefined) {
+				boolPass = false;
+				boolBreak = false;
+				errorMsg += '<b>Description</b> for <b>sample id: ' + sample_info[x].id + '</b> is not defined.<br>';
+			}
+			if (sample_info[x].read_length == undefined) {
+				boolPass = false;
+				boolBreak = false;
+				errorMsg += '<b>Read Length</b> for <b>sample id: ' + sample_info[x].id + '</b> is not defined.<br>';
+			}
+			if (sample_info[x].biosample_term_name == undefined) {
+				boolPass = false;
+				boolBreak = false;
+				errorMsg += '<b>Biosample Term Name</b> for <b>sample id: ' + sample_info[x].id + '</b> is not defined.<br>';
+			}
+			if (sample_info[x].biosample_term_id == undefined) {
+				boolPass = false;
+				boolBreak = false;
+				errorMsg += '<b>Biosample Term ID</b> for <b>sample id: ' + sample_info[x].id + '</b> is not defined.<br>';
+			}
+			if (sample_info[x].biosample_type == undefined) {
+				boolPass = false;
+				boolBreak = false;
+				errorMsg += '<b>Biosample Type</b> for <b>sample id: ' + sample_info[x].id + '</b> is not defined.<br>';
+			}
+			
 			if (!boolBreak) {
 				errorMsg += '<br>';
 			}
@@ -138,11 +188,6 @@ function checkForEncodeSubmission(type){
 				boolPass = false;
 				boolBreak = false;
 				errorMsg += '<b>Name</b> for <b>lane id: ' + lane_info[x].id + '</b> is not defined.<br>';
-			}
-			if (lane_info[x].date_submitted == undefined) {
-				boolPass = false;
-				boolBreak = false;
-				errorMsg += '<b>Date submitted</b> for <b>lane id: ' + lane_info[x].id + '</b> is not defined.<br>';
 			}
 			if (lane_info[x].date_received == undefined) {
 				boolPass = false;
@@ -235,7 +280,7 @@ function checkForEncodeSubmission(type){
 			document.getElementById('confirmPatchButton').setAttribute('style', 'display:none');
 			document.getElementById('confirmPatchButton').setAttribute('data-dismiss', '');
 		}else{
-			errorMsg += '<b>Database checks did not pass inspection, submission to ENCODE has been halted.  See errors above for more details.</b>'
+			errorMsg += '<b>Database checks did not pass inspection, submission to ENCODE has been halted.  The entries listed above must have values in order to submit to ENCODE.</b>'
 			$('#deleteModal').modal({
 				show: true
 			});
@@ -257,45 +302,47 @@ function checkForEncodeSubmission(type){
  */
 
 function encodeCheckForPatch(type){
-	var boolPass = false;
+	var boolPass = true;
 	for ( var x = 0; x < sample_info.length; x++ ){
-		if (sample_info[x].donor_acc != null || sample_info[x].donor_uuid != null) {
-			boolPass = true;
-		}else if (sample_info[x].treatment_uuid != null) {
-			boolPass = true;
-		}else if (sample_info[x].biosample_acc != null || sample_info[x].biosample_uuid != null) {
-			boolPass = true;
-		}else if (sample_info[x].library_acc != null || sample_info[x].library_uuid != null) {
-			boolPass = true;
-		}else if (sample_info[x].replicate_uuid != null) {
-			boolPass = true;
+		if (sample_info[x].donor_acc == null || sample_info[x].donor_uuid == null) {
+			boolPass = false;
+		}else if (sample_info[x].treatment_uuid == null) {
+			boolPass = false;
+		}else if (sample_info[x].biosample_acc == null || sample_info[x].biosample_uuid == null) {
+			boolPass = false;
+		}else if (sample_info[x].library_acc == null || sample_info[x].library_uuid == null) {
+			boolPass = false;
+		}else if (sample_info[x].replicate_uuid == null) {
+			boolPass = false;
 		}
 	}
 	for ( var x = 0; x < lane_info.length; x++ ){
-		if (lane_info[x].experiment_acc != null || lane_info[x].experiment_uuid != null) {
-			boolPass = true;
+		if (lane_info[x].experiment_acc == null || lane_info[x].experiment_uuid == null) {
+			boolPass = false;
 		}
 	}
 	
 	if (boolPass) {
 		if (type == 'metadata') {
-			encodePost('patch')
+			encodePost()
 		}else if (type == 'files') {
 			encodePostFiles()
 		}else{
-			encodePost('patch')
+			encodePost()
 			encodePostFiles()
 		}
 	}else{
 		if (type == 'metadata') {
-			encodePost('post')
+			encodePost()
 		}else if (type == 'files') {
 			encodePostFiles()
 		}else{
-			encodePost('post')
+			encodePost()
 			encodePostFiles()
 		}
 	}
+	console.log(log_str);
+	logResponse();
 }
 
 /*
@@ -426,11 +473,10 @@ function createEncodeJson(json_type){
 	
 	var post = [];
 	var patch = [];
-	var post_bool = true;
 	//	Using array_info, set up library calls
 	for(var x = 0; x < array_info.length; x++){
 		var json = {};
-		
+		var post_bool = true;
 		//	Grab correct ids
 		var proto_lib_type = null;
 		for(var y = 0; y < protocol_info.length; y++){
@@ -484,7 +530,6 @@ function createEncodeJson(json_type){
 			json['aliases'] = [experiment_info[0].lab+':'+treatment_info[treatment_lib_type].name+'_'+treatment_info[treatment_lib_type].duration + treatment_info[treatment_lib_type].duration_units.substring(0,1)];
 			treatment_ids.push(treatment_info[x].id);
 			treatment_uuid.push(treatment_info[x].uuid);
-			console.log(treatment_info[x].uuid)
 			if (treatment_info[x].uuid != undefined) {
 				post_bool = false;
 			}
@@ -493,7 +538,6 @@ function createEncodeJson(json_type){
 			json['aliases'] = [experiment_info[0].lab +':'+sample_info[x].samplename];
 			biosample_ids.push(sample_info[x].id);
 			biosample_accs.push(sample_info[x].biosample_acc);
-			console.log(sample_info[x].biosample_acc);
 			if (sample_info[x].biosample_acc != null) {
 				post_bool = false;
 			}
@@ -582,7 +626,7 @@ function createEncodeJson(json_type){
 			}else if (terms[y] == "biosample_type") {
 				json['biosample_type'] = sample_info[x].biosample_type;
 			}else if (terms[y] == "description") {
-				json['description'] = sample_info[x].notes;
+				json['description'] = sample_info[x].description;
 			}else if (terms[y] == "treatment_term_name") {
 				json['treatment_term_name'] = treatment_info[treatment_lib_type].treatment_term_name;
 			}else if (terms[y] == "treatment_term_id") {
@@ -611,7 +655,6 @@ function createEncodeJson(json_type){
 				}else{
 					json['source'] = sample_info[x].source
 				}
-				console.log(json['source'])
 			}else if (terms[y] == "treatments") {
 				json['treatments'] = [experiment_info[0].lab+':'+treatment_info[treatment_lib_type].name+'_'+treatment_info[treatment_lib_type].duration + treatment_info[treatment_lib_type].duration_units.substring(0,1)];
 			}else if (terms[y] == "date_obtained") {
@@ -622,6 +665,14 @@ function createEncodeJson(json_type){
 					}
 				}
 				json['date_obtained'] = lane_info[lane_id_pos].date_received.split(' ')[0];
+			}else if (terms[y] == "date_submitted") {
+				var lane_id_pos = -1;
+				for(var z = 0; z < lane_info.length; z++){
+					if (lane_info[z].id == sample_info[x].lane_id) {
+						lane_id_pos = z;
+					}
+				}
+				json['date_submitted'] = lane_info[lane_id_pos].date_received.split(' ')[0];
 			}else if (terms[y] == "biosample") {
 				json['biosample'] = experiment_info[0].lab + ':' + sample_info[x].samplename;
 			}else if (terms[y] == "nucleic_acid_term_name") {
@@ -705,10 +756,8 @@ function createEncodeJson(json_type){
 			}
 		}
 		if (post_bool) {
-			//	Post
 			post.push(json);
 		}else{
-			//	Patch
 			if (json_type != 'treatment') {
 				patch.push(json);
 			}
@@ -739,6 +788,7 @@ function encodeFilePost(){
 			async: false,
 			success : function(s)
 			{
+				console.log(s)
 				//	Print out server response
 				var file_post_string = "[" + s + "]";;
 				var file_response = JSON.parse(file_post_string);
@@ -762,6 +812,7 @@ function encodeFilePost(){
 
 function encodeSubmission(name, json, subType, type, table){
 	var response = [];
+	var string_array_json = '';
 	var output = '';
 	var item;
 	var accs;
@@ -788,10 +839,6 @@ function encodeSubmission(name, json, subType, type, table){
 		item = replicate_ids;
 		accs = replicate_uuids;
 	}
-	console.log(name);
-	console.log(item);
-	console.log(accs);
-	console.log(json);
 	if (subType == "post") {
 		$.ajax({ type: "GET",
 			url: BASE_PATH + "/public/ajax/encode_post.php",
@@ -805,14 +852,14 @@ function encodeSubmission(name, json, subType, type, table){
 			}
 		});
 	}else{
-		console.log(accs.toString());
 		$.ajax({ type: "GET",
 			url: BASE_PATH + "/public/ajax/encode_patch.php",
 			data: { json_name: name, json_passed: json, accession: accs.toString() },
 			async: false,
 			success : function(s)
 			{
-				var string_array_json = "[" + s + "]";
+				string_array_json = "[" + s + "]";
+				log_str += s + "\n";
 				console.log(string_array_json);
 				response = JSON.parse(string_array_json);
 			}
@@ -822,6 +869,7 @@ function encodeSubmission(name, json, subType, type, table){
 	output += '<b>' + name + ' ' + subType + ' Submission:</b></br>';
 	
 	for(var x = 0; x < response.length; x++){
+		console.log(response)
 		if (response[x].status.toLowerCase() == 'success') {
 			//	SUCCESS
 			output += 'Success<br>';
@@ -833,25 +881,31 @@ function encodeSubmission(name, json, subType, type, table){
 			}
 			if (type == "treatment") {
 				if (response[x]['@graph'][0].uuid != undefined) {
-					submitAccessionAndUuid(item[x], table, type, "treatment", response[x]['@graph'][0].uuid);
+					console.log("inside treatment")
+					submitAccessionAndUuid(item[id_hash[type]], table, type, "treatment", response[x]['@graph'][0].uuid);
 				}
 			}else if (type == "replicate"){
 				if (replicate_uuids[x] == null || replicate_uuids[x] == "" || replicate_uuids[x] == undefined) {
 					replicate_uuids[x] = response[x]['@graph'][0].uuid;
 				}
 				if (response[x]['@graph'][0].uuid != undefined) {
-					submitAccessionAndUuid(item[x], table, type, "replicate", response[x]['@graph'][0].uuid);
+					submitAccessionAndUuid(item[id_hash[type]], table, type, "replicate", response[x]['@graph'][0].uuid);
 				}
 			}else if (type == "experiment"){
 				if (experiment_accs[x] == null || experiment_accs[x] == "" || experiment_accs[x] == undefined) {
 					experiment_accs[x] = response[x]['@graph'][0].accession;
 				}
 				if (response[x]['@graph'][0].accession != undefined && response[x]['@graph'][0].uuid != undefined) {
-					submitAccessionAndUuid(item[x], table, type, response[x]['@graph'][0].accession, response[x]['@graph'][0].uuid);
+					submitAccessionAndUuid(item[id_hash[type]], table, type, response[x]['@graph'][0].accession, response[x]['@graph'][0].uuid);
 				}
 			}else{
+				console.log(item[id_hash[type]])
+				console.log(table)
+				console.log(type)
+				console.log(response[x]['@graph'][0].accession)
+				console.log(response[x]['@graph'][0].uuid)
 				if (response[x]['@graph'][0].accession != undefined && response[x]['@graph'][0].uuid != undefined) {
-					submitAccessionAndUuid(item[x], table, type, response[x]['@graph'][0].accession, response[x]['@graph'][0].uuid);
+					submitAccessionAndUuid(item[id_hash[type]], table, type, response[x]['@graph'][0].accession, response[x]['@graph'][0].uuid);
 				}
 			}
 		}else{
@@ -879,9 +933,23 @@ function encodeSubmission(name, json, subType, type, table){
 				}
 				output += response[x].description + '<br><br>';
 			}
-		}	
+		}
+		id_hash[type]++;
 	}
+	
 	return output;
+}
+
+function logResponse(){
+	$.ajax({ type: "GET",
+		url: BASE_PATH + "/public/ajax/encode_data.php",
+		data: { p: 'endLog', sample_ids: biosample_ids},
+		async: false,
+		success : function(s)
+		{
+			console.log(s);
+		}
+	});
 }
 
 function submitAccessionAndUuid(item, table, type, accession, uuid){
@@ -911,7 +979,7 @@ function submitAccessionAndUuid(item, table, type, accession, uuid){
  *	If submitting in the background, response files need to be created for the user to check the output.
  */
 
-function encodePost(subType){
+function encodePost(){
 	//	output response string initiation
 	var responseOutput = '';
 	
@@ -924,65 +992,72 @@ function encodePost(subType){
 	var antibody_lot_json = createEncodeJson("antibody");
 	var replicate_json = createEncodeJson("replicate");
 	
+	console.log(donor_json)
+	console.log(experiment_json)
 	console.log(treatment_json)
+	console.log(biosample_json)
+	console.log(antibody_lot_json)
+	console.log(replicate_json)
 	
 	//	DONOR SUBMISSION
+	console.log('donor')
 	if (donor_json[0].toString() != "") {
 		responseOutput += encodeSubmission('human_donor', donor_json[0], "post", "donor", "ngs_donor");
 	}
-	if (subType == "patch" && donor_json[1].toString() != "") {
-		responseOutput += encodeSubmission('human_donor', donor_json[1], subType, "donor", "ngs_donor");
+	if (donor_json[1].toString() != "") {
+		responseOutput += encodeSubmission('human_donor', donor_json[1], "patch", "donor", "ngs_donor");
 	}
 	//	EXPERIMENT SUBMISSION
-	console.log(experiment_json[0].toString());
+	console.log('experiment')
 	if (experiment_json[0].toString() != "") {
 		responseOutput += encodeSubmission('experiments', experiment_json[0], "post", "experiment", "ngs_samples");
 	}
-	if (subType == "patch" && experiment_json[1].toString() != "") {
-		responseOutput += encodeSubmission('experiments', experiment_json[1], subType, "experiment", "ngs_samples");
+	if (experiment_json[1].toString() != "") {
+		responseOutput += encodeSubmission('experiments', experiment_json[1], "patch", "experiment", "ngs_samples");
 	}
 	//	TREATMENT SUBMISSION
+	console.log('treatment')
 	if (treatment_json[0].toString() != "") {
 		//responseOutput +=
 		responseOutput += encodeSubmission('treatment', treatment_json[0], "post", "treatment", "ngs_treatment");
 	}
-	if (subType == "patch" && treatment_json[1].toString() != "") {
+	if (treatment_json[1].toString() != "") {
 		//responseOutput +=
-		responseOutput += encodeSubmission('treatment', treatment_json[1], subType, "treatment", "ngs_treatment");
+		responseOutput += encodeSubmission('treatment', treatment_json[1], "patch", "treatment", "ngs_treatment");
 	}
-	
 	//	BIOSAMPLE SUBMISSION
+	console.log('biosample')
 	if (biosample_json[0].toString() != "") {
 		responseOutput += encodeSubmission('biosamples', biosample_json[0], "post", "biosample", "ngs_samples");
 	}
-	if (subType == "patch" && biosample_json[1].toString() != "") {
-		responseOutput += encodeSubmission('biosamples', biosample_json[1], subType, "biosample", "ngs_samples");
+	if (biosample_json[1].toString() != "") {
+		responseOutput += encodeSubmission('biosamples', biosample_json[1], "patch", "biosample", "ngs_samples");
 	}
-	
 	//	LIBRARY SUBMISSION
+	console.log('library')
 	if (library_json[0].toString() != "") {
 		responseOutput += encodeSubmission('libraries', library_json[0], "post", "library", "ngs_samples");
 	}
-	if (subType == "patch" && library_json[1].toString() != "") {
-		responseOutput += encodeSubmission('libraries', library_json[1], subType, "library", "ngs_samples");
+	if (library_json[1].toString() != "") {
+		responseOutput += encodeSubmission('libraries', library_json[1], "patch", "library", "ngs_samples");
 	}
-	
 	//	ANTIBODY_LOT SUBMISSION
+	console.log('antibody_lot')
 	if (antibody_lot_json[0].toString() != "") {
 		//responseOutput +=
 		responseOutput += encodeSubmission('antibody_lot', antibody_lot_json[0], "post", "antibody_lot", "ngs_antibody_target");
 	}
-	if (subType == "patch" && antibody_lot_json[1].toString() != "") {
+	if (antibody_lot_json[1].toString() != "") {
 		//responseOutput +=
-		responseOutput += encodeSubmission('antibody_lot', antibody_lot_json[1], subType, "antibody_lot", "ngs_antibody_target");
+		responseOutput += encodeSubmission('antibody_lot', antibody_lot_json[1], "patch", "antibody_lot", "ngs_antibody_target");
 	}
-	
 	//	REPLICATE SUBMISSION
+	console.log('replicate')
 	if (replicate_json[0].toString() != "") {
 		responseOutput += encodeSubmission('replicate', replicate_json[0], "post", "replicate", "ngs_samples");
 	}
-	if (subType == "patch" && replicate_json[1].toString() != "") {
-		responseOutput += encodeSubmission('replicate', replicate_json[1], subType, "replicate", "ngs_samples");
+	if (replicate_json[1].toString() != "") {
+		responseOutput += encodeSubmission('replicate', replicate_json[1], "patch", "replicate", "ngs_samples");
 	}
 
 	//	Report Errors/Successes to modal
