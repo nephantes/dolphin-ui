@@ -11,7 +11,7 @@ $query = new dbfuncs();
 $funcs = new funcs();
 
 $p = '';
-$normalized = ['facility', 'organism', 'molecule', 'lab', 'organization', 'genotype', 'library_type',
+$normalized = ['facility', 'organism', 'molecule', 'lab', 'organization', 'genotype', 'library_type', 'source',
 				'instrument_model', 'treatment_manufacturer', 'library_strategy', 'donor', 'biosample_term_name'];
 
 if (isset($_GET['p'])){$p = $_GET['p'];}
@@ -42,7 +42,6 @@ if($p == 'insertDatabaseMulti')
 }
 if($p == 'updateDatabase')
 {
-
 	if (isset($_GET['id'])){$id = $_GET['id'];}
 	if (isset($_GET['type'])){$type = $_GET['type'];}
 	if (isset($_GET['table'])){$table = $_GET['table'];}
@@ -50,18 +49,23 @@ if($p == 'updateDatabase')
 	if (isset($_GET['parent'])){$parent = $_GET['parent'];}
 	if (isset($_GET['parent_id'])){$parent_id = $_GET['parent_id'];}
 	if (isset($_GET['parent_child'])){$parent_child = $_GET['parent_child'];}
-	
 	if(in_array($type, $normalized)){
 		$type_list = json_decode($query->queryTable("SELECT id FROM ".$table." WHERE $type = '$value'"));
 		if($type_list != array()){
 			$data=$query->runSQL("UPDATE $table SET ".$type."_id = ".$type_list[0]->id." WHERE id = '$id'"); 	
+		}else if ($value = ''){
+			$data=$query->runSQL("UPDATE $table SET ".$type."_id = NULL WHERE id = '$id'");
 		}else{
 			$query->runSQL("INSERT INTO ngs_".$type." ($type) VALUES ('$value')");
 			$insert_id= json_decode($query->queryTable("SELECT id FROM ngs_".$type." WHERE $type = '$value'"));
 			$data=$query->runSQL("UPDATE $table SET ".$type."_id = '".$insert_id[0]->id."' WHERE id = '$id'");
 		}	
 	}else{
-		$data=$query->runSQL("UPDATE $table SET $table.$type = '$value' WHERE id = '$id'");
+		if ($value == ''){
+			$data=$query->runSQL("UPDATE $table SET $table.$type = NULL WHERE id = '$id'");
+		}else{
+			$data=$query->runSQL("UPDATE $table SET $table.$type = '$value' WHERE id = '$id'");
+		}
 	}
 }
 if($p == 'updateDatabaseEncode')
@@ -79,13 +83,19 @@ if($p == 'updateDatabaseEncode')
 		$type_list = json_decode($query->queryTable("SELECT id FROM ".$table." WHERE $type = '$value'"));
 		if($type_list != array()){
 			$data=$query->runSQL("UPDATE $parent SET $parent_child = ".$type_list[0]->id." WHERE id = $parent_id"); 	
+		}else if ($value == ''){
+			$data=$query->runSQL("UPDATE $parent SET ".$parent_child." = NULL WHERE id = $parent_id");
 		}else{
 			$query->runSQL("INSERT INTO ".$table." ($type) VALUES ('$value')");
 			$insert_id= json_decode($query->queryTable("SELECT id FROM ".$table." WHERE $type = '$value'"));
 			$data=$query->runSQL("UPDATE $parent SET ".$parent_child." = '".$insert_id[0]->id."' WHERE id = $parent_id");
 		}
 	}else{
-		$data=$query->runSQL("UPDATE $table SET $table.$type = '$value' WHERE id = '$id'");
+		if ($value == ''){
+			$data=$query->runSQL("UPDATE $table SET $table.$type = NULL WHERE id = '$id'");
+		}else{
+			$data=$query->runSQL("UPDATE $table SET $table.$type = '$value' WHERE id = '$id'");
+		}
 	}
 }
 if($p == 'updateDatabaseMultiEncode')
@@ -102,13 +112,19 @@ if($p == 'updateDatabaseMultiEncode')
 		$type_list = json_decode($query->queryTable("SELECT id FROM ".$table." WHERE $type = '$value'"));
 		if($type_list != array()){
 			$data=$query->runSQL("UPDATE $parent SET $parent_child = ".$type_list[0]->id." WHERE id in ($id)"); 	
+		}else if ($value == ''){
+			$data=$query->runSQL("UPDATE $parent SET ".$parent_child." = NULL WHERE id in ($id)");
 		}else{
 			$query->runSQL("INSERT INTO ".$table." ($type) VALUES ('$value')");
 			$insert_id= json_decode($query->queryTable("SELECT id FROM ".$table." WHERE $type = '$value'"));
 			$data=$query->runSQL("UPDATE $parent SET ".$parent_child." = '".$insert_id[0]->id."' WHERE id in ($id)");
 		}
 	}else{
-		$data=$query->runSQL("UPDATE $table SET $table.$type = '$value' WHERE id in ($id)");
+		if ($value == ''){
+			$data=$query->runSQL("UPDATE $table SET $table.$type = NULL WHERE id in ($id)");
+		}else{
+			$data=$query->runSQL("UPDATE $table SET $table.$type = '$value' WHERE id in ($id)");
+		}
 	}
 }
 else if($p == 'checkPerms')
