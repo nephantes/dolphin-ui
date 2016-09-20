@@ -87,10 +87,11 @@ class funcs
         $this->readINI();
         $file_array = explode(",",$params['file']);
         $com = 'ls ';
+        $files = '';
         foreach($file_array as $fa){
-            $com .= $fa . " ";
+            $files .= $fa . " ";
         }
-        $com .= " | grep XXXXXXXXXXX";
+        $com .= "$files | grep XXXXXXXXXXX";
         $retval = $this->syscall($this->getCMDs($com));
         if (preg_match('/No such file or directory/', $retval)) {
             return "{\"ERROR\": \"".trim($retval)."\"}";
@@ -102,6 +103,11 @@ class funcs
             return "{\"ERROR\": \"Cluster account password has expired.\"}";
         }else if (preg_match('/password:/', $retval)){
             return "{\"ERROR\": \"Dolphin cannot access your cluster account.  Please log into the GHPCC cluster and run this script: /project/umw_biocore/bin/addKey.bash\"}";
+        }
+        $com2 = "ls -lshd $files | awk '{print \\\$2}' | grep d";
+        $retval = $this->syscall($this->getCMDs($com2));
+        if(preg_match("/d/", $retval)){
+            return "{\"ERROR\":\"Cannot use a directory as a specified file.  Please check your file input for inconsistencies\"}";
         }
         return "{\"Result\":\"Ok\"}";
     }
