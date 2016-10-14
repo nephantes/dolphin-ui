@@ -41,7 +41,7 @@
 						<div class="col-md-12">
 							<div class="col-md-8">
 								<?php 
-									echo $html->getRespBoxTable_ng("Samples Selected", "selected_samples", "<th>id</th><th>Sample Name</th><th>Run ID</th><th>Delete</th>");
+									echo $html->getRespBoxTable_ng("Samples Selected", "selected_samples", "<th>id</th><th>Sample Name</th><th>Run ID</th><th>Select</th><th>Delete</th>");
 								?>
 							</div>
 							<div class="col-md-4">
