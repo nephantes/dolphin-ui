@@ -130,7 +130,8 @@ function directoryGrab(directory){
 	var file_array = [];
 	$.ajax({
 		type: 	'GET',
-		url: 	BASE_PATH+'/public/api/service.php?func=directoryContents&directory='+directory+'&username='+username.clusteruser,
+		url: 	API_PATH+'/public/api/service.php',
+		data: { func:'directoryContents', directory:directory, username:username.clusteruser},
 		async:	false,
 		success: function(s)
 		{
@@ -290,7 +291,6 @@ $(function() {
 	"use strict";
 	//	Disable directory tab
 	if (window.location.href.split("/")[window.location.href.split("/").length - 1] != "process") {
-		document.getElementById('Directory_toggle').setAttribute('data-toggle', 'none');
 		var files = $('#jsontable_dir_files').dataTable();
 		files.fnClearTable();
 		document.getElementById('jsontable_dir_files').style.width = '100%';
