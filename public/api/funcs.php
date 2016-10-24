@@ -1015,6 +1015,14 @@ class funcs
         return $this->queryTable($sql); 
       }
 
+      function getGSMs($params)
+      {
+        $runparamsid=$params['runparamsid'];
+        
+        $sql = "SELECT id, title from ngs_samples WHERE id in (SELECT sample_id FROM ngs_runlist WHERE run_id = $runparamsid)";
+        
+        return $this->queryTable($sql);
+      }
       //#######################################
 
 }

@@ -8,6 +8,7 @@ $(function() {
 	if (typeof(initialSubmission) != "undefined" && window.location.href.split("/").indexOf('process') > -1) {
 		console.log(initialSubmission);
 		var initial_split = initialSubmission.split(",");
+		console.log(initial_split)
 		var outdir;
 		var runname;
 		var rundesc;
@@ -73,6 +74,26 @@ $(function() {
 			group = initial_split[initial_split.length - 2];
 			perms = initial_split[initial_split.length - 1];
 			
+		}else if (window.location.href.split("/").indexOf('geoimport') > -1) {
+			runname = 'GEO Initial Run';
+			rundesc = 'GEO Initial Run within series: ' + initial_split[0];
+			outdir = initial_split[4] + '/initial_run';
+			experiment_series = initial_split[0];
+			sample_lane = "'" + initial_split[1] + "'"
+			var names_list = initial_split[3].split(":");
+			group = initial_split[initial_split.length - 2];
+			perms = initial_split[initial_split.length - 1];
+			JSON_OBJECT['genomebuild'] = 'human,hg19';
+			JSON_OBJECT['spaired'] = initial_split[2];
+			JSON_OBJECT['resume'] = 'no';
+			JSON_OBJECT['fastqc'] = 'no';
+			JSON_OBJECT['barcodes'] = 'none';
+			JSON_OBJECT['adapters'] = 'none';
+			JSON_OBJECT['quality'] = 'none';
+			JSON_OBJECT['trim'] = 'none';
+			JSON_OBJECT['split'] = 'none';
+			JSON_OBJECT['commonind'] = 'none';
+			JSON_OBJECT['submission'] = '2';
 		}else{
 			runname = 'Import Initial Run';
 			rundesc = 'Import Initial Run within series: ' + initial_split[0];
