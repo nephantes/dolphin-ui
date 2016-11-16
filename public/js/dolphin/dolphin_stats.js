@@ -33,14 +33,16 @@ $(function() {
     $('.daterange').daterangepicker(
             {
                 ranges: {
-                    'Today': [moment(), moment()],
-                    'Yesterday': [moment().subtract('days', 1), moment().subtract('days', 1)],
+                    'Today': [moment().subtract('days', 1), moment()],
+                    'Yesterday': [moment().subtract('days', 2), moment().subtract('days', 1)],
                     'Last 7 Days': [moment().subtract('days', 6), moment()],
                     'Last 30 Days': [moment().subtract('days', 29), moment()],
                     'This Month': [moment().startOf('month'), moment().endOf('month')],
-                    'Last Month': [moment().subtract('month', 1).startOf('month'), moment().subtract('month', 1).endOf('month')]
+                    'Last Month': [moment().subtract('month', 1).startOf('month'), moment().subtract('month', 1).endOf('month')],
+					'This Year': [moment().startOf('year'), moment().endOf('year')],
+					'All Time': [moment('2012-01-01'), moment()],
                 },
-                startDate: moment().subtract('days', 29),
+                startDate: moment('2012-01-01'),
                 endDate: moment()
             },
     function(start, end) {
@@ -113,9 +115,10 @@ $(function() {
                     'Last 30 Days': [moment().subtract('days', 29), moment()],
                     'This Month': [moment().startOf('month'), moment().endOf('month')],
                     'Last Month': [moment().subtract('month', 1).startOf('month'), moment().subtract('month', 1).endOf('month')],
-                    'This Year': [moment().startOf('year'), moment().endOf('year')],
+					'This Year': [moment().startOf('year'), moment().endOf('year')],
+					'All Time': [moment('2012-01-01'), moment()],
                 },
-                startDate: moment().subtract('days', 29),
+                startDate: moment('2012-01-01'),
                 endDate: moment()
             },
     function(start, end) {
@@ -168,9 +171,10 @@ $(function() {
                     'Last 30 Days': [moment().subtract('days', 29), moment()],
                     'This Month': [moment().startOf('month'), moment().endOf('month')],
                     'Last Month': [moment().subtract('month', 1).startOf('month'), moment().subtract('month', 1).endOf('month')],
-                    'This Year': [moment().startOf('year'), moment().endOf('year')],
+					'This Year': [moment().startOf('year'), moment().endOf('year')],
+					'All Time': [moment('2012-01-01'), moment()],
                 },
-                startDate: moment().subtract('days', 29),
+                startDate: moment('2012-01-01'),
                 endDate: moment()
             },
     function(start, end) {
@@ -193,25 +197,28 @@ $(function() {
     });
     labTable.fnSort( [ [1,'desc'] ] );
     
-    var toolTable = $('#jsontable_Tool').dataTable();
+	/*##### SERVICE TABLE #####*/
+    
+    var serviceTable = $('#jsontable_Service').dataTable();
     
     $.ajax({ type: "GET",   
-                     url: BASE_PATH+"/public/ajax/statquerydb.php",
-                     data: { p: "getToolTime", type:"Dolphin" },
+                     url: BASE_PATH+"/public/ajax/adminstatquerydb.php",
+                     data: { p: "getServiceTime", type:"Dolphin" },
                      async: false,
                      success : function(s)
                      {
-                        toolTable.fnClearTable();
+						console.log(s);
+                        serviceTable.fnClearTable();
                         for(var i = 0; i < s.length; i++) {
-                        toolTable.fnAddData([
-                        s[i].tool_name,
+                        serviceTable.fnAddData([
+                        s[i].servicename,
                         s[i].count                      
                         ]);
                         } // End For
                      }
             });
     
-    $('.daterange_Tool').daterangepicker(
+    $('.daterange_Service').daterangepicker(
             {
                 ranges: {
                     'Today': [moment().subtract('days', 1), moment()],
@@ -220,31 +227,32 @@ $(function() {
                     'Last 30 Days': [moment().subtract('days', 29), moment()],
                     'This Month': [moment().startOf('month'), moment().endOf('month')],
                     'Last Month': [moment().subtract('month', 1).startOf('month'), moment().subtract('month', 1).endOf('month')],
-                    'This Year': [moment().startOf('year'), moment().endOf('year')],
+					'This Year': [moment().startOf('year'), moment().endOf('year')],
+					'All Time': [moment('2012-01-01'), moment()],
                 },
-                startDate: moment().subtract('days', 29),
+                startDate: moment('2012-01-01'),
                 endDate: moment()
             },
     function(start, end) {
             $.ajax({ type: "GET",   
-                     url: BASE_PATH+"/public/ajax/statquerydb.php",
-                     data: { p: "getToolTime", type:"Dolphin", start:start.format('YYYY-MM-DD'), end:end.format('YYYY-MM-DD') },
+                     url: BASE_PATH+"/public/ajax/adminstatquerydb.php",
+                     data: { p: "getServiceTime", type:"Dolphin", start:start.format('YYYY-MM-DD'), end:end.format('YYYY-MM-DD') },
                      async: false,
                      success : function(s)
                      {
-                        toolTable.fnClearTable();
+						console.log(s);
+                        serviceTable.fnClearTable();
                         for(var i = 0; i < s.length; i++) {
-                        toolTable.fnAddData([
-                        s[i].tool_name,
+                        serviceTable.fnAddData([
+                        s[i].servicename,
                         s[i].count                      
                         ]);
                         } // End For
                      }
             });
-
     });
     
-    toolTable.fnSort( [ [1,'desc'] ] );
+    serviceTable.fnSort( [ [1,'desc'] ] );
     
     /*##### JOB TABLE #####*/
     
@@ -275,9 +283,10 @@ $(function() {
                     'Last 30 Days': [moment().subtract('days', 29), moment()],
                     'This Month': [moment().startOf('month'), moment().endOf('month')],
                     'Last Month': [moment().subtract('month', 1).startOf('month'), moment().subtract('month', 1).endOf('month')],
-                    'This Year': [moment().startOf('year'), moment().endOf('year')],
+					'This Year': [moment().startOf('year'), moment().endOf('year')],
+					'Total': [moment('2012-01-01'), moment()],
                 },
-                startDate: moment().subtract('days', 29),
+                startDate: moment('2012-01-01'),
                 endDate: moment()
             },
     function(start, end) {
@@ -298,6 +307,7 @@ $(function() {
             });
 
     });
-    
+	
     jobTable.fnSort( [ [1,'desc'] ] );
+	
 });
