@@ -232,6 +232,20 @@ function checkIfFileExists(input, username){
 	return check;
 }
 
+function checkBigwigCreated(doesnotexist, input){
+	console.log(input)
+	var check = false;
+	if (doesnotexist || input == -1) {
+		var check = true;
+	}else{
+		var value = document.getElementById('select_bigwig_'+currentPipelineID[input]).value;
+		if (value == 'no') {
+			check = true;
+		}
+	}
+	return check;
+}
+
 //	END GENERIC FUNCTIONS
 //	************************************************************************
 //	START GROUPED FUNCTIONS
@@ -252,10 +266,10 @@ function pipelineSelectCheck(num, type){
 			return true;
 		}
 	//	ChipSeq
-	}else if (type == 'ChipSeq') {
+	}else if (type == 'ChipSeq' || type == 'ChipSeq/ATACSeq') {
 		//	If a ChipSeq pipeline already exists
 		if(checkPipelineExists(num, type)){
-			displayErrorModal('#errorModal', 'You cannot select more than one ChipSeq pipeline');
+			displayErrorModal('#errorModal', 'You cannot select more than one ChipSeq/ATACSeq pipeline');
 			return true;
 		}
 	//	DESeq
@@ -303,10 +317,26 @@ function pipelineSelectCheck(num, type){
 		}else{
 			var tophat_check = checkPipelineDoesNotExist(num, 'Tophat') || checkPipelineDownstream(num, 'Tophat') || checkPipelineReplacing(num, 'Tophat');
 			var chipseq_check = checkPipelineDoesNotExist(num, 'ChipSeq') || checkPipelineDownstream(num, 'ChipSeq') || checkPipelineReplacing(num, 'ChipSeq');
-			if (chipseq_check && tophat_check) {
+			var atacseq_check = checkPipelineDoesNotExist(num, 'ChipSeq/ATACSeq') || checkPipelineDownstream(num, 'ChipSeq/ATACSeq') || checkPipelineReplacing(num, 'ChipSeq/ATACSeq');
+			var chip_atac_check = (chipseq_check || atacseq_check)
+			if (chipseq_check && chip_atac_check) {
 				displayErrorModal('#errorModal', 'You must run a Tophat/ChipSeq pipeline before you can run HaplotypeCaller');
 				return true;
 			}
+		}
+	}else if (type == 'Deeptools') {
+		//var rsem_check = checkBigwigCreated(checkPipelineDoesNotExist(num, 'RNASeqRSEM') || checkPipelineDownstream(num, 'RNASeqRSEM') || checkPipelineReplacing(num, 'RNASeqRSEM'), currentPipelineVal.indexOf('RNASeqRSEM'));
+		//var tophat_check = checkBigwigCreated(checkPipelineDoesNotExist(num, 'Tophat') || checkPipelineDownstream(num, 'Tophat') || checkPipelineReplacing(num, 'Tophat'), currentPipelineVal.indexOf('Tophat'));
+		var chipseq_check = checkBigwigCreated(checkPipelineDoesNotExist(num, 'ChipSeq') || checkPipelineDownstream(num, 'ChipSeq') || checkPipelineReplacing(num, 'ChipSeq'), currentPipelineVal.indexOf('ChipSeq'));
+		var atacseq_check = checkBigwigCreated(checkPipelineDoesNotExist(num, 'ChipSeq/ATACSeq') || checkPipelineDownstream(num, 'ChipSeq/ATACSeq') || checkPipelineReplacing(num, 'ChipSeq/ATACSeq'), currentPipelineVal.indexOf('ChipSeq/ATACSeq'));
+		var chip_atac_check = (chipseq_check && atacseq_check)
+		//var star_check = checkBigwigCreated(checkPipelineDoesNotExist(num, 'STAR') || checkPipelineDownstream(num, 'STAR') || checkPipelineReplacing(num, 'STAR'), currentPipelineVal.indexOf('STAR'));
+		//var hisat2_check = checkBigwigCreated(checkPipelineDoesNotExist(num, 'Hisat2') || checkPipelineDownstream(num, 'Hisat2') || checkPipelineReplacing(num, 'Hisat2'), currentPipelineVal.indexOf('Hisat2'));
+		//var bis_check = checkBigwigCreated(checkPipelineDoesNotExist(num, 'BisulphiteMapping') || checkPipelineDownstream(num, 'BisulphiteMapping') || checkPipelineReplacing(num, 'BisulphiteMapping'), currentPipelineVal.indexOf('BisulphiteMapping'));
+		//if (rsem_check && tophat_check && chip_atac_check && star_check && hisat2_check && bis_check) {
+		if (chip_atac_check) {
+			displayErrorModal('#errorModal', 'A bigwig file from a ChipSeq/ATACSeq pipeline needs to be generated in order to select Deeptools');
+			return true;
 		}
 	}
 	return false;
@@ -422,10 +452,6 @@ function pipelineSubmitCheck(non_pipeline, non_pipeline_values, pipeline, pipeli
 			}else if (!checkFieldCheckboxChecked('checkbox_rseqc_'+pipeline_index[x]) && !checkFieldCheckboxChecked('checkbox_nogenbam_'+pipeline_index[x])){
 				displayErrorModal('#errorModal', 'You cannot perform RNA-Seq QC while No Genome BAM is selected.');
 				return true;
-			//	K-means selection
-			}else if (!checkFieldCheckboxChecked('checkbox_usekm_'+pipeline_index[x]) && (checkFieldsEmpty('text_kmeans_'+pipeline_index[x]) || checkFieldIsNotInt('text_kmeans_'+pipeline_index[x]))) {
-				displayErrorModal('#errorModal', 'K-means selection must be an integer in order to use k-means clustering in Deeptools.');
-				return true;
 			}
 		//	Tophat
 		}else if (name == 'Tophat') {
@@ -436,10 +462,6 @@ function pipelineSubmitCheck(non_pipeline, non_pipeline_values, pipeline, pipeli
 			//	single end dedup selected
 			}else if (!checkFieldCheckboxChecked('checkbox_markdup_'+pipeline_index[x]) && (!checkFieldSelection('spaired', 'no'))){
 				displayErrorModal('#errorModal', 'Deduplication can not be performed on single-end reads');
-				return true;
-			//	K-means selection
-			}else if (!checkFieldCheckboxChecked('checkbox_usekm_'+pipeline_index[x]) && (checkFieldsEmpty('text_kmeans_'+pipeline_index[x]) || checkFieldIsNotInt('text_kmeans_'+pipeline_index[x]))) {
-				displayErrorModal('#errorModal', 'K-means selection must be an integer in order to use k-means clustering in Deeptools.');
 				return true;
 			}
 		//	ChipSeq
@@ -480,10 +502,6 @@ function pipelineSubmitCheck(non_pipeline, non_pipeline_values, pipeline, pipeli
 			//	Effective genome size(bp) is non-int
 			}else if (checkFieldIsNotInt('select_genomes_'+pipeline_index[x]) || checkFieldsEmpty('select_genomes_'+pipeline_index[x])) {
 				displayErrorModal('#errorModal', 'Effective genome size(bp) field must contain an integer value within ChipSeq');
-				return true;
-			//	K-means selection
-			}else if (!checkFieldCheckboxChecked('checkbox_usekm_'+pipeline_index[x]) && (checkFieldsEmpty('text_kmeans_'+pipeline_index[x]) || checkFieldIsNotInt('text_kmeans_'+pipeline_index[x]))) {
-				displayErrorModal('#errorModal', 'K-means selection must be an integer in order to use k-means clustering in Deeptools.');
 				return true;
 			}
 		//	DESeq
@@ -534,10 +552,6 @@ function pipelineSubmitCheck(non_pipeline, non_pipeline_values, pipeline, pipeli
 			//	MethylKit Top N Regions
 			}else if (!checkFieldCheckboxChecked('checkbox_runmk_'+pipeline_index[x]) && (checkFieldIsNotInt('text_topn_'+pipeline_index[x]) || checkFieldsEmpty('text_topn_'+pipeline_index[x])) ) {
 				displayErrorModal('#errorModal', 'Top N Regions field must be of type int for BisulphiteMapping');
-				return true;
-			//	K-means selection
-			}else if (!checkFieldCheckboxChecked('checkbox_usekm_'+pipeline_index[x]) && (checkFieldsEmpty('text_kmeans_'+pipeline_index[x]) || checkFieldIsNotInt('text_kmeans_'+pipeline_index[x]))) {
-				displayErrorModal('#errorModal', 'K-means selection must be an integer in order to use k-means clustering in Deeptools.');
 				return true;
 			}
 		//	DiffMeth
@@ -605,6 +619,31 @@ function pipelineSubmitCheck(non_pipeline, non_pipeline_values, pipeline, pipeli
 			}else if (!checkFieldsEmpty('text_custombed_'+pipeline_index[x]) && checkIfFileExists('text_custombed_'+pipeline_index[x], username)) {
 				displayErrorModal('#errorModal', 'You do not have access to this file, or the file does not exist (Haplotype Custom Bed File)');
 				return true;
+			}
+		//	Deeptools
+		}else if (name == 'Deeptools') {
+			//	Before
+			if (checkFieldIsNotInt('input_beforeregion_'+pipeline_index[x]) || checkFieldsEmpty('input_beforeregion_'+pipeline_index[x])) {
+				displayErrorModal('#errorModal', 'Before region start length field must be of type int for Deeptools');
+				return true;
+			//	After
+			}else if (checkFieldIsNotInt('input_afterregion_'+pipeline_index[x]) || checkFieldsEmpty('input_afterregion_'+pipeline_index[x])) {
+				displayErrorModal('#errorModal', 'after region start length field must be of type int for Deeptools');
+				return true;
+			// Body
+			}else if (checkFieldIsNotInt('input_bodyregion_'+pipeline_index[x]) || checkFieldsEmpty('input_bodyregion_'+pipeline_index[x])) {
+				displayErrorModal('#errorModal', 'Region body length field must be of type int for Deeptools');
+				return true;
+			//	Quality
+			}else if (checkFieldIsNotInt('input_qualitycut_'+pipeline_index[x]) || checkFieldsEmpty('input_qualitycut_'+pipeline_index[x])) {
+				displayErrorModal('#errorModal', 'Peak cut-off score field must be of type int for Deeptools');
+				return true;
+			//	K-means
+			}else if (checkFieldCheckboxChecked('select_plottype_'+pipeline_index[x])) {
+				if (checkFieldIsNotInt('text_kmeans_'+pipeline_index[x]) || checkFieldsEmpty('text_kmeans_'+pipeline_index[x])) {
+					displayErrorModal('#errorModal', 'K-Means field must be of type int for Deeptools');
+					return true;
+				}
 			}
 		}
 	}
