@@ -1,4 +1,7 @@
 var addModalType = '';
+var sampleRuns = {};
+var runParams = {};
+var active_runs = [];
 
 function responseCheck(data) {
 	for(var x = 0; x < Object.keys(data).length; x++){
@@ -75,6 +78,7 @@ function loadInEncodeTables(){
 		loadLibraries();
 		loadAntibodies();
 		loadReplicates();
+		loadFiles();
 	}
 }
 
@@ -111,7 +115,7 @@ function loadSamples(){
 				
 				//	Modal
 				treatmentSelect.innerHTML += '<option id="treatment_'+s[x].samplename+'" value="'+s[x].id+'">'+s[x].samplename+'</option>'
-				antibodySelect.innerHTML += '<option id="treatment_'+s[x].samplename+'" value="'+s[x].id+'">'+s[x].samplename+'</option>'
+				antibodySelect.innerHTML += '<option id="antibody_'+s[x].samplename+'" value="'+s[x].id+'">'+s[x].samplename+'</option>'
 			}
 			
 		}
@@ -322,6 +326,327 @@ function loadReplicates(){
 	});
 }
 
+function loadFiles() {
+	sampleRuns = {};
+	runParams = {};
+	$.ajax({ type: "GET",
+		url: BASE_PATH+"/public/ajax/encode_tables.php",
+		data: { p: "getFiles", samples:basket_info },
+		async: false,
+		success : function(s)
+		{
+			console.log(s);
+			for(var x = 0; x < s.length; x++){
+				if (sampleRuns[s[x].samplename] == undefined) {
+					sampleRuns[s[x].samplename] = {};
+					sampleRuns[s[x].samplename]['sid'] = s[x].sample_id
+					sampleRuns[s[x].samplename]['rid'] = s[x].id
+					sampleRuns[s[x].samplename]['did'] = s[x].dir_id
+					sampleRuns[s[x].samplename][s[x].id] = 1
+				}
+				if (runParams[s[x].id] == undefined) {
+					runParams[s[x].id] = JSON.parse(s[x].json_parameters)
+					runParams[s[x].id].run_name = s[x].run_name
+					runParams[s[x].id].run_description = s[x].run_description
+					runParams[s[x].id].outdir = s[x].outdir
+				}
+				if (sampleRuns[s[x].samplename][s[x].id] == undefined) {
+					sampleRuns[s[x].samplename][s[x].id] = 0
+				}
+			}
+		}
+	});
+	
+	var runtable = $('#jsontable_encode_runs').dataTable();
+	var keys = Object.keys(sampleRuns)
+	runtable.fnClearTable();
+	var ordertable = $('#jsontable_encode_file_order').dataTable();
+	ordertable.fnClearTable();
+	for(var x = 0; x < keys.length; x++){
+		var runs = Object.keys(sampleRuns[keys[x]])
+		runs.splice(runs.indexOf('sid'), 1)
+		runs.splice(runs.indexOf('rid'), 1)
+		runs.splice(runs.indexOf('did'), 1)
+		var sample_options = "";
+		for(var y = 0; y < runs.length; y++){
+			sample_options += "<option value=\""+runs[y]+"___"+runParams[runs[y]].run_name+"\">"+runParams[runs[y]].run_name+"</option>"
+		}
+		runtable.fnAddData([
+			keys[x],
+			"<select id=\""+keys[x]+"_select\" class=\"form-control\" onChange=\"runSelectionEncode(this)\">" + sample_options + "</select>",
+			runParams[runs[0]].outdir,
+		]);
+	}
+	
+	if (keys.length > 0) {
+		runSelectionEncode(document.getElementById(keys[0]+'_select'))
+	}
+	
+	var selectLength = keys.length
+	console.log(selectLength)
+	if (selectLength == 0) {
+		document.getElementById("addSampleFiles").size = Math.floor((189)/18);
+	}else if (selectLength == 1) {
+		document.getElementById("addSampleFiles").size = Math.floor((203)/18);
+	}else if (selectLength <= 10 ) {
+		document.getElementById("addSampleFiles").size = Math.floor((((selectLength - 1)  * 51) + 203)/18);
+	}else{
+		document.getElementById("addSampleFiles").size = ((509)/18);
+	}
+	
+}
+
+function loadPreviousFiles(){
+	var previoustable = $('#jsontable_previous_submissions').dataTable();
+	previoustable.fnClearTable();
+	$.ajax({ type: "GET",
+		url: BASE_PATH+"/public/ajax/encode_tables.php",
+		data: { p: "getSubmittedFiles", samples:basket_info },
+		async: false,
+		success : function(s)
+		{
+			console.log(s)
+			for(var x = 0; x < s.length; x++){
+				if (s[x].parent_file == 0) {
+					previoustable.fnAddData([
+						s[x].samplename,
+						s[x].run_name,
+						"Initial Fastq",
+						s[x].parent_file,
+						s[x].file_acc,
+						s[x].file_uuid
+					])
+				}else{
+					previoustable.fnAddData([
+						s[x].samplename,
+						s[x].run_name,
+						s[x].outdir + s[x].file_name,
+						s[x].parent_file,
+						s[x].file_acc,
+						s[x].file_uuid
+					])
+				}
+			}
+		}
+	});
+}
+
+function runSelectionEncode(select){
+	var id = select.id
+	var id_name = id.split("_select")[0]
+	var option = select.options[select.selectedIndex].value
+	var option_split = option.split("___")
+	var runs = Object.keys(sampleRuns[id_name])
+	runs.splice(runs.indexOf('sid'), 1)
+	runs.splice(runs.indexOf('rid'), 1)
+	runs.splice(runs.indexOf('did'), 1)
+	for (var x = 0; x < runs.length; x++) {
+		if (runs[x] == option_split[0]) {
+			sampleRuns[id_name][runs[x]] = 1
+		}else{
+			sampleRuns[id_name][runs[x]] = 0
+		}
+	}
+	active_runs = gatherFileSelection()
+	var options = createRunOptions(active_runs)
+	var file_select = document.getElementById('addSampleFiles').innerHTML = options
+	
+}
+
+function gatherFileSelection() {
+	var active_runs = []
+	var samples = Object.keys(sampleRuns)
+	console.log(samples)
+	console.log(samples.length)
+	for (var x = 0; x < samples.length; x++){
+		console.log(samples[x])
+		var runs = Object.keys(sampleRuns[samples[x]])
+		runs.splice(runs.indexOf('sid'), 1)
+		runs.splice(runs.indexOf('rid'), 1)
+		runs.splice(runs.indexOf('did'), 1)
+		for (var y = 0; y < runs.length; y++){
+			console.log(sampleRuns[samples[x]][runs[y]])
+			console.log(active_runs.indexOf(runs[y]))
+			console.log("@@@@")
+			if (sampleRuns[samples[x]][runs[y]] == 1 && active_runs.indexOf(runs[y]) == -1) {
+				active_runs.push(runs[y])
+			}
+		}
+	}
+	return active_runs
+}
+
+function createRunOptions(active_runs) {
+	console.log(active_runs)
+	var options_parse = {};
+	var options_select = "";
+	
+	for(var x = 0; x < active_runs.length; x++){
+		options_parse = JSONOptionParse(active_runs[x], options_parse)
+	}
+	console.log(options_parse)
+	var runs = Object.keys(options_parse)
+	for (var z = 0; z < runs.length; z++){
+		if (options_parse[runs[z]].length != active_runs.length) {
+			console.log(options_parse)
+			console.log(runs[z])
+			console.log(active_runs)
+			options_select += "<option disabled value=\""+runs[z]+"\">"+runs[z]+"</option>"
+		}else{
+			options_select += "<option value=\""+runs[z]+"\">"+runs[z]+"</option>"
+		}
+	}
+	return options_select
+}
+
+function JSONOptionParse(run_id, options_parse){
+	var pipeline = runParams[run_id].pipeline
+	var commonind = runParams[run_id].commonind
+	if (pipeline != undefined || pipeline != []) {
+		if (runParams[run_id].commonind != "" && runParams[run_id].commonind != "no" && runParams[run_id].commonind != "none") {
+			options_parse = mergeDedupChecks(runParams[run_id], run_id, merged, 'seqmapping', options_parse, commonind)
+		}
+		for(var y = 0; y < pipeline.length; y++){
+			var merged = false;
+			if (runParams[run_id].split != 'none') {
+				merged = true;
+			}
+			if (pipeline[y].Type == 'RNASeqRSEM') {
+				options_parse = mergeDedupChecks(pipeline[y], run_id, merged, 'rsem', options_parse, commonind)
+			}else if (pipeline[y].Type == 'Tophat') {
+				options_parse = mergeDedupChecks(pipeline[y], run_id, merged, 'tophat', options_parse, commonind)
+			}else if (pipeline[y].MacsType.toLowerCase() == 'chip') {
+				options_parse = mergeDedupChecks(pipeline[y], run_id, merged, 'chip', options_parse, commonind)
+			}else if (pipeline[y].MacsType.toLowerCase() == 'atac') {
+				options_parse = mergeDedupChecks(pipeline[y], run_id, merged, 'atac', options_parse, commonind)
+			}else if (pipeline[y].Type == 'STAR') {
+				//TBA
+			}else if (pipeline[y].Type == 'Hisat2') {
+				//TBA
+			}
+		}
+	}
+	return options_parse
+}
+
+function mergeDedupChecks(pipeline, run_id, merged, type, options_parse, commonind){
+	var dedup = false;
+	if (pipeline.MarkDuplicates == "yes") {
+		dedup = true;
+	}
+	var tdf = false;
+	if (pipeline.IGVTDF == "yes") {
+		tdf = true;
+	}
+	var bigwig = false;
+	if (pipeline.BAM2BW == "yes") {
+		bigwig = true;
+	}
+	if (type == "seqmapping") {
+		var split_common = commonind.split(",")
+		for ( var x = 0; x < split_common.length; x++) {
+			options_parse = optionsCheck(options_parse, '/seqmapping/'+split_common[x].toLowerCase()+'/', run_id, "fastq")
+		}
+	}
+	
+	if (dedup && merged) {
+		if (type == 'rsem') {
+			options_parse = optionsCheck(options_parse, '/dedupmergersem_ref.transcipts/', run_id, "bam")
+			options_parse = optionsCheck(options_parse, '/rsem/genes', run_id, "tdf")
+			options_parse = optionsCheck(options_parse, '/rsem/isoforms', run_id, "tdf")
+			options_parse = optionsCheck(options_parse, '/ucsc_dedupmergersem_ref.transcipts/', run_id, "bigWig")
+		}else{
+			options_parse = optionsCheck(options_parse, '/dedupmerge'+type+'/', run_id, "bam")
+			if (type == 'chip' || type == 'atac') {
+				options_parse = optionsCheck(options_parse, '/macs/', run_id, "peaks-bed")
+			}
+			options_parse = optionsCheck(options_parse, '/ucsc_dedupmerge'+type+'/', run_id, "bigWig")
+		}
+	}else if (merged) {
+		if (type == 'rsem') {
+			options_parse = optionsCheck(options_parse, '/rsem/', run_id, "bam")
+			options_parse = optionsCheck(options_parse, '/rsem/genes', run_id, "tdf")
+			options_parse = optionsCheck(options_parse, '/rsem/isoforms', run_id, "tdf")
+			options_parse = optionsCheck(options_parse, '/ucsc_rsem/', run_id, "bigWig")
+		}else{
+			options_parse = optionsCheck(options_parse, '/merge'+type+'/', run_id, "bam")
+			if (type == 'chip' || type == 'atac') {
+				options_parse = optionsCheck(options_parse, '/macs/', run_id, "peaks-bed")
+			}
+			options_parse = optionsCheck(options_parse, '/ucsc_dedupmerge'+type+'/', run_id, "bigWig")
+		}
+	}else if (dedup) {
+		if (type == 'rsem') {
+			options_parse = optionsCheck(options_parse, '/deduprsem_ref.transcipts/', run_id, "bam")
+			options_parse = optionsCheck(options_parse, '/rsem/genes', run_id, "tdf")
+			options_parse = optionsCheck(options_parse, '/rsem/isoforms', run_id, "tdf")
+			options_parse = optionsCheck(options_parse, '/ucsc_deduprsem_ref.transcipts/', run_id, "bigWig")
+		}else{
+			options_parse = optionsCheck(options_parse, '/dedup'+type+'/', run_id, "bam")
+			if (type == 'chip' || type == 'atac') {
+				options_parse = optionsCheck(options_parse, '/macs/', run_id, "peaks-bed")
+			}
+			options_parse = optionsCheck(options_parse, '/ucsc_dedupmerge'+type+'/', run_id, "bigWig")
+		}
+	}else{
+		if (type == 'rsem') {
+			options_parse = optionsCheck(options_parse, '/rsem/', run_id, "bam")
+			options_parse = optionsCheck(options_parse, '/rsem/genes', run_id, "tdf")
+			options_parse = optionsCheck(options_parse, '/rsem/isoforms', run_id, "tdf")
+			options_parse = optionsCheck(options_parse, '/ucsc_rsem_ref.transcipts/', run_id, "bigWig")
+		}else if (type == 'chip' || type == 'atac'){
+			options_parse = optionsCheck(options_parse, '/seqmapping/'+type+'/', run_id, "bam")
+			if (type == 'chip' || type == 'atac') {
+				options_parse = optionsCheck(options_parse, '/macs/', run_id, "peaks-bed")
+			}
+			options_parse = optionsCheck(options_parse, '/ucsc_'+type+'/', run_id, "bigWig")
+		}else if (type != "seqmapping"){
+			options_parse = optionsCheck(options_parse, '/'+type+'/', run_id, "bam")
+			options_parse = optionsCheck(options_parse, '/ucsc_'+type+'/', run_id, "bigWig")
+		}
+	}
+	return options_parse
+}
+
+function optionsCheck(options_parse, title, run_id, file){
+	if (options_parse[title+ " " + file] == undefined) {
+		options_parse[title+ " " + file] = []
+		options_parse[title+ " " + file].push(run_id)
+	}else{
+		options_parse[title+ " " + file].push(run_id)
+	}
+	return options_parse
+}
+
+function submissionSelection(){
+	var select = document.getElementById('addSampleFiles')
+	var options = select.selectedOptions
+	var ordertable = $('#jsontable_encode_file_order').dataTable();
+	ordertable.fnClearTable();
+	var options_html = "<option value=\"1\">1</option>";
+	for (var x = 0; x < options.length; x++) {
+		options_html += "<option value=\""+(x+2)+"\">"+(x+2)+"</option>"
+	}
+	ordertable.fnAddData([
+			1,
+			"Initial Fastq",
+			"/input/",
+			"fastq",
+			"<textarea type=\"text\" class=\"form-control\" rows=\"1\" style=\"width:100%\"></textarea>",
+			"<textarea type=\"text\" class=\"form-control\" rows=\"1\" style=\"width:100%\"></textarea>"
+		])
+	for (var x = 0; x < options.length; x++) {
+		ordertable.fnAddData([
+			x+2,
+			"<select id=\""+(x+2)+"_orderselect\">"+options_html+"</select>",
+			options[x].value.split(" ")[0],
+			options[x].value.split(" ")[1],
+			"<textarea type=\"text\" class=\"form-control\" rows=\"1\" style=\"width:100%\"></textarea>",
+			"<textarea type=\"text\" class=\"form-control\" rows=\"1\" style=\"width:100%\"></textarea>"
+		])
+	}
+}
+
 function changeValuesEncode(type, table, ele, event = event){
 	//	submitChanges function located within browse_edit.js
 	//	Global variables used within browse_edit.js
@@ -374,6 +699,25 @@ function addAntibody(){
 		show: true
 	});
 	addModalType = 'antibody'
+}
+
+function getSampleFileRuns(){
+	var selected = document.getElementById('addFileSelectSample')
+	var samples = []
+	for (var i = 0; i < selected.length; i++) {
+		if (selected.options[i].selected){
+			samples.push(selected.options[i].value);
+		}
+	}
+	$.ajax({ type: "GET",
+		url: BASE_PATH+"/public/ajax/encode_tables.php",
+		data: { p: "getLikeSampleRuns", samples:samples.toString() },
+		async: false,
+		success : function(s)
+		{
+			console.log(s)
+		}
+	});
 }
 
 function createNewData(type){
@@ -429,5 +773,6 @@ $( function(){
 		loadInEncodeSubmissions();
 	}else{
 		loadInEncodeTables();
+		loadPreviousFiles();
 	}
 });
