@@ -2,7 +2,7 @@
 //	Include files needed to test ngsimport
 if (!isset($_SESSION) || !is_array($_SESSION)) session_start();
 $_SESSION['uid'] = '1';
-$_SESSION['user'] = 'kucukura';
+$_SESSION['user'] = 'docker';
 chdir('public/ajax/');
 
 class ngsfastlanddb_unittest extends PHPUnit_Framework_TestCase
@@ -41,7 +41,7 @@ class ngsfastlanddb_unittest extends PHPUnit_Framework_TestCase
 		ob_start();
 		$_GET['p'] = 'directoryCheck';
 		$_GET['input'] = '/export/genome_data/mousetest/mm10/barcodetest';
-		$_GET['backup'] = '/export/backup/barcodetest';
+		$_GET['backup'] = '/export/genome_data/process';
 		$_GET['amazon'] = 's3';
 		include("ngsfastlanedb.php");
 		$this->assertEquals(json_decode($data),'1');
@@ -148,8 +148,8 @@ class ngsfastlanddb_unittest extends PHPUnit_Framework_TestCase
 		ob_start();
 		$_GET['p'] = 'getClusterName';
 		include("ngsfastlanedb.php");
-		$this->assertEquals(json_decode($data)[0]->username,'kucukura');
-		$this->assertEquals(json_decode($data)[0]->clusteruser,'ak97w');
+		$this->assertEquals(json_decode($data)[0]->username,'docker');
+		$this->assertEquals(json_decode($data)[0]->clusteruser,'docker');
 		ob_end_clean();
 	}
 }

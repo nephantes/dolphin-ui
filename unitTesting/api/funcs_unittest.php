@@ -2,7 +2,7 @@
 //	Include files needed to test ngsimport
 if (!isset($_SESSION) || !is_array($_SESSION)) session_start();
 $_SESSION['uid'] = '1';
-$_SESSION['user'] = 'kucukura';
+$_SESSION['user'] = 'docker';
 chdir('public/api/');
 
 include 'funcs.php';
@@ -416,14 +416,15 @@ class funcs_unittest extends PHPUnit_Framework_TestCase
 		$funcs  = new funcs();
         $params['barcode'] = 'none';
         $params['runparamsid'] = '1';
-		$this->assertEquals($funcs->getSampleList($params), array());
+		$this->assertEquals($funcs->getSampleList($params)[0]['sample_id'], '1');
+		$this->assertEquals($funcs->getSampleList($params)[0]['samplename'], 'control_rep1');
 		ob_end_clean();
 	}
 	
 	public function testGetAmazonCredentials(){
 		ob_start();
 		$funcs  = new funcs();
-        $params['username'] = 'kucukura';
+        $params['username'] = 'docker';
 		$this->assertEquals($funcs->getAmazonCredentials($params)[0]['id'], '1');
 		$this->assertEquals($funcs->getAmazonCredentials($params)[0]['bucket'], 'test_bucket');
 		ob_end_clean();
