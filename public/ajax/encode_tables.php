@@ -38,7 +38,7 @@ else if ($p == 'getSamples')
 	$data=$query->queryTable("
 		SELECT ngs_samples.id AS sample_id, ngs_samples.samplename, ngs_samples.source_id,
 		ngs_samples.organism_id, ngs_samples.molecule_id, source, organism, molecule,
-		ngs_samples.donor_id, ngs_donor.donor, ngs_experiment_series.id,
+		ngs_samples.donor_id, ngs_donor.donor, ngs_experiment_series.id as e_id,
 		ngs_experiment_series.`grant`, ngs_experiment_series.lab_id, ngs_lab.lab		
 		FROM ngs_samples
 		LEFT JOIN ngs_donor
@@ -357,8 +357,8 @@ else if ($p == 'enterFileSubmission')
 						$filename = $subdata['l'] . "pipe.star.$current_sample_name/$current_sample_name.bam";
 					}
 				}
-			}else if($subdata['t'] == 'peaks-bed' && (preg_match("/chip/", $subdata['l']) || preg_match("/atac/", $subdata['l']))){
-				$filename = $subdata['l'] . $current_sample_name . "_peaks.narrowPeaks";
+			}else if($subdata['t'] == 'peaks-bed'){
+				$filename = $subdata['l'] . $current_sample_name . "_peaks.narrowPeak";
 			}
 			foreach($submissions as $nfs){
 				if($nfs->dir_id == $sample['did'] && $nfs->run_id == $sample['rid'] && $nfs->sample_id == $id &&
