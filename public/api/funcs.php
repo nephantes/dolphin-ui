@@ -39,11 +39,19 @@ class funcs
     { 
         if($this->schedular == "LSF")
         {
-            $this->checkjob_cmd = $this->getSSH() . " \"" . $this->jobstatus . " $this->job_num\"|grep " . $this->job_num . "|awk '{printf (\"%s\t%s\",\$3,\$1)}'";
+	    if ($this->remotehost == "N") {
+               $this->checkjob_cmd = $this->jobstatus . " $this->job_num\"|grep " . $this->job_num ."|awk '{printf (\"%s\t%s\",\$3,\$1)}'";
+            } else {
+               $this->checkjob_cmd = $this->getSSH() . " \"" . $this->jobstatus . " $this->job_num\"|grep " . $this->job_num . "|awk '{printf (\"%s\t%s\",\$3,\$1)}'";
+            }
         }
         else if($this->schedular == "SGE")
         {
-            #Put SGE commands here
+	    if ($this->remotehost == "N") {
+               $this->checkjob_cmd = $this->jobstatus . " $this->job_num\"|grep " . $this->job_num;
+            } else {
+               $this->checkjob_cmd = $this->getSSH() . " \"" . $this->jobstatus . " $this->job_num\"|grep " . $this->job_num;
+	    }
         }
         else
         {
@@ -54,6 +62,7 @@ class funcs
     function getCMDs($com)
     {
         
+        #if($this->remotehost != "N")
         if($this->schedular == "LSF" || $this->schedular == "SGE")
         {
             $com=str_replace("\"", "\\\"", $com);
@@ -587,11 +596,12 @@ class funcs
                     
                 $edir = $this->tool_path;
                 $command=str_replace("\"", "\\\"", $command);
-                if($this->schedular == "LSF" || $this->schedular == "SGE")
+                #if($this->remotehost != "N")
+   		if($this->schedular == "LSF" || $this->schedular == "SGE")
                 {
                    $command=str_replace("\\\"", "\\\\\"", $command);
                 }
-                $com = $this->python . " " . $edir . "/runService.py -f ".$this->config." $ipf $dpf -o $outdir -u $username -k $wkey -c \"$command\" -n $servicename -s $servicename";
+                $com = "source /etc/profile && ".$this->python . " " . $edir . "/runService.py -f ".$this->config." $ipf $dpf -o $outdir -u $username -k $wkey -c \"$command\" -n $servicename -s $servicename";
                 $com=$this->getCMDs($com);
                 $retval = $this->sysback($com);
              }
