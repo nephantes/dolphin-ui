@@ -12,9 +12,9 @@ from boto3.s3.transfer import S3Transfer
 from botocore.client import Config
 from sys import argv, exit, stderr
 from optparse import OptionParser
+sys.path.insert(0, sys.argv[4])
 from config import *
 from workflowdefs import *
-sys.path.insert(0, sys.argv[4])
 from funcs import *
 
 class botoSubmit:
@@ -143,7 +143,7 @@ class botoSubmit:
         try:
             config = ConfigParser.ConfigParser()
             config.readfp(open('../config/.salt'))
-            password = config.get('Dolphin', 'AMAZON')
+            password = config.get('Dolphin','AMAZON')
             s3 = boto3.resource('s3', 'us-east-1',
             aws_access_key_id=decrypt(password, unhexlify(amazon['aws_access_key_id'])),
             aws_secret_access_key=decrypt(password, unhexlify(amazon['aws_secret_access_key'])))
