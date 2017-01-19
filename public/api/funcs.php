@@ -100,7 +100,9 @@ class funcs
         $file_array = explode(",",$params['file']);
         $com = 'ls ';
         $files = '';
-        $this->setAmazonCredentials($params);
+        if (preg_match('/^s3:/', $params['file'])){
+            $this->setAmazonCredentials($params);
+        }
         $amazon_checks = "";
         foreach($file_array as $fa){
             $files .= $fa . " ";
@@ -181,7 +183,7 @@ class funcs
         $decrypted_a_key=str_replace("\n","",$decrypted_a_key);
         return $decrypted_a_key;
     }
-    function setAmazonCredentials($params, $type){
+    function setAmazonCredentials($params){
         $amazon = $this->getAmazonCredentials($params);
         $this->access = $this->amazonDecode($amazon[0]['aws_access_key_id']);
         $this->secret = $this->amazonDecode($amazon[0]['aws_secret_access_key']);
