@@ -16,6 +16,9 @@ class funcs
     public $checkjob_cmd = "";
     public $job_num = "";
     public $username = "";
+    private $access = "";
+    private $secret = "";
+    private $bucket = "";
     function readINI()
     {
             $this->dbhost     = DB_HOST;
@@ -97,8 +100,23 @@ class funcs
         $file_array = explode(",",$params['file']);
         $com = 'ls ';
         $files = '';
+        if (preg_match('/^s3:/', $params['file'])){
+            $this->setAmazonCredentials($params);
+        }
+        $amazon_checks = "";
         foreach($file_array as $fa){
             $files .= $fa . " ";
+            if (preg_match('/^s3:/', $fa)){
+               $amazon_checks = "ok";
+               $com = $this->listBucket($fa); 
+               $retval = $this->syscall($this->getCMDs($com));
+               if ($retval == ""){
+                   return "{\"ERROR\": \"No such file! $fa\"}";
+	       }
+            }
+        }
+        if ($amazon_checks == "ok"){
+           return "{\"Result\":\"Ok\"}";
         }
         $com .= "$files | grep XXXXXXXXXXX";
         $retval = $this->syscall($this->getCMDs($com));
@@ -157,11 +175,35 @@ class funcs
         }
         return "{\"Result\":\"Ok\"}";
     }
+
+    function amazonDecode($a_key){
+        $cmd = "cd ../../scripts && python decode.py AMAZON $a_key";
+        $amazon_key = popen( $cmd, "r" );
+        $decrypted_a_key=fread($amazon_key, 2096);
+        $decrypted_a_key=str_replace("\n","",$decrypted_a_key);
+        return $decrypted_a_key;
+    }
+    function setAmazonCredentials($params){
+        $amazon = $this->getAmazonCredentials($params);
+        $this->access = $this->amazonDecode($amazon[0]['aws_access_key_id']);
+        $this->secret = $this->amazonDecode($amazon[0]['aws_secret_access_key']);
+    } 
+    function listBucket($bucket){
+          $com = "s3cmd ls --access_key $this->access --secret $this->secret $bucket|awk '{split(\\$4, a, \"/\"); print a[length(a)]}'"; 
+          return $com;
+    }
     function directoryContents($params){
         $this->username=$params['username'];
         $this->readINI();
         if (isset($params['directory'])){
-          $com = 'ls -1 '.$params['directory'];
+          if (preg_match('/^s3:/', $params['directory'])){
+               $this->setAmazonCredentials($params);
+               $dir = rtrim($params['directory'], '/') . '/'; 
+               $com = $this->listBucket($dir); 
+	  }
+          else{ 
+             $com = 'ls -1 '.$params['directory'];
+          }
         }else{
           $com = 'ls -1';
         }
