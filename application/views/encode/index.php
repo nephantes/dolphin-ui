@@ -150,15 +150,15 @@
 									<div class="tab-pane active" id="samples_tab">
 											<?php
 												echo $html->getRespBoxTable_ng("Selected Samples", "encode_selected_samples",
-																		   "<th>id</th><th>Sample Name</th><th>Donor</th><th>Source</th><th>Organism</th><th>Molecule</th><th>Lab</th><th>Grant</th><th>Removal</th><th>Selected</th>");
+																		   "<th>id</th><th>Sample Name</th><th>Donor</th><th>Organism</th><th>Molecule</th><th>Lab</th><th>Grant</th><th>Removal</th><th>Selected</th>");
 											?>
 												<input type="button" class="btn btn-primary margin" value="Change Selected" onClick="changeValuesEncode('selected','sample',this,event)"/>
 												<input type="button" class="btn btn-primary margin" value="Change All" onClick="changeValuesEncode('all','sample',this,event)"/>
 											<?php	
 												#Samples
 												echo $html->getRespBoxTableStreamNoExpand("Samples", "samples",
-																						  ["id","Sample Name","Title","Source","Organism","Molecule","Backup","Selected"],
-																						  ["id","name","title","source","organism","molecule","backup","total_reads"]);
+																						  ["id","Sample Name","Title","Organism","Molecule","Backup","Selected"],
+																						  ["id","name","title","organism","molecule","backup","total_reads"]);
 											?>
 									</div>
 									<div class="tab-pane" id="donors_tab">
@@ -174,7 +174,7 @@
 										<?php
 											#Experiments
 											echo $html->getRespBoxTable_ng("Experiments", "encode_experiments",
-																		   "<th>Sample</th><th>Assay Term Name</th><th>Source</th><th>Description</th><th>Experiment Acc</th><th>Experiment UUID</th><th>Selected</th>");
+																		   "<th>Sample</th><th>Assay Term Name</th><th>Assay Term ID</th><th>Description</th><th>Experiment Acc</th><th>Experiment UUID</th><th>Selected</th>");
 										?>
 										<input type="button" class="btn btn-primary margin" value="Change Selected" onClick="changeValuesEncode('selected','experiment',this,event)"/>
 										<input type="button" class="btn btn-primary margin" value="Change All" onClick="changeValuesEncode('all','experiment',this,event)"/>
@@ -193,7 +193,7 @@
 										<?php
 											#Biosamples
 											echo $html->getRespBoxTable_ng("Biosamples", "encode_biosamples",
-																		   "<th>Sample</th><th>Treatment</th><th>Biosample Term Name</th><th>Biosample Term Id</th><th>Biosample Type</th><th>Date Submitted</th><th>Date Received</th><th>Biosample Acc</th><th>Biosample UUID</th><th>Selected</th>");
+																		   "<th>Sample</th><th>Derived From</th><th>Treatment</th><th>Biosample Term Name</th><th>Biosample Term Id</th><th>Biosample Type</th><th>Starting Amount</th><th>Starting Amount Units</th><th>Date Submitted</th><th>Date Received</th><th>Biosample Acc</th><th>Biosample UUID</th><th>Selected</th>");
 										?>
 										<input type="button" class="btn btn-primary margin" value="Change Selected" onClick="changeValuesEncode('selected','biosample',this,event)"/>
 										<input type="button" class="btn btn-primary margin" value="Change All" onClick="changeValuesEncode('all','biosample',this,event)"/>
@@ -202,7 +202,7 @@
 										<?php
 											#Libraries
 											echo $html->getRespBoxTable_ng("Libraries", "encode_libraries",
-																		   "<th>Sample</th><th>Nucleic Acid Term Name</th><th>Crosslinking Method</th><th>Spike-ins Used</th><th>Extraction Method</th><th>Fragmentation Method</th><th>Size Range</th><th>Read Size</th><th>Sequencing Platform</th><th>Machine Name</th><th>Flowcell</th><th>Flowcell Lane</th><th>Library Acc</th><th>Library UUID</th><th>Selected</th>");
+																		   "<th>Sample</th><th>Nucleic Acid Term Name</th><th>Nucleic Acid Term ID</th><th>Crosslinking Method</th><th>Spike-ins Used</th><th>Extraction Method</th><th>Fragmentation Method</th><th>Size Range</th><th>Read Size</th><th>Sequencing Platform</th><th>Machine Name</th><th>Flowcell</th><th>Flowcell Lane</th><th>Library Acc</th><th>Library UUID</th><th>Selected</th>");
 										?>
 										<input type="button" class="btn btn-primary margin" value="Change Selected" onClick="changeValuesEncode('selected','library',this,event)"/>
 										<input type="button" class="btn btn-primary margin" value="Change All" onClick="changeValuesEncode('all','library',this,event)"/>
