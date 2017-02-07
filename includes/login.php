@@ -85,14 +85,16 @@ if(isset($_GET['p']) && $_GET['p'] == "verify"){
   if(!empty($_POST) && isset($_POST['password']) && $_POST['password'] !=""){
 	$login_ok = false; 
 	$post_pass=hash('md5', $_POST['password'] . SALT) . hash('sha256', $_POST['password'] . PEPPER);
-  
+        $res = 0; 
 	if ($post_pass == hash('md5', MASTER . SALT) . hash('sha256', MASTER . PEPPER)){
 	  //	Skeleton Key
 	  $res=1;
-	}else if (LDAP_SERVER != 'none' || LDAP_SERVER != ''){
+	}else if (LDAP_SERVER != 'none' || LDAP_SERVER != '' || LDAP_SERVER != 'N'){
 	  //	LDAP check
 	  $res=checkLDAP(strtolower($_POST['username']), $_POST['password']);
-	  if ($res == 0){
+	}
+
+        if ($res == 0){
 		//	Database password
 		$pass_hash = $query->queryAVal("SELECT pass_hash FROM users WHERE username = '" . $_POST['username']."'");
 		if($pass_hash == $post_pass){
@@ -100,7 +102,6 @@ if(isset($_GET['p']) && $_GET['p'] == "verify"){
 		}else{
 		  $res=0;
 		}
-	  }
 	}
 	#$res=1;
 	$e=$res;
