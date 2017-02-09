@@ -254,12 +254,6 @@ class Dolphin:
           print >>fp, '@BARCODES=NONE'
        previous=self.writeInputParamLine(fp, runparams, "@ADAPTER", 'adapters', "ADAPTER", previous )
        
-       if ( 'quality' in runparams and type(runparams['quality']) is list):
-            pipe=runparams['quality'][0]
-            runparams['quality']="%s:%s:%s:%s:%s"%(pipe['windowSize'],pipe['requiredQuality'],pipe['leading'],pipe['trailing'],pipe['minlen'])
-       
-       previous=self.writeInputParamLine(fp, runparams, "@QUALITY", 'quality', "QUALITY", previous)
-       
        if ( 'trim' in runparams and type(runparams['trim']) is list):
           pipe=runparams['trim'][0]
           if (pipe["5len1"]>0 and pipe["3len1"]>0):
@@ -270,6 +264,11 @@ class Dolphin:
             else:
                runparams['trim']="%s:%s"%(str(pipe["5len1"]),str(pipe["3len1"]))
        previous=self.writeInputParamLine(fp, runparams, "@TRIM", 'trim', "TRIM", previous)
+
+       if ( 'quality' in runparams and type(runparams['quality']) is list):
+            pipe=runparams['quality'][0]
+            runparams['quality']="%s:%s:%s:%s:%s"%(pipe['windowSize'],pipe['requiredQuality'],pipe['leading'],pipe['trailing'],pipe['minlen'])
+       previous=self.writeInputParamLine(fp, runparams, "@QUALITY", 'quality', "QUALITY", previous)
        
        if ('commonind' in runparams and  str(runparams['commonind']).lower() != "none"):
          arr=re.split(r'[,:]+', self.parse_content(commonind))
@@ -500,8 +499,8 @@ class Dolphin:
         self.prf(fp, stepBackupS3 % locals() if (backupS3 and backupS3.lower()!="none") else None )
         self.prf(fp, stepFastQC % locals() + "\n" + stepMergeFastQC % locals() if ('fastqc' in runparams and runparams['fastqc'].lower()=="yes") else None )
         self.prf(fp, stepAdapter % locals() if ('adapters' in runparams and runparams['adapters'].lower()!="none") else None )
-        self.prf(fp, stepQuality % locals() if ('quality' in runparams and runparams['quality'].lower()!="none") else None )
         self.prf(fp, stepTrim % locals() if ('trim' in runparams and runparams['trim'].lower()!="none") else None  )
+        self.prf(fp, stepQuality % locals() if ('quality' in runparams and runparams['quality'].lower()!="none") else None )
        
         countstep = False
         if ('commonind' in runparams and str(runparams['commonind']).lower() != 'none'):
