@@ -138,6 +138,7 @@ function createSummary(fastqc_summary) {
 	
 		for(var x = 0; x < linkRefName.length; x++){
 			var link = createElement('a', ['href'], [BASE_PATH + '/public/pub/' + wkey + '/fastqc/UNITED' + linkRef[x]]);
+                        console.log(link);
 			link.appendChild(document.createTextNode(linkRefName[x]));
 			masterDiv.appendChild(link);
 			masterDiv.appendChild(createElement('div', [],[]));
@@ -262,7 +263,6 @@ function showTable(type){
 	currentResultSelection = document.getElementById('select_' + type + '_report').value;
 	var temp_currentResultSelection;
 	var objList;
-	
 	if (type == 'initial_mapping') {
 		temp_currentResultSelection = 'counts/' + currentResultSelection + '.counts.tsv&fields=id,' + lib_checklist.toString().replace(/-/g,"_");
 		console.log(BASE_PATH + "/public/api/?source=" + API_PATH + '/public/pub/' + wkey + '/' + temp_currentResultSelection);
