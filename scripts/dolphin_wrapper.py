@@ -345,7 +345,7 @@ class Dolphin:
     
              if (pipe['Type']=="ChipSeq/ATACSeq" or pipe['Type']=="ChipSeq"):
                chipinput=self.chip_parse_input(pipe['ChipInput'])
-               bowtie_params=self.remove_space("-k_%s"%(str(pipe['MultiMapper'])))
+               bowtie_params=""
                filter_out="0"
                print >>fp, '@ADVPARAMS=NONE'
                print >>fp, '@CHIPINPUT=%s'%(chipinput)
