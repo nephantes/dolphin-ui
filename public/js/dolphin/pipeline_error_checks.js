@@ -318,9 +318,9 @@ function pipelineSelectCheck(num, type){
 			var tophat_check = checkPipelineDoesNotExist(num, 'Tophat') || checkPipelineDownstream(num, 'Tophat') || checkPipelineReplacing(num, 'Tophat');
 			var chipseq_check = checkPipelineDoesNotExist(num, 'ChipSeq') || checkPipelineDownstream(num, 'ChipSeq') || checkPipelineReplacing(num, 'ChipSeq');
 			var atacseq_check = checkPipelineDoesNotExist(num, 'ChipSeq/ATACSeq') || checkPipelineDownstream(num, 'ChipSeq/ATACSeq') || checkPipelineReplacing(num, 'ChipSeq/ATACSeq');
-			var chip_atac_check = (chipseq_check || atacseq_check)
-			if (chipseq_check && chip_atac_check) {
-				displayErrorModal('#errorModal', 'You must run a Tophat/ChipSeq pipeline before you can run HaplotypeCaller');
+			var chip_atac_check = (chipseq_check && atacseq_check)
+			if (chip_atac_check) {
+				displayErrorModal('#errorModal', 'You must run a ChipSeq/ATACSeq pipeline before you can run HaplotypeCaller');
 				return true;
 			}
 		}

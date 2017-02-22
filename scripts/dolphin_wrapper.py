@@ -557,6 +557,8 @@ class Dolphin:
               
               if (pipe['Type']=="Tophat"):
                  gtf = (pipe['CustomGenomeAnnotation'] if ('CustomGenomeAnnotation' in pipe and pipe['CustomGenomeAnnotation'].lower()!="none") else "@GTF" )
+                 if (gtf == ""):
+                    gtf = "none"
                  bowtie2index = (pipe['CustomGenomeIndex'] if ('CustomGenomeIndex' in pipe and pipe['CustomGenomeIndex'].lower()!="none") else "@BOWTIE2INDEX" )
                  self.prf( fp, stepTophat % locals() )
                  type="tophat"
