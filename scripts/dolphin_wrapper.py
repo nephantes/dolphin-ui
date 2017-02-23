@@ -400,7 +400,11 @@ class Dolphin:
                if ('peaks' in pipe and pipe['peaks'] != "none"):
                  print >>fp, '@PEAKS=%s'%(pipe['peaks'])
                if ('custombed' in pipe and pipe['custombed'] != "none"):
-                 print >>fp, '@CUSTOMBED=%s'%(pipe['custombed'])
+                 if (pipe['custombed'] != ''):
+                     print >>fp, '@CUSTOMBED=%s'%(pipe['custombed'])
+		 else:
+                     print >>fp, '@CUSTOMBED=none'
+
                    
              if (pipe['Type'] == "Deeptools"):
                 print >>fp, '@PLOTTYPE=%s'%(pipe['PlotType'])
