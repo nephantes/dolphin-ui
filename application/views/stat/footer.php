@@ -27,5 +27,10 @@
         <script src="<?php echo BASE_PATH?>/js/streamTable/vendors/mustache.js" type="text/javascript"></script>
         <script src="<?php echo BASE_PATH?>/js/dolphin/ngs_help.js" type="text/javascript"></script>
 		<script src="<?php echo BASE_PATH?>/js/dolphin/ngstrackstatus.js" type="text/javascript"></script>
+		<script>
+		  document.getElementById("all_tracking_data_table").style.overflowX = "scroll";
+		  $('#table_div_run_status_stream').width($('#all_tracking_data_table').width());
+		  $('#jsontable_run_status_stream').width($('#all_tracking_data_table').width());
+		</script>
 	</body>
 </html>
