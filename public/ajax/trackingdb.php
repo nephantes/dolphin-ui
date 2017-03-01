@@ -7,6 +7,7 @@ require_once("../../config/config.php");
 require_once("../../includes/dbfuncs.php");
 if (!isset($_SESSION) || !is_array($_SESSION)) session_start();
 $query = new dbfuncs();
+if (isset($_GET['debug'])){$debug = $_GET['debug'];}
 if (isset($_GET['p'])){$p = $_GET['p'];}
 
 $amazon_str = "AND ngs_fastq_files.dir_id = (SELECT ngs_dirs.id FROM ngs_dirs WHERE ngs_fastq_files.dir_id = ngs_dirs.id AND (ngs_dirs.amazon_bucket LIKE '%s3://%'))";
@@ -38,43 +39,40 @@ $selectTracking = "SELECT ngs_samples.id AS sample_id,
 $amazon_not_null = "ngs_dirs.id=ngs_fastq_files.dir_id and ngs_dirs.amazon_bucket!=''
 and ngs_dirs.amazon_bucket != 'none'";
 
+$sql = "";
 
 if ($p == 'getTrackingData')
 {
 
-	$data=$query->queryTable("$selectTracking
+	$sql = "$selectTracking
 		WHERE $amazon_not_null and
 		(ngs_fastq_files.backup_checksum='' or isnull(ngs_fastq_files.backup_checksum)
-		or DATE(ngs_fastq_files.date_modified) <= DATE(NOW() - INTERVAL 2 MONTH))"
-    );
+		or DATE(ngs_fastq_files.date_modified) <= DATE(NOW() - INTERVAL 2 MONTH))";
 }
 else if ($p == 'getTrackingDataAmazon')
 {
-	$data=$query->queryTable("$selectTracking
-		WHERE $amazon_not_null"
-    );
+	$sql = "$selectTracking
+		WHERE $amazon_not_null";
 }
-
 else if ($p == 'getTrackingDataBackup')
 {
-	$data=$query->queryTable("$selectTracking
+	$sql = "$selectTracking
 		WHERE
 		(ngs_fastq_files.backup_checksum='' or isnull(ngs_fastq_files.backup_checksum)
-		or DATE(ngs_fastq_files.date_modified) <= DATE(NOW() - INTERVAL 2 MONTH))"
-    );
+		or DATE(ngs_fastq_files.date_modified) <= DATE(NOW() - INTERVAL 2 MONTH))";
 }
-
 else if ($p == 'getTrackingDataUnfiltered')
 {
-	$data=$query->queryTable("$selectTracking"
-    );
+	$sql = "$selectTracking";
 }
-
+$data=$query->queryTable("$sql");
 
 if (!headers_sent()) {
    header('Cache-Control: no-cache, must-revalidate');
    header('Expires: Mon, 26 Jul 1997 05:00:00 GMT');
    header('Content-type: application/json');
+   if ($debug == "yes")
+	echo $sql."\n\n";
    echo $data;
    exit;
 }else{
