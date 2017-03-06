@@ -3,6 +3,146 @@ var sampleRuns = {};
 var runParams = {};
 var active_runs = [];
 
+function comboBoxScript(){
+	$( function() {
+	  $.widget( "custom.combobox", {
+	    _create: function() {
+	      this.wrapper = $( "<span>" )
+	        .addClass( "custom-combobox" )
+	        .insertAfter( this.element );
+
+	      this.element.hide();
+	      this._createAutocomplete();
+	      this._createShowAllButton();
+	    },
+
+	    _createAutocomplete: function() {
+	      var selected = this.element.children( ":selected" ),
+	        value = selected.val() ? selected.text() : "";
+
+	      this.input = $( "<input>" )
+	        .appendTo( this.wrapper )
+	        .val( value )
+	        .attr( "title", "" )
+	        .addClass( "custom-combobox-input ui-widget ui-widget-content ui-state-default ui-corner-left" )
+	        .autocomplete({
+	          delay: 0,
+	          minLength: 0,
+	          source: $.proxy( this, "_source" )
+	        })
+	        .tooltip({
+	          classes: {
+	            "ui-tooltip": "ui-state-highlight"
+	          }
+	        });
+
+	      this._on( this.input, {
+	        autocompleteselect: function( event, ui ) {
+	          ui.item.option.selected = true;
+	          this._trigger( "select", event, {
+	            item: ui.item.option
+	          });
+	        },
+
+	        autocompletechange: "_removeIfInvalid"
+	      });
+	    },
+
+	    _createShowAllButton: function() {
+	      var input = this.input,
+	        wasOpen = false;
+
+	      $( "<a>" )
+	        .attr( "tabIndex", -1 )
+	        .attr( "title", "Show All Items" )
+	        .tooltip()
+	        .appendTo( this.wrapper )
+	        .button({
+	          icons: {
+	            primary: "ui-icon-triangle-1-s"
+	          },
+	          text: false
+	        })
+	        .removeClass( "ui-corner-all" )
+	        .addClass( "custom-combobox-toggle ui-corner-right" )
+	        .on( "mousedown", function() {
+	          wasOpen = input.autocomplete( "widget" ).is( ":visible" );
+	        })
+	        .on( "click", function() {
+	          input.trigger( "focus" );
+
+	          // Close if already visible
+	          if ( wasOpen ) {
+	            return;
+	          }
+
+	          // Pass empty string as value to search for, displaying all results
+	          input.autocomplete( "search", "" );
+	        });
+	    },
+
+	    _source: function( request, response ) {
+	      var matcher = new RegExp( $.ui.autocomplete.escapeRegex(request.term), "i" );
+	      response( this.element.children( "option" ).map(function() {
+	        var text = $( this ).text();
+	        if ( this.value && ( !request.term || matcher.test(text) ) )
+	          return {
+	            label: text,
+	            value: text,
+	            option: this
+	          };
+	      }) );
+	    },
+
+	    _removeIfInvalid: function( event, ui ) {
+
+	      // Selected an item, nothing to do
+	      if ( ui.item ) {
+	        return;
+	      }
+
+	      // Search for a match (case-insensitive)
+	      var value = this.input.val(),
+	        valueLowerCase = value.toLowerCase(),
+	        valid = false;
+	      this.element.children( "option" ).each(function() {
+	        if ( $( this ).text().toLowerCase() === valueLowerCase ) {
+	          this.selected = valid = true;
+	          return false;
+	        }
+	      });
+
+	      // Found a match, nothing to do
+	      if ( valid ) {
+	        return;
+	      }
+
+	      // Remove invalid value
+	      this.input
+	        .val( "" )
+	        .attr( "title", value + " didn't match any item" )
+	        .tooltip( "open" );
+	      this.element.val( "" );
+	      this._delay(function() {
+	        this.input.tooltip( "close" ).attr( "title", "" );
+	      }, 2500 );
+	      this.input.autocomplete( "instance" ).term = "";
+	    },
+
+	    _destroy: function() {
+	      this.wrapper.remove();
+	      this.element.show();
+	    }
+	  });
+
+	  $( "#combobox" ).combobox();
+	  $( "#toggle" ).on( "click", function() {
+	    $( "#combobox" ).toggle();
+	  });
+	} );
+}
+
+
 function removeConditionDetails($sample_id, $cond_id) {
 		$.ajax({ type: "POST",
 			url: BASE_PATH+"/public/ajax/encode_tables.php",
@@ -53,6 +193,32 @@ function updateConditionDetails($sample_id) {
 	});
 }
 
+function getCreateTreatmentHTML(){
+  html_to_return = '<div id="createNewCondition">';
+  html_to_return += 'Treatment Name: <input style="margin:0 20px 20px 20px; width:25em" type="text" id="new_treatment_name" value="">';
+	html_to_return += '<br/>';
+	html_to_return += 'Treatment Symbol: <input style="margin:0 20px 0 20px;" type="text" id="new_treatment_symbol" value="">';
+	html_to_return += '</div>';
+	return html_to_return;
+
+}
+
+function createNewTreatment(){
+	$new_treatment_name = $('#new_treatment_name').val();
+	$new_treatment_symbol = $('#new_treatment_symbol').val();
+	$.ajax({ type: "POST",
+		url: BASE_PATH+"/public/ajax/encode_tables.php",
+		data: { p: "createTreatmentWithSelection",
+		  new_treatment_name:$new_treatment_name,
+		  new_treatment_symbol:$new_treatment_symbol},
+		async: false,
+		success : function(s)
+		{
+			console.log(s);
+		}
+	});
+
+}
 
 function getEditConditionHTML($cond_id, $condition, $cond_symbol,
 	$concentration, $duration, $sample_id, $concentration_unit, $duration_unit){
@@ -214,7 +380,9 @@ function loadSamplesNew($sample_id, $samplename){
 			addConditionsSampleName.innerHTML += '<button type="button" ' +
 				'class="btn btn-primary" ' +
 				'onclick="addConditionToModal(' + $sample_id + ')">Add Condition</button>';
-			addConditionsSampleName.innerHTML += '<a href="#">Look Up ID</a>'
+
+			addConditionsSampleName.innerHTML += '<div class="ui-widget"><label>Select Treatment: </label><select id="combobox"><option value="">Select one...</option><option id="50" value="LPS">Lipopolysaccharide</option><option id="14" value="Control">Control</option><option value="Starved Mom">Starved Mom</option><option value="Starved Dad">Starved Dad</option></select></div>';
+
 
 			for(var x = 0; x < s.length; x++){
 				// addConditions.innerHTML += '<option value="' + s[x].cond_id +
@@ -240,6 +408,7 @@ function loadSamplesNew($sample_id, $samplename){
 			editConditionDetails.innerHTML += '</form>';
 		}
 	});
+  comboBoxScript();
 }
 
 function loadSamples(){
@@ -930,6 +1099,7 @@ function createTreatment(){
 	$('#createTreatmentModal').modal({
 		show: true
 	});
+	$('#createTreatment').html(getCreateTreatmentHTML());
 	addModalType = 'create_treatment'
 }
 
