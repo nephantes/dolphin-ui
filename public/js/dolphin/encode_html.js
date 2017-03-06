@@ -3,6 +3,114 @@ var sampleRuns = {};
 var runParams = {};
 var active_runs = [];
 
+function removeConditionDetails($sample_id, $cond_id) {
+		$.ajax({ type: "POST",
+			url: BASE_PATH+"/public/ajax/encode_tables.php",
+			data: { p: "removeCondSample", sample_id:$sample_id,
+			cond_id:$cond_id },
+			async: false,
+			success : function(s)
+			{
+		    console.log(s);
+			}
+		});
+		$('#editCondition' + $cond_id).remove();
+}
+
+
+function updateConditionDetails($sample_id) {
+	var $i = 0
+	var condSampleList = [];
+	var treatmentList = [];
+	var concentrationList = [];
+	$('#editConditionDetails input').each(function () {
+		  $i += 1;
+			condSampleList.push(this.value);
+
+			if(($i % 5) == 0){
+				treatmentList.push(condSampleList[0]);
+				concentrationList.push(condSampleList[1]);
+
+				//alert($sample_id + "  " + condSampleList[0]+ "  " + condSampleList[1]+ "  " + condSampleList[2] + "  " + condSampleList[3] + "  " + condSampleList[4]);
+				$.ajax({ type: "POST",
+					url: BASE_PATH+"/public/ajax/encode_tables.php",
+					data: { p: "addOrUpdateCondSample", sample_id:$sample_id, new_cond_id:condSampleList[0],
+					   concentration:condSampleList[1], duration:condSampleList[3],
+					  concentration_unit:"" + condSampleList[2] + "", duration_unit:"" + condSampleList[4] + ""},
+					async: false,
+					success : function(s)
+					{
+				    console.log(s);
+					}
+				});
+
+				condSampleList = [];
+			}
+			$("#treatment_list" + $sample_id).html(treatmentList.join(", "));
+			$("#concentration_list" + $sample_id).html(concentrationList.join(", "));
+
+	    //alert(this.value);
+	});
+}
+
+
+function getEditConditionHTML($cond_id, $condition, $cond_symbol,
+	$concentration, $duration, $sample_id, $concentration_unit, $duration_unit){
+
+	html_to_return = '<div id="editCondition' + $cond_id + '">';
+	html_to_return += '<input type="hidden" value="' + $cond_id + '">';
+	html_to_return += $condition + ' (' + $cond_symbol + ')<br/>';
+	html_to_return += 'Concentration: <input style="margin:0 20px 0 20px;" type="text" class="concentration" value="' +
+		$concentration + '">';
+	html_to_return += 'Concentration Unit: <input style="margin:0 20px 0 20px;" type="text" class="concentration_unit" value="' +
+		$concentration_unit + '">';
+	html_to_return += 'Duration: <input style="margin:0 20px 0 20px;" type="text" class="duration" value="' +
+		$duration + '">';
+	html_to_return += 'Duration Unit: <input style="margin:0 20px 0 20px;" type="text" class="duration_unit" value="' +
+			$duration_unit + '">';
+
+	html_to_return += '<button type="button" ' +
+			'class="btn btn-warning" onclick="removeConditionDetails(' +
+			 $sample_id + ',' + $cond_id + ')">Remove</button>' + '<br/><br/>';
+	html_to_return += '</div>';
+	return html_to_return;
+}
+
+function addConditionToModal($sample_id) {
+	var editConditionDetails = document.getElementById('editConditionDetails');
+	var newCondID =  $('#conditionInputModal').val();
+
+	 $.ajax({ type: "GET",
+		url: BASE_PATH+"/public/ajax/encode_tables.php",
+		data: { p: "getConditionsDetailsWithID", new_cond_id:newCondID },
+		async: false,
+		success : function(s)
+		  {
+				editConditionDetails.innerHTML += getEditConditionHTML(newCondID,
+					s[0].condition, s[0].cond_symbol, '', '', $sample_id, '', '');
+
+				// editConditionDetails.innerHTML += '<input type="hidden" value="' + newCondID + '">';
+				// editConditionDetails.innerHTML += s[0].condition + ' (' + s[0].cond_symbol + ')<br/>';
+				// editConditionDetails.innerHTML += 'Concentration: <input style="margin:0 20px 0 20px;" type="text" class="concentration" value="">' +
+				// 	'Duration: <input style="margin:0 20px 0 20px;" type="text" class="duration" value="">' +
+				// 	'<br/><br/>';
+		  }
+	});
+
+}
+
+function selectizeTreatmentsFromDatabase() {
+	$('.conditions_from_database').selectize({
+		create: false,
+		sortField: {
+			field: 'text',
+			direction: 'asc'
+		},
+		dropdownParent: 'body'
+	});
+}
+selectizeTreatmentsFromDatabase();
+
 function responseCheck(data) {
 	for(var x = 0; x < Object.keys(data).length; x++){
 		if (data[Object.keys(data)[x]] == null) {
@@ -39,7 +147,7 @@ function loadInEncodeSubmissions(){
 			}
 		}
 	});
-	
+
 	$.ajax({ type: "GET",
 		url: BASE_PATH+"/public/ajax/encode_tables.php",
 		data: { p: "getSubmissions" },
@@ -82,26 +190,82 @@ function loadInEncodeTables(){
 	}
 }
 
+function loadSamplesNew($sample_id, $samplename){
+	var addConditions = document.getElementById('add_conditions_from_database');
+	var editConditionDetails = document.getElementById('editConditionDetails');
+	var editConditionsFooter = document.getElementById('editConditionsFooter');
+	var addConditionsSampleName = document.getElementById('addConditionsSampleName');
+
+	editConditionDetails.innerHTML = '';
+	$.ajax({ type: "GET",
+		url: BASE_PATH+"/public/ajax/encode_tables.php",
+		data: { p: "getConditionsForSample", sample_id:$sample_id },
+		async: false,
+		success : function(s)
+		{
+			console.log("++++++++-------++++++++-------++++++++-------++++++++-------");
+			console.log(s);
+			//addConditions.innerHTML = '<option value="">Add a condition(treatment)...</option>';
+			// To change to right ajax
+			editConditionDetails.innerHTML = '<form id="editConditionsForm">';
+      addConditionsSampleName.innerHTML = '<h3>' + $samplename + '</h3>';
+
+			addConditionsSampleName.innerHTML += '<input type="text" id="conditionInputModal" value="">';
+			addConditionsSampleName.innerHTML += '<button type="button" ' +
+				'class="btn btn-primary" ' +
+				'onclick="addConditionToModal(' + $sample_id + ')">Add Condition</button>';
+			addConditionsSampleName.innerHTML += '<a href="#">Look Up ID</a>'
+
+			for(var x = 0; x < s.length; x++){
+				// addConditions.innerHTML += '<option value="' + s[x].cond_id +
+				// '" selected>' + s[x].condition + '</option>';
+
+				editConditionDetails.innerHTML += getEditConditionHTML(s[x].cond_id,
+					s[x].condition, s[x].cond_symbol, s[x].concentration, s[x].duration,
+				  $sample_id, s[x].concentration_unit, s[x].duration_unit);
+
+				// editConditionDetails.innerHTML += '<input type="hidden" value="' + s[x].cond_id + '">';
+				// editConditionDetails.innerHTML += s[x].condition + ' (' + s[x].cond_symbol + ')<br/>';
+				// editConditionDetails.innerHTML += 'Concentration: <input style="margin:0 20px 0 20px;" type="text" class="concentration" value="' +
+			  //   s[x].concentration + '">' +
+				// 	'Duration: <input style="margin:0 20px 0 20px;" type="text" class="duration" value="' +
+				// 	s[x].duration + '">' +
+				// 	'<br/><br/>';
+
+			}
+			editConditionsFooter.innerHTML = '<button type="button" ' +
+				'class="btn btn-primary" data-dismiss="modal" ' +
+				'onclick="updateConditionDetails(' + $sample_id + ')">Save</button>' +
+				'<button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>';
+			editConditionDetails.innerHTML += '</form>';
+		}
+	});
+}
+
 function loadSamples(){
 	var treatmentSelect = document.getElementById('addSampleTreatment')
 	var antibodySelect = document.getElementById('addSampleAntibody')
 	var biosampleSelect = document.getElementById('selectBiosample')
 	var experimentSelect = document.getElementById('selectExperiment')
-	
+
+
 	var linkBiosample = document.getElementById('linkBiosample')
 	var linkExperiment = document.getElementById('linkExperiment')
-	
+
+
+
 	var ret_biosample_accs = [];
 	var ret_experiment_accs = [];
-	
+
 	treatmentSelect.innerHTML = ''
 	antibodySelect.innerHTML = ''
 	biosampleSelect.innerHTML = ''
 	experimentSelect.innerHTML = ''
-	
+
+
 	linkBiosample.innerHTML = '<option value="none">* New Accession *</option>';
 	linkExperiment.innerHTML = '<option value="none">* New Accession *</option>';
-	
+
 	$.ajax({ type: "GET",
 		url: BASE_PATH+"/public/ajax/encode_tables.php",
 		data: { p: "getSamples", samples:basket_info },
@@ -127,13 +291,15 @@ function loadSamples(){
 					"<button id=\"sample_removal_"+s[x].sample_id+"\" class=\"btn btn-danger btn-xs pull-right\" onclick=\"manageChecklists('"+s[x].sample_id+"', 'sample_checkbox')\"><i class=\"fa fa-times\"></i></button>",
 					"<input type=\"checkbox\" class=\"pull-right\" onclick=\"allCheckboxCheck("+s[x].sample_id+", 'sample')\">"
 				]);
-				
+
 				//	Modal
 				treatmentSelect.innerHTML += '<option id="treatment_'+s[x].samplename+'" value="'+s[x].sample_id+'">'+s[x].samplename+'</option>'
 				antibodySelect.innerHTML += '<option id="antibody_'+s[x].samplename+'" value="'+s[x].sample_id+'">'+s[x].samplename+'</option>'
 				biosampleSelect.innerHTML += '<option id="antibody_'+s[x].samplename+'" value="'+s[x].sample_id+'">'+s[x].samplename+'</option>'
 				experimentSelect.innerHTML += '<option id="antibody_'+s[x].samplename+'" value="'+s[x].sample_id+'">'+s[x].samplename+'</option>'
-				
+
+
+
 				if (ret_biosample_accs.indexOf(s[x].biosample_acc) == -1) {
 					ret_biosample_accs.push(s[x].biosample_acc)
 				}
@@ -141,7 +307,7 @@ function loadSamples(){
 					ret_experiment_accs.push(s[x].experiment_acc)
 				}
 			}
-			
+
 		}
 	});
 	for(var x in ret_biosample_accs){
@@ -233,6 +399,8 @@ function loadTreatments() {
 	});
 }
 
+
+
 function loadBiosamples() {
 	$.ajax({ type: "GET",
 		url: BASE_PATH+"/public/ajax/encode_tables.php",
@@ -248,8 +416,8 @@ function loadBiosamples() {
 				biosampletable.fnAddData([
 					s[x].samplename,
 					"<p onclick=\"editBox("+1+", '"+s[x].sample_id+"', 'biosample_derived_from', 'ngs_samples', this, '', '', '')\">"+s[x].biosample_derived_from+"</p>",
-					"<p onclick=\"editBox("+1+", '"+s[x].treatment_id+"', 'name', 'ngs_treatment', this, 'ngs_samples', '"+s[x].sample_id+"', 'treatment_id')\">"+s[x].name+"</p>",
-					s[x].duration + " " + s[x].duration_units,
+					"<div id=\"treatment_list" +s[x].sample_id + "\">" + s[x].treatment_list + "</div>" + "<a style=\"margin:10px\" href=\"#\"><span class=\"glyphicon glyphicon-edit\" onClick=\"editConditions(); loadSamplesNew(" + s[x].sample_id + ", '" + s[x].samplename + "')\"/></span></a>",
+					"<div id=\"concentration_list" +s[x].sample_id + "\">" + s[x].concentration_list + "</div>",
 					"<p onclick=\"editEncodeBox("+1+", '"+s[x].biosample_id+"', 'biosample_term_name', 'ngs_biosample_term', this, 'ngs_samples', '"+s[x].sample_id+"', 'biosample_id', 'biosample')\">"+s[x].biosample_term_name+"</p>",
 					"<p onclick=\"editBox("+1+", '"+s[x].biosample_id+"', 'biosample_term_id', 'ngs_biosample_term', this, '', '', '')\">"+s[x].biosample_term_id+"</p>",
 					"<p onclick=\"editBox("+1+", '"+s[x].biosample_id+"', 'biosample_type', 'ngs_biosample_term', this, '', '', '')\">"+s[x].biosample_type+"</p>",
@@ -393,7 +561,7 @@ function loadFiles() {
 			}
 		}
 	});
-	
+
 	var runtable = $('#jsontable_encode_runs').dataTable();
 	var keys = Object.keys(sampleRuns)
 	runtable.fnClearTable();
@@ -416,11 +584,11 @@ function loadFiles() {
 			"<select id=\""+keys[x]+"_dirselect\" style=\"display:none\">"+directories+"</select><p id=\""+keys[x]+"_dirvalue\">"+runParams[runs[0]].outdir+"</p>",
 		]);
 	}
-	
+
 	if (keys.length > 0) {
 		runSelectionEncode(document.getElementById(keys[0]+'_select'))
 	}
-	
+
 	var selectLength = keys.length
 	console.log(selectLength)
 	if (selectLength == 0) {
@@ -432,7 +600,7 @@ function loadFiles() {
 	}else{
 		document.getElementById("addSampleFiles").size = ((509)/18);
 	}
-	
+
 }
 
 function loadPreviousFiles(){
@@ -519,7 +687,7 @@ function createRunOptions(active_runs) {
 	console.log(active_runs)
 	var options_parse = {};
 	var options_select = "";
-	
+
 	for(var x = 0; x < active_runs.length; x++){
 		options_parse = JSONOptionParse(active_runs[x], options_parse)
 	}
@@ -541,7 +709,7 @@ function createRunOptions(active_runs) {
 function JSONOptionParse(run_id, options_parse){
 	var pipeline = runParams[run_id].pipeline
 	var commonind = runParams[run_id].commonind
-	if (pipeline != undefined || pipeline != []) {
+	if (typeof(pipeline) != "undefined" && pipeline != []) {
 		if (runParams[run_id].commonind != "" && runParams[run_id].commonind != "no" && runParams[run_id].commonind != "none") {
 			options_parse = mergeDedupChecks(runParams[run_id], run_id, merged, 'seqmapping', options_parse, commonind)
 		}
@@ -587,7 +755,7 @@ function mergeDedupChecks(pipeline, run_id, merged, type, options_parse, commoni
 			options_parse = optionsCheck(options_parse, '/seqmapping/'+split_common[x].toLowerCase()+'/', run_id, "fastq")
 		}
 	}
-	
+
 	if (dedup && merged) {
 		if (type == 'rsem') {
 			options_parse = optionsCheck(options_parse, '/dedupmergersem_ref.transcipts/', run_id, "bam")
@@ -737,6 +905,13 @@ function linkBiosample() {
 	addModalType = 'biosample'
 }
 
+function editConditions() {
+	$('#editConditionsModal').modal({
+		show: true
+	});
+	addModalType = 'condition'
+}
+
 function linkExperiment() {
 	$('#linkExperimentModal').modal({
 		show: true
@@ -749,6 +924,13 @@ function addTreatment(){
 		show: true
 	});
 	addModalType = 'treatment'
+}
+
+function createTreatment(){
+	$('#createTreatmentModal').modal({
+		show: true
+	});
+	addModalType = 'create_treatment'
 }
 
 function addAntibody(){
@@ -825,10 +1007,10 @@ function createLink(type) {
 		async: false,
 		success : function(s)
 		{
-			
+
 		}
 	});
-	
+
 }
 
 function viewEncodeLog(log){
