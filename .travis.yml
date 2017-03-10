@@ -28,14 +28,15 @@ before_install:
   - sudo chown -R ${APACHE_RUN_USER}:${APACHE_RUN_GROUP} /var/www
   - sudo sed -i '$ a\export JAVA_OPTS="-Djava.util.prefs.systemRoot=/var/www/.java Djava.util.prefs.userRoot=/var/www/.java/.userPrefs\"' /etc/apache2/envvars
   - sudo cat /etc/apache2/envvars
+  - sudo wget https://phar.phpunit.de/phpunit-5.6.0.phar
+  - sudo chmod +x phpunit-5.6.0.phar
+  - sudo mv phpunit-5.6.0.phar /usr/local/bin/phpunit
+  - phpunit --version
+
   
 install:
-  ######################
-  # CHANGE BRANCH HERE #
-  # use --branch=      #
-  ######################
-  - git clone --branch=2016_09_21_travis https://github.com/Rhaknam/dolphin-tools.git /home/travis/build/dolphin_tools
-  - git clone --branch=2016_09_21_travis https://github.com/Rhaknam/dolphin-ui.git /home/travis/build/dolphin-ui
+  - git clone https://github.com/UMMS-Biocore/dolphin-tools.git /home/travis/build/dolphin_tools
+  - git clone https://github.com/UMMS-Biocore/dolphin-ui.git /home/travis/build/dolphin-ui
 
 before_script:
   - sudo a2enmod actions
@@ -104,8 +105,6 @@ after_script:
   - mysql -e "use biocore; SELECT * FROM users" -uroot
   - mysql -e "use biocore; SELECT * FROM jobs" -uroot
   - mysql -e "use biocore; SELECT * FROM services" -uroot
-  - mysql -e "use biocore; SELECT * FROM jobstats" -uroot
   - mysql -e "use biocore; SELECT * FROM workflows" -uroot
   - mysql -e "use biocore; SELECT * FROM service_run" -uroot
-  - mysql -e "use biocore; SELECT * FROM jobstats" -uroot
   
