@@ -15,6 +15,19 @@ $normalized = ['facility', 'organism', 'molecule', 'lab', 'organization', 'genot
 				'instrument_model', 'treatment_manufacturer', 'library_strategy', 'donor', 'biosample_term_name'];
 
 if (isset($_GET['p'])){$p = $_GET['p'];}
+if (isset($_POST['p'])){$p = $_POST['p'];}
+
+
+if($p == 'postInsertDatabase')
+{
+	if (isset($_POST['type'])){$type = $_POST['type'];}
+	if (isset($_POST['table'])){$table = $_POST['table'];}
+	if (isset($_POST['value'])){$value = $_POST['value'];}
+	if (isset($_POST['sample_ids'])){$sample_ids = $_POST['sample_ids'];}
+	if($type != '' && $table != '' && $value != '' && $sample_ids != ''){
+		$data=$query->runSQL("UPDATE $table SET $type = $value  WHERE id IN ($sample_ids)");
+	}
+}
 
 if($p == 'insertDatabase')
 {
@@ -155,6 +168,11 @@ else if($p == 'getDropdownValues')
 {
 	if (isset($_GET['type'])){$type = $_GET['type'];}
 	$data=$query->queryTable("SELECT $type FROM ngs_".$type);
+}
+else if($p == 'getDropdownValuesWithID')
+{
+	if (isset($_GET['type'])){$type = $_GET['type'];}
+	$data=$query->queryTable("SELECT id, $type FROM ngs_".$type);
 }
 else if($p == 'getDropdownValuesPerms')
 {
