@@ -278,16 +278,12 @@ else if($p == 'getSamplesFromName')
 else if ($p == 'getLanesWithSamples')
 {
     $data=$query->queryTable("
-    SELECT ngs_lanes.id, ngs_lanes.owner_id
-    FROM ngs_lanes
-    WHERE ngs_lanes.id in (
-        SELECT ngs_samples.lane_id
-        FROM ngs_samples
+    SELECT DISTINCT ngs_samples.lane_id id, ngs_samples.owner_id
+    FROM ngs_samples
         WHERE id in (
             SELECT ngs_fastq_files.sample_id
             FROM ngs_fastq_files
             WHERE total_reads > 0
-        )
     )
     ");
 }
