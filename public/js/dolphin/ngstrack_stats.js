@@ -395,28 +395,31 @@ function generateStreamTable(type, queryData, queryType, qvar, rvar, seg, theSea
 	 data, type);
 	
 	var search = document.getElementById('st_search');
-	search.id = 'st_search_' + type;
-	search.setAttribute('class',"st_search margin pull-right");
-	
-	var table_element = document.getElementById('jsontable_'+type);
-	var num_search = document.getElementById('st_num_search');
-	num_search.id = 'st_num_search_' + type;
-	
-	var newlabel = createElement('label', ['class'], ['margin']);
-	newlabel.setAttribute("for",'st_num_search_'+type);
-	newlabel.innerHTML = "entries per page";
-	document.getElementById('table_div_'+type).insertBefore(newlabel, table_element);
-	
-	num_search.setAttribute('class',"st_per_page"+type+" margin pull-left input-sm");
-	
-	document.getElementById('st_pagination').id = 'st_pagination_' + type;
-	var pagination = document.getElementById('st_pagination_'+type);
-	pagination.setAttribute('class',"st_pagination_"+type+" margin");
-	pagination.setAttribute('style',"text-align:right");
-	
-	type_summary = document.getElementById(type+'_summary');
-	document.getElementById(type+'_summary').remove();
-	the_table.insertBefore(type_summary, pagination);
+	if(search){
+		search.id = 'st_search_' + type;
+		search.setAttribute('class',"st_search margin pull-right");
+
+		var table_element = document.getElementById('jsontable_'+type);
+		var num_search = document.getElementById('st_num_search');
+		num_search.id = 'st_num_search_' + type;
+		
+		var newlabel = createElement('label', ['class'], ['margin']);
+		newlabel.setAttribute("for",'st_num_search_'+type);
+		newlabel.innerHTML = "entries per page";
+		document.getElementById('table_div_'+type).insertBefore(newlabel, table_element);
+		
+		num_search.setAttribute('class',"st_per_page"+type+" margin pull-left input-sm");
+		
+		document.getElementById('st_pagination').id = 'st_pagination_' + type;
+		var pagination = document.getElementById('st_pagination_'+type);
+		pagination.setAttribute('class',"st_pagination_"+type+" margin");
+		pagination.setAttribute('style',"text-align:right");
+		
+		type_summary = document.getElementById(type+'_summary');
+		document.getElementById(type+'_summary').remove();
+		the_table.insertBefore(type_summary, pagination);
+	}
+
 }
 
 function shiftColumns(id){
@@ -782,78 +785,78 @@ $(function() {
 			{
 				console.log(s);
 				sample_data = s;
-			// 	var changeHTML = '';
-			// 	var hrefSplit = window.location.href.split("/");
-			// 	var typeLocSelected = $.inArray('selected', hrefSplit);
-			// 	var typeLocRerun = $.inArray('rerun', hrefSplit);
-			// 	var queryType = 'getSamples';
-			// 	if (typeLocSelected > 0 || typeLocRerun > 0) {
-			// 		theSearch = '';
-			// 	}
-			// 	var type = 'samples';
-			// 	if (samplesType == 'getSamples' && segment == 'table_create') {
-			// 		var samples_with_runs = [];
-			// 		var objects_with_runs = [];
-			// 		$.ajax({ type: "GET",
-			// 			url: BASE_PATH+"/public/ajax/tablegenerator.php",
-			// 			data: { p: "samplesWithRuns" },
-			// 			async: false,
-			// 			success : function(k)
-			// 			{
-			// 				for(var x = 0; x < k.length; x++){
-			// 					samples_with_runs.push(k[x].sample_id);
-			// 				}
-			// 			}
-			// 		});
-			// 		console.log(samples_with_runs);
-			// 		for(var z = 0; z < s.length; z++){
-			// 			if (samples_with_runs.indexOf(s[z].id) > -1) {
-			// 				objects_with_runs.push(s[z]);
-			// 			}
-			// 		}
-			// 		console.log(objects_with_runs);
-			// 		s = objects_with_runs;
-			// 		queryType = 'table_create';
-			// 	}
-			// 	if (segment == 'selected') {
-			// 		var runparams = $('#jsontable_samples_selected').dataTable();
-			// 		runparams.fnClearTable();
-			// 		for(var i = 0; i < s.length; i++){
-			// 			var selection_bool = false;
-			// 			if (window.location.href.indexOf("/rerun/") > -1 || window.location.href.indexOf("/selected/") > -1) {
-			// 				selection_bool = true;
-			// 			}
-			// 			if (selection_bool) {
-			// 				runparams.fnAddData([
-			// 					s[i].id,
-			// 					s[i].samplename,
-			// 					s[i].organism,
-			// 					s[i].molecule,
-			// 					s[i].backup,
-			// 					'<button id="sample_removal_'+s[i].id+'" class="btn btn-danger btn-xs pull-right" onclick="removeSampleSelection(\''+s[i].id+'\', this)"><i class=\"fa fa-times\"></i></button>'
-			// 				]);
-			// 				selected_samples.push(s[i].id);
-			// 			}
-			// 		}
-			// 		samplesType = "getSamples";
-			// 		$.ajax({ type: "GET",
-			// 			url: BASE_PATH+"/public/ajax/ngs_tables.php",
-			// 			data: { p: samplesType, q: qvar, r: rvar, seg: segment, search: theSearch, uid: uid, gids: gids },
-			// 			async: false,
-			// 			success : function(k)
-			// 			{
-			// 				generateStreamTable(type, k, queryType, qvar, rvar, segment, theSearch, uid, gids);
-			// 				manageChecklistsBulk(selected_samples)
-			// 			}
-			// 		});
-			// 	}else if (segment == "encode") {
-			// 		generateStreamTable(type, s, queryType, qvar, rvar, segment, theSearch, uid, gids);
-			// 		var basket = basket_info.split(",");
-			// 		basket = basket.filter(function(e){return e}); 
-			// 		manageChecklistsBulk(basket);
-			// 	}else{
-			// 		generateStreamTable(type, s, queryType, qvar, rvar, segment, theSearch, uid, gids);
-			// 	}
+				var changeHTML = '';
+				var hrefSplit = window.location.href.split("/");
+				var typeLocSelected = $.inArray('selected', hrefSplit);
+				var typeLocRerun = $.inArray('rerun', hrefSplit);
+				var queryType = 'getSamples';
+				if (typeLocSelected > 0 || typeLocRerun > 0) {
+					theSearch = '';
+				}
+				var type = 'samples';
+				if (samplesType == 'getSamples' && segment == 'table_create') {
+					var samples_with_runs = [];
+					var objects_with_runs = [];
+					$.ajax({ type: "GET",
+						url: BASE_PATH+"/public/ajax/tablegenerator.php",
+						data: { p: "samplesWithRuns" },
+						async: false,
+						success : function(k)
+						{
+							for(var x = 0; x < k.length; x++){
+								samples_with_runs.push(k[x].sample_id);
+							}
+						}
+					});
+					console.log(samples_with_runs);
+					for(var z = 0; z < s.length; z++){
+						if (samples_with_runs.indexOf(s[z].id) > -1) {
+							objects_with_runs.push(s[z]);
+						}
+					}
+					console.log(objects_with_runs);
+					s = objects_with_runs;
+					queryType = 'table_create';
+				}
+				if (segment == 'selected') {
+					var runparams = $('#jsontable_samples_selected').dataTable();
+					runparams.fnClearTable();
+					for(var i = 0; i < s.length; i++){
+						var selection_bool = false;
+						if (window.location.href.indexOf("/rerun/") > -1 || window.location.href.indexOf("/selected/") > -1) {
+							selection_bool = true;
+						}
+						if (selection_bool) {
+							runparams.fnAddData([
+								s[i].id,
+								s[i].samplename,
+								s[i].organism,
+								s[i].molecule,
+								s[i].backup,
+								'<button id="sample_removal_'+s[i].id+'" class="btn btn-danger btn-xs pull-right" onclick="removeSampleSelection(\''+s[i].id+'\', this)"><i class=\"fa fa-times\"></i></button>'
+							]);
+							selected_samples.push(s[i].id);
+						}
+					}
+					samplesType = "getSamples";
+					$.ajax({ type: "GET",
+						url: BASE_PATH+"/public/ajax/ngs_tables.php",
+						data: { p: samplesType, q: qvar, r: rvar, seg: segment, search: theSearch, uid: uid, gids: gids },
+						async: false,
+						success : function(k)
+						{
+							generateStreamTable(type, k, queryType, qvar, rvar, segment, theSearch, uid, gids);
+							manageChecklistsBulk(selected_samples)
+						}
+					});
+				}else if (segment == "encode") {
+					generateStreamTable(type, s, queryType, qvar, rvar, segment, theSearch, uid, gids);
+					var basket = basket_info.split(",");
+					basket = basket.filter(function(e){return e}); 
+					manageChecklistsBulk(basket);
+				}else{
+					generateStreamTable(type, s, queryType, qvar, rvar, segment, theSearch, uid, gids);
+				}
 			}
 		});
 	
