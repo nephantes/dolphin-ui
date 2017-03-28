@@ -252,7 +252,6 @@ class HTML {
 										<tbody>
 										</tbody>
 								</table>
-						<div id="summary"></div>
 						</div><!-- /.box-body -->
 				</div><!-- /.box -->';
 		
@@ -367,7 +366,7 @@ e range"><i class="fa fa-calendar"></i></button>
 	';
 	return $html;
 	}
-	function getAccordion($name, $object, $search)
+	function getAccordion($name, $object, $search, $gids)
 	{
 	 $html='	<div class="panel box box-primary">
 					<div class="box-header with-border">
@@ -385,9 +384,7 @@ e range"><i class="fa fa-calendar"></i></button>
 				else{ $adjName = $name; }
 				if($search == ""){
 				foreach ($object as $obj):
-					$html.='<li><a href="'.BASE_PATH.'/search/browse/'
-					.$name."/".$obj['name']."/".strtolower($adjName)."=".$obj['name']."".
-					'">'.$obj['name'].' ('.$obj['count'].')</a></li>';
+					$html.='<li><a href="#" onclick="loadAllFromSidebarBrowse(\'' .$_SESSION['uid'].'\', \''.$gids.'\', \''.$name.'\', \''.$obj['name'].'\', \''.strtolower($adjName)."=".$obj['name'].'\');event.preventDefault();">'.$obj['name'].' ('.$obj['count'].')</a></li>';
 				endforeach;
 				}
 				else
@@ -728,7 +725,10 @@ e range"><i class="fa fa-calendar"></i></button>
 	$html.= 		'</ul>';
 	$html.= '	</div>
 				<div class="margin pull-right">
-					<input type="button" class="btn btn-danger" name="delete_Selected" value="Delete Selected" onclick="deleteButton('.$_SESSION['uid'].')"/>
+					<button class="btn btn-info" type="button" onClick="editMultipleSamples()"><i class="glyphicon glyphicon-edit"></i></button>
+					<button class="btn btn-success" type="button" onClick="showAllSamplesAndImports()"><i class="glyphicon glyphicon-refresh"></i></button>
+					<button class="btn btn-warning" type="button" onClick="selectAllCurrentTab()"><i class="glyphicon glyphicon-check"></i></button>
+					<button class="btn btn-danger" type="button" onclick="deleteButton('.$_SESSION['uid'].')"><i class="glyphicon glyphicon-remove-sign"></i></button>
 				</div>
 			</div>';
 	return $html;

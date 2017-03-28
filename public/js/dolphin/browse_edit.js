@@ -580,7 +580,7 @@ function removeCombobox($combobox_id){
 }
 
 function addNewFieldCombobox(){
-	var $selected = $('#select_fields_combobox option:selected').val();
+	var $selected =$('#select_fields_combobox option:selected').val(); 
 	$('#' + $selected + '_div').show();
 }
 
@@ -593,8 +593,21 @@ function getEditableFields(){
 	return $editable_fields;
 }
 
+function getDirectlyEditableFields(){
+	// fields that have regular naming in the database
+	var $directly_editable_fields = ['barcode', 'description', 
+		'avg_insert_size', 'read_length', 'concentration', 'time',
+		'biological_replica', 'technical_replica', 'spike_ins', 'adapter',
+        'notebook_ref', 'notes'];
+	return $directly_editable_fields;
+}
+
 function updateSelectedSamples(){
-	var $editable_fields = getEditableFields();
+	// fields that are connected via id such as organism_id in ngs_samples
+	var $editable_fields_i = getEditableFields();
+	// fields that are directly columns of ngs_samples
+	var $directly_editable_fields = getDirectlyEditableFields();
+	var $editable_fields = $editable_fields_i.concat($directly_editable_fields);
 
 	var $table = 'ngs_samples';
 
@@ -607,7 +620,11 @@ function updateSelectedSamples(){
 		for (i = 0; i < $editable_fields.length; i++) {
 			var $new_value = $("#" + $editable_fields[i] + "_combobox").val();
 			if($new_value) {
-				var $type = $editable_fields[i] + '_id';
+				console.log($new_value);
+				var $type = $editable_fields[i];
+				if($editable_fields_i.includes($type)) {
+					$type += '_id';
+				}
 				$.ajax({ type: "POST",
 						url: BASE_PATH+"/public/ajax/browse_edit.php",
 						data: { p: 'postInsertDatabase', type: $type, table: $table, 
@@ -622,6 +639,7 @@ function updateSelectedSamples(){
 				});
 			}
 		}
+		location = "";
 	}
 }
 
@@ -634,7 +652,10 @@ function normalizeName($str){
 }
 
 function editMultipleSamples(){
-	var $editable_fields = getEditableFields();
+	var $editable_fields_i = getEditableFields();
+	var $directly_editable_fields = getDirectlyEditableFields();
+	var $editable_fields = $editable_fields_i.concat($directly_editable_fields);
+	$editable_fields.sort();
 
 	var combobox_list_string = '';
 	var combobox_select_field_string ='<div id="select_fields_div"><div class="inner"><div class="combobox"><div class="ui-widget"><label>Fields To Add&ensp;</label><select id="select_fields_combobox"><option value="">Select one...</option></select></div></div></div></div>';
@@ -676,11 +697,11 @@ function editMultipleSamples(){
 
 	$('.ui-state-default').css({'background-color':'#fff'});
 	$('.inner').css({'display': 'inline-block'});
-	$('.btn').css({'margin': '10px 20px'});
+	$('.btn-xs').css({'margin': '10px 20px'});
 
 
-	for (i = 0; i < $editable_fields.length; i++) {
-    	$type = $editable_fields[i];
+	for (i = 0; i < $editable_fields_i.length; i++) {
+    	$type = $editable_fields_i[i];
 
     	$.ajax({ type: "GET",
 			url: BASE_PATH+"/public/ajax/browse_edit.php",
@@ -688,19 +709,105 @@ function editMultipleSamples(){
 			async: false,
 			success : function(s)
 			{
-			for(var x = 0; x < s.length; x++){
-    			$( "#" + $type + "_combobox"  ).append('<option id="' + s[x]['id'] +
-				  '" value="' + s[x]['id'] + '">' + s[x][$type] +
-					'</option>');
+				for(var x = 0; x < s.length; x++){
+	    			$( "#" + $type + "_combobox"  ).append('<option id="' + s[x]['id'] +
+					  '" value="' + s[x]['id'] + '">' + s[x][$type] +
+						'</option>');
+				}
 			}
-		}
-	});
+		});
+	}
 
+	for (i = 0; i < $directly_editable_fields.length; i++) {
+    	$type = $directly_editable_fields[i];
+
+    	$.ajax({ type: "GET",
+			url: BASE_PATH+"/public/ajax/browse_edit.php",
+			data: { p: 'getDirectDropdownValues', type: $type},
+			async: false,
+			success : function(s)
+			{
+				for(var x = 0; x < s.length; x++){
+	    			$( "#" + $type + "_combobox"  ).append('<option id="' + s[x][$type] +
+					  '" value="' + s[x][$type] + '">' + s[x][$type] +
+						'</option>');
+				}
+			}
+		});
 	}
 
 	$('.ui-icon-triangle-1-s').replaceWith('<span class="caret" style="margin:8px"></span>');
 	$('.ui-button-text').remove();
 	$('.ui-button-icon-only').css({'background-color':'#eee'});
+
+}
+
+function loadAllFromSidebarBrowse(uid, gids, qvar, rvar, theSearch){
+	var type = 'samples';
+	var queryType = 'getSamples';
+	var segment = 'browse';
+
+	var e_save = $('#table_div_experiments table').detach();
+	$('#table_div_experiments').empty().append(e_save);
+	var i_save = $('#table_div_lanes table').detach();
+	$('#table_div_lanes').empty().append(i_save);
+	var s_save = $('#table_div_samples table').detach();
+	$('#table_div_samples').empty().append(s_save);
+
+	loadSamplesFromSidebarBrowse(type, queryType, rvar, qvar, segment, theSearch, uid, gids);
+	loadImportsFromSidebarBrowse(rvar, qvar, segment, theSearch, uid, gids);
+	loadExperimentsFromSidebarBrowse(rvar, qvar, segment, theSearch, uid, gids);
+
+	// showAllFilteredTables();
+}
+
+function loadSamplesFromSidebarBrowse(type, queryType, rvar, qvar, segment, theSearch, uid, gids){
+
+	$.ajax({ type: "GET",
+	url: BASE_PATH+"/public/ajax/ngs_tables.php",
+	data: { p: queryType, q: qvar, r: rvar, seg: segment, search: theSearch, uid: uid, gids: gids },
+	async: false,
+		success : function(s)
+		{
+			generateStreamTable(type, s, queryType, qvar, rvar, segment, theSearch, uid, gids);
+		}
+	});
+
+}
+
+function loadImportsFromSidebarBrowse(rvar, qvar, segment, theSearch, uid, gids){ 
+	$.ajax({ type: "GET",
+		url: BASE_PATH+"/public/ajax/ngs_tables.php",
+		data: { p: "getLanes", q: qvar, r: rvar, seg: segment, search: theSearch, uid: uid, gids: gids },
+		async: false,
+		success : function(s)
+		{
+			lane_data = s;
+			var type = 'lanes';
+			var queryType = "getLanes";
+			if (window.location.href.split("/").indexOf('search') > -1) {
+				generateStreamTable(type, s, queryType, qvar, rvar, segment, theSearch, uid, gids);
+			}
+		}
+	});
+}
+
+function loadExperimentsFromSidebarBrowse(rvar, qvar, segment, theSearch, uid, gids){ 
+
+	$.ajax({ type: "GET",
+		url: BASE_PATH+"/public/ajax/ngs_tables.php",
+		data: { p: "getExperimentSeries", q: qvar, r: rvar, seg: segment, search: theSearch, uid: uid, gids: gids },
+		async: false,
+		success : function(s)
+		{
+			experiment_series_data = s;
+			var type = 'experiments';
+			var queryType = "getExperimentSeries";
+			if (window.location.href.split("/").indexOf('search') > -1) {
+				generateStreamTable(type, s, queryType, qvar, rvar, segment, theSearch, uid, gids);
+			}
+		}
+	});
 
 }
 
@@ -817,22 +924,59 @@ function comboBoxScript(){
 	      if ( valid ) {
 	        return;
 	      }
+	      
+
+
+
+	      var current_div_id = this.input.parents(':eq(4)').attr('id');
+	      var $value = this.input.val();
+	      var $type = current_div_id.slice(0, -4);
+		  var last_id = this.input.parents(':eq(1)').children('select').children('option').last().attr('id');
+		  var new_id = parseInt(last_id) + 1;
+
+	    if($type == 'select_fields'){
+	    	var $temp_msg = " is not a valid option.";
+	    } else {
+	    	var $directly_editable_fields = getDirectlyEditableFields();
+	    	var $temp_msg = " is now added to the database.";
+
+	    	if($directly_editable_fields.includes($type)){
+				var to_add = '<option id="' + $value + '" value="' + $value+ '">' + $value + '</option>';
+	    		$temp_msg = " is added as a choice. Please type or select the choice if you would like to update.";
+	    	} else {
+		    	$.ajax({ type: "POST",
+						url: BASE_PATH+"/public/ajax/browse_edit.php",
+						data: { p: 'insertFromCombobox', type: $type, value: $value},
+						async: false,
+						complete : function(s)
+						{
+							console.log(s);
+						}
+				});
+				var to_add = '<option id="' + new_id + '" value="' + new_id + '">' + $value + '</option>';
+	    	}
+
+		    this.input.parents(':eq(1)').children('select').append(to_add);
+		    console.log("havuc");
+	    }
+
 
 	      // Remove invalid value
 	      this.input
 	        .val( "" )
-	        .attr( "title", value + " didn't match any item" )
+	        .attr( "title", value +  $temp_msg)
 	        .tooltip( "open" );
 	      this.element.val( "" );
 	      this._delay(function() {
 	        this.input.tooltip( "close" ).attr( "title", "" );
 	      }, 2500 );
 	      this.input.autocomplete( "instance" ).term = "";
+		  $('#' + $type + '_combobox option:selected').val(new_id + '');
 	    },
 
 	    _destroy: function() {
-	      this.wrapper.remove();
-	      this.element.show();
+	      // this.wrapper.remove();
+	      // this.element.show();
 	    }
 	  });
 

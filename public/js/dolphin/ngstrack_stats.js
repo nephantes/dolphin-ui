@@ -12,6 +12,7 @@ var table_params = '';
 function generateStreamTable(type, queryData, queryType, qvar, rvar, seg, theSearch, uid, gids, basket_info){
 	var keys = [];
 	var obj_conversion = [];
+
 	if (type == 'generated') {
 		if (queryData.length > 0) {
 			console.log(queryData.length);
@@ -168,6 +169,12 @@ function generateStreamTable(type, queryData, queryType, qvar, rvar, seg, theSea
 		if (window.location.href.indexOf("/pipeline/") > -1) {
 			checklist_type = "onClick=\"managePipelineChecklists(this.name, 'sample_checkbox')\""
 		}
+
+		// to reduce repetition
+		$s_details_html = '<td><a href="#s_details" onclick="displaySampleDetails(' + record.id+', \'s_details\');event.preventDefault();">'+sample_name+'</a></td>';
+		$i_details_html = '<td><a href="#" onclick="displayImportDetails(' + record.id+', \'i_details\');event.preventDefault();">'+record.name+'</a></td>';
+		$e_details_html = '<td><a href="#e_details" onclick="displayExperimentDetails(' + record.id+', \'e_details\');event.preventDefault();">'+record.experiment_name+'</a></td>';
+
 		if (type == 'generated') {
 			var row = '<tr>';
 			for(var key in keys){
@@ -179,7 +186,7 @@ function generateStreamTable(type, queryData, queryType, qvar, rvar, seg, theSea
 				if (queryType == 'getSamples') {
 					return 	"<tr>"+
 						"<td>"+record.id+"</td>"+
-						"<td><a href=\""+BASE_PATH+"/search/details/samples/"+record.id+'/'+theSearch+"\">"+sample_name+"</a></td>"+
+						$s_details_html+
 						"<td onclick=\"editBox("+uid+", "+record.id+", 'title', 'ngs_samples', this, '', '', '')\">"+record.title+"</td>"+
 						"<td onclick=\"editBox("+uid+", "+record.id+", 'source', 'ngs_samples', this, '', '', '')\">"+record.source+"</td>"+
 						"<td onclick=\"editBox("+uid+", "+record.id+", 'organism', 'ngs_samples', this, '', '', '')\">"+record.organism+"</td>"+
@@ -207,7 +214,7 @@ function generateStreamTable(type, queryData, queryType, qvar, rvar, seg, theSea
 				}else if (queryType == 'table_create') {
 					return "<tr>" +
 						"<td>"+record.id+"</td>" +
-						"<td><a href=\""+BASE_PATH+"/search/details/samples/"+record.id+'/'+theSearch+"\">"+sample_name+"</a></td>"+
+						$s_details_html+
 						"<td onclick=\"editBox("+uid+", "+record.id+", 'title', 'ngs_samples', this, '', '', '')\">"+record.title+"</td>"+
 						"<td onclick=\"editBox("+uid+", "+record.id+", 'source', 'ngs_samples', this, '', '', '')\">"+record.source+"</td>"+
 						"<td onclick=\"editBox("+uid+", "+record.id+", 'organism', 'ngs_samples', this, '', '', '')\">"+record.organism+"</td>"+
@@ -234,7 +241,7 @@ function generateStreamTable(type, queryData, queryType, qvar, rvar, seg, theSea
 				}else{
 					return "<tr>"+
 						"<td>"+record.id+"</td>"+
-						"<td><a href=\""+BASE_PATH+"/search/details/samples/"+record.id+'/'+theSearch+"\">"+sample_name+"</a></td>"+
+						$s_details_html+
 						"<td onclick=\"editBox("+uid+", "+record.id+", 'title', 'ngs_samples', this, '', '', '')\">"+record.title+"</td>"+
 						"<td onclick=\"editBox("+uid+", "+record.id+", 'source', 'ngs_samples', this, '', '', '')\">"+record.source+"</td>"+
 						"<td onclick=\"editBox("+uid+", "+record.id+", 'organism', 'ngs_samples', this, '', '', '')\">"+record.organism+"</td>"+
@@ -263,7 +270,7 @@ function generateStreamTable(type, queryData, queryType, qvar, rvar, seg, theSea
 			}else if (type == 'lanes') {
 				return "<tr>"+
 					"<td>"+record.id+"</td>"+
-					"<td><a href=\""+BASE_PATH+"/search/details/experiments/"+record.id+'/'+theSearch+"\">"+record.name+"</a></td>"+
+					$i_details_html+
 					"<td onclick=\"editBox("+uid+", "+record.id+", 'facility', 'ngs_lanes', this, '', '', '')\">"+record.facility+"</td>"+
 					"<td onclick=\"editBox("+uid+", "+record.id+", 'total_reads', 'ngs_lanes', this, '', '', '')\">"+record.total_reads+"</td>"+
 					"<td onclick=\"editBox("+uid+", "+record.id+", 'total_samples', 'ngs_lanes', this, '', '', '')\">"+record.total_samples+"</td>"+
@@ -278,7 +285,7 @@ function generateStreamTable(type, queryData, queryType, qvar, rvar, seg, theSea
 			}else if(type == 'experiments'){
 				return "<tr>"+
 					"<td>"+record.id+"</td>"+
-					"<td><a href=\""+BASE_PATH+"/search/details/experiment_series/"+record.id+'/'+theSearch+"\">"+record.experiment_name+"</a></td>"+
+					$e_details_html+
 					"<td onclick=\"editBox("+uid+", "+record.id+", 'summary', 'ngs_experiment_series', this, '', '', '')\">"+record.summary+"</td>"+
 					"<td onclick=\"editBox("+uid+", "+record.id+", 'design', 'ngs_experiment_series', this, '', '', '')\">"+record.design+"</td>"+
 					"<td onclick=\"editBox("+uid+", "+record.id+", 'lab', 'ngs_experiment_series', this, '', '', '')\">"+record.lab+"</td>"+
@@ -294,7 +301,7 @@ function generateStreamTable(type, queryData, queryType, qvar, rvar, seg, theSea
 				if (queryType == 'getSamples') {
 					return "<tr>"+
 						"<td>"+record.id+"</td>"+
-						"<td><a href=\""+BASE_PATH+"/search/details/samples/"+record.id+'/'+theSearch+"\">"+sample_name+"</a></td>"+
+						$s_details_html+
 						"<td onclick=\"editBox("+uid+", "+record.id+", 'title', 'ngs_samples', this, '', '', '')\">"+record.title+"</td>"+
 						"<td onclick=\"editBox("+uid+", "+record.id+", 'source', 'ngs_samples', this, '', '', '')\">"+record.source+"</td>"+
 						"<td onclick=\"editBox("+uid+", "+record.id+", 'organism', 'ngs_samples', this, '', '', '')\">"+record.organism+"</td>"+
@@ -306,7 +313,7 @@ function generateStreamTable(type, queryData, queryType, qvar, rvar, seg, theSea
 					console.log('test');
 					return "<tr>"+
 						"<td>"+record.id+"</td>"+
-						"<td><a href=\""+BASE_PATH+"/search/details/samples/"+record.id+'/'+theSearch+"\">"+sample_name+"</a></td>"+
+						$s_details_html+
 						"<td onclick=\"editBox("+uid+", "+record.id+", 'title', 'ngs_samples', this, '', '', '')\">"+record.title+"</td>"+
 						"<td onclick=\"editBox("+uid+", "+record.id+", 'source', 'ngs_samples', this, '', '', '')\">"+record.source+"</td>"+
 						"<td onclick=\"editBox("+uid+", "+record.id+", 'organism', 'ngs_samples', this, '', '', '')\">"+record.organism+"</td>"+
@@ -317,7 +324,7 @@ function generateStreamTable(type, queryData, queryType, qvar, rvar, seg, theSea
 				}else{
 					return "<tr>"+
 					"<td>"+record.id+"</td>"+
-					"<td><a href=\""+BASE_PATH+"/search/details/samples/"+record.id+'/'+theSearch+"\">"+sample_name+"</a></td>"+
+						$s_details_html+
 					"<td onclick=\"editBox("+uid+", "+record.id+", 'title', 'ngs_samples', this, '', '', '')\">"+record.title+"</td>"+
 					"<td onclick=\"editBox("+uid+", "+record.id+", 'source', 'ngs_samples', this, '', '', '')\">"+record.source+"</td>"+
 					"<td onclick=\"editBox("+uid+", "+record.id+", 'organism', 'ngs_samples', this, '', '', '')\">"+record.organism+"</td>"+
@@ -328,7 +335,7 @@ function generateStreamTable(type, queryData, queryType, qvar, rvar, seg, theSea
 			}else if (type == 'lanes') {
 				return "<tr>"+
 					"<td>"+record.id+"</td>"+
-					"<td><a href=\""+BASE_PATH+"/search/details/experiments/"+record.id+'/'+theSearch+"\">"+record.name+"</a></td>"+
+					$i_details_html+
 					"<td onclick=\"editBox("+uid+", "+record.id+", 'facility', 'ngs_lanes', this, '', '', '')\">"+record.facility+"</td>"+
 					"<td onclick=\"editBox("+uid+", "+record.id+", 'total_reads', 'ngs_lanes', this, '', '', '')\">"+record.total_reads+"</td>"+
 					"<td onclick=\"editBox("+uid+", "+record.id+", 'total_samples', 'ngs_lanes', this, '', '', '')\">"+record.total_samples+"</td>"+
@@ -338,7 +345,7 @@ function generateStreamTable(type, queryData, queryType, qvar, rvar, seg, theSea
 			}else if(type == 'experiments'){
 				return "<tr>"+
 					"<td>"+record.id+"</td>"+
-					"<td><a href=\""+BASE_PATH+"/search/details/experiment_series/"+record.id+'/'+theSearch+"\">"+record.experiment_name+"</a></td>"+
+					$e_details_html+
 					"<td onclick=\"editBox("+uid+", "+record.id+", 'summary', 'ngs_experiment_series', this, '', '', '')\">"+record.summary+"</td>"+
 					"<td onclick=\"editBox("+uid+", "+record.id+", 'design', 'ngs_experiment_series', this, '', '', '')\">"+record.design+"</td>"+
 					"<td><input type=\"checkbox\" class=\"ngs_checkbox\" name=\""+record.id+"\" id=\"experiment_checkbox_"+record.id+"\" onClick=\"manageChecklistsModified(this.name, 'experiment_checkbox')\"></td>"+
@@ -630,8 +637,11 @@ $(function() {
 
 	//Browse values
 	else if (segment == "browse") {
+		console.log(segment);
 		qvar = phpGrab.theField;//field
+		console.log(qvar);
 		rvar = unescape(phpGrab.theValue);//value
+		console.log(rvar);
 	}
 
 	if (phpGrab.theField == "samples") {
@@ -777,6 +787,7 @@ $(function() {
 			samplesType = "getSamples";
 		}
 		console.log(basket_info);
+		console.log('samplesType: ' + samplesType + ' qvar: ' + qvar +  ' rvar: ' + rvar+  ' segment: ' + segment+  ' theSearch: ' + theSearch+  ' uid: ' + uid+  ' gids: ' + gids );
 		$.ajax({ type: "GET",
 			url: BASE_PATH+"/public/ajax/ngs_tables.php",
 			data: { p: samplesType, q: qvar, r: rvar, seg: segment, search: theSearch, uid: uid, gids: gids },
@@ -855,6 +866,7 @@ $(function() {
 					basket = basket.filter(function(e){return e}); 
 					manageChecklistsBulk(basket);
 				}else{
+					console.log('type: ' + type + ' queryType: ' + queryType +  ' rvar: ' + rvar+  ' qvar: ' + qvar+  ' segment: ' + segment+  ' uid: ' + uid+  ' gids: ' + gids + ' theSearch: ' + theSearch);
 					generateStreamTable(type, s, queryType, qvar, rvar, segment, theSearch, uid, gids);
 				}
 			}

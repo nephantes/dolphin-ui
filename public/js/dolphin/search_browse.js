@@ -1,3 +1,82 @@
+// $('.toggle').toggles({
+//   text:{on:'All',off:'Filtered'},
+//   width: 100,
+//   height: 20,
+//   on: true
+// });
+
+// $('.toggle').on('toggle', function(e, active) {
+//   if (active) {
+//     $('#imports_filtered_by_selection').hide();
+//     $('#samples_filtered_by_selection').hide();
+//     $('#browse_import_data_table').show();
+//     $('#browse_sample_data_table').show();
+//   } else {
+//     $('#imports_filtered_by_selection').show();
+//     $('#samples_filtered_by_selection').show();
+//     $('#browse_import_data_table').hide();
+//     $('#browse_sample_data_table').hide();
+
+//   }
+// });
+
+
+$('#return-to-top').click(function() {      // When arrow is clicked
+    $('body,html').animate({
+        scrollTop : 0                       // Scroll to top of body
+    }, 500);
+});
+
+
+$(function() { 
+    $('a[data-toggle="tab"]').on('shown.bs.tab', function (e) {
+        localStorage.setItem('focustab', $(e.target).attr('href'));
+    });
+
+    var focustab = localStorage.getItem('focustab');
+    if (focustab) {
+        $('[href="' + focustab + '"]').tab('show');
+    }
+});
+
+// $(document).ready(function() {
+//     if (location.hash) {
+//         $("a[href='" + location.hash + "']").tab("show");
+//     }
+//     $(document.body).on("click", "a[data-toggle]", function(event) {
+//         location.hash = this.getAttribute("href");
+//     });
+// });
+// $(window).on("popstate", function() {
+//     var anchor = location.hash || $("a[data-toggle='tab']").first().attr("href");
+//     $("a[href='" + anchor + "']").tab("show");
+// });
+
+
+function selectAllCurrentTab(){
+    $("input:checkbox:visible:not(:checked)").each(function(i, obj) {
+        $(this).click();
+    });
+}
+
+function showAllSamplesAndImports(){
+    $('#imports_filtered_by_selection').hide();
+    $('#samples_filtered_by_selection').hide();
+    $('#experiments_filtered_by_selection').hide();
+    $('#browse_import_data_table').show();
+    $('#browse_sample_data_table').show();
+    $('#browse_experiment_data_table').show();
+}
+
+function showAllFilteredTables(){
+    $('#imports_filtered_by_selection').show();
+    $('#samples_filtered_by_selection').show();
+    $('#experiments_filtered_by_selection').show();
+    $('#browse_import_data_table').hide();
+    $('#browse_sample_data_table').hide();
+    $('#browse_experiment_data_table').hide();
+}
+
 function fillSampleTable(){
   if($('#table_div_samples').length == 0){
 		$.ajax({ type: "GET",
@@ -15,12 +94,325 @@ function fillSampleTable(){
   }
 }
 
+function changeUnfilteredCheckbox(id, type){
+  var check_id = '#filtered_' + type + '_' + id;
+
+  manageChecklists(id, type);
+}
+
+function createFilteredSample($experiment_or_import, $id){
+  $.ajax({ type: "GET",
+    url: BASE_PATH+"/public/ajax/browse_edit.php",
+    data: { p: 'getFilteredSampleData', experiment_or_import: $experiment_or_import, id: $id },
+    async: false,
+    success : function(s)
+    {
+      for(var i = 0; i < s.length; i++ ){
+        s[i].options = '<input type="checkbox" class="ngs_checkbox" name="' +
+          s[i].id + '" id="filtered_sample_checkbox_' + s[i].id +
+          '" onclick="changeUnfilteredCheckbox(this.name, \'sample_checkbox\')">';
+        s[i].samplename = '<a href="#" onclick="displaySampleDetails(' + s[i].id +
+          ', \'s_details\');event.preventDefault();">' + s[i].samplename + '</a>';
+        // replace nulls with empty strings
+        for (var field_to_check in s[i]) {
+          if (s[i].hasOwnProperty(field_to_check) && s[i][field_to_check] == null) {
+            s[i][field_to_check] = '';
+          }
+        }
+
+        if($('#avg_insert_size').length == 0){
+          s[i] = (({ id, samplename, title, source, organism, molecule, backup, options }) => ({ id, samplename, title, source, organism, molecule, backup, options }))(s[i]);
+        }
+
+      }
+      console.log("+++-+++-+++-+++-+++-+++-+++-+++-+++-+++-+++-+++-+++-+++-+++-");
+      console.log(s);
+      var save = $('#table_div_samples_filtered table').detach();
+      $('#table_div_samples_filtered').empty().append(save);
+      groupsStreamTable = createStreamTable('samples_filtered', s, "", true, [10,20,50,100], 20, true, true);
+
+      $('#samples_filtered_by_selection').show();
+      $('#browse_sample_data_table').hide();
+      checkAllFilteredBoxes();
+
+    }
+  });
+}
+
+
+function createFilteredImport($experiment_id){
+  $.ajax({ type: "GET",
+    url: BASE_PATH+"/public/ajax/browse_edit.php",
+    data: { p: 'getFilteredImportData', 'experiment_id': $experiment_id },
+    async: false,
+    success : function(s)
+    {
+      for(var i = 0; i < s.length; i++ ){
+        s[i].options = '<input type="checkbox" class="ngs_checkbox" name="' +
+          s[i].id + '" id="lfiltered_ane_checkbox_' + s[i].id +
+          '" onclick="changeUnfilteredCheckbox(this.name, \'lane_checkbox\')">';
+        s[i].import_name = '<a href="#" onclick="displayImportDetails(' + s[i].id +
+          ', \'i_details\');event.preventDefault();">' + s[i].import_name + '</a>';
+        // replace nulls with empty strings
+        for (var field_to_check in s[i]) {
+          if (s[i].hasOwnProperty(field_to_check) && s[i][field_to_check] == null) {
+            s[i][field_to_check] = '';
+          }
+        }
+        if($('#phix_requested').length == 0){
+          s[i] = (({ id, import_name, facility, total_reads, total_samples, options }) => ({ id, import_name, facility, total_reads, total_samples, options }))(s[i]);
+        }
+
+      }
+      console.log("+++-+++-+++-+++-+++-+++-+++-+++-+++-+++-+++-+++-+++-+++-+++-");
+      console.log(s);
+      var save = $('#table_div_lanes_filtered table').detach();
+      $('#table_div_lanes_filtered').empty().append(save);
+      groupsStreamTable = createStreamTable('lanes_filtered', s, "", true,
+        [10,20,50,100], 20, true, true);
+
+      $('#imports_filtered_by_selection').show();
+      $('#browse_import_data_table').hide();
+      checkAllFilteredBoxes();
+    }
+  });
+}
+
+function clearAllDetails(){
+  $('#e_details').html('');
+  $('#i_details').html('');
+  $('#s_details').html('');
+}
+
+function hideFilteredTables(){
+      $('#experiments_filtered_by_selection').hide();
+      $('#imports_filtered_by_selection').hide();
+      $('#samples_filtered_by_selection').hide();
+}
+hideFilteredTables();
+
+
+function checkAllFilteredBoxes(){
+  $('input:checkbox:checked').each(function () {
+    var check_id = "#filtered_" + $(this).attr('id');
+    console.log(check_id);
+    $(check_id).prop('checked', true);
+    console.log( $(check_id).prop('checked'));
+  });
+}
+
+function displayExperimentDetails($experiment_id, $div_id, $called_from_import = false){
+  clearAllDetails();
+  var $html_to_return = "";
+  var $fields = ["summary", "design", "name", "perms_name"];
+  var $titles = ["Summary", "Overall Design", "Groups", "Permission"];
+        $.ajax({ type: "GET",
+            url: BASE_PATH+"/public/ajax/browse_edit.php",
+            data: { p: 'getExperimentDetailsSearch', experiment_id: '' +
+              $experiment_id},
+            async: false,
+            complete : function(s)
+            {
+              console.log(s);
+              var $json_object = jQuery.parseJSON(s.responseText)[0];
+              $html_to_return += getDetailsHTML($json_object,
+                'Experiment Series', 'experiment_name', $fields, $titles);
+            }
+        });
+      $('#' + $div_id).html($html_to_return);
+      if(!$called_from_import){
+        createFilteredImport($experiment_id);
+        createFilteredSample('experiment', $experiment_id);
+        var scroll_to = "#back_to_top";
+      } else {
+        var scroll_to = "#back_to_top";
+      }
+
+      $('html, body').animate({
+          scrollTop: $(scroll_to).offset().top - 500
+      }, 2000);
+
+  }
+
+function displayImportDetails($import_id, $div_id, $called_from_sample = false){
+  clearAllDetails();
+  var $html_to_return = "";
+  var $fields = ["experiment_name", "facility", "date_submitted",
+    "date_received", "total_samples", "resequenced", "group_name",
+    "perms_name", "lane_id"];
+  var $titles = ["Series Name", "Sequencing Facility", "Date Submitted",
+    "Date Received", "# of Samples", "Resequenced", "Groups", "Permission",
+    "Lane ID"];
+  $.ajax({ type: "GET",
+      url: BASE_PATH+"/public/ajax/browse_edit.php",
+      data: { p: 'getImportDetailsSearch', import_id: '' + $import_id},
+      async: false,
+      complete : function(s)
+      {
+        console.log(s);
+        var $json_object = jQuery.parseJSON(s.responseText)[0];
+        // Also show Experiment Details
+        displayExperimentDetails($json_object['series_id'], 'e_details', true);
+        $html_to_return += getDetailsHTML($json_object, 'Import',
+          'import_name', $fields, $titles);
+      }
+  });
+  $('#' + $div_id).html($html_to_return);
+  if(!$called_from_sample){
+    createFilteredSample('import', $import_id);
+  }
+}
+
+function displaySampleDetails($sample_id, $div_id){
+  clearAllDetails();
+  var $html_to_return = "";
+  var $fields1 = ["experiment_name", "import_name", "protocol_name", 
+    "samplename", "barcode", "title", "source", "organism", "molecule",
+    "instrument_model", "avg_insert_size", "read_length", "genotype",
+    "library_type", "notes", "group_name", "perms_name", "donor", "time",
+    "biological_replica", "technical_replica"];
+  var $titles1 = ["Series Name", "Lane Name", "Protocol Name", "Sample Name", 
+    "Barcode", "Title", "Source", "Organism", "Molecule", "Instrument Model",
+    "Avg. Insert Size", "Read Length", "Genotype", "Library Type", "Notes",
+    "Groups", "Permission", "Donor", "Time", "Biological Rep", "Technical Rep"];
+
+  var $fields_lists = [$fields1, [], [], []];
+  var $titles_lists = [$titles1, [], [], []];
+  $.ajax({ type: "GET",
+      url: BASE_PATH+"/public/ajax/browse_edit.php",
+      data: { p: 'getSampleDetailsSearch', sample_id: '' + $sample_id},
+      async: false,
+      complete : function(s)
+      {
+        console.log(s);
+        var $json_object = jQuery.parseJSON(s.responseText)[0];
+        // Also show Import Details (which in turn shows Experiment's)
+        displayImportDetails($json_object['lane_id'], 'i_details', true);
+        $html_to_return += getDetailsHTMLforSample($json_object, 
+          ['Data', 'Directory', 'Runs', 'Tables'], 
+          ['data_of_sample', 'directory_of_sample', 'runs_of_sample', 
+            'tables_of_sample'], 
+          $fields_lists, $titles_lists);
+
+      }
+  });
+  $('#' + $div_id).html($html_to_return);
+  $( "#data_of_sample" ).addClass('active');
+  
+  // Directory Info to Sample Details
+  addRDirectoryInfoToSampleDetails($sample_id, 'directory_of_sample');
+  // Runs and Tables to Sample Details
+  addRunsToSampleDetails($sample_id, 'runs_of_sample');
+  
+}
+
+function addRDirectoryInfoToSampleDetails($sample_id, $directory_div_id){
+  $.ajax({ type: "GET",
+      url: BASE_PATH+"/public/ajax/browse_edit.php",
+      data: { p: 'getDirectoryInfoForSample', sample_id: '' + $sample_id},
+      // async: false,
+      complete : function(s)
+      {
+        console.log(s);
+        $('#' + $directory_div_id).html(s.responseText);
+      }
+  });
+}
+
+
+function addRunsToSampleDetails($sample_id, $run_div_id){
+  var $run_html = '';
+  $.ajax({ type: "GET",
+      url: BASE_PATH+"/public/ajax/browse_edit.php",
+      data: { p: 'getRunsForSample', sample_id: '' + $sample_id},
+      async: false,
+      complete : function(response)
+      {
+        console.log(response);
+        var s = jQuery.parseJSON(response.responseText);
+
+        addTablesToSampleDetails(response.responseText, 'tables_of_sample');
+
+        console.log(s);
+        for(var i = 0; i < s.length; i++ ){
+          $run_html += '<p>' + s[i].id + '&ensp;' + s[i].run_name +
+          '&ensp;<a href="#" id="' + s[i].id +
+          '" onclick="reportSelected(this.id,1)">Reports</a>&ensp;<a href="#" id="' +
+          s[i].id + '" onclick="sendToAdvancedStatus(this.id)">Status</a></p>';
+        }
+      }
+  });
+  $('#' + $run_div_id).html($run_html);
+}
+
+
+function addTablesToSampleDetails($runs, $table_div_id){
+  var $tables_html = '';
+  $.ajax({ type: "GET",
+      url: BASE_PATH+"/public/ajax/browse_edit.php",
+      data: { p: 'getTablesForSample', runs: '' + $runs},
+      async: false,
+      complete : function(response)
+      {
+        console.log(response);
+        var s = jQuery.parseJSON(response.responseText);
+
+        console.log(s);
+        for(var i = 0; i < s.length; i++ ){
+          $tables_html += '<a href="#" id="' + s[i].id + 
+            '" onclick="sendToSavedTable(this.id)">' + s[i].id + ' -- ' +
+            s[i].name + '</a><br>';
+        }
+      }
+  });
+  $('#' + $table_div_id).html($tables_html);
+}
 
 
 
+  function getDetailsHTML($json_object, $top_title, $second_title, $fields, $titles){
+    var $html_to_return = "<hr><h3>" + $top_title + "</h3><br/>"
+    $html_to_return += "<h4>" + $json_object[$second_title] + "</h4>" + "<br/>";
+    var $current_val;
+    for(var i = 0; i < $fields.length; i++){
+      $current_val = $json_object[$fields[i]];
+      if($current_val){
+        $html_to_return += "<label>" + $titles[i] + "</label>" + ": " + $current_val + "<br/>";
+      }
+    }
+    return $html_to_return;
+  }
+
+  function getDetailsHTMLforSample($json_object, $top_title_list, $div_id_list,
+                                    $fields_lists, $titles_lists){
+    var $html_to_return = '<hr><h3>Sample</h3><div class="nav-tabs-custom">' +
+      '<ul id="tabList" class="nav nav-tabs">';
+    for(var k = 0; k < $top_title_list.length; k++){
+      $html_to_return += '<li class><a href="#' + $div_id_list[k] + 
+        '" id="' + $div_id_list[k] +
+        '_select" data-toggle="tab" aria-expanded="true">' +
+        $top_title_list[k] + '</a></li>';
+    }
+    $html_to_return += '</ul></div>';
+    $html_to_return += '<div class="tab-content">';
+    for(var i = 0; i < $top_title_list.length; i++){
+      $html_to_return += '<div class="box-body tab-pane" id="' +$div_id_list[i]
+        + '"><div style="overflow-y:scroll"><dl class="dl-horizontal">';
+      var $current_val;
+      for(var j = 0; j < $fields_lists[i].length; j++){
+        $current_val = $json_object[$fields_lists[i][j]];
+        if($current_val){
+          $html_to_return += "<dt>" + $titles_lists[i][j] + "</dt><dd>" +
+            $current_val + "</dd>";
+        }
+      }
+      $html_to_return += '</dl></div></div>';
+    }
+    $html_to_return += '</div>';
+    return $html_to_return;
+  }
 
 function ngsTrackCopy(){
-
   $(function() {
   	"use strict";
 

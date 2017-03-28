@@ -25,6 +25,34 @@
 					  </div>
 					</div>
 				</div><!-- End Delete modal -->
+
+				<div class="modal fade" id="fileModal" tabindex="-1" role="dialog" aria-labelledby="myFileModal" aria-hidden="true">
+					<div class="modal-dialog">
+					  <div class="modal-content">
+						<div class="modal-header">
+						  <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+						  <h4 class="modal-title" id="myFileModal">Save Editted Changes</h4>
+						</div>
+						<form name="editFileForm" role="form" method="post">
+							<div class="modal-body">
+								<fieldset>
+									<div class="form-group" style="overflow:scroll">
+										<label id="fileLabel">Saving these changes will overwrite current directory/file information</label>
+										<br>
+										<p id="fileAreas">Please make sure that the changes being made to either the directory location or the file names are accurate before submission.</p>
+										<p id="fileAreas2">Once completed, please visit the NGS Run Status page and resubmit the initial run to make sure that all file information is correct and secure.</p>
+									</div>
+								</fieldset>   
+							</div>
+							<div class="modal-footer">
+							  <button type="button" id="confirmFileButton" class="btn btn-danger" data-dismiss="modal" onclick="">Confirm</button>
+							  <button type="button" id="cancelFileButton" class="btn btn-default" data-dismiss="modal" onclick="">Cancel</button>
+							</div>
+						</form>
+					  </div>
+					</div>
+				</div><!-- End File modal -->
+
 				<div class="modal fade" id="permsModal" tabindex="-1" role="dialog" aria-labelledby="myPermsModal" aria-hidden="true">
 					<div class="modal-dialog">
 					  <div class="modal-content">
@@ -66,6 +94,7 @@
 				<!-- Main content -->
 				<section class="content">
 					<div class="row">
+					<div class="toggle toggle-modern pull-right" style="margin:25px;"></div>
 						<div class="col-md-3">
 
 			<div class="box box-solid">
@@ -81,11 +110,11 @@
 				<div class="box-group" id="accordion">
 					<!-- we are adding the .panel class so bootstrap.js collapse plugin detects it -->
 					<?php echo $html->sendJScript("index", "", "", "", $uid, $gids); ?>
-					<?php echo $html->getAccordion("Assay", $assay, "")?>
-					<?php echo $html->getAccordion("Organism", $organism, "")?>
-					<?php echo $html->getAccordion("Molecule", $molecule, "")?>
-					<?php echo $html->getAccordion("Source", $source, "")?>
-					<?php echo $html->getAccordion("Genotype", $genotype, "")?>
+					<?php echo $html->getAccordion("Assay", $assay, "", $gids)?>
+					<?php echo $html->getAccordion("Organism", $organism, "", $gids)?>
+					<?php echo $html->getAccordion("Molecule", $molecule, "", $gids)?>
+					<?php echo $html->getAccordion("Source", $source, "", $gids)?>
+					<?php echo $html->getAccordion("Genotype", $genotype, "", $gids)?>
 				</div>
 				</div><!-- /.box-body -->
 		</div><!-- /.box -->
@@ -95,54 +124,114 @@
 		<!-- END ACCORDION & CAROUSEL-->
 			</div><!-- /.col (LEFT) -->
 			<?php echo $html->getSubmitBrowserButton()?>
-						<div class="col-md-9">
+
+						<div id="top_search_section" class="col-md-9">
 							<ul id="tabList" class="nav nav-tabs">
-			          <li class="active">
-			            <a href="#browse_experiments" data-toggle="tab" aria-expanded="true">Experiments</a>
-			          </li>
-			          <li class>
-			            <a href="#browse_imports" data-toggle="tab" aria-expanded="true">Imports</a>
-			          </li>
-			          <li class>
-			            <a href="#browse_samples" onclick="fillSampleTable();" data-toggle="tab" aria-expanded="true">Samples</a>
-			          </li>
-			        </ul>
+					          <li class="active">
+					            <a href="#browse_experiments" data-toggle="tab" aria-expanded="true">Experiments</a>
+					          </li>
+					          <li class>
+					            <a href="#browse_imports" data-toggle="tab" aria-expanded="true">Imports</a>
+					          </li>
+					          <li class>
+					            <a href="#browse_samples" onclick="fillSampleTable();" data-toggle="tab" aria-expanded="true">Samples</a>
+					          </li>
+					        </ul>
 							<div class="tab-content">
 								<div class="tab-pane active" id="browse_experiments">
 									<div id="browse_experiment_data_table" class="margin">
-										<?php if(!isset($_SESSION['ngs_experiments']) || ($_SESSION['ngs_experiments'] == '') ){
-											echo $html->getRespBoxTableStream("Experiments", "experiments", ["id","Series Name","Summary","Design", "Selected"], ["id","experiment_name","summary","design", ""]);
+										<?php
+											$title_all_experiment = "Experiments";
+											$table_all_experiment = "experiments";
+											$table_filtered_experiment = "experiments_filtered";
+											$title_filtered_experiment = "<div style='color: #367fa9;'>Experiments</div>";
+											$fields_basic_experiment = ["id","Series Name","Summary","Design", "Selected"];
+											$tableKeys_basic_experiment = ["id","experiment_name","summary","design", ""];
+											$fields_extended_experiment = ["id","Series Name","Summary","Design", "Lab","Organization","Grant", "Selected"];
+											$tableKeys_extended_experiment = ["id","experiment_name","summary","design", "lab","organization","grant", ""];
+
+
+										 if(!isset($_SESSION['ngs_experiments']) || ($_SESSION['ngs_experiments'] == '') ){
+											echo $html->getRespBoxTableStream($title_all_experiment, $table_all_experiment, $fields_basic_experiment, $tableKeys_basic_experiment);
 										} else{
-											echo $html->getRespBoxTableStream("Experiments", "experiments", ["id","Series Name","Summary","Design", "Lab","Organization","Grant", "Selected"], ["id","experiment_name","summary","design", "lab","organization","grant", ""]);
+											echo $html->getRespBoxTableStream($title_all_experiment, $table_all_experiment, $fields_extended_experiment, $tableKeys_extended_experiment);
 										}?>
+									</div>
+									<div id="experiments_filtered_by_selection" class="margin" style="display:none;">
+										<?php 
+										if(!isset($_SESSION['ngs_experiments']) || ($_SESSION['ngs_experiments'] == '') ){
+											echo $html->getRespBoxTableStreamNoExpand($title_filtered_experiment, $table_filtered_experiment, $fields_basic_experiment, $tableKeys_basic_experiment);
+										} else{
+											echo $html->getRespBoxTableStreamNoExpand($title_filtered_experiment, $table_filtered_experiment, $fields_extended_experiment, $tableKeys_extended_experiment);
+										}
+										 ?>
 									</div>
 								</div>
 								<div class="tab-pane" id="browse_imports">
 									<div id="browse_import_data_table" class="margin">
-										<?php if(!isset($_SESSION['ngs_lanes']) || ($_SESSION['ngs_lanes'] == '') ){
-											echo $html->getRespBoxTableStream("Imports", "lanes", ["id","Import Name","Facility","Total Reads","Total Samples","Selected"], ["id","name","facility", "total_reads", "total_samples",""]);
+										<?php 
+											$title_all_import = "Imports";
+											$table_all_import = "lanes";
+											$table_filtered_import = "lanes_filtered";
+											$title_filtered_import = "<div style='color: #367fa9;'>Imports</div>";
+											$fields_basic_import = ["id","Import Name","Facility","Total Reads","Total Samples","Selected"];
+											$tableKeys_basic_import = ["id","name","facility", "total_reads", "total_samples",""];
+											$fields_extended_import = ["id","Import Name","Facility","Total Reads","Total Samples", "Cost", "Phix Requested", "Phix in Lane", "Notes", "Selected"];
+											$tableKeys_extended_import = ["id","name","facility", "total_reads", "total_samples", "cost", "phix_requested", "phix_in_lane", "notes", ""];
+
+										if(!isset($_SESSION['ngs_lanes']) || ($_SESSION['ngs_lanes'] == '') ){
+											echo $html->getRespBoxTableStream($title_all_import, $table_all_import, $fields_basic_import, $tableKeys_basic_import);
 										} else{
-											echo $html->getRespBoxTableStream("Imports", "lanes", ["id","Import Name","Facility","Total Reads","Total Samples", "Cost", "Phix Requested", "Phix in Lane", "Notes", "Selected"],
-																			  ["id","name","facility", "total_reads", "total_samples", "cost", "phix_requested", "phix_in_lane", "notes", ""]);
-										}?>
+											echo $html->getRespBoxTableStream($title_all_import, $table_all_import, $fields_extended_import, $tableKeys_extended_import);
+										}
+										?>
+									</div>
+									<div id="imports_filtered_by_selection" class="margin">
+										<?php 
+										if(!isset($_SESSION['ngs_lanes']) || ($_SESSION['ngs_lanes'] == '') ){
+											echo $html->getRespBoxTableStreamNoExpand($title_filtered_import, $table_filtered_import, $fields_basic_import, $tableKeys_basic_import);
+										} else{
+											echo $html->getRespBoxTableStreamNoExpand($title_filtered_import, $table_filtered_import, $fields_extended_import, $tableKeys_extended_import);
+										}
+										 ?>
 									</div>
 								</div>
 								<div class="tab-pane" id="browse_samples">
 									<div id="browse_sample_data_table" class="margin">
-										<?php if(!isset($_SESSION['ngs_samples']) || ($_SESSION['ngs_samples'] == '') ){
-											// echo $html->getRespBoxTableStream("Samples", "samples", ["id","Sample Name","Title","Source","Organism","Molecule","Backup","Selected"], ["id","name","title","source","organism","molecule","backup","total_reads"]);
+										<?php 
+											$title_all_sample = "Samples";
+											$table_all_sample = "samples";
+											$table_filtered_sample = "samples_filtered";
+											$title_filtered_sample = "<div style='color: #367fa9;'>Samples</div>";
+											$fields_basic_sample = ["id","Sample Name","Title","Source","Organism","Molecule","Backup","Selected"];
+											$tableKeys_basic_sample = ["id","name","title","source","organism","molecule","backup","total_reads"];
+											$fields_extended_sample = ["id","Sample Name","Title","Source","Organism","Molecule", "Backup", 
+												"Barcode", "Description", "Avg Insert Size", "Read Length", "Concentration", "Time", 
+												"Biological Replica", "Technical Replica", "Spike-ins", "Adapter", "Notebook Ref", "Notes", 
+												"Genotype", "Library Type", "Biosample Type", "Instrument Model", "Treatment Manufacturer","Selected"];
+											$tableKeys_extended_sample = ["id","name","title","source","organism","molecule","backup","total_reads",
+												"barcode", "description", "avg_insert_size", "read_length", "concentration", "time", 
+												"biological_replica", "technical_replica", "spike_ins", "adapter", "notebook_ref", "notes",
+												"genotype", "library_type", "biosample_type", "instrument_model", "treatment_manufacturer"];
+
+											if(!isset($_SESSION['ngs_samples']) || ($_SESSION['ngs_samples'] == '') ){
+												echo $html->getRespBoxTableStream($title_all_sample, $table_all_sample, $fields_basic_sample, $tableKeys_basic_sample);
+											} else{
+												echo $html->getRespBoxTableStream($title_all_sample, $table_all_sample, $fields_extended_sample, $tableKeys_extended_sample);
+											}
+										?>
+									</div>
+									<div id="samples_filtered_by_selection" class="margin">
+										<?php 
+										if(!isset($_SESSION['ngs_samples']) || ($_SESSION['ngs_samples'] == '') ){
+											echo $html->getRespBoxTableStreamNoExpand($title_filtered_sample, $table_filtered_sample, $fields_basic_sample, $tableKeys_basic_sample);
 										} else{
-											// echo $html->getRespBoxTableStream("Samples", "samples", ["id","Sample Name","Title","Source","Organism","Molecule", "Barcode", "Backup", "Description", "Avg Insert Size", "Read Length",
-											// 														"Concentration", "Time", "Biological Replica", "Technical Replica", "Spike-ins", "Adapter",
-											// 														"Notebook Ref", "Notes", "Genotype", "Library Type", "Biosample Type", "Instrument Model", "Treatment Manufacturer","Selected"],
-											// 														["id","name","title","source","organism","molecule","backup","total_reads", "barcode", "description", "avg_insert_size", "read_length",
-											// 														"concentration", "time", "biological_replica", "technical_replica", "spike_ins", "adapter",
-											// 														"notebook_ref", "notes", "genotype", "library_type", "biosample_type", "instrument_model", "treatment_manufacturer"]);
-										}?>
+											echo $html->getRespBoxTableStreamNoExpand($title_filtered_sample, $table_filtered_sample, $fields_extended_sample, $tableKeys_extended_sample);
+										}
+										 ?>										
 									</div>
 								</div>
 							</div>
-							<input type="button" class="btn btn-success margin pull-right" value="Edit Selected" onClick="editMultipleSamples()"/>
 							<div class="modal fade" id="editMultipleSamplesModal" tabindex="-1" role="dialog" aria-labelledby="editMultipleSamplesModalLabel" aria-hidden="true">
 								<div class="modal-dialog">
 								  <div class="modal-content">
@@ -174,5 +263,18 @@
 								</div>
 							</div><!-- End Edit Selected modal -->
 						</div><!-- /.col (RIGHT) -->
+						<div id="outer_e_and_i_and_s" style="width: 75%; padding: 25px !important;" class="pull-right">
+							<div id="outer_s" style="background-color:white;  padding: 0 !important;"  class="col-md-12 pull-right"><div id="s_details" class="col-md-11"></div></div>
+							<!-- <div id="filler_div" class="col-md-2 pull-right"></div> -->
+							<div id="outer_e_and_i"  style="background-color:white; padding: 0 !important;"  class="col-md-12 pull-right">
+								<div id="outer_e" class="col-md-6"><div id="e_details"class="col-md-10"></div></div>
+								<div id="outer_i" class="col-md-6"><div id="i_details" class="col-md-10"></div></div>
+							</div>
+						</div>
+						<div id="outer_top" class="col-md-9 pull-right" style="margin-top: 50px;">
+							<div id="back_to_top" class="col-md-9">
+								<a href="javascript:" id="return-to-top"><i class="glyphicon glyphicon-chevron-up"></i></a>
+							</div>
+						</div>
 					</div><!-- /.row -->
 				</section><!-- /.content -->
