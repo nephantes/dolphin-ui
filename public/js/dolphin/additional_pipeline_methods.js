@@ -428,16 +428,18 @@ function reloadChip(splt1, i){
 	var icon = createElement('i', ['class'],['fa fa-times']);
 	remove_button.appendChild(icon);
 	for(var z = 0; z < chip.length; z++){
+                console.log("z:"+z+" length"+chip.length);
 		var chiptable = $('#json_chiptable').dataTable();
+                console.log("Samples" + chip[z].samples)
 		chiptable.fnAddData([
 			'<textarea id="'+chip[z].name+'" class="form-control" type="text" value="'+chip[z].name+'" onChange="updateChipName(this)">'+chip[z].name+'</textarea>',
-			chip[z].samples.replace(/,/g, ", "),
-			chip[z].input.replace(/,/g, ", "),
+		        chip[z].samples.replace(/,/g, ", "),
+		        chip[z].input.replace(/,/g, ", "),
 			remove_button.outerHTML
 		]);
-		for(var k = 0; k < chip[z].samples.split(",").length; k++){
-			document.getElementById('0_1_'+ chip[z].samples.split(",")[k]).remove();
-		}
+		//for(var k = 0; k < chip[z].samples.split(",").length; k++){
+		//	document.getElementById('0_1_'+ chip[z].samples.split(",")[k]).remove();
+		//}
 	}
 	document.getElementById('textarea_params_'+i).value = splt1[i].Params.replace("__cr____cn__", "\n");
 	document.getElementById('text_multimap_'+i).value = splt1[i].MultiMapper;
