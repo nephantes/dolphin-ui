@@ -4,7 +4,7 @@ public/pub
 public/tmp/files/*
 .DS_Store
 .com.greenworldsoft.syncfolderspro
-public/progs/Requests
+public/progs/Requests/*
 scripts/seqmapping_workflow.txt
 scripts/workflowdefs.pyc
 scripts/dolphin_wrapper.pyc

@@ -32,6 +32,7 @@
 				<script src="<?php echo BASE_PATH?>/js/selectize/selectize.min.js"></script>
 		<script src='<?php echo BASE_PATH?>/js/dolphin/encode_funcs.js' type="text/javascript"></script>
 		<script src='<?php echo BASE_PATH?>/js/dolphin/encode_html.js' type="text/javascript"></script>
+                <script src="<?php echo BASE_PATH?>/js/dolphin/search_browse.js" type="text/javascript"></script>
 		<script>
 		  //$('.dropdown').css({'z-index' : 999999, 'position' : 'relative'});
 			//$('.modal-body').css({'overflow' : 'visible'});
