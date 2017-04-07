@@ -289,8 +289,8 @@ function getEditConditionHTML($cond_id, $condition, $cond_symbol,
 
 function addConditionToModal($sample_id) {
 	var editConditionDetails = document.getElementById('editConditionDetails');
-	var newCondID =  $('#conditionInputModal').val();
-
+	//var newCondID =  $('#conditionInputModal').val();
+	var newCondID =  $('#sample_conds_combobox').val();
 	 $.ajax({ type: "GET",
 		url: BASE_PATH+"/public/ajax/encode_tables.php",
 		data: { p: "getConditionsDetailsWithID", new_cond_id:newCondID },
