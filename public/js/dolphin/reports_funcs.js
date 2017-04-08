@@ -679,6 +679,7 @@ function populateTable(summary_files, samplenames, libraries, read_counts) {
 		console.log(table_data)
 		console.log(initial_mapping_table);
 		if (table_array.length > 0) {
+			tableElementRemoveTableArray(table_array[0].Sample, 'RSEM', 'RSEM')
 			tableElementRemoveTableArray(table_array[0].Sample, 'tophat', 'Tophat')
 			tableElementRemoveTableArray(table_array[0].Sample, 'chip', 'Chip')
 			tableElementRemoveTableArray(table_array[0].Sample, 'atac', 'Atac')

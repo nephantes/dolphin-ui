@@ -17,7 +17,7 @@ if(!isset($_SESSION['encode_log'])){
 $logloc = $_SESSION['encode_log'];
 $logfile = fopen($logloc, "a") or die("Unable to open file!");
 fwrite($logfile,"File Submission\n###########################################\n\n");
-fclose($logfile);
+
 
 function baselineJSON($dataset_acc, $replicate, $snq, $sub, $my_lab, $my_award, $filename, $platform, $dir_query, $efn){
 	$sample_name=$snq->samplename;
@@ -292,18 +292,26 @@ $run_type = "";
 
 //For each file
 echo '{"status":"start"}';
+fwrite($logfile,"{status:start}\n");
+
 foreach($sample_name_query as $snq){
 	$dataset_acc = $snq->experiment_acc;
 	$encValData = 'encValData';
 	$assembly = $snq->organism_symbol;
 	$replicate = "/replicates/" . $snq->replicate_uuid . "/";
 	$md5_sums = array();
+	fwrite($logfile,"{ACC:$dataset_acc}\n");
+	fwrite($logfile,"{assembly:$assembly}\n");
+	fwrite($logfile,"{replicates:$replicate}\n");
+
 	foreach($file_sub as $sub){
 		$file_accs = array();
 		$file_uuids = array();
 		$file_names = array();
 		$extended_file_names = array();
 		$fnc = 0;
+		fwrite($logfile,"{File Names: ".$sub->file_name."}\n");
+
 		if($sub->parent_file == 0){
 			$file_names = explode(",",$sub->file_name);
 			if(count($file_names) == 2){
@@ -422,13 +430,13 @@ foreach($sample_name_query as $snq){
 				'hdf5' => array(null => array(null)),
 				'gff' => array(null => array(null))
 			);
-			/*
+			
 			$validate_args = $validate_map[$data['file_format']][null];
 			$cmd = ENCODE_VALIDATE."/validateFiles " . $validate_args[0] . " " . $directory . $fn;
 			$VALIDATE = popen( $cmd, "r" );
 			$VALIDATE_READ =fread($VALIDATE, 2096);
 			pclose($VALIDATE);
-			*/
+
 			$VALIDATE_READ = "Error count 0\n";
 			if($VALIDATE_READ == "Error count 0\n"){
 				//	File Validation Passed
@@ -534,5 +542,6 @@ foreach($sample_name_query as $snq){
 		$step++;
 	}
 	echo ',{"status":"end"}';
+	fclose($logfile);
 }
 ?>
