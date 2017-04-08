@@ -475,8 +475,8 @@ function getDataInfo(){
 		if (protocol_ids.indexOf(sample_info[x].protocol_id) < 0 ){
 			protocol_ids.push(sample_info[x].protocol_id);
 		}
-		if (treatment_ids.indexOf(sample_info[x].treatment_id && sample_info[x].treatment_id != null) < 0 ){
-			treatment_ids.push(sample_info[x].treatment_id);
+		if (treatment_ids.indexOf(sample_info[x].id && sample_info[x].id != null) < 0 ){
+			treatment_ids.push(sample_info[x].id);
 		}
 		if (antibody_lot_ids.indexOf(sample_info[x].antibody_lot_id) < 0 && sample_info[x].antibody_lot_id != null){
 			antibody_lot_ids.push(sample_info[x].antibody_lot_id);

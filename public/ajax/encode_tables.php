@@ -181,13 +181,11 @@ else if($p == 'getTreatments')
 {
 	if (isset($_GET['samples'])){$samples = $_GET['samples'];}
 	$data=$query->queryTable("
-		SELECT *
-		FROM ngs_treatment
-		WHERE id in (
-			SELECT treatment_id
-			FROM ngs_samples
-			WHERE id in ($samples)
-		)
+		 SELECT nsc.id, nc.cond_symbol name, nc.condition treatment_term_name,   nc.treatment_term_id,
+							 nc.treatment_type, nsc.concentration, nsc.duration, nsc.concentration_unit concentration_units,
+							 nsc.duration_unit duration_units, nsc.uuid
+							 FROM ngs_sample_conds nsc, ngs_conds nc WHERE nc.id=nsc.cond_id
+							 and nsc.sample_id in ($samples)
 		");
 }
 else if($p == 'getBiosamples')
