@@ -8,6 +8,7 @@ import json
 import boto
 from boto.s3.connection import S3Connection
 from boto.s3.key import Key
+requests.packages.urllib3.disable_warnings()
 
 #grab commandline args
 file_path = sys.argv[1]
@@ -24,41 +25,40 @@ log = sys.argv[8]
 host = url
 print upload.split("/")[-1].split(".")[0]
 
-#connect
-conn = S3Connection(access_key, secret_key, security_token=session_token)
-Bucket = conn.get_bucket(bucket, validate=False)
-
-# Get file info
-source_path = file_path
-source_size = os.stat(source_path).st_size
+encoded_access_key = "JZZGVV5D"
+encoded_secret_access_key = '5grlay5j7mlpqo7h'
+headers = {
+    'Content-type': 'application/json',
+    'Accept': 'application/json',
+}
+r = requests.post(
+    host + 'files/'+upload.split("/")[-1].split(".")[0]+'/upload',
+    auth=(encoded_access_key, encoded_secret_access_key),
+    data=json.dumps({}),
+    headers=headers
+)
 try:
-    # Create a multipart upload request
-    mp = Bucket.initiate_multipart_upload(upload)
+    r.raise_for_status()
+except:
+    print(r.text)
+    raise
 
-    # Use a chunk size of 50 MiB
-    chunk_size = 52428800
-    chunk_count = int(math.ceil(source_size / float(chunk_size)))
+item = r.json()['@graph'][0];
+access_key = item['upload_credentials']['access_key'];
+secret_key = item['upload_credentials']['secret_key'];
+session_token = item['upload_credentials']['session_token'];
+upload = item['upload_credentials']['upload_url'];
+split = upload.split("/")
+upload_path = upload.split(split[2])[1]
+com = "export AWS_SESSION_TOKEN="+ session_token
+com = com + " && export AWS_ACCESS_KEY_ID="+ access_key 
+com = com + " && export AWS_SECRET_ACCESS_KEY="+ secret_key 
+com = com + " && aws s3 cp "+ file_path +" " + upload
 
-    # Send the file parts, using FileChunkIO to create a file-like object
-    # that points to a certain byte range within the original file. We
-    # set bytes to never exceed the original file size.
-    for i in range(chunk_count):
-        offset = chunk_size * i
-        bytes = min(chunk_size, source_size - offset)
-        with FileChunkIO(source_path, 'r', offset=offset, bytes=bytes) as fp:
-            mp.upload_part_from_file(fp, part_num=i + 1)
+print(com)
 
-    # Finish the upload
-    mp.complete_upload()
-except boto.exception.S3ResponseError as e:
-    print e
-
-#send whole file
-sys.stdout = open(log, 'a')
-try:
-    k = Key(Bucket)
-    k.name = upload_path 
-    k.set_contents_from_filename(file_path)
-    print '{"message":"passed"}'
-except boto.exception.S3ResponseError as e:
-    print e
+child = os.popen(com)
+response = child.read().rstrip()
+print(response)
+err = child.close()
+print(err)

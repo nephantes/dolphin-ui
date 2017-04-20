@@ -103,7 +103,7 @@ function baselineJSON($dataset_acc, $replicate, $snq, $sub, $my_lab, $my_award, 
 		$data['output_type'] = 'alignments';
 	}else if($sub->file_type == 'bigWig'){
 		$data['output_type'] = 'signal of all reads';
-	}else if($sub->file_type == 'tdf'){
+	}else if($sub->file_type == 'tsv'){
 		if(strpos($sub->file_name,".genes.results") !== false){
 			$data['output_type'] = 'gene quantifications';
 		}else{
@@ -185,11 +185,10 @@ function bamJSON($data, $sub, $my_lab, $sample_name, $run_type, $step_list, $gen
 	return $data;
 }
 
-function tdfJSON($data, $sub, $my_lab, $sample_name, $run_type, $step_list, $tdfcount, $genome){
-	//	TDF/TSV
+function tsvJSON($data, $sub, $my_lab, $sample_name, $run_type, $step_list, $tsvcount, $genome){
 	$data["file_format"] = 'tsv';
 	$data['assembly'] = $genome;
-	$data["aliases"] = array($my_lab.':tdf_'.$tdfcount.'_'.$sample_name.'_'.$sub->parent_file);
+	$data["aliases"] = array($my_lab.':tsv_'.$tsvcount.'_'.$sample_name.'_'.$sub->parent_file);
 	if($sub->step_run != NULL && $sub->step_run != ''){
 		$data['step_run'] = $sub->step_run;
 	}
@@ -276,7 +275,7 @@ $file_sub = json_decode($query->queryTable("
 	FROM ngs_file_submissions
 	LEFT JOIN ngs_runparams
 	ON ngs_file_submissions.run_id = ngs_runparams.id
-	WHERE sample_id = $sample_id
+	WHERE sample_id = $sample_id order by id
 	"), false);
 
 //Encoded access information
@@ -288,7 +287,7 @@ $my_lab = $experiment_info[0]->lab;
 $my_award = $experiment_info[0]->grant;
 
 $step = 0;
-$tdfcount = 0;
+$tsvcount = 0;
 $step_list = array();
 $run_type = "";
 
@@ -350,13 +349,16 @@ foreach($sample_name_query as $snq){
 				$data = fastqJSON($data, $sub, $my_lab, $snq->samplename, $run_type, $fn, $file_names, $step_list);
 			}else if($sub->file_type == 'bam'){
 				$data = bamJSON($data, $sub, $my_lab, $snq->samplename, $run_type, $step_list, $snq->organism_symbol);
-			}else if($sub->file_type == 'tdf'){
-				$data = tdfJSON($data, $sub, $my_lab, $snq->samplename, $run_type, $step_list, $tdfcount, $snq->organism_symbol);
-				$tdfcount++;
+			}else if($sub->file_type == 'tsv'){
+				$data = tsvJSON($data, $sub, $my_lab, $snq->samplename, $run_type, $step_list, $tsvcount, $snq->organism_symbol);
+				$tsvcount++;
 			}else if($sub->file_type == 'bigWig'){
 				$data = bigwigJSON($data, $sub, $my_lab, $snq->samplename, $run_type, $step_list, $snq->organism_symbol);
 			}else if($sub->file_type == 'peaks-bed'){
 				$data = bedJSON($data, $sub, $my_lab, $snq->samplename, $run_type, $step_list, $snq->organism_symbol);
+			}
+			if($sub->file_type != 'fastq'){
+			    $md5_sums = array();
 			}
 			array_push($md5_sums, $data["md5sum"]);
 			$gzip_types = array(
@@ -467,7 +469,7 @@ foreach($sample_name_query as $snq){
 				echo "<BR><BR>DATA:<br>";
 
 				$data_str = json_encode($data)."\n";
-				print_r($data);
+				print_r($data_str);
 				echo "<BR>";
 				if($sub->file_acc == NULL || $sub->file_acc == "" || $extra_tests){
 					$inputType = "POST";
@@ -529,7 +531,6 @@ foreach($sample_name_query as $snq){
 				###################
 				# POST file to S3 #
 				###################
-				$inserted = true;
 				if($inserted){
 					$creds = $item->{'upload_credentials'};
 					echo "<BR>CREDS:<BR>";
@@ -575,7 +576,7 @@ foreach($sample_name_query as $snq){
 		echo "<BR>file_uuids:<BR>";
 		print_r($file_uuids);	
 		echo "<BR>";
-		$inserted = false;
+		//$inserted = false;
 		if($inserted && end($file_names) == $fn){
 			$file_update = json_decode($query->runSQL("
 			UPDATE ngs_file_submissions
