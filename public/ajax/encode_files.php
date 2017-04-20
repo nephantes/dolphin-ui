@@ -10,7 +10,7 @@ $query = new dbfuncs();
 if (isset($_GET['sample_id'])){$sample_id = $_GET['sample_id'];}
 if (isset($_GET['experiment'])){$experiment = $_GET['experiment'];}
 if (isset($_GET['replicate'])){$replicate = $_GET['replicate'];}
-if(!isset($_SESSION['encode_log'])){
+if (!isset($_SESSION['encode_log'])) {
 	$_SESSION['encode_log'] = "../../tmp/encode/".$_SESSION['user']."_".date('Y-m-d-H-i-s').".log";
 }
 
@@ -38,6 +38,8 @@ function baselineJSON($dataset_acc, $replicate, $snq, $sub, $my_lab, $my_award, 
 		$read_length = 'unknown';
 	}
 	$paired = '';
+
+    print_r($sub);
 	if($sub->parent_file == 0){
 		$directory = $dir_query[0]->backup_dir;
 		if(substr($directory, -1) != '/'){
@@ -90,8 +92,8 @@ function baselineJSON($dataset_acc, $replicate, $snq, $sub, $my_lab, $my_award, 
 		"lab" => $my_lab,
 		"award" => $my_award,
 		"flowcell_details" => array(array("machine" => $machine_name),
-									array("flowcell" => $flowcell),
-									array("lane" => $lane))
+			array("flowcell" => $flowcell),
+			array("lane" => $lane))
 		
 	);
 	if($sub->file_type == 'fastq'){
@@ -101,7 +103,7 @@ function baselineJSON($dataset_acc, $replicate, $snq, $sub, $my_lab, $my_award, 
 		$data['output_type'] = 'alignments';
 	}else if($sub->file_type == 'bigWig'){
 		$data['output_type'] = 'signal of all reads';
-	}else if($sub->file_type == 'tdf'){
+	}else if($sub->file_type == 'tsv'){
 		if(strpos($sub->file_name,".genes.results") !== false){
 			$data['output_type'] = 'gene quantifications';
 		}else{
@@ -169,7 +171,7 @@ function fastqJSON($data, $sub, $my_lab, $sample_name, $run_type, $file, $file_n
 function bamJSON($data, $sub, $my_lab, $sample_name, $run_type, $step_list, $genome){
 	//	BAM
 	$data["file_format"] = 'bam';
-	$data['assembly'] = $genome;
+	$data["assembly"] = $genome;
 	$data["aliases"] = array($my_lab.':bam_'.$sample_name.'_'.$sub->parent_file);
 	if($sub->step_run != NULL && $sub->step_run != ''){
 		$data['step_run'] = $sub->step_run;
@@ -183,11 +185,10 @@ function bamJSON($data, $sub, $my_lab, $sample_name, $run_type, $step_list, $gen
 	return $data;
 }
 
-function tdfJSON($data, $sub, $my_lab, $sample_name, $run_type, $step_list, $tdfcount, $genome){
-	//	TDF/TSV
+function tsvJSON($data, $sub, $my_lab, $sample_name, $run_type, $step_list, $tsvcount, $genome){
 	$data["file_format"] = 'tsv';
 	$data['assembly'] = $genome;
-	$data["aliases"] = array($my_lab.':tdf_'.$tdfcount.'_'.$sample_name.'_'.$sub->parent_file);
+	$data["aliases"] = array($my_lab.':tsv_'.$tsvcount.'_'.$sample_name.'_'.$sub->parent_file);
 	if($sub->step_run != NULL && $sub->step_run != ''){
 		$data['step_run'] = $sub->step_run;
 	}
@@ -244,17 +245,17 @@ $experiment_info = json_decode($query->queryTable("
 	LEFT JOIN ngs_lab
 	ON ngs_lab.id = ngs_experiment_series.lab_id
 	WHERE ngs_experiment_series.id =
-	(SELECT series_id FROM ngs_samples WHERE id = $sample_id)"));
+	(SELECT series_id FROM ngs_samples WHERE id = $sample_id)"), false);
 $fastq_data = json_decode($query->queryTable("
 	SELECT *
 	FROM ngs_fastq_files
 	WHERE sample_id = $sample_id
-	"));
+	"), false);
 $dir_query=json_decode($query->queryTable("
 	SELECT fastq_dir, backup_dir, amazon_bucket
 	FROM ngs_dirs
 	WHERE id = " . $fastq_data[0]->dir_id
-	));
+	), false);
 $sample_name_query = json_decode($query->queryTable("
 	SELECT samplename, machine_name, flowcell, lane, read_length, organism_symbol, instrument_model, replicate_uuid,
 	ngs_experiment_acc.experiment_acc, replicate_uuid
@@ -268,14 +269,14 @@ $sample_name_query = json_decode($query->queryTable("
 	LEFT JOIN ngs_experiment_acc
 	ON ngs_samples.experiment_acc = ngs_experiment_acc.id
 	WHERE ngs_samples.id = $sample_id
-	"));
+	"), false);
 $file_sub = json_decode($query->queryTable("
 	SELECT ngs_file_submissions.id, file_name, file_type, parent_file, step_run, additional_derived_from, outdir, file_acc, file_uuid, file_md5
 	FROM ngs_file_submissions
 	LEFT JOIN ngs_runparams
 	ON ngs_file_submissions.run_id = ngs_runparams.id
-	WHERE sample_id = $sample_id
-	"));
+	WHERE sample_id = $sample_id order by id
+	"), false);
 
 //Encoded access information
 $encoded_access_key = ENCODE_ACCESS;
@@ -286,7 +287,7 @@ $my_lab = $experiment_info[0]->lab;
 $my_award = $experiment_info[0]->grant;
 
 $step = 0;
-$tdfcount = 0;
+$tsvcount = 0;
 $step_list = array();
 $run_type = "";
 
@@ -348,13 +349,16 @@ foreach($sample_name_query as $snq){
 				$data = fastqJSON($data, $sub, $my_lab, $snq->samplename, $run_type, $fn, $file_names, $step_list);
 			}else if($sub->file_type == 'bam'){
 				$data = bamJSON($data, $sub, $my_lab, $snq->samplename, $run_type, $step_list, $snq->organism_symbol);
-			}else if($sub->file_type == 'tdf'){
-				$data = tdfJSON($data, $sub, $my_lab, $snq->samplename, $run_type, $step_list, $tdfcount, $snq->organism_symbol);
-				$tdfcount++;
+			}else if($sub->file_type == 'tsv'){
+				$data = tsvJSON($data, $sub, $my_lab, $snq->samplename, $run_type, $step_list, $tsvcount, $snq->organism_symbol);
+				$tsvcount++;
 			}else if($sub->file_type == 'bigWig'){
 				$data = bigwigJSON($data, $sub, $my_lab, $snq->samplename, $run_type, $step_list, $snq->organism_symbol);
 			}else if($sub->file_type == 'peaks-bed'){
 				$data = bedJSON($data, $sub, $my_lab, $snq->samplename, $run_type, $step_list, $snq->organism_symbol);
+			}
+			if($sub->file_type != 'fastq'){
+			    $md5_sums = array();
 			}
 			array_push($md5_sums, $data["md5sum"]);
 			$gzip_types = array(
@@ -432,9 +436,16 @@ foreach($sample_name_query as $snq){
 			);
 			
 			$validate_args = $validate_map[$data['file_format']][null];
-			$cmd = ENCODE_VALIDATE."/validateFiles " . $validate_args[0] . " " . $directory . $fn;
+			$cmd = VALIDATE_ENCODE."/validateFiles " . $validate_args[0] . " $chromInfo " . $directory . $fn;
+			echo "<BR><BR>CMD:<br>";
+			echo($cmd);
+			echo "<BR>";
+
 			$VALIDATE = popen( $cmd, "r" );
 			$VALIDATE_READ =fread($VALIDATE, 2096);
+			echo "<BR><BR>VALIDATE READ:<br>";
+			echo($VALIDATE_READ);
+			echo "<BR>";
 			pclose($VALIDATE);
 
 			$VALIDATE_READ = "Error count 0\n";
@@ -455,10 +466,15 @@ foreach($sample_name_query as $snq){
 						$extra_tests = true;
 					}
 				}
+				echo "<BR><BR>DATA:<br>";
+
+				$data_str = json_encode($data)."\n";
+				print_r($data_str);
+				echo "<BR>";
 				if($sub->file_acc == NULL || $sub->file_acc == "" || $extra_tests){
 					$inputType = "POST";
 					$url = $server_start . 'file' . $server_end;
-					$response = Requests::post($url, $headers, json_encode($data), $auth);
+					$response = Requests::post($url, $headers, $data_str, $auth);
 					$body = json_decode($response->body);
 					$inserted = true;
 					array_push($file_accs, $body->{'@graph'}[0]->{'accession'});
@@ -493,33 +509,53 @@ foreach($sample_name_query as $snq){
 							$step_list[$step] = '/files/' . explode(",",$sub->file_acc)[0] . $server_end;
 						}
 					}
-					$response = Requests::patch($url, $headers, json_encode($data), $auth);
+					echo "<BR>$inputType URL:<BR>";
+					print_r($url);
+					echo "<BR>"; 
+					$response = Requests::patch($url, $headers, $data_str, $auth);
 					$body = json_decode($response->body);
 				}
-				
+				echo "<BR>BODY:<BR>";
+			        print_r($body);	
+				echo "<BR>";
 				$logloc = $_SESSION['encode_log'];
 				$logfile = fopen($logloc, "a") or die("Unable to open file!");
 				fwrite($logfile, $inputType."\n".$response->body . "\n\n");
 				fclose($logfile);
 				
 				$item = $body->{'@graph'}[0];
-				
-				echo ','.$response->body;
+				echo "<BR>ITEM:<BR>";
+			        print_r($item);	
+				echo "<BR>";
 				
 				###################
 				# POST file to S3 #
 				###################
 				if($inserted){
 					$creds = $item->{'upload_credentials'};
+					echo "<BR>CREDS:<BR>";
+			        print_r($creds);
+					echo "<BR><BR>upload_url:";
+					print_r($creds->{'upload_url'});
+					echo "<BR>secret_key:";
+					print_r($creds->{'secret_key'});
+					echo "<BR>session_token:";
+					print_r($creds->{'session_token'});
+					echo "<BR>";
 					$cmd_aws_launch = "python ../../scripts/encode_file_submission.py " . $submissionfile . " " . $creds->{'access_key'} . " " .
 						$creds->{'secret_key'} . " " . $creds->{'upload_url'} . " " . $creds->{'session_token'} . " " .
 						ENCODE_URL . " " . ENCODE_BUCKET . " " . $_SESSION['encode_log'] . " &";
 					$AWS_COMMAND_DO = popen( $cmd_aws_launch, "r" );
 					$AWS_COMMAND_OUT = fread($AWS_COMMAND_DO, 2096);
 					pclose($AWS_COMMAND_DO);
-					//echo $cmd_aws_launch . "\n\n";
-					//echo ','.$AWS_COMMAND_OUT;
-					//echo ','.$cmd_aws_launch;
+					echo "<BR><BR>cmd_aws_launch:<BR>";
+			        print_r($cmd_aws_launch);
+					echo "<BR><BR>AWS_COMMAND_DO:";
+					print_r($AWS_COMMAND_DO);
+
+					echo "<BR><BR>AWS_COMMAND_OUT:";
+					print_r($AWS_COMMAND_OUT);
+					echo "<BR>";
 				}
 			}else{
 				//	File Validation Failed
@@ -531,6 +567,16 @@ foreach($sample_name_query as $snq){
 			}
 		}
 		//	Store uuid/acc in database
+		echo "<BR>md5_sums:<BR>";
+		print_r($md5_sums);	
+		echo "<BR>";
+		echo "<BR>file_accs:<BR>";
+		print_r($file_accs);	
+		echo "<BR>";
+		echo "<BR>file_uuids:<BR>";
+		print_r($file_uuids);	
+		echo "<BR>";
+		//$inserted = false;
 		if($inserted && end($file_names) == $fn){
 			$file_update = json_decode($query->runSQL("
 			UPDATE ngs_file_submissions

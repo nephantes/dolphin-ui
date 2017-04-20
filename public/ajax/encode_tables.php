@@ -424,7 +424,7 @@ else if ($p == 'enterFileSubmission')
 				}else{
 					$filename = $subdata['l'] . "$current_sample_name.fastq";
 				}
-			}else if($subdata['t'] == "tdf"){
+			}else if($subdata['t'] == "tsv"){
 				if(preg_match("/rsem/", $subdata['l'])){
 					if($subdata['l'] == "/rsem/genes"){
 						$filename = "/rsem/pipe.rsem.$current_sample_name/rsem.out.$current_sample_name.genes.results";
@@ -439,6 +439,9 @@ else if ($p == 'enterFileSubmission')
 			}else if($subdata['t'] == 'bigWig'){
 				if(preg_match("/rsem/", $subdata['l']) && !preg_match("/dedup/", $subdata['l'])){
 					$filename = $subdata['l'] . "rsem.out.$current_sample_name.bw";
+				}else  if(preg_match("/dedup/", $subdata['l']) || preg_match("/merge/", $subdata['l'])){
+					$filename = $subdata['l'] . "$current_sample_name.sorted.bw";
+
 				}else{
 					$filename = $subdata['l'] . "$current_sample_name.sorted.bw";
 				}
@@ -452,7 +455,7 @@ else if ($p == 'enterFileSubmission')
 				if(preg_match("/merge/", $subdata['l'])){
 					$merge = true;
 				}
-				if($dedup){
+				if($dedup || $merge){
 					$filename = $subdata['l'] . "$current_sample_name.bam";
 				}else if(preg_match("/rsem/", $subdata['l'])){
 					$filename = $subdata['l'] . "pipe.rsem.$current_sample_name/rsem.out.$current_sample_name.transcript.bam";
