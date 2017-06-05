@@ -83,12 +83,12 @@ else { $q = strtolower($q); }
 if ($p == 'getStatus')	//	Status tables
 {
 	$run_type = "";
-	if($_SESSION['run_type'] == 1){
+	if(isset($_SESSION['run_type']) && $_SESSION['run_type'] == 1){
 		$run_type = "WHERE ((run_name = 'Fastlane Initial Run') OR (run_name = 'Import Initial Run')) ";
 		if($uid != "" && $gids != "" && $_SESSION['uid'] != "1"){
 			$run_type .= "AND (((ngs_runparams.group_id in ($gids)) AND (ngs_runparams.perms >= 15)) OR (ngs_runparams.owner_id = $uid) OR (ngs_runparams.perms >= 32))";
 		}
-	}else if ($_SESSION['run_type'] == 2){
+	}else if (isset($_SESSION['run_type']) && $_SESSION['run_type'] == 2){
 		$run_type = "WHERE ((run_name != 'Fastlane Initial Run') AND (run_name != 'Import Initial Run')) ";
 		if($uid != "" && $gids != "" && $_SESSION['uid'] != "1"){
 			$run_type .= "AND (((ngs_runparams.group_id in ($gids)) AND (ngs_runparams.perms >= 15)) OR (ngs_runparams.owner_id = $uid) OR (ngs_runparams.perms >= 32))";
@@ -463,7 +463,7 @@ else	//	if there isn't a search term (experiments, lanes, samples)
 				$sample_perms = "WHERE (((ngs_samples.group_id in ($gids)) AND (ngs_samples.perms >= 15)) OR (ngs_samples.owner_id = $uid))";
 			}
 			if (isset($start)){$time="and `date_created`>='$start' and `date_created`<='$end'";}
-			$data=$query->queryTable("
+			$sql = "
 			SELECT ngs_samples.id, ngs_samples.series_id, ngs_samples.lane_id, name, samplename, title, source, organism, molecule, total_reads, barcode, description, avg_insert_size, read_length, concentration, time, biological_replica, technical_replica, spike_ins, adapter,
             notebook_ref, notes, genotype, library_type, biosample_type, instrument_model, treatment_manufacturer, ngs_samples.owner_id,backup_checksum,
 			$sampleBackup
@@ -472,7 +472,8 @@ else	//	if there isn't a search term (experiments, lanes, samples)
             $sampleJoin
             $sample_perms
             $time
-			");
+			";
+			$data=$query->queryTable($sql);
 		}
 	}
 }

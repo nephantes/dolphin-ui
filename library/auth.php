@@ -5,7 +5,7 @@ if (strpos(getcwd(), "travis/build") == 6){
   $_SESSION['user'] = 'travis';
 }
   
-if ($_SESSION['user'] == "")
+if (!isset($_SESSION['user']) || $_SESSION['user'] == "")
 {
   if(isset($_GET['p']) && $_GET['p'] == "verify" ){
     require_once("../includes/login.php");

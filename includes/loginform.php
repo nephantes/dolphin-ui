@@ -29,7 +29,7 @@
                         <input type="password" name="password" class="form-control" placeholder="Password"/>
                     </div>
                     <div class="text-center">
-                        <?php echo $loginfail ?>
+                        <?php echo "login failed"; ?>
                     </div>
                 </div>
                 <div class="footer">                                                               

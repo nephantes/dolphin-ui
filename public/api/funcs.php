@@ -1108,7 +1108,7 @@ class funcs
         return "RUNNING: $retval : $com";
       }
       */
-      
+       
       function dbMd5sumUpdate($params){
         $this->readINI();
         $backup_dir   = $params['backup_dir'];
@@ -1126,6 +1126,24 @@ class funcs
                 )";
         
         return $this->runSQL($sql);
+      }
+      function getAmazonBackupList(){
+          $sql = "SELECT id, file_name, s3bucket FROM amazon_backup where isnull(checksum) OR checksum = ''"; 
+          return $this->queryTable($sql);
+      }
+
+
+      function updateMD5sum($params){
+          $this->readINI();
+          $id    = $params['id'];
+          $md5sum       = $params['md5sum'];
+          $table        = $params['table'];
+          $field        = $params['field'];
+          $sql = "UPDATE $table 
+                SET $field = '$md5sum',
+                date_modified = NOW()
+                WHERE id = '$id'";
+          return $this->runSQL($sql);
       }
       //#######################################
 }

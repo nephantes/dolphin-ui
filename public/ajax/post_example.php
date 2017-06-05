@@ -11,26 +11,29 @@ $headers = array('Content-Type' => 'application/json', 'Accept' => 'application/
 $server_start = ENCODE_URL;
 $server_end = "/";
 $auth = array('auth' => array(ENCODE_ACCESS, ENCODE_SECRET));
-#$url = $server_start . $json_name . "/" . $acc . $server_end;
-$acc = "TSTFF433829";
-$url = $server_start . 'file' . "/" . $acc . $server_end;
+$url = $server_start . 'file' . $server_end;
+
 echo "<BR>URL:<BR>";
 print_r($url);
-echo "<BR>"; 
-$data =  array( "dataset" => "ENCSR740ROX",
-                 "replicate" => "/replicates/c7f6a50f-6c2f-49e8-993a-4fc3c7ec931c/",
-                 "file_size" => 1515485930,
-                 "md5sum" => "f127a914bdb1b8a6b4c68f2b0847c771",
-                 "platform" => "ENCODE:NextSeq500",
-                 "submitted_file_name" => "F33_MDDC_H3K27ac_Lps_1h.bam",
+echo "<BR>";
+
+$data =  array( "dataset" => "ENCSR536GUD",
+                 "replicate" => "/replicates/fd789497-7b9d-486d-a376-aa423cbb6c8c/",
+                 "file_size" => 1505194079,
+                 "md5sum" => "030d1ad82155f9779abd08c9ef9c8bb6",
+                 "platform" => "encode:HiSeq2000",
+                 "submitted_file_name" => "D01_MDDC_Lps_4h.bam",
                  "lab" => "manuel-garber",
                  "award" => "U01HG007910",
-                 "flowcell_details" => array ( array("machine" => "NB501205") , array("flowcell" => "HCFYGAFXX"), array("lane" => "1" )),
+                 "flowcell_details" => array ( array("machine" => "HWI-ST570") , array("flowcell" => "C5F36ACXX"), array("lane" => "2" )),
                  "output_type" => "alignments",
                  "file_format" => "bam",
                  "assembly" => "hg19",
-                 "aliases" => array ("manuel-garber:bam_F33_MDDC_H3K27ac_Lps_1h_1" ),
-                 "step_run" => "manuel-garber:chip_pipeline_fastq_alignment_step_run");
+                 "aliases" => array ("manuel-garber:bam_D01_MDDC_Lps_4h_2" ),
+                 "step_run" => "manuel-garber:pipeline_1_mapping_step_run",
+                 "derived_from" => array ("/files/ENCFF816SSU/","/files/ENCFF912WRB/","/files/ENCFF550VOB/","/files/ENCFF484VOS","/files/ENCFF123SSX")
+                 );
+
 
 
 echo "<BR>DATA:<BR>";
@@ -41,7 +44,7 @@ echo "<BR>encode:<BR>";
 print_r($data);
 echo "<BR>";
 
-$response = Requests::patch($url, $headers, $data, $auth);
+$response = Requests::post($url, $headers, $data, $auth);
 $body = json_decode($response->body);
 
 echo "<BR>BODY:<BR>";
