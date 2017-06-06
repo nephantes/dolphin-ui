@@ -170,7 +170,7 @@ if($p == 'getFilteredSampleData')
 	    "biosample_type", "instrument_model", "treatment_manufacturer"];
 	              
 	foreach( $fields_to_left_join as $field_join){
-	    $left_join_str .= "LEFT JOIN `ngs_$field`
+	    $left_join_str .= "LEFT JOIN `ngs_$field_join`
 			ON ngs_samples." . $field_join . "_id = ngs_" . $field_join . ".id
 			";
 	}

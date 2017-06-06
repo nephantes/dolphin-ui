@@ -440,8 +440,7 @@ else if ($p == 'enterFileSubmission')
 				if(preg_match("/rsem/", $subdata['l']) && !preg_match("/dedup/", $subdata['l'])){
 					$filename = $subdata['l'] . "rsem.out.$current_sample_name.bw";
 				}else  if(preg_match("/dedup/", $subdata['l']) || preg_match("/merge/", $subdata['l'])){
-					$filename = $subdata['l'] . "$current_sample_name.sorted.bw";
-
+					$filename = $subdata['l'] . "$current_sample_name.bw";
 				}else{
 					$filename = $subdata['l'] . "$current_sample_name.sorted.bw";
 				}

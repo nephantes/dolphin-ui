@@ -18,9 +18,9 @@ if ($p == 'getAccessions')
 	$COMMAND_READ =trim(fread($COMMAND_OPEN, 4096));
 	$data = json_encode(str_replace("'", '"', $COMMAND_READ));
 	pclose($COMMAND_OPEN);
-	$cmd = "cd ../../scripts && rm $term*";
-	$COMMAND_OPEN = popen( $cmd, "r" );
-	pclose($COMMAND_OPEN);
+	#$cmd = "cd ../../scripts && rm $term*";
+	#$COMMAND_OPEN = popen( $cmd, "r" );
+	#pclose($COMMAND_OPEN);
 }else if ($p == 'insertSampleGEO'){
 	if (isset($_GET['experiment'])){$experiment = $_GET['experiment'];}
 	if (isset($_GET['lane'])){$lane = $_GET['lane'];}

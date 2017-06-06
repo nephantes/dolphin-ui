@@ -441,12 +441,12 @@ foreach($sample_name_query as $snq){
 			echo($cmd);
 			echo "<BR>";
 
-			$VALIDATE = popen( $cmd, "r" );
-			$VALIDATE_READ =fread($VALIDATE, 2096);
-			echo "<BR><BR>VALIDATE READ:<br>";
-			echo($VALIDATE_READ);
-			echo "<BR>";
-			pclose($VALIDATE);
+			//$VALIDATE = popen( $cmd, "r" );
+			//$VALIDATE_READ =fread($VALIDATE, 2096);
+			//echo "<BR><BR>VALIDATE READ:<br>";
+			//echo($VALIDATE_READ);
+			//echo "<BR>";
+			//pclose($VALIDATE);
 
 			$VALIDATE_READ = "Error count 0\n";
 			if($VALIDATE_READ == "Error count 0\n"){
@@ -471,6 +471,7 @@ foreach($sample_name_query as $snq){
 				$data_str = json_encode($data)."\n";
 				print_r($data_str);
 				echo "<BR>";
+
 				if($sub->file_acc == NULL || $sub->file_acc == "" || $extra_tests){
 					$inputType = "POST";
 					$url = $server_start . 'file' . $server_end;
