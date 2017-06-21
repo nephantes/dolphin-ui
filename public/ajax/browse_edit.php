@@ -101,12 +101,9 @@ if($p == 'getDirectoryInfoForSample')
 if($p == 'getRunsForSample')
 {
 	if (isset($_GET['sample_id'])){$sample_id = $_GET['sample_id'];}
-	$data=$query->queryTable("SELECT id, run_name
-		FROM ngs_runparams
-		WHERE id in(
-		SELECT run_id
-		FROM ngs_runlist
-		WHERE sample_id = $sample_id)");
+        $data=$query->queryTable("SELECT nr.id, nr.run_name
+                FROM ngs_runparams nr, ngs_runlist nl
+                WHERE nr.id = nl.run_id and nl.sample_id = $sample_id");
 }
 
 if($p == 'getTablesForSample')

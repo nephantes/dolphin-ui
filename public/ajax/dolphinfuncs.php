@@ -23,6 +23,30 @@ if($p == "getFileList")
      (f.backup_checksum='' or isnull(f.backup_checksum) or DATE(f.date_modified) <= DATE(NOW() - INTERVAL 2 MONTH))
     ");
 }
+else if($p == "getFileListGeneric")
+{
+    $data=$query->queryTable("
+   SELECT a.id, a.file_name, a.s3bucket, ac.aws_access_key_id ak, ac.aws_secret_access_key sk from amazon_backup a, amazon_credentials ac, group_amazon ga where a.group_id=ga.group_id and ac.id=ga.amazon_id AND (a.backup_checksum='' or isnull(a.backup_checksum) or DATE(a.date_modified) <= DATE(NOW() - INTERVAL 2 MONTH))
+    ");
+}
+if($p == "updateHashBackupGeneric")
+{
+   if (isset($_GET['file_id'])){$file_id = rawurldecode($_GET['file_id']);}
+   if (isset($_GET['hashstr'])){$hashstr = rawurldecode($_GET['hashstr']);}
+   $sql="
+   UPDATE  amazon_backup 
+   set backup_checksum='$hashstr',
+   date_modified=NOW()
+   where 
+   id = '$file_id'";
+   $data = $query->runSQL($sql);
+}
+else if($p == "getUnmatchedList")
+{
+    $data=$query->queryTable("
+   SELECT id, file_name, s3bucket, checksum,  date_modified from amazon_backup where (backup_checksum!='' and !isnull(backup_checksum) and checksum != backup_checksum )
+    ");
+}
 else if($p == "updateHashBackup")
 {
    if (isset($_GET['input'])){$input = rawurldecode($_GET['input']);}
