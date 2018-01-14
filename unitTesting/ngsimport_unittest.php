@@ -9,7 +9,7 @@ include 'library/vanillamodel.class.php';
 
 $_SESSION['uid'] = '1';
 $_SESSION['gids'] = '1';
-$_SESSION['user'] = 'docker';
+$_SESSION['user'] = 'kucukura';
 $_SESSION['group_id'] = '1';
 $_SESSION['security_id'] = '15';
 $_POST['group_id'] = '1';
@@ -113,20 +113,7 @@ class ngsimport_unittest extends PHPUnit_Framework_TestCase
 		
 		$ngsimport = new Ngsimport();
 		chdir('public');
-		foreach ($worksheetData as $worksheet) {
-			$objPHPExcel->setActiveSheetIndexByName($worksheet['worksheetName']);
-			$sheetData = $objPHPExcel->getActiveSheet()->toArray(null,true,true,true);
-			$parseArray = $ngsimport->parseExcel($gid, $uid, $worksheet, $sheetData, $passed_final_check);
-			$passed_final_check = $parseArray[0];
-			$this->assertEquals($parseArray[0], '1');
-		}
 		
-		foreach ($worksheetData as $worksheet) {
-			$objPHPExcel->setActiveSheetIndexByName($worksheet['worksheetName']);
-			$sheetData = $objPHPExcel->getActiveSheet()->toArray(null,true,true,true);
-			$out_string = $ngsimport->finalizeExcel($worksheet, $sheetData);
-			$this->assertEquals(strpos($out_string, "color='red'"), false);
-		}
 		chdir('../');
 		ob_end_clean();
 	}

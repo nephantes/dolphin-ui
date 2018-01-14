@@ -23,8 +23,8 @@ log = sys.argv[8]
 
 host = url
 print upload.split("/")[-1].split(".")[0]
-encoded_access_key = "SU45FB2Q"
-encoded_secret_access_key = 'rae76sr5bntlz5c6'
+encoded_access_key = '3WVUTVAP'
+encoded_secret_access_key = 'w22l5uyldnmnasrs'
 headers = {
     'Content-type': 'application/json',
     'Accept': 'application/json',
@@ -35,6 +35,8 @@ r = requests.post(
     data=json.dumps({}),
     headers=headers
 )
+print('files/'+upload.split("/")[-1].split(".")[0]+'/upload')
+
 try:
     r.raise_for_status()
 except:
@@ -42,9 +44,15 @@ except:
     raise
 
 item = r.json()['@graph'][0];
+print(item)
 access_key = item['upload_credentials']['access_key'];
 secret_key = item['upload_credentials']['secret_key'];
 session_token = item['upload_credentials']['session_token'];
+
+print(access_key)
+print(secret_key)
+print(session_token)
+
 upload = item['upload_credentials']['upload_url'];
 split = upload.split("/")
 upload_path = upload.split(split[2])[1]
@@ -52,7 +60,6 @@ upload_path = upload.split(split[2])[1]
 #connect
 conn = S3Connection(access_key, secret_key, security_token=session_token)
 Bucket = conn.get_bucket(bucket, validate=False)
-"""
 # Get file info
 source_path = file_path
 source_size = os.stat(source_path).st_size
@@ -71,13 +78,12 @@ try:
         offset = chunk_size * i
         bytes = min(chunk_size, source_size - offset)
         with FileChunkIO(source_path, 'r', offset=offset, bytes=bytes) as fp:
-    mp.upload_part_from_file(fp, part_num=i + 1)
+           mp.upload_part_from_file(fp, part_num=i + 1)
 
     # Finish the upload
     mp.complete_upload()
 except boto.exception.S3ResponseError as e:
     print e
-""" 
 #send whole file
 sys.stdout = open(log, 'a')
 try:
