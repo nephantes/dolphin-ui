@@ -47,8 +47,8 @@ before_script:
   # update database
   - sudo gzip -d db/biocoredb.sql.gz
   - sudo mysql -e "CREATE DATABASE biocore;" -uroot
-  - sudo mysql -e "CREATE USER 'docker'@'127.0.0.1' IDENTIFIED BY 'docker' GRANT ALL ON *.* TO 'docker'@'127.0.0.1';" -uroot
-  - sudo mysql --user=docker --password=docker biocore < db/biocoredb.sql
+  - sudo mysql -e "CREATE USER 'bioinfo'@'localhost' IDENTIFIED BY 'bioinfo2013'; GRANT ALL ON *.* TO 'bioinfo'@'localhost';" -uroot
+  - sudo mysql --user=bioinfo --password=bioinfo2013 biocore < db/biocoredb.sql
   - sudo mysql -e "use biocore; INSERT INTO amazon_credentials ( aws_access_key_id, aws_secret_access_key, bucket ) VALUES ( 'test_access', 'test_secret', 'test_bucket' );" -uroot
   - sudo mysql -e "use biocore; INSERT INTO ngs_organism (organism, organism_symbol) VALUES ('mousetest', 'mm10'); UPDATE ngs_samples SET organism_id = 1;" -uroot
   # other dependencies
