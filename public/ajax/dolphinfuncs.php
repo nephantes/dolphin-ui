@@ -33,7 +33,9 @@ if($p == "updateHashBackupGeneric")
 {
    if (isset($_GET['file_id'])){$file_id = rawurldecode($_GET['file_id']);}
    if (isset($_GET['hashstr'])){$hashstr = rawurldecode($_GET['hashstr']);}
-   $sql="UPDATE amazon_backup 
+
+   $sql="
+   UPDATE  amazon_backup 
    set backup_checksum='$hashstr',
    date_modified=NOW()
    where 
