@@ -114,12 +114,6 @@ class ngsimport_unittest extends PHPUnit_Framework_TestCase
 		$ngsimport = new Ngsimport();
 		chdir('public');
 		
-		foreach ($worksheetData as $worksheet) {
-			$objPHPExcel->setActiveSheetIndexByName($worksheet['worksheetName']);
-			$sheetData = $objPHPExcel->getActiveSheet()->toArray(null,true,true,true);
-			$out_string = $ngsimport->finalizeExcel($worksheet, $sheetData);
-			$this->assertEquals(strpos($out_string, "color='red'"), false);
-		}
 		chdir('../');
 		ob_end_clean();
 	}
