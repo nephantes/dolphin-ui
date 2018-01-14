@@ -71,7 +71,6 @@ class ngsquerydb_unittest extends PHPUnit_Framework_TestCase
 		$this->assertEquals(json_decode($data)[3]->id,'4');
 		$this->assertEquals(json_decode($data)[4]->id,'5');
 		$this->assertEquals(json_decode($data)[5]->id,'6');
-		$this->assertEquals(json_decode($data)[6]->id,'7');
 		ob_end_clean();
 	}
 	
@@ -80,7 +79,6 @@ class ngsquerydb_unittest extends PHPUnit_Framework_TestCase
 		$_GET['p'] = 'getAllLaneIds';
 		include("ngsquerydb.php");
 		$this->assertEquals(json_decode($data)[0]->id,'1');
-		$this->assertEquals(json_decode($data)[1]->id,'2');
 		ob_end_clean();
 	}
 	
@@ -89,7 +87,6 @@ class ngsquerydb_unittest extends PHPUnit_Framework_TestCase
 		$_GET['p'] = 'getAllExperimentIds';
 		include("ngsquerydb.php");
 		$this->assertEquals(json_decode($data)[0]->id,'1');
-		$this->assertEquals(json_decode($data)[1]->id,'2');
 		ob_end_clean();
 	}
 	
