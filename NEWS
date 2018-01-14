@@ -1,3 +1,6 @@
+VERSION:	0.9.8
+DETAILS:	-encode changes
+
 VERSION:	0.9.7
 DETAILS:	-https support
 		-ngs browser simplified
