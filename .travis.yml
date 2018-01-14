@@ -42,12 +42,12 @@ before_script:
   - sudo a2enmod actions
   - sudo a2enmod rewrite
   - sudo service apache2 restart
-  - mysql -u root -e "CREATE USER 'myproject'@'localhost' IDENTIFIED BY 'mypass'"
-  - mysql -u root -e "GRANT ALL PRIVILEGES ON *.* TO 'myproject'@'localhost' WITH GRANT OPTION;"
+  - mysql -u root -e "CREATE USER 'myproject'@'127.0.0.1' IDENTIFIED BY 'mypass'"
+  - mysql -u root -e "GRANT ALL PRIVILEGES ON *.* TO 'myproject'@'127.0.0.1' WITH GRANT OPTION;"
   # update database
   - sudo gzip -d db/biocoredb.sql.gz
   - sudo mysql -e "CREATE DATABASE biocore;" -uroot
-  - sudo mysql -e "CREATE USER 'docker'@'localhost' IDENTIFIED BY 'docker' GRANT ALL ON *.* TO 'docker'@'localhost';" -uroot
+  - sudo mysql -e "CREATE USER 'docker'@'127.0.0.1' IDENTIFIED BY 'docker' GRANT ALL ON *.* TO 'docker'@'127.0.0.1';" -uroot
   - sudo mysql --user=docker --password=docker biocore < db/biocoredb.sql
   - sudo mysql -e "use biocore; INSERT INTO amazon_credentials ( aws_access_key_id, aws_secret_access_key, bucket ) VALUES ( 'test_access', 'test_secret', 'test_bucket' );" -uroot
   - sudo mysql -e "use biocore; INSERT INTO ngs_organism (organism, organism_symbol) VALUES ('mousetest', 'mm10'); UPDATE ngs_samples SET organism_id = 1;" -uroot
@@ -55,7 +55,7 @@ before_script:
   - sudo mkdir -p /home/travis/build/pub /home/travis/build/logs tmp/files tmp/logs tmp/logs/run4 tmp/logs/run5 tmp/logs/run6 tmp/logs/run7 tmp/logs/run8
   - sudo ln -s $(pwd) /var/www/dolphin
   - sudo ln -s /home/travis/build/pub public/pub
-  - printf "[Dolphin]\nSALT=test123\nPEPPER=test456\nMASTER=travis\nAMAZON=travis\nENCODE_ACCESS=test789\nENCODE_SECRET=test10\nVERIFY=test11\nDB_NAME=biocore\nDB_USER=docker\nDB_PASSWORD=docker\nDB_HOST=localhost\nDB_PORT=3306" > config/.salt
+  - printf "[Dolphin]\nSALT=test123\nPEPPER=test456\nMASTER=travis\nAMAZON=travis\nENCODE_ACCESS=test789\nENCODE_SECRET=test10\nVERIFY=test11\nDB_NAME=biocore\nDB_USER=docker\nDB_PASSWORD=docker\nDB_HOST=127.0.0.1\nDB_PORT=3306" > config/.salt
   - export PATH=$PATH:/usr/local/bin/dolphin-bin
   - sudo chmod -R 777 /home
   - DOLPHIN_PARAMS_SECTION=Travis
