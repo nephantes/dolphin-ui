@@ -15,10 +15,6 @@ if(isset($_GET['change'])){
 	}
 }
 
-$cmd = " mysql -u biocore --password=biocore2013 --xml -e 'SELECT * from biocore.ngs_runparams' > ./runparams.xml";
-$PID_COMMAND = popen( $cmd, "r" );
-pclose($PID_COMMAND);
-
 $runparams = json_decode($query->queryTable("
 	SELECT id, json_parameters
 	FROM ngs_runparams

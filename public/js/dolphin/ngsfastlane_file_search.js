@@ -44,7 +44,9 @@ function queryDirectory() {
 		var R1 = [];
 		var R2 = [];
 		//	Grab files from directory
+		console.log(directory)
 		var file_list = directoryGrab(directory);;
+		console.log(file_list[0])
 		if (file_list[0] == "" || file_list[0].indexOf("ls: cannot") > -1) {
 			$('#errorModal').modal({
 				show: true

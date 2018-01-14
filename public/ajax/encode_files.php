@@ -301,6 +301,7 @@ foreach($sample_name_query as $snq){
 	$assembly = $snq->organism_symbol;
 	$replicate = "/replicates/" . $snq->replicate_uuid . "/";
 	$md5_sums = array();
+        echo "ACC:$dataset_acc";
 	fwrite($logfile,"{ACC:$dataset_acc}\n");
 	fwrite($logfile,"{assembly:$assembly}\n");
 	fwrite($logfile,"{replicates:$replicate}\n");
@@ -311,6 +312,7 @@ foreach($sample_name_query as $snq){
 		$file_names = array();
 		$extended_file_names = array();
 		$fnc = 0;
+                echo "{File Names: ".$sub->file_name."}<br>";
 		fwrite($logfile,"{File Names: ".$sub->file_name."}\n");
 
 		if($sub->parent_file == 0){
@@ -532,7 +534,7 @@ foreach($sample_name_query as $snq){
 				###################
 				# POST file to S3 #
 				###################
-				if($inserted){
+				if(!$inserted){
 					$creds = $item->{'upload_credentials'};
 					echo "<BR>CREDS:<BR>";
 			        print_r($creds);

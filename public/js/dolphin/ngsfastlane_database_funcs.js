@@ -158,9 +158,9 @@ function checkFastlaneInput(info_array){
 					{
 						var file_check = JSON.parse(s);
 						console.log(file_check);
-						if (file_check.Result != 'Ok' ){
-							error_out.push('(Input Files) ' + file_check.ERROR);
-						}
+						//if (file_check.Result != 'Ok' ){
+						//	error_out.push('(Input Files) ' + file_check.ERROR);
+						//}
 					}
 				});
 			}

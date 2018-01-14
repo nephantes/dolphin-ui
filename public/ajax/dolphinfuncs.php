@@ -1,6 +1,6 @@
 <?php
-//error_reporting(E_ERROR);
-error_reporting(E_ALL);
+error_reporting(E_ERROR);
+//error_reporting(E_ALL);
 ini_set('report_errors','on');
 
 require_once("../../config/config.php");
@@ -33,8 +33,7 @@ if($p == "updateHashBackupGeneric")
 {
    if (isset($_GET['file_id'])){$file_id = rawurldecode($_GET['file_id']);}
    if (isset($_GET['hashstr'])){$hashstr = rawurldecode($_GET['hashstr']);}
-   $sql="
-   UPDATE  amazon_backup 
+   $sql="UPDATE amazon_backup 
    set backup_checksum='$hashstr',
    date_modified=NOW()
    where 
