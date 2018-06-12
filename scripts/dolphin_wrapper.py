@@ -839,7 +839,8 @@ def main():
            amazon = dolphin.getAmazonCredentials(username)
            backupS3="Yes"
            amazonupload="No"
-           if (amazon != () and BACKUP):
+           #if (amazon != () and BACKUP):
+           if (amazon != ()):
               amazonupload     = "Yes"
 
            (inputdir, backup_dir, amazon_bucket, outdir) = dolphin.getDirs(runparamsid, isbarcode)

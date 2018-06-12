@@ -627,8 +627,8 @@ function createEncodeJson(json_type){
 			if (sample_info[x].experiment_acc != null) {
 				post_bool = false;
 			}
-                        json['target']='/targets/H3K27ac-human/'
-                        json["documents"]= ["/documents/342b2d20-53cf-4698-b7db-48fefe735f56/"]
+                        //json['target']='/targets/H3K27ac-human/'
+                        //json["documents"]= ["/documents/342b2d20-53cf-4698-b7db-48fefe735f56/"]
 			json = createJSON(json, x, experiment_terms, exp_index, lane_index, proto_index, treatment_index, antibody_index)
 		}else if (json_type == 'treatment') {
 			terms = treatment_terms;
@@ -814,6 +814,8 @@ function encodeSubmission(name, json, subType, type, table){
 			}
 		});
 	}else{
+		console.log("PATCH started")
+                console.log(name)
 		$.ajax({ type: "GET",
 			url: BASE_PATH + "/public/ajax/encode_patch.php",
 			data: { json_name: name, json_passed: json, accession: accs.toString() },
