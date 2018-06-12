@@ -9,9 +9,9 @@ $accs = explode(",", $accession);
 $server_start = ENCODE_URL;
 $server_end = "/";
 if(!isset($_SESSION['encode_log'])){
-		$_SESSION['encode_log'] = "../../tmp/encode/".$_SESSION['user']."_".date('Y-m-d-H-i-s').".log";
+	$_SESSION['encode_log'] = "../../tmp/encode/".$_SESSION['user']."_".date('Y-m-d-H-i-s').".log";
 }
-print "[".$_SESSION['encode_log']."]";
+#print "[".$_SESSION['encode_log']."]";
 $logloc = $_SESSION['encode_log'];
 $logfile = fopen($logloc, "a") or die("Unable to open file!");
 

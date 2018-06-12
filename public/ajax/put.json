@@ -1,0 +1,26 @@
+{
+    "schema_version": "18",
+    "biosample_type": "in vitro differentiated cells",
+    "assay_term_name": "ATAC-seq",
+    "possible_controls": [],
+    "aliases": [
+        "jeremy-luban:E91_MDDC_Ctrl_0h_ATAC-seq"
+    ],
+    "lab": "/labs/jeremy-luban/",
+    "biosample_term_name": "dendritic cell",
+    "biosample_term_id": "CL:0000451",
+    "award": "/awards/U01HG007910/",
+    "status": "in progress",
+    "internal_tags": [],
+    "submitted_by": "/users/b28a80d7-28ef-40c0-8060-25686893f642/",
+    "date_created": "2018-04-26T15:05:15.444357+00:00",
+    "internal_status": "unreviewed",
+    "dbxrefs": [],
+    "supersedes": [],
+    "references": [],
+    "alternate_accessions": [],
+    "description": "ATAC-seq",
+    "related_files": [],
+    "replicates": [],
+    "accession": "TSTSR406148"
+}
